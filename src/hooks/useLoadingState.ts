@@ -27,20 +27,15 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
 
     if (options.timeout) {
       setTimeout(() => {
-        setLoading((prev: LoadingState): LoadingState => {
-          if (prev.isLoading) {
-            options.onTimeout?.();
-            toast.error('Operation timed out', {
-              description: 'The request took too long to complete'
-            });
-            return {
-              ...prev,
-              isLoading: false,
-              state: 'error',
-              error: new Error('Operation timed out')
-            };
-          }
-          return prev;
+        setLoading({
+          isLoading: false,
+          state: 'error',
+          error: new Error('Operation timed out'),
+          message: 'Operation timed out'
+        });
+        options.onTimeout?.();
+        toast.error('Operation timed out', {
+          description: 'The request took too long to complete'
         });
       }, options.timeout);
     }
@@ -59,7 +54,8 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
     const newState: LoadingState = {
       isLoading: false,
       state: 'error',
-      error
+      error,
+      message: error.message
     };
     setLoading(newState);
     toast.error('Error', {
@@ -68,11 +64,11 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
   }, [setLoading]);
 
   const setProgress = useCallback((progress: number) => {
-    setLoading((prev: LoadingState): LoadingState => ({
-      ...prev,
+    setLoading({
+      ...loadingState,
       progress
-    }));
-  }, [setLoading]);
+    });
+  }, [setLoading, loadingState]);
 
   return {
     ...loadingState,
