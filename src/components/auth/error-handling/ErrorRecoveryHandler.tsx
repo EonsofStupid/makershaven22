@@ -33,9 +33,9 @@ export const ErrorRecoveryHandler: React.FC<ErrorRecoveryHandlerProps> = ({
       const { error: logError } = await supabase
         .from('auth_error_logs')
         .insert({
-          errorType: error.code || 'auth/internal-error',
-          errorMessage: error.message,
-          stackTrace: error.stack,
+          error_type: error.code || 'auth/internal-error',
+          error_message: error.message,
+          stack_trace: error.stack,
           metadata: {
             recoveryAttempts: recoveryState.attemptCount,
             lastAttempt: recoveryState.lastAttempt?.toISOString(),
