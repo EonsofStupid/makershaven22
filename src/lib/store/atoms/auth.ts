@@ -39,7 +39,7 @@ export const isAdminAtom = atom((get) => {
 
 // Writable atoms (setters)
 export const setSessionAtom = atom(
-  null,
+  (get) => get(sessionAtom),
   (_get, set, update: AuthSession | null) => {
     set(sessionAtom, update);
     if (!update) {
@@ -49,35 +49,35 @@ export const setSessionAtom = atom(
 );
 
 export const setUserAtom = atom(
-  null,
+  (get) => get(userAtom),
   (_get, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
 export const setAuthLoadingAtom = atom(
-  null,
+  (get) => get(authLoadingAtom),
   (_get, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
 export const setAuthErrorAtom = atom(
-  null,
+  (get) => get(authErrorAtom),
   (_get, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
 export const setOfflineAtom = atom(
-  null,
+  (get) => get(isOfflineAtom),
   (_get, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
 export const setIsTransitioningAtom = atom(
-  null,
+  (get) => get(isTransitioningAtom),
   (_get, set, update: boolean) => {
     set(isTransitioningAtom, update);
   }

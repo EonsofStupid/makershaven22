@@ -9,10 +9,24 @@ import { securityManager } from "@/lib/auth/SecurityManager";
 import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
 import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
 import { useLoadingState } from "@/hooks/useLoadingState";
+import { useAtom } from 'jotai';
+import { 
+  setSessionAtom,
+  setUserAtom,
+  setAuthLoadingAtom,
+  setAuthErrorAtom,
+  setIsTransitioningAtom
+} from '@/lib/store/atoms/auth';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
-  const { isLoading, message, startLoading, stopLoading, setError } = useLoadingState({
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
+  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
+  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
+  
+  const { isLoading, message, startLoading, stopLoading, setError: setLoadingError } = useLoadingState({
     timeout: 30000,
     onTimeout: () => {
       console.error('Auth initialization timed out');
@@ -34,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Error initializing security headers:', error);
-        setError(error instanceof Error ? error : new Error('Failed to initialize security'));
+        setLoadingError(error instanceof Error ? error : new Error('Failed to initialize security'));
       }
     };
 
@@ -55,6 +69,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting auth setup');
         startLoading('Setting up authentication...');
+        setLoading(true);
+        setIsTransitioning(true);
         
         try {
           sessionManager.startSession();
@@ -71,7 +87,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (sessionError.message.includes('refresh_token_not_found')) {
             console.log('Refresh token not found, signing out');
             await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
             stopLoading();
+            setIsTransitioning(false);
             return;
           }
           throw sessionError;
@@ -79,7 +98,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         console.log('Initial session check:', session?.user?.id || 'No session');
         await handleAuthChange(session);
-        stopLoading('success');
+        stopLoading();
+        setIsTransitioning(false);
 
       } catch (error) {
         console.error("Auth setup error:", error);
@@ -89,7 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setTimeout(setupAuth, retryDelay * retryCount);
         } else {
           setError(error instanceof Error ? error : new Error('Failed to initialize authentication'));
+          setIsTransitioning(false);
         }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -102,14 +125,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Auth state changed:', _event, session?.user?.id);
         startLoading('Updating authentication state...');
+        setIsTransitioning(true);
         await handleAuthChange(session);
-        stopLoading('success');
+        stopLoading();
       } catch (error) {
         console.error('Auth state change error:', error);
         setError(error instanceof Error ? error : new Error('Authentication error occurred'));
         toast.error('Authentication error', {
           description: 'There was a problem with your session. Please try signing in again.',
         });
+      } finally {
+        setIsTransitioning(false);
       }
     });
     
@@ -120,7 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       securityManager.cleanup();
       stopLoading();
     };
-  }, [handleAuthChange, startLoading, stopLoading, setError]);
+  }, [handleAuthChange, startLoading, stopLoading, setLoadingError, setSession, setUser, setLoading, setError, setIsTransitioning]);
 
   return (
     <AuthErrorBoundary>
