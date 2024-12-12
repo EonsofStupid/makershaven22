@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import { createAtomPair } from '@/lib/types/atom-types';
 
 export type LoadingState = {
   isLoading: boolean;
@@ -16,15 +15,16 @@ const defaultState: LoadingState = {
   error: null
 };
 
-const [loadingBaseAtom, loadingWritableAtom] = createAtomPair<LoadingState>({
-  default: defaultState,
-  onSet: (newState) => {
-    console.log('Loading state updated:', newState);
+export const loadingAtom = atom<LoadingState>(defaultState);
+export const setLoadingAtom = atom(
+  null,
+  (_, set, update: Partial<LoadingState>) => {
+    set(loadingAtom, (prev) => ({
+      ...prev,
+      ...update
+    }));
   }
-});
-
-export const loadingAtom = loadingBaseAtom;
-export const setLoadingAtom = loadingWritableAtom;
+);
 
 // Derived atoms for specific states
 export const isLoadingAtom = atom((get) => get(loadingAtom).isLoading);
