@@ -1,41 +1,11 @@
-import React from 'react';
-import { DayPicker } from 'react-day-picker';
-import { CustomComponents } from 'react-day-picker'; // Ensure correct import
+import type { DayPicker } from "react-day-picker";
 
-// Define your custom PrevButton component
-const MyCustomPrevButton = () => <button>Previous</button>;
-
-// Extend CustomComponents to include PrevButton if not present
-interface ExtendedCustomComponents extends CustomComponents {
-  PrevButton?: React.ReactNode;
-}
-
-const customComponents: Partial<ExtendedCustomComponents> = {
-  PrevButton: <MyCustomPrevButton />,
-  // ...other custom components
-};
-
-const Calendar: React.FC<CalendarProps> = ({
-  mode,
-  selected,
-  onSelect,
-  disabled,
-  initialFocus,
-  weekStartsOn,
-  className,
-}) => {
-  return (
-    <DayPicker
-      mode={mode}
-      selected={selected}
-      onSelect={onSelect}
-      disabled={disabled}
-      initialFocus={initialFocus}
-      weekStartsOn={weekStartsOn}
-      className={className}
-      components={customComponents} // Pass custom components here
-    />
-  );
-};
-
-export default Calendar;
+export type CalendarProps = {
+  mode?: "single" | "multiple" | "range";
+  selected?: Date | Date[] | { from?: Date; to?: Date } | undefined;
+  onSelect?: (date: Date | undefined) => void;
+  disabled?: (date: Date) => boolean;
+  initialFocus?: boolean;
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  className?: string;
+} & Partial<Pick<DayPicker, "mode" | "selected" | "onSelect" | "disabled" | "initialFocus">>;
