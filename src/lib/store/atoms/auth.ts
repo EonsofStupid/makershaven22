@@ -1,10 +1,5 @@
 import { atom } from 'jotai';
-import type { 
-  AuthSession, 
-  AuthUser, 
-  SecurityLog,
-  UserRole 
-} from '@/lib/auth/types/auth';
+import type { AuthSession, AuthUser, SecurityLog, UserRole } from '@/lib/auth/types/auth';
 
 // Base atoms
 export const sessionAtom = atom<AuthSession | null>(null);
@@ -38,9 +33,9 @@ export const isAdminAtom = atom((get) => {
 });
 
 // Setter atoms (Writable Atoms)
-export const setSessionAtom = atom(
+export const setSessionAtom = atom<AuthSession | null, AuthSession | null>(
   (get) => get(sessionAtom), // Read
-  (_, set, update: AuthSession | null) => { // Write
+  (_, set, update) => { // Write
     set(sessionAtom, update);
     if (!update) {
       set(userAtom, null);
@@ -48,51 +43,54 @@ export const setSessionAtom = atom(
   }
 );
 
-export const setUserAtom = atom(
+export const setUserAtom = atom<AuthUser | null, AuthUser | null>(
   (get) => get(userAtom), // Read
-  (_, set, update: AuthUser | null) => { // Write
+  (_, set, update) => { // Write
     set(userAtom, update);
   }
 );
 
-export const setAuthLoadingAtom = atom(
+export const setAuthLoadingAtom = atom<boolean, boolean>(
   (get) => get(authLoadingAtom), // Read
-  (_, set, update: boolean) => { // Write
+  (_, set, update) => { // Write
     set(authLoadingAtom, update);
   }
 );
 
-export const setAuthErrorAtom = atom(
+export const setAuthErrorAtom = atom<Error | null, Error | null>(
   (get) => get(authErrorAtom), // Read
-  (_, set, update: Error | null) => { // Write
+  (_, set, update) => { // Write
     set(authErrorAtom, update);
   }
 );
 
-export const setOfflineAtom = atom(
+export const setOfflineAtom = atom<boolean, boolean>(
   (get) => get(isOfflineAtom), // Read
-  (_, set, update: boolean) => { // Write
+  (_, set, update) => { // Write
     set(isOfflineAtom, update);
   }
 );
 
-export const setIsTransitioningAtom = atom(
+export const setIsTransitioningAtom = atom<boolean, boolean>(
   (get) => get(isTransitioningAtom), // Read
-  (_, set, update: boolean) => { // Write
+  (_, set, update) => { // Write
     set(isTransitioningAtom, update);
   }
 );
 
 // Action atoms
-export const appendSecurityLogAtom = atom(
+export const appendSecurityLogAtom = atom<SecurityLog[], SecurityLog>(
   (get) => get(securityLogsAtom), // Read
-  (get, set, log: SecurityLog) => { // Write
+  (get, set, log) => { // Write
     const currentLogs = get(securityLogsAtom);
     set(securityLogsAtom, [...currentLogs, log]);
   }
 );
 
-export const clearAuthStateAtom = atom(
+export const clearAuthStateAtom = atom<
+  { session: AuthSession | null; user: AuthUser | null; loading: boolean; error: Error | null; logs: SecurityLog[] },
+  void
+>(
   (get) => ({
     session: get(sessionAtom),
     user: get(userAtom),
@@ -110,7 +108,7 @@ export const clearAuthStateAtom = atom(
 );
 
 // RBAC utility atoms
-export const hasRoleAtom = atom(
+export const hasRoleAtom = atom<(requiredRole: UserRole | UserRole[]) => boolean>(
   (get) => (requiredRole: UserRole | UserRole[]) => {
     const userRole = get(userRoleAtom);
     if (!userRole) return false;
