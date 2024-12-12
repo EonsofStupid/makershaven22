@@ -8,12 +8,12 @@ import { AdminSidebarProvider } from "@/components/admin/dashboard/sidebar/Admin
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/auth/providers/QueryProvider";
 import { AuthProvider } from "@/components/auth/providers/AuthProvider";
-import { Provider as JotaiProvider } from 'jotai';
+import { StoreProvider } from '@/lib/store/providers/JotaiProvider';
 
 const App = () => {
   return (
     <ErrorBoundary>
-      <JotaiProvider>
+      <StoreProvider>
         <QueryProvider>
           <BrowserRouter>
             <AdminSidebarProvider>
@@ -46,7 +46,7 @@ const App = () => {
             </AdminSidebarProvider>
           </BrowserRouter>
         </QueryProvider>
-      </JotaiProvider>
+      </StoreProvider>
     </ErrorBoundary>
   );
 };
