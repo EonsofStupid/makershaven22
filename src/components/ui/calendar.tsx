@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import type { CalendarProps, CalendarComponents } from "@/types/ui/calendar";
+import type { CalendarProps } from "@/types/ui/calendar";
 
 function Calendar({
   mode = "single",
@@ -14,11 +14,6 @@ function Calendar({
   weekStartsOn = 0,
   className,
 }: CalendarProps) {
-  const components: CalendarComponents = {
-    IconLeft: ChevronLeft,
-    IconRight: ChevronRight,
-  };
-
   return (
     <DayPicker
       mode={mode}
@@ -60,7 +55,10 @@ function Calendar({
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
       }}
-      components={components}
+      components={{
+        IconLeft: ChevronLeft,
+        IconRight: ChevronRight,
+      }}
     />
   );
 }
