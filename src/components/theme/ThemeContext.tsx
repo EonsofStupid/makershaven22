@@ -1,10 +1,15 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { themeAtom } from '@/lib/store/atoms/theme';
+import { 
+  themeSettingsAtom, 
+  themeModeAtom, 
+  systemThemeAtom, 
+  effectiveThemeAtom,
+  updateThemeAtom 
+} from '@/lib/store/atoms/theme';
 import { Settings } from '@/components/admin/settings/types';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useEffect } from 'react';
 import { applyThemeToDocument } from './utils/themeUtils';
 
 interface ThemeProviderProps {
@@ -12,19 +17,36 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme, setTheme] = useAtom(themeAtom);
+  const [themeSettings] = useAtom(themeSettingsAtom);
+  const [themeMode] = useAtom(themeModeAtom);
+  const [, setSystemTheme] = useAtom(systemThemeAtom);
+  const [effectiveTheme] = useAtom(effectiveThemeAtom);
+  const [, updateTheme] = useAtom(updateThemeAtom);
 
+  // Handle system theme changes
   useEffect(() => {
-    if (theme) {
-      applyThemeToDocument(theme);
-    }
-  }, [theme]);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? 'dark' : 'light');
+    };
 
-  const updateTheme = async (newTheme: Settings) => {
+    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [setSystemTheme]);
+
+  // Apply theme settings to document
+  useEffect(() => {
+    if (themeSettings) {
+      applyThemeToDocument(themeSettings);
+      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
+    }
+  }, [themeSettings, effectiveTheme]);
+
+  const handleThemeUpdate = async (newTheme: Settings) => {
     try {
       const { error } = await supabase.rpc('update_site_settings', {
         p_site_title: newTheme.site_title,
-        p_tagline: newTheme.tagline,
         p_primary_color: newTheme.primary_color,
         p_secondary_color: newTheme.secondary_color,
         p_accent_color: newTheme.accent_color,
@@ -46,8 +68,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
       if (error) throw error;
       
-      setTheme(newTheme);
-      applyThemeToDocument(newTheme);
+      updateTheme(newTheme);
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
@@ -56,8 +77,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   };
 
   const contextValue = {
-    theme,
-    updateTheme
+    theme: themeSettings,
+    themeMode,
+    effectiveTheme,
+    updateTheme: handleThemeUpdate
   };
 
   return (
@@ -69,9 +92,13 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
 const ThemeContext = createContext<{
   theme: Settings | null;
+  themeMode: 'light' | 'dark' | 'system';
+  effectiveTheme: 'light' | 'dark';
   updateTheme: (theme: Settings) => void;
 }>({
   theme: null,
+  themeMode: 'system',
+  effectiveTheme: 'dark',
   updateTheme: () => {},
 });
 
