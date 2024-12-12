@@ -6,7 +6,7 @@ import type {
   UserRole 
 } from '@/lib/auth/types/auth';
 
-// Base primitive atoms
+// Base primitive atoms with proper write access
 export const sessionAtom = atom<AuthSession | null>(null);
 export const userAtom = atom<AuthUser | null>(null);
 export const authLoadingAtom = atom<boolean>(true);
@@ -37,10 +37,10 @@ export const isAdminAtom = atom((get) => {
   return role === 'admin' || role === 'super_admin';
 });
 
-// Writable atoms (setters)
+// Writable atoms (setters) with proper types
 export const setSessionAtom = atom(
-  (get) => get(sessionAtom),
-  (_get, set, update: AuthSession | null) => {
+  null, // Read function is not needed for setters
+  (get, set, update: AuthSession | null) => {
     set(sessionAtom, update);
     if (!update) {
       set(userAtom, null);
@@ -49,36 +49,36 @@ export const setSessionAtom = atom(
 );
 
 export const setUserAtom = atom(
-  (get) => get(userAtom),
-  (_get, set, update: AuthUser | null) => {
+  null,
+  (get, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
 export const setAuthLoadingAtom = atom(
-  (get) => get(authLoadingAtom),
-  (_get, set, update: boolean) => {
+  null,
+  (get, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
 export const setAuthErrorAtom = atom(
-  (get) => get(authErrorAtom),
-  (_get, set, update: Error | null) => {
+  null,
+  (get, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
 export const setOfflineAtom = atom(
-  (get) => get(isOfflineAtom),
-  (_get, set, update: boolean) => {
+  null,
+  (get, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
 export const setIsTransitioningAtom = atom(
-  (get) => get(isTransitioningAtom),
-  (_get, set, update: boolean) => {
+  null,
+  (get, set, update: boolean) => {
     set(isTransitioningAtom, update);
   }
 );
@@ -94,7 +94,7 @@ export const appendSecurityLogAtom = atom(
 
 export const clearAuthStateAtom = atom(
   null,
-  (_get, set) => {
+  (get, set) => {
     set(sessionAtom, null);
     set(userAtom, null);
     set(authLoadingAtom, false);
