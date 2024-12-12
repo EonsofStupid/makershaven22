@@ -1,49 +1,45 @@
 import { atom } from 'jotai';
 import type { AuthUser, AuthSession } from '@/lib/auth/types/auth';
-import { createAtomPair } from '@/lib/types/atom-types';
 
-// Create atom pairs with proper typing
-const [sessionBaseAtom, sessionWritableAtom] = createAtomPair<AuthSession | null>({
-  default: null,
-  onSet: (newSession) => {
-    console.log('Session updated:', newSession?.user?.id);
+// Base atoms
+export const sessionAtom = atom<AuthSession | null>(null);
+export const userAtom = atom<AuthUser | null>(null);
+export const authLoadingAtom = atom<boolean>(true);
+export const authErrorAtom = atom<Error | null>(null);
+export const isOfflineAtom = atom<boolean>(!navigator.onLine);
+
+// Writable atoms
+export const setSessionAtom = atom(
+  (get) => get(sessionAtom),
+  (_get, set, session: AuthSession | null) => {
+    set(sessionAtom, session);
   }
-});
+);
 
-const [userBaseAtom, userWritableAtom] = createAtomPair<AuthUser | null>({
-  default: null,
-  onSet: (newUser) => {
-    console.log('User updated:', newUser?.id);
+export const setUserAtom = atom(
+  (get) => get(userAtom),
+  (_get, set, user: AuthUser | null) => {
+    set(userAtom, user);
   }
-});
+);
 
-const [loadingBaseAtom, loadingWritableAtom] = createAtomPair<boolean>({
-  default: true
-});
-
-const [errorBaseAtom, errorWritableAtom] = createAtomPair<Error | null>({
-  default: null,
-  onSet: (error) => {
-    if (error) {
-      console.error('Auth error:', error);
-    }
+export const setAuthLoadingAtom = atom(
+  (get) => get(authLoadingAtom),
+  (_get, set, loading: boolean) => {
+    set(authLoadingAtom, loading);
   }
-});
+);
 
-const [offlineBaseAtom, offlineWritableAtom] = createAtomPair<boolean>({
-  default: !navigator.onLine
-});
+export const setAuthErrorAtom = atom(
+  (get) => get(authErrorAtom),
+  (_get, set, error: Error | null) => {
+    set(authErrorAtom, error);
+  }
+);
 
-// Export read-only atoms
-export const sessionAtom = sessionBaseAtom;
-export const userAtom = userBaseAtom;
-export const authLoadingAtom = loadingBaseAtom;
-export const authErrorAtom = errorBaseAtom;
-export const isOfflineAtom = offlineBaseAtom;
-
-// Export writable atoms
-export const setSessionAtom = sessionWritableAtom;
-export const setUserAtom = userWritableAtom;
-export const setAuthLoadingAtom = loadingWritableAtom;
-export const setAuthErrorAtom = errorWritableAtom;
-export const setOfflineAtom = offlineWritableAtom;
+export const setOfflineAtom = atom(
+  (get) => get(isOfflineAtom),
+  (_get, set, offline: boolean) => {
+    set(isOfflineAtom, offline);
+  }
+);
