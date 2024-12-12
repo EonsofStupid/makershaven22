@@ -6,7 +6,7 @@ import type {
   UserRole 
 } from '@/lib/auth/types/auth';
 
-// Base primitive atoms with proper write access
+// Base writable atoms with proper write access
 export const sessionAtom = atom<AuthSession | null>(null);
 export const userAtom = atom<AuthUser | null>(null);
 export const authLoadingAtom = atom<boolean>(true);
@@ -37,9 +37,9 @@ export const isAdminAtom = atom((get) => {
   return role === 'admin' || role === 'super_admin';
 });
 
-// Writable atoms (setters) with proper types
-export const setSessionAtom = atom<null, [AuthSession | null], void>(
-  null,
+// Setter atoms with proper write types
+export const setSessionAtom = atom(
+  null, // Read function returns null since this is a setter
   (get, set, update: AuthSession | null) => {
     set(sessionAtom, update);
     if (!update) {
@@ -48,35 +48,35 @@ export const setSessionAtom = atom<null, [AuthSession | null], void>(
   }
 );
 
-export const setUserAtom = atom<null, [AuthUser | null], void>(
+export const setUserAtom = atom(
   null,
   (get, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
-export const setAuthLoadingAtom = atom<null, [boolean], void>(
+export const setAuthLoadingAtom = atom(
   null,
   (get, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
-export const setAuthErrorAtom = atom<null, [Error | null], void>(
+export const setAuthErrorAtom = atom(
   null,
   (get, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
-export const setOfflineAtom = atom<null, [boolean], void>(
+export const setOfflineAtom = atom(
   null,
   (get, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
-export const setIsTransitioningAtom = atom<null, [boolean], void>(
+export const setIsTransitioningAtom = atom(
   null,
   (get, set, update: boolean) => {
     set(isTransitioningAtom, update);
@@ -84,7 +84,7 @@ export const setIsTransitioningAtom = atom<null, [boolean], void>(
 );
 
 // Action atoms
-export const appendSecurityLogAtom = atom<null, [SecurityLog], void>(
+export const appendSecurityLogAtom = atom(
   null,
   (get, set, log: SecurityLog) => {
     const currentLogs = get(securityLogsAtom);
@@ -92,14 +92,14 @@ export const appendSecurityLogAtom = atom<null, [SecurityLog], void>(
   }
 );
 
-export const clearAuthStateAtom = atom<null, [], void>(
+export const clearAuthStateAtom = atom(
   null,
   (get, set) => {
-    set(sessionAtom, update => null);
-    set(userAtom, update => null);
-    set(authLoadingAtom, update => false);
-    set(authErrorAtom, update => null);
-    set(securityLogsAtom, update => []);
+    set(sessionAtom, null);
+    set(userAtom, null);
+    set(authLoadingAtom, false);
+    set(authErrorAtom, null);
+    set(securityLogsAtom, []);
   }
 );
 
