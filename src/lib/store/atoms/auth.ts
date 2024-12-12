@@ -5,81 +5,122 @@ import type {
   SecurityLog,
   UserRole 
 } from '@/lib/auth/types/auth';
+import type { 
+  AuthAtomValue, 
+  AuthWritableAtom 
+} from '@/lib/types/atom-types';
+
+// Helper function to create auth atoms with metadata
+function createAuthAtom<T>(initialValue: T): AuthWritableAtom<T> {
+  return atom<AuthAtomValue<T>>({
+    value: initialValue,
+    version: 0,
+    lastUpdated: new Date()
+  });
+}
 
 // Base atoms
-export const sessionAtom = atom<AuthSession | null>(null);
-export const userAtom = atom<AuthUser | null>(null);
-export const authLoadingAtom = atom<boolean>(true);
-export const authErrorAtom = atom<Error | null>(null);
-export const isOfflineAtom = atom<boolean>(!navigator.onLine);
-export const isTransitioningAtom = atom<boolean>(false);
-export const securityLogsAtom = atom<SecurityLog[]>([]);
+export const sessionAtom = createAuthAtom<AuthSession | null>(null);
+export const userAtom = createAuthAtom<AuthUser | null>(null);
+export const authLoadingAtom = createAuthAtom<boolean>(true);
+export const authErrorAtom = createAuthAtom<Error | null>(null);
+export const isOfflineAtom = createAuthAtom<boolean>(!navigator.onLine);
+export const isTransitioningAtom = createAuthAtom<boolean>(false);
+export const securityLogsAtom = createAuthAtom<SecurityLog[]>([]);
 
 // Derived read-only atoms
 export const isAuthenticatedAtom = atom((get) => {
-  const session = get(sessionAtom);
-  return !!session?.user;
+  const sessionState = get(sessionAtom);
+  return !!sessionState.value?.user;
 });
 
 export const userRoleAtom = atom((get) => {
-  const user = get(userAtom);
-  return user?.role || null;
+  const userState = get(userAtom);
+  return userState.value?.role || null;
 });
 
 export const hasValidSessionAtom = atom((get) => {
-  const session = get(sessionAtom);
-  if (!session?.expires_at) return false;
-  return new Date(session.expires_at * 1000) > new Date();
+  const sessionState = get(sessionAtom);
+  if (!sessionState.value?.expires_at) return false;
+  return new Date(sessionState.value.expires_at * 1000) > new Date();
 });
 
 export const isAdminAtom = atom((get) => {
-  const role = get(userRoleAtom);
-  return role === 'admin' || role === 'super_admin';
+  const roleState = get(userRoleAtom);
+  return roleState === 'admin' || roleState === 'super_admin';
 });
 
 // Setter atoms
 export const setSessionAtom = atom(
   null,
-  (_get, set, update: AuthSession | null) => {
-    set(sessionAtom, update);
+  (get, set, update: AuthSession | null) => {
+    set(sessionAtom, {
+      value: update,
+      version: get(sessionAtom).version + 1,
+      lastUpdated: new Date()
+    });
     if (!update) {
-      set(userAtom, null);
+      set(userAtom, {
+        value: null,
+        version: get(userAtom).version + 1,
+        lastUpdated: new Date()
+      });
     }
   }
 );
 
 export const setUserAtom = atom(
   null,
-  (_get, set, update: AuthUser | null) => {
-    set(userAtom, update);
+  (get, set, update: AuthUser | null) => {
+    set(userAtom, {
+      value: update,
+      version: get(userAtom).version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
 export const setAuthLoadingAtom = atom(
   null,
-  (_get, set, update: boolean) => {
-    set(authLoadingAtom, update);
+  (get, set, update: boolean) => {
+    set(authLoadingAtom, {
+      value: update,
+      version: get(authLoadingAtom).version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
 export const setAuthErrorAtom = atom(
   null,
-  (_get, set, update: Error | null) => {
-    set(authErrorAtom, update);
+  (get, set, update: Error | null) => {
+    set(authErrorAtom, {
+      value: update,
+      version: get(authErrorAtom).version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
 export const setOfflineAtom = atom(
   null,
-  (_get, set, update: boolean) => {
-    set(isOfflineAtom, update);
+  (get, set, update: boolean) => {
+    set(isOfflineAtom, {
+      value: update,
+      version: get(isOfflineAtom).version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
 export const setIsTransitioningAtom = atom(
   null,
-  (_get, set, update: boolean) => {
-    set(isTransitioningAtom, update);
+  (get, set, update: boolean) => {
+    set(isTransitioningAtom, {
+      value: update,
+      version: get(isTransitioningAtom).version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
@@ -88,18 +129,22 @@ export const appendSecurityLogAtom = atom(
   null,
   (get, set, log: SecurityLog) => {
     const currentLogs = get(securityLogsAtom);
-    set(securityLogsAtom, [...currentLogs, log]);
+    set(securityLogsAtom, {
+      value: [...currentLogs.value, log],
+      version: currentLogs.version + 1,
+      lastUpdated: new Date()
+    });
   }
 );
 
 export const clearAuthStateAtom = atom(
   null,
-  (_get, set) => {
-    set(sessionAtom, null);
-    set(userAtom, null);
-    set(authLoadingAtom, false);
-    set(authErrorAtom, null);
-    set(securityLogsAtom, []);
+  (get, set) => {
+    set(sessionAtom, { value: null, version: get(sessionAtom).version + 1, lastUpdated: new Date() });
+    set(userAtom, { value: null, version: get(userAtom).version + 1, lastUpdated: new Date() });
+    set(authLoadingAtom, { value: false, version: get(authLoadingAtom).version + 1, lastUpdated: new Date() });
+    set(authErrorAtom, { value: null, version: get(authErrorAtom).version + 1, lastUpdated: new Date() });
+    set(securityLogsAtom, { value: [], version: get(securityLogsAtom).version + 1, lastUpdated: new Date() });
   }
 );
 
