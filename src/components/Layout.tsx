@@ -1,9 +1,24 @@
-import { Link } from "react-router-dom";
-import { Menu, Search, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, Search, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { toast } from "sonner";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Successfully signed out");
+      navigate("/login");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -30,9 +45,17 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <button className="p-2 hover:bg-white/5 rounded-full transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                <User className="w-5 h-5" />
-              </Link>
+              {user?.role === 'admin' && (
+                <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                  <User className="w-5 h-5" />
+                </Link>
+              )}
+              <button
+                onClick={handleSignOut}
+                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
               <button
                 className="md:hidden p-2 hover:bg-white/5 rounded-full transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}

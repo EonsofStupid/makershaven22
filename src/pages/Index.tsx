@@ -16,7 +16,7 @@ const FeaturedPost = () => {
   };
 
   return (
-    <div className="glass-card p-6 mb-12 animate-fadeIn">
+    <div className="glass-card p-6 mb-12">
       <span className="inline-block px-3 py-1 bg-primary/20 text-primary rounded-full text-sm mb-4">
         Featured
       </span>
@@ -37,7 +37,7 @@ const FeaturedPost = () => {
           </div>
         </div>
         <Link
-          to={user ? "/post/1" : "/auth/login"}
+          to={user ? "/post/1" : "/login"}
           onClick={!user ? handleReadMore : undefined}
           className="flex items-center text-primary hover:text-primary/80 transition-colors"
         >
@@ -61,7 +61,7 @@ const PostCard = ({ delay, id }: { delay: number; id: number }) => {
 
   return (
     <div
-      className="glass-card p-6 animate-fadeIn"
+      className="glass-card p-6"
       style={{ animationDelay: `${delay}ms` }}
     >
       <img
@@ -82,7 +82,7 @@ const PostCard = ({ delay, id }: { delay: number; id: number }) => {
           <span>Mar 14, 2024</span>
         </div>
         <Link
-          to={user ? `/post/${id}` : "/auth/login"}
+          to={user ? `/post/${id}` : "/login"}
           onClick={!user ? handleReadMore : undefined}
           className="flex items-center text-primary hover:text-primary/80 transition-colors"
         >
@@ -94,6 +94,12 @@ const PostCard = ({ delay, id }: { delay: number; id: number }) => {
 };
 
 const Index = () => {
+  const { user } = useAuthStore();
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
   return (
     <Layout>
       <FeaturedPost />
