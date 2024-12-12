@@ -19,6 +19,7 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 import { AuthSession, AuthUser } from '@/lib/auth/types';
 import { toast } from 'sonner';
+import { authLogger } from '@/lib/auth/AuthLogger';
 
 export const useAuthStore = () => {
   // Read-only atoms
@@ -38,7 +39,7 @@ export const useAuthStore = () => {
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
 
   const handleAuthError = (error: Error) => {
-    console.error('Auth error:', error);
+    authLogger.error('Auth error:', error);
     setError(error);
     toast.error('Authentication error', {
       description: error.message
@@ -47,7 +48,7 @@ export const useAuthStore = () => {
 
   const signOut = async () => {
     try {
-      console.log('Signing out user:', user?.id);
+      authLogger.info('Signing out user:', user?.id);
       setLoading(true);
       setError(null);
       
@@ -63,6 +64,7 @@ export const useAuthStore = () => {
       setSession(null);
       setUser(null);
       
+      authLogger.info('Sign out successful');
       toast.success('Signed out successfully');
     } catch (error) {
       const authError = error instanceof Error ? error : new Error('Sign out failed');
@@ -76,12 +78,14 @@ export const useAuthStore = () => {
   const refreshSession = async () => {
     try {
       setLoading(true);
+      authLogger.info('Refreshing session');
       const { data: { session }, error } = await supabase.auth.refreshSession();
       if (error) throw error;
       
       if (session) {
         setSession(session as AuthSession);
         setUser(session.user as AuthUser);
+        authLogger.info('Session refreshed successfully');
       }
     } catch (error) {
       handleAuthError(error instanceof Error ? error : new Error('Session refresh failed'));
@@ -91,7 +95,7 @@ export const useAuthStore = () => {
   };
 
   const reset = () => {
-    console.log('Resetting auth store');
+    authLogger.info('Resetting auth store');
     setSession(null);
     setUser(null);
     setLoading(false);
