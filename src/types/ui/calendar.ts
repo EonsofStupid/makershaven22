@@ -10,10 +10,3 @@ export type CalendarProps = {
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   className?: string;
 };
-
-export type CalendarComponents = {
-  IconLeft?: LucideIcon;
-  IconRight?: LucideIcon;
-  IconToday?: LucideIcon;
-  IconCalendar?: LucideIcon;
-}
