@@ -21,16 +21,19 @@ export class SecurityLogger {
     metadata: Record<string, any> = {}
   ): Promise<string | null> {
     try {
-      const { data, error } = await supabase.rpc('log_security_event', {
-        p_user_id: userId,
-        p_event_type: eventType,
-        p_severity: severity,
-        p_category: category,
-        p_metadata: metadata
-      });
+      const { data, error } = await supabase
+        .from('security_events')
+        .insert({
+          user_id: userId,
+          event_type: eventType,
+          severity: severity,
+          details: metadata
+        })
+        .select()
+        .single();
 
       if (error) throw error;
-      return data;
+      return data?.id;
     } catch (error) {
       console.error('Failed to log security event:', error);
       return null;
@@ -40,7 +43,7 @@ export class SecurityLogger {
   public async getSecurityLogs(userId: string) {
     try {
       const { data, error } = await supabase
-        .from('auth_security_logs')
+        .from('security_events')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });

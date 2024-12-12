@@ -12,37 +12,37 @@ export const securityLogsAtom = atom<SecurityLog[]>([]);
 
 // Writable atoms
 export const setSessionAtom = atom(
-  (get) => get(sessionAtom),
+  null,
   (_get, set, update: AuthSession | null) => set(sessionAtom, update)
 );
 
 export const setUserAtom = atom(
-  (get) => get(userAtom),
+  null,
   (_get, set, update: AuthUser | null) => set(userAtom, update)
 );
 
 export const setAuthLoadingAtom = atom(
-  (get) => get(authLoadingAtom),
+  null,
   (_get, set, update: boolean) => set(authLoadingAtom, update)
 );
 
 export const setAuthErrorAtom = atom(
-  (get) => get(authErrorAtom),
+  null,
   (_get, set, update: Error | null) => set(authErrorAtom, update)
 );
 
 export const setOfflineAtom = atom(
-  (get) => get(isOfflineAtom),
+  null,
   (_get, set, update: boolean) => set(isOfflineAtom, update)
 );
 
 export const setIsTransitioningAtom = atom(
-  (get) => get(isTransitioningAtom),
+  null,
   (_get, set, update: boolean) => set(isTransitioningAtom, update)
 );
 
 export const setSecurityLogsAtom = atom(
-  (get) => get(securityLogsAtom),
+  null,
   (_get, set, update: SecurityLog[]) => set(securityLogsAtom, update)
 );
 
@@ -51,7 +51,7 @@ export const hasValidSessionAtom = atom(
   (get) => {
     const session = get(sessionAtom);
     if (!session) return false;
-    return session.isValid && new Date(session.expiresAt) > new Date();
+    return session.expires_at ? new Date(session.expires_at * 1000) > new Date() : false;
   }
 );
 
