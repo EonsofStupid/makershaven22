@@ -2,7 +2,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAtom } from 'jotai';
 import { 
-  sessionAtom,
   setSessionAtom,
   setAuthErrorAtom
 } from '@/lib/store/atoms/auth';
