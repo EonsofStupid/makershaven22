@@ -5,11 +5,6 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import type { CalendarProps, CalendarComponents } from "@/types/ui/calendar";
 
-const components: CalendarComponents = {
-  IconLeft: ChevronLeft,
-  IconRight: ChevronRight,
-};
-
 function Calendar({
   mode = "single",
   selected,
@@ -19,6 +14,11 @@ function Calendar({
   weekStartsOn = 0,
   className,
 }: CalendarProps) {
+  const components: CalendarComponents = {
+    IconLeft: ChevronLeft,
+    IconRight: ChevronRight,
+  };
+
   return (
     <DayPicker
       mode={mode}
