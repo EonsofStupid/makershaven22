@@ -56,8 +56,8 @@ function Calendar({
         day_hidden: "invisible",
       }}
       components={{
-        IconNext: ChevronRight,
-        IconPrevious: ChevronLeft,
+        PrevButton: ChevronLeft,
+        NextButton: ChevronRight,
       }}
     />
   );
