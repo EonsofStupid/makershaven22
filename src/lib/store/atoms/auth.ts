@@ -39,7 +39,7 @@ export const isAdminAtom = atom((get) => {
 });
 
 // Setter atoms
-export const setSessionAtom = atom(
+export const setSessionAtom: AuthWritableAtom<AuthSession | null> = atom(
   null,
   (_, set, update: AuthSession | null) => {
     set(sessionAtom, update);
@@ -49,35 +49,35 @@ export const setSessionAtom = atom(
   }
 );
 
-export const setUserAtom = atom(
+export const setUserAtom: AuthWritableAtom<AuthUser | null> = atom(
   null,
   (_, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
-export const setAuthLoadingAtom = atom(
+export const setAuthLoadingAtom: AuthWritableAtom<boolean> = atom(
   null,
   (_, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
-export const setAuthErrorAtom = atom(
+export const setAuthErrorAtom: AuthWritableAtom<Error | null> = atom(
   null,
   (_, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
-export const setOfflineAtom = atom(
+export const setOfflineAtom: AuthWritableAtom<boolean> = atom(
   null,
   (_, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
-export const setIsTransitioningAtom = atom(
+export const setIsTransitioningAtom: AuthWritableAtom<boolean> = atom(
   null,
   (_, set, update: boolean) => {
     set(isTransitioningAtom, update);
@@ -85,7 +85,7 @@ export const setIsTransitioningAtom = atom(
 );
 
 // Action atoms
-export const appendSecurityLogAtom = atom(
+export const appendSecurityLogAtom: AuthWritableAtom<SecurityLog> = atom(
   null,
   (get, set, log: SecurityLog) => {
     const currentLogs = get(securityLogsAtom);
@@ -93,7 +93,7 @@ export const appendSecurityLogAtom = atom(
   }
 );
 
-export const clearAuthStateAtom = atom(
+export const clearAuthStateAtom: AuthWritableAtom<null> = atom(
   null,
   (_, set) => {
     set(sessionAtom, null);
