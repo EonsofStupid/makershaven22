@@ -11,7 +11,7 @@ export const isOfflineAtom = atom<boolean>(!navigator.onLine);
 export const isTransitioningAtom = atom<boolean>(false);
 export const securityLogsAtom = atom<SecurityLog[]>([]);
 
-// Derived read-only atoms with proper typing
+// Derived read-only atoms
 export const isAuthenticatedAtom = atom<boolean>((get) => {
   const session = get(sessionAtom);
   return !!session?.user;
@@ -33,7 +33,7 @@ export const isAdminAtom = atom<boolean>((get) => {
   return role === 'admin' || role === 'super_admin';
 });
 
-// Setter atoms with proper write functions
+// Setter atoms
 export const setSessionAtom: AuthWritableAtom<AuthSession | null> = atom(
   (get) => get(sessionAtom),
   (_get, set, update) => {
@@ -79,7 +79,7 @@ export const setIsTransitioningAtom: AuthWritableAtom<boolean> = atom(
   }
 );
 
-// Action atoms with proper typing
+// Action atoms
 export const appendSecurityLogAtom = atom(
   (get) => get(securityLogsAtom),
   (get, set, log: SecurityLog) => {
@@ -105,7 +105,7 @@ export const clearAuthStateAtom = atom(
   }
 );
 
-// RBAC utility atoms with proper typing
+// RBAC utility atoms
 export const hasRoleAtom = atom(
   (get) => (requiredRole: UserRole | UserRole[]): boolean => {
     const userRole = get(userRoleAtom);
