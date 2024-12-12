@@ -10,7 +10,9 @@ import {
   setUserAtom,
   setAuthLoadingAtom,
   setAuthErrorAtom,
-  setOfflineAtom
+  setOfflineAtom,
+  isTransitioningAtom,
+  setIsTransitioningAtom
 } from './atoms/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
@@ -25,6 +27,7 @@ export const useAuthStore = () => {
   const [isLoading] = useAtom(authLoadingAtom);
   const [error] = useAtom(authErrorAtom);
   const [isOffline] = useAtom(isOfflineAtom);
+  const [isTransitioning] = useAtom(isTransitioningAtom);
   
   // Writable atoms
   const [, setSession] = useAtom(setSessionAtom);
@@ -32,20 +35,7 @@ export const useAuthStore = () => {
   const [, setLoading] = useAtom(setAuthLoadingAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [, setOffline] = useAtom(setOfflineAtom);
-
-  // Initialize offline detection
-  useEffect(() => {
-    const handleOnline = () => setOffline(false);
-    const handleOffline = () => setOffline(true);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [setOffline]);
+  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
 
   const handleAuthError = (error: Error) => {
     console.error('Auth error:', error);
@@ -116,6 +106,7 @@ export const useAuthStore = () => {
     isLoading,
     error,
     isOffline,
+    isTransitioning,
     
     // Setters
     setSession,
@@ -123,6 +114,7 @@ export const useAuthStore = () => {
     setLoading,
     setError,
     setOffline,
+    setIsTransitioning,
     
     // Actions
     signOut,
