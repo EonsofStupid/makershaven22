@@ -1,5 +1,11 @@
 import { useCallback, useRef } from 'react';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useAtom } from 'jotai';
+import { 
+  setSessionAtom,
+  setUserAtom,
+  setAuthLoadingAtom,
+  setAuthErrorAtom
+} from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
 import { useSessionManagement } from './auth/useSessionManagement';
 import { useAuthValidation } from './auth/useAuthValidation';
@@ -10,7 +16,10 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 
 export const useAuthSetup = () => {
-  const { setLoading, setError } = useAuthStore();
+  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
   const initialSetupDone = useRef(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout>();
   const retryAttempts = useRef(0);
@@ -36,7 +45,6 @@ export const useAuthSetup = () => {
           await attachCSRFToken();
           await validateAuthAttempt(session);
           
-          // Initialize security managers
           await sessionManager.startSession();
           securityManager.initialize();
           
@@ -105,7 +113,7 @@ export const useAuthSetup = () => {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt]);
+  }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt, setSession, setUser]);
 
   return { handleAuthChange, initialSetupDone };
 };

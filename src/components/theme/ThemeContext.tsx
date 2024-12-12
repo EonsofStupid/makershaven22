@@ -1,40 +1,27 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { Settings } from "@/components/admin/settings/types";
-import { useThemeSetup } from "./hooks/useThemeSetup";
-import { useThemeSubscription } from "./hooks/useThemeSubscription";
-import { applyThemeToDocument } from "./utils/themeUtils";
+import React, { createContext, useContext } from 'react';
+import { useAtom } from 'jotai';
+import { themeAtom } from '@/lib/store/atoms/theme';
+import { Settings } from '@/components/admin/settings/types';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useEffect } from 'react';
+import { applyThemeToDocument } from './utils/themeUtils';
 
-interface ThemeContextType {
-  theme: Settings | null;
-  updateTheme: (newTheme: Settings) => void;
+interface ThemeProviderProps {
+  children: React.ReactNode;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { theme, setTheme } = useThemeSetup();
-  const { session } = useAuthStore();
-  
-  useThemeSubscription(setTheme);
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [theme, setTheme] = useAtom(themeAtom);
 
   useEffect(() => {
-    console.log('ThemeProvider mounted, current theme:', theme?.site_title);
+    if (theme) {
+      applyThemeToDocument(theme);
+    }
   }, [theme]);
 
   const updateTheme = async (newTheme: Settings) => {
-    console.log('Updating theme with new settings:', newTheme.site_title);
-    
     try {
-      if (!session?.user) {
-        console.log('No active session, applying theme without persistence');
-        applyThemeToDocument(newTheme);
-        setTheme(newTheme);
-        return;
-      }
-
       const { error } = await supabase.rpc('update_site_settings', {
         p_site_title: newTheme.site_title,
         p_tagline: newTheme.tagline,
@@ -48,11 +35,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_neon_cyan: newTheme.neon_cyan,
         p_neon_pink: newTheme.neon_pink,
         p_neon_purple: newTheme.neon_purple,
-        p_border_radius: newTheme.border_radius,
-        p_spacing_unit: newTheme.spacing_unit,
-        p_transition_duration: newTheme.transition_duration,
-        p_shadow_color: newTheme.shadow_color,
-        p_hover_scale: newTheme.hover_scale,
         p_font_family_heading: newTheme.font_family_heading,
         p_font_family_body: newTheme.font_family_body,
         p_font_size_base: newTheme.font_size_base,
@@ -66,32 +48,36 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       
       setTheme(newTheme);
       applyThemeToDocument(newTheme);
-      toast.success("Theme updated successfully", {
-        description: "Your changes have been saved and applied"
-      });
+      toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
-      toast.error("Failed to update theme", {
-        description: "Please try again or contact support if the issue persists"
-      });
+      toast.error("Failed to update theme");
     }
   };
 
-  if (!theme) {
-    console.log("ThemeProvider: Theme not loaded yet");
-    return null;
-  }
+  const contextValue = {
+    theme,
+    updateTheme
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
+const ThemeContext = createContext<{
+  theme: Settings | null;
+  updateTheme: (theme: Settings) => void;
+}>({
+  theme: null,
+  updateTheme: () => {},
+});
+
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
