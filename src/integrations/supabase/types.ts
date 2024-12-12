@@ -109,6 +109,45 @@ export type Database = {
           },
         ]
       }
+      auth_error_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          error_type: string
+          id: string
+          metadata: Json | null
+          resolution_metadata: Json | null
+          resolved: boolean | null
+          resolved_at: string | null
+          stack_trace: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          error_type: string
+          id?: string
+          metadata?: Json | null
+          resolution_metadata?: Json | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          error_type?: string
+          id?: string
+          metadata?: Json | null
+          resolution_metadata?: Json | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
