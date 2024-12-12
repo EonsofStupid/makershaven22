@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { useAuthStore } from "@/lib/store/auth-store";
@@ -97,7 +97,7 @@ const Index = () => {
   const { user } = useAuthStore();
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return (

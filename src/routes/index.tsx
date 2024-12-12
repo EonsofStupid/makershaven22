@@ -10,17 +10,12 @@ import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
 import LandingPage from "@/pages/site/landing";
 import Index from "@/pages/Index";
+import Login from "@/pages/auth/login";
+import Register from "@/pages/auth/register";
 
 export const AppRoutes = () => {
   const { session, user, isLoading } = useAuthStore();
   
-  console.log('AppRoutes: Session state:', { 
-    userId: session?.user?.id,
-    role: user?.role,
-    isLoading,
-    hasSession: !!session
-  });
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -88,8 +83,22 @@ export const AppRoutes = () => {
           ))}
 
           {/* Auth routes */}
-          <Route path="/login" element={<AuthGuard requireAuth={false}>{/* Login component */}</AuthGuard>} />
-          <Route path="/register" element={<AuthGuard requireAuth={false}>{/* Register component */}</AuthGuard>} />
+          <Route 
+            path="/login" 
+            element={
+              <AuthGuard requireAuth={false}>
+                <Login />
+              </AuthGuard>
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <AuthGuard requireAuth={false}>
+                <Register />
+              </AuthGuard>
+            } 
+          />
 
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />

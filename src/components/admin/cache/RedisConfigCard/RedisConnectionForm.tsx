@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RedisConfig } from '../types';
 import { redisConfigAtom, updateRedisConfigAtom } from '@/lib/store/atoms/redis/redis-atoms';
 
 export const RedisConnectionForm = () => {
@@ -35,7 +36,7 @@ export const RedisConnectionForm = () => {
             <Label htmlFor="redis-host">Host</Label>
             <Input
               id="redis-host"
-              value={config.host || ''}
+              value={config.host}
               onChange={(e) => handleInputChange('host', e.target.value)}
               placeholder="localhost"
             />
@@ -45,9 +46,9 @@ export const RedisConnectionForm = () => {
             <Label htmlFor="redis-port">Port</Label>
             <Input
               id="redis-port"
-              type="number"
-              value={config.port || ''}
-              onChange={(e) => handleInputChange('port', parseInt(e.target.value))}
+              type="text"
+              value={config.port}
+              onChange={(e) => handleInputChange('port', e.target.value)}
               placeholder="6379"
             />
           </div>

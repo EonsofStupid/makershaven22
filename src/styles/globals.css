@@ -89,7 +89,7 @@
 
 /* Navigation elements */
 .nav-item {
-  @apply flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/80 hover:text-neon-cyan transition-all duration-300 hover:bg-white/5 relative group;
+  @apply flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/80 hover:text-neon-cyan transition-all duration-300 hover:bg-white/5 relative;
 }
 
 .nav-item-highlight {

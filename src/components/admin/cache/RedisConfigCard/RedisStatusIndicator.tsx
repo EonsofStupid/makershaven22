@@ -10,7 +10,7 @@ export const RedisStatusIndicator = () => {
   return (
     <CardContent className="flex items-center justify-between border-t">
       <span className="text-sm text-muted-foreground">Status</span>
-      <Badge variant={status.isConnected ? "success" : "destructive"}>
+      <Badge variant={status.isConnected ? "default" : "destructive"}>
         {status.isConnected ? "Connected" : "Disconnected"}
       </Badge>
       {status.error && (

@@ -1,10 +1,9 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import type { AuthSession } from '@/lib/auth/types/auth';
 
-// Base session atom with proper WritableAtom type
-export const sessionAtom = atom<AuthSession | null>(null);
+export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
 
-// Setter atom for session
 export const setSessionAtom = atom(
   (get) => get(sessionAtom),
   (_get, set, session: AuthSession | null) => {
@@ -12,7 +11,6 @@ export const setSessionAtom = atom(
   }
 );
 
-// Derived session states
 export const isAuthenticatedAtom = atom(
   (get) => !!get(sessionAtom)?.user
 );

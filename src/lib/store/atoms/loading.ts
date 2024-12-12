@@ -2,23 +2,22 @@ import { atom } from 'jotai';
 
 export interface LoadingState {
   isLoading: boolean;
-  state: 'idle' | 'loading' | 'success' | 'error';
   message?: string;
-  error?: Error | null;
   progress?: number;
+  details?: string;
 }
 
-// Base loading atom
 export const loadingAtom = atom<LoadingState>({
-  isLoading: false,
-  state: 'idle',
-  error: null,
+  isLoading: false
 });
 
-// Setter atom with proper typing
 export const setLoadingAtom = atom(
   (get) => get(loadingAtom),
-  (_get, set, update: LoadingState) => {
-    set(loadingAtom, update);
+  (_get, set, update: Partial<LoadingState> | ((prev: LoadingState) => LoadingState)) => {
+    if (typeof update === 'function') {
+      set(loadingAtom, (prev) => update(prev));
+    } else {
+      set(loadingAtom, (prev) => ({ ...prev, ...update }));
+    }
   }
 );
