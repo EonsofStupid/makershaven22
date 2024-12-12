@@ -1,11 +1,15 @@
-import { atom, useAtom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
 import { 
   sessionAtom, 
   userAtom, 
   authLoadingAtom, 
   authErrorAtom, 
-  isOfflineAtom 
+  isOfflineAtom,
+  setSessionAtom,
+  setUserAtom,
+  setAuthLoadingAtom,
+  setAuthErrorAtom,
+  setOfflineAtom
 } from './atoms/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
@@ -13,11 +17,17 @@ import { securityManager } from '@/lib/auth/SecurityManager';
 import { authLogger } from '@/lib/auth/AuthLogger';
 
 export const useAuthStore = () => {
-  const [session, setSession] = useAtom(sessionAtom);
-  const [user, setUser] = useAtom(userAtom);
-  const [isLoading, setLoading] = useAtom(authLoadingAtom);
-  const [error, setError] = useAtom(authErrorAtom);
-  const [isOffline, setOffline] = useAtom(isOfflineAtom);
+  const [session] = useAtom(sessionAtom);
+  const [user] = useAtom(userAtom);
+  const [isLoading] = useAtom(authLoadingAtom);
+  const [error] = useAtom(authErrorAtom);
+  const [isOffline] = useAtom(isOfflineAtom);
+  
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
+  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
+  const [, setOffline] = useAtom(setOfflineAtom);
 
   const signOut = async () => {
     try {

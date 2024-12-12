@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAtom } from 'jotai';
-import { sessionAtom, userAtom } from '@/lib/store/atoms/auth';
+import { 
+  sessionAtom, 
+  userAtom,
+  setSessionAtom,
+  setUserAtom
+} from '@/lib/store/atoms/auth';
 import { storeSessionLocally } from '@/utils/auth/offlineAuth';
 import { registerUserSession, cleanupUserSessions } from '@/utils/auth/sessionManager';
 import { handleSecurityEvent } from '@/utils/auth/securityHandlers';
@@ -9,20 +14,17 @@ import { attachCSRFToken, clearCSRFToken } from '@/utils/auth/csrfProtection';
 import { toast } from 'sonner';
 
 export const useSessionManagement = () => {
-  const [session, setSession] = useAtom(sessionAtom);
-  const [user, setUser] = useAtom(userAtom);
+  const [session] = useAtom(sessionAtom);
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
 
   const handleSessionUpdate = useCallback(async (session: any) => {
     if (session?.user) {
       try {
-        // Generate and attach CSRF token
         await attachCSRFToken();
-        
-        // Store session locally for offline access
         storeSessionLocally(session);
         await registerUserSession(session.user.id);
 
-        // Fetch user profile with role information
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
@@ -44,9 +46,8 @@ export const useSessionManagement = () => {
         
         await handleSecurityEvent(session.user.id, 'successful_auth', 'low');
 
-        // Set up refresh token timer
         const expiresIn = session.expires_in || 3600;
-        const refreshBuffer = 60; // Refresh 1 minute before expiry
+        const refreshBuffer = 60;
         const refreshTimeout = (expiresIn - refreshBuffer) * 1000;
         
         setTimeout(async () => {
@@ -67,7 +68,6 @@ export const useSessionManagement = () => {
         throw error;
       }
     } else {
-      // Clear session data
       storeSessionLocally(null);
       setSession(null);
       setUser(null);

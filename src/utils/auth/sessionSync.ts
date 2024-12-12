@@ -1,20 +1,20 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAtom } from 'jotai';
-import { sessionAtom, userAtom, authLoadingAtom, authErrorAtom, isOfflineAtom } from '@/lib/store/atoms/auth';
+import { 
+  sessionAtom,
+  setSessionAtom,
+  setAuthErrorAtom
+} from '@/lib/store/atoms/auth';
 
 const STORAGE_KEY = 'auth_session_state';
 const SYNC_CHANNEL = 'auth_sync_channel';
 
 export const initializeSessionSync = () => {
-  // Listen for storage events (cross-tab communication)
   window.addEventListener('storage', handleStorageChange);
-  
-  // Listen for online/offline events
   window.addEventListener('online', handleNetworkChange);
   window.addEventListener('offline', handleNetworkChange);
   
-  // Initialize broadcast channel for more reliable cross-tab communication
   const channel = new BroadcastChannel(SYNC_CHANNEL);
   channel.addEventListener('message', handleBroadcastMessage);
 
@@ -64,18 +64,16 @@ const handleNetworkChange = async () => {
 };
 
 const syncSessionState = async (newState: any) => {
-  const [, setSession] = useAtom(sessionAtom);
-  const [, setError] = useAtom(authErrorAtom);
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
   
   try {
     if (newState && newState.access_token) {
       setSession(newState);
       
-      // Broadcast the change to other tabs
       const channel = new BroadcastChannel(SYNC_CHANNEL);
       channel.postMessage({ type: 'SESSION_UPDATED', session: newState });
       
-      // Update local storage
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
     } else {
       setSession(null);
