@@ -50,6 +50,65 @@ export type Database = {
           },
         ]
       }
+      admin_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          setting_key: string
+          setting_type: string
+          setting_value: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          setting_key: string
+          setting_type?: string
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          setting_key?: string
+          setting_type?: string
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      admin_toolbar_shortcuts: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          position: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          position: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          position?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_toolbar_shortcuts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -295,28 +354,58 @@ export type Database = {
       }
       cms_content_revisions: {
         Row: {
+          change_summary: string | null
           content: Json
           content_id: string | null
           created_at: string | null
           created_by: string | null
+          diff: Json | null
           id: string
           metadata: Json | null
+          previous_version_id: string | null
+          publish_status: string | null
+          rollback_from: string | null
+          rollback_metadata: Json | null
+          rollback_type: string | null
+          scheduled_by: string | null
+          scheduled_publish_at: string | null
+          version_number: number | null
         }
         Insert: {
+          change_summary?: string | null
           content: Json
           content_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          diff?: Json | null
           id?: string
           metadata?: Json | null
+          previous_version_id?: string | null
+          publish_status?: string | null
+          rollback_from?: string | null
+          rollback_metadata?: Json | null
+          rollback_type?: string | null
+          scheduled_by?: string | null
+          scheduled_publish_at?: string | null
+          version_number?: number | null
         }
         Update: {
+          change_summary?: string | null
           content?: Json
           content_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          diff?: Json | null
           id?: string
           metadata?: Json | null
+          previous_version_id?: string | null
+          publish_status?: string | null
+          rollback_from?: string | null
+          rollback_metadata?: Json | null
+          rollback_type?: string | null
+          scheduled_by?: string | null
+          scheduled_publish_at?: string | null
+          version_number?: number | null
         }
         Relationships: [
           {
@@ -329,6 +418,27 @@ export type Database = {
           {
             foreignKeyName: "cms_content_revisions_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_content_revisions_previous_version_id_fkey"
+            columns: ["previous_version_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_content_revisions_rollback_from_fkey"
+            columns: ["rollback_from"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_content_revisions_scheduled_by_fkey"
+            columns: ["scheduled_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -427,6 +537,223 @@ export type Database = {
           },
         ]
       }
+      erd_visualizations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          data: Json
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erd_visualizations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_flags: {
+        Row: {
+          created_at: string | null
+          id: string
+          reason: string
+          reporter_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          thread_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reason: string
+          reporter_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          thread_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          thread_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_flags_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_flags_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_replies: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          thread_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          thread_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          thread_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "forum_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_threads: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_threads_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          file_name: string | null
+          file_size: number | null
+          id: string
+          metadata: Json | null
+          row_count: number | null
+          status: string
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          row_count?: number | null
+          status?: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          row_count?: number | null
+          status?: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maker_projects: {
         Row: {
           category: string
@@ -516,6 +843,82 @@ export type Database = {
           },
         ]
       }
+      pin_auth_logs: {
+        Row: {
+          attempt_type: string | null
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          success: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempt_type?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempt_type?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pin_auth_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      printer_builds: {
+        Row: {
+          author_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "printer_builds_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -525,17 +928,25 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          failed_login_attempts: number | null
+          failed_pin_attempts: number | null
           gamification_enabled: boolean | null
           id: string
           is_banned: boolean | null
+          last_login_at: string | null
+          last_password_login: string | null
           last_seen: string | null
           location: string | null
+          lockout_until: string | null
           onboarding_completed: boolean | null
+          pin_enabled: boolean | null
+          pin_hash: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
           updated_at: string
           username: string | null
+          visual_editor_enabled: boolean | null
           website: string | null
         }
         Insert: {
@@ -546,17 +957,25 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          failed_login_attempts?: number | null
+          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id: string
           is_banned?: boolean | null
+          last_login_at?: string | null
+          last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
+          lockout_until?: string | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
+          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string
           username?: string | null
+          visual_editor_enabled?: boolean | null
           website?: string | null
         }
         Update: {
@@ -567,17 +986,25 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          failed_login_attempts?: number | null
+          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id?: string
           is_banned?: boolean | null
+          last_login_at?: string | null
+          last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
+          lockout_until?: string | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
+          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string
           username?: string | null
+          visual_editor_enabled?: boolean | null
           website?: string | null
         }
         Relationships: [
@@ -586,6 +1013,64 @@ export type Database = {
             columns: ["banned_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publishing_queue: {
+        Row: {
+          content_id: string | null
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          processed_at: string | null
+          revision_id: string | null
+          scheduled_for: string
+          status: string | null
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          revision_id?: string | null
+          scheduled_for: string
+          status?: string | null
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          revision_id?: string | null
+          scheduled_for?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publishing_queue_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_queue_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_queue_revision_id_fkey"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
             referencedColumns: ["id"]
           },
         ]
@@ -631,10 +1116,164 @@ export type Database = {
           },
         ]
       }
+      revision_history: {
+        Row: {
+          changes: Json
+          created_at: string | null
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          revision_type: string
+        }
+        Insert: {
+          changes: Json
+          created_at?: string | null
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          revision_type: string
+        }
+        Update: {
+          changes?: Json
+          created_at?: string | null
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          revision_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_audit_logs: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_events: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          severity: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_logs: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           accent_color: string | null
+          backdrop_blur: string | null
           border_radius: string | null
+          box_shadow: string | null
           favicon_url: string | null
           font_family_body: string
           font_family_heading: string
@@ -646,24 +1285,36 @@ export type Database = {
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
+          neon_cyan: string | null
+          neon_pink: string | null
+          neon_purple: string | null
           primary_color: string | null
           secondary_color: string | null
+          security_settings: Json | null
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
           tagline: string | null
+          text_animation_color: string | null
+          text_animation_duration: string | null
+          text_animation_enabled: boolean | null
+          text_animation_type: string | null
           text_heading_color: string | null
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
           theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
+          transition_settings: Json | null
+          transition_type: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           accent_color?: string | null
+          backdrop_blur?: string | null
           border_radius?: string | null
+          box_shadow?: string | null
           favicon_url?: string | null
           font_family_body?: string
           font_family_heading?: string
@@ -675,24 +1326,36 @@ export type Database = {
           letter_spacing?: string
           line_height_base?: string
           logo_url?: string | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_settings?: Json | null
           shadow_color?: string | null
           site_title?: string
           spacing_unit?: string | null
           tagline?: string | null
+          text_animation_color?: string | null
+          text_animation_duration?: string | null
+          text_animation_enabled?: boolean | null
+          text_animation_type?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
+          transition_settings?: Json | null
+          transition_type?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           accent_color?: string | null
+          backdrop_blur?: string | null
           border_radius?: string | null
+          box_shadow?: string | null
           favicon_url?: string | null
           font_family_body?: string
           font_family_heading?: string
@@ -704,18 +1367,28 @@ export type Database = {
           letter_spacing?: string
           line_height_base?: string
           logo_url?: string | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_settings?: Json | null
           shadow_color?: string | null
           site_title?: string
           spacing_unit?: string | null
           tagline?: string | null
+          text_animation_color?: string | null
+          text_animation_duration?: string | null
+          text_animation_enabled?: boolean | null
+          text_animation_type?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
+          transition_settings?: Json | null
+          transition_type?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -728,6 +1401,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      text_animation_presets: {
+        Row: {
+          color: string
+          created_at: string | null
+          description: string | null
+          duration: string
+          id: string
+          name: string
+          timing_function: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          color: string
+          created_at?: string | null
+          description?: string | null
+          duration: string
+          id?: string
+          name: string
+          timing_function?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          duration?: string
+          id?: string
+          name?: string
+          timing_function?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transition_presets: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          settings: Json
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          settings?: Json
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          settings?: Json
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       trusted_devices: {
         Row: {
@@ -844,6 +1583,281 @@ export type Database = {
           },
         ]
       }
+      workflow_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          instance_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instance_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instance_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_comments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_comments_instance_id_fkey"
+            columns: ["instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_history: {
+        Row: {
+          action: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          instance_id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instance_id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          instance_id?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_history_instance_id_fkey"
+            columns: ["instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_instances: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          created_by: string | null
+          current_stage: number | null
+          id: string
+          metadata: Json | null
+          status: string | null
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_stage?: number | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          current_stage?: number | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instances_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string | null
+          workflow_instance_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean | null
+          title: string
+          type: string
+          user_id?: string | null
+          workflow_instance_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string | null
+          workflow_instance_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_notifications_workflow_instance_id_fkey"
+            columns: ["workflow_instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_stage_validation_rules: {
+        Row: {
+          created_at: string | null
+          id: string
+          rules: Json | null
+          stage_id: string
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rules?: Json | null
+          stage_id: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rules?: Json | null
+          stage_id?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_stage_validation_rules_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          notification_config: Json | null
+          stage_configs: Json | null
+          stage_types: Json | null
+          stages: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          notification_config?: Json | null
+          stage_configs?: Json | null
+          stage_types?: Json | null
+          stages?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          notification_config?: Json | null
+          stage_configs?: Json | null
+          stage_types?: Json | null
+          stages?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -864,6 +1878,30 @@ export type Database = {
         }
         Returns: undefined
       }
+      check_rate_limit: {
+        Args: {
+          p_user_id: string
+          p_action_type: string
+          p_max_count: number
+          p_time_window: string
+        }
+        Returns: boolean
+      }
+      create_rollback_revision: {
+        Args: {
+          p_content_id: string
+          p_target_version_number: number
+          p_current_content: Json
+          p_user_id: string
+        }
+        Returns: string
+      }
+      initialize_user_gamification: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
       record_user_activity: {
         Args: {
           p_user_id: string
@@ -872,6 +1910,27 @@ export type Database = {
           p_metadata?: Json
         }
         Returns: string
+      }
+      resend_2fa_code: {
+        Args: {
+          p_email: string
+        }
+        Returns: undefined
+      }
+      reset_pin_lockout: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      setup_pin: {
+        Args: {
+          p_user_id: string
+          p_pin: string
+          p_ip_address?: string
+          p_user_agent?: string
+        }
+        Returns: Json
       }
       update_site_settings:
         | {
@@ -973,6 +2032,22 @@ export type Database = {
             }
             Returns: Json
           }
+      verify_2fa_code: {
+        Args: {
+          p_code: string
+          p_email: string
+        }
+        Returns: Json
+      }
+      verify_pin_login: {
+        Args: {
+          p_user_id: string
+          p_pin: string
+          p_ip_address?: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       content_status: "draft" | "published" | "archived"
@@ -987,6 +2062,12 @@ export type Database = {
         | "3D Printer Hardware"
       theme_mode: "light" | "dark" | "system"
       user_role: "subscriber" | "maker" | "admin" | "super_admin"
+      workflow_stage_type:
+        | "approval"
+        | "review"
+        | "task"
+        | "notification"
+        | "conditional"
     }
     CompositeTypes: {
       [_ in never]: never
