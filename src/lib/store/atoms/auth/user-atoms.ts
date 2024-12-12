@@ -5,25 +5,26 @@ import type { AuthUser, UserRole } from '@/lib/auth/types/auth';
 export const userAtom = atom<AuthUser | null>(null);
 
 // Setter atom for user
-export const setUserAtom = atom<AuthUser | null, AuthUser | null>(
-  (get) => get(userAtom),
-  (_, set, update) => {
-    set(userAtom, update);
+export const setUserAtom = atom(
+  null,
+  (_get, set, user: AuthUser | null) => {
+    set(userAtom, user);
   }
 );
 
 // User role atoms
-export const userRoleAtom = atom((get) => {
-  const user = get(userAtom);
-  return user?.role || null;
-});
+export const userRoleAtom = atom(
+  (get) => get(userAtom)?.role || null
+);
 
-export const isAdminAtom = atom((get) => {
-  const role = get(userRoleAtom);
-  return role === 'admin' || role === 'super_admin';
-});
+export const isAdminAtom = atom(
+  (get) => {
+    const role = get(userRoleAtom);
+    return role === 'admin' || role === 'super_admin';
+  }
+);
 
-export const hasRoleAtom = atom<(requiredRole: UserRole | UserRole[]) => boolean>(
+export const hasRoleAtom = atom(
   (get) => (requiredRole: UserRole | UserRole[]) => {
     const userRole = get(userRoleAtom);
     if (!userRole) return false;

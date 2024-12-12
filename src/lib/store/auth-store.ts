@@ -2,21 +2,19 @@ import { useAtom } from 'jotai';
 import { 
   sessionAtom, 
   userAtom, 
-  authLoadingAtom, 
-  authErrorAtom, 
-  isOfflineAtom,
+  loadingStateAtom,
+  authErrorAtom,
   setSessionAtom,
   setUserAtom,
-  setAuthLoadingAtom,
+  setLoadingStateAtom,
   setAuthErrorAtom,
-  setOfflineAtom,
   isTransitioningAtom,
   setIsTransitioningAtom
 } from './atoms/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthSession, AuthUser, UserRole } from '@/lib/auth/types/auth';
+import { AuthSession, AuthUser } from '@/lib/auth/types/auth';
 import { toast } from 'sonner';
 import { authLogger } from '@/lib/auth/AuthLogger';
 
@@ -24,17 +22,15 @@ export const useAuthStore = () => {
   // Read-only atoms
   const [session] = useAtom(sessionAtom);
   const [user] = useAtom(userAtom);
-  const [isLoading] = useAtom(authLoadingAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
   const [error] = useAtom(authErrorAtom);
-  const [isOffline] = useAtom(isOfflineAtom);
   const [isTransitioning] = useAtom(isTransitioningAtom);
   
   // Writable atoms
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
-  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [, setLoading] = useAtom(setLoadingStateAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
-  const [, setOffline] = useAtom(setOfflineAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
 
   const handleAuthError = (error: Error) => {
@@ -48,7 +44,7 @@ export const useAuthStore = () => {
   const signOut = async () => {
     try {
       authLogger.info('Signing out user:', user?.id);
-      setLoading(true);
+      setLoading({ isLoading: true });
       setError(null);
       
       await sessionManager.handleSignOut();
@@ -67,23 +63,20 @@ export const useAuthStore = () => {
       handleAuthError(authError);
       throw error;
     } finally {
-      setLoading(false);
+      setLoading({ isLoading: false });
     }
   };
 
   const refreshSession = async () => {
     try {
-      setLoading(true);
+      setLoading({ isLoading: true });
       authLogger.info('Refreshing session');
       const { data: { session }, error } = await supabase.auth.refreshSession();
       if (error) throw error;
       
       if (session) {
         const authSession: AuthSession = {
-          user: {
-            ...session.user,
-            role: session.user.role as UserRole
-          },
+          user: session.user as AuthUser,
           expires_at: session.expires_at,
           access_token: session.access_token,
           refresh_token: session.refresh_token
@@ -96,7 +89,7 @@ export const useAuthStore = () => {
     } catch (error) {
       handleAuthError(error instanceof Error ? error : new Error('Session refresh failed'));
     } finally {
-      setLoading(false);
+      setLoading({ isLoading: false });
     }
   };
 
@@ -104,18 +97,17 @@ export const useAuthStore = () => {
     authLogger.info('Resetting auth store');
     setSession(null);
     setUser(null);
-    setLoading(false);
+    setLoading({ isLoading: false });
     setError(null);
-    setOffline(false);
+    setIsTransitioning(false);
   };
 
   return {
     // State
     session,
     user,
-    isLoading,
+    loadingState,
     error,
-    isOffline,
     isTransitioning,
     
     // Setters
@@ -123,7 +115,6 @@ export const useAuthStore = () => {
     setUser,
     setLoading,
     setError,
-    setOffline,
     setIsTransitioning,
     
     // Actions

@@ -6,7 +6,7 @@ export const authErrorAtom = atom<Error | null>(null);
 // Setter atom for errors
 export const setAuthErrorAtom = atom(
   null,
-  (_, set, error: Error | null) => {
+  (_get, set, error: Error | null) => {
     set(authErrorAtom, error);
   }
 );

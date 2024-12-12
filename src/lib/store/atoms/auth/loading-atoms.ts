@@ -29,15 +29,14 @@ export const loadingMessageAtom = atom(
 // Setter atoms
 export const setLoadingStateAtom = atom(
   null,
-  (get, set, update: Partial<LoadingState>) => {
-    const current = get(loadingStateAtom);
-    set(loadingStateAtom, { ...current, ...update });
+  (_get, set, update: Partial<LoadingState>) => {
+    set(loadingStateAtom, (prev) => ({ ...prev, ...update }));
   }
 );
 
 export const setIsTransitioningAtom = atom(
   null,
-  (_, set, update: boolean) => {
-    set(isTransitioningAtom, update);
+  (_get, set, isTransitioning: boolean) => {
+    set(isTransitioningAtom, isTransitioning);
   }
 );

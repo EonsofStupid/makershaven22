@@ -3,7 +3,7 @@ import { useAtom } from 'jotai';
 import { 
   setSessionAtom,
   setUserAtom,
-  setAuthLoadingAtom,
+  setLoadingStateAtom,
   setAuthErrorAtom
 } from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 
 export const useAuthSetup = () => {
-  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [, setLoading] = useAtom(setLoadingStateAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
