@@ -1,6 +1,6 @@
-import { DayPicker } from "react-day-picker";
+import type { DayPicker } from "react-day-picker";
 
-export interface CalendarProps extends React.ComponentProps<typeof DayPicker> {
+export interface CalendarProps {
   mode?: "single" | "multiple" | "range";
   selected?: Date | Date[] | { from: Date; to: Date };
   onSelect?: (date: Date | undefined) => void;

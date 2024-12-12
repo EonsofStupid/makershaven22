@@ -5,7 +5,6 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type TrustedDevice = Database["public"]["Tables"]["trusted_devices"]["Row"];
 export type Active2FASession = Database["public"]["Tables"]["active_2fa_sessions"]["Row"];
 export type RecoveryCode = Database["public"]["Tables"]["recovery_codes"]["Row"];
-export type PinAuthLog = Database["public"]["Tables"]["pin_auth_logs"]["Row"];
 
 export interface AuthTableDefinitions {
   profiles: {
