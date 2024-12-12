@@ -1,6 +1,8 @@
 export * from './auth';
-export * from './content';
-export * from './media';
-export * from './settings';
-export * from './activity';
 export * from './database';
+export * from './storage';
+
+// Re-export specific types that might be needed directly
+export type { UserRole } from './auth/roles';
+export type { AuthSession, AuthUser } from './auth/session';
+export type { SecurityLog } from './auth/security';
