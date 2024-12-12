@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
+import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
@@ -41,14 +42,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize security systems first
         try {
           sessionManager.startSession();
           securityManager.initialize();
           console.log('Security systems initialized');
         } catch (securityError) {
           console.error('Error initializing security systems:', securityError);
-          // Continue with auth setup even if security init fails
         }
 
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -105,13 +104,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [handleAuthChange]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      {children}
-    </motion.div>
+    <AuthErrorBoundary>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
+    </AuthErrorBoundary>
   );
 };
