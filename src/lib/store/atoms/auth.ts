@@ -6,7 +6,7 @@ import type {
   UserRole 
 } from '@/lib/auth/types/auth';
 
-// Base writable atoms with proper write access
+// Base atoms with proper typing
 export const sessionAtom = atom<AuthSession | null>(null);
 export const userAtom = atom<AuthUser | null>(null);
 export const authLoadingAtom = atom<boolean>(true);
