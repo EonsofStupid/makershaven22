@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useAtom } from 'jotai';
+import { sessionAtom, userAtom, authLoadingAtom } from '@/lib/store/atoms/auth';
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 import { ErrorBoundary } from '@/components/shared/error-handling/ErrorBoundary';
@@ -22,7 +23,9 @@ const AuthGuardContent = ({
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const navigate = useNavigate();
-  const { session, user, isLoading } = useAuthStore();
+  const [session] = useAtom(sessionAtom);
+  const [user] = useAtom(userAtom);
+  const [isLoading] = useAtom(authLoadingAtom);
 
   useEffect(() => {
     console.log('AuthGuard: Checking access', {

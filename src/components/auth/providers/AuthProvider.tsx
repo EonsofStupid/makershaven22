@@ -15,18 +15,24 @@ import {
   setUserAtom,
   setAuthLoadingAtom,
   setAuthErrorAtom,
-  setIsTransitioningAtom
+  setIsTransitioningAtom,
+  authLoadingAtom,
+  authErrorAtom,
+  isTransitioningAtom
 } from '@/lib/store/atoms/auth';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
+  const [isLoading] = useAtom(authLoadingAtom);
+  const [error] = useAtom(authErrorAtom);
+  const [isTransitioning] = useAtom(isTransitioningAtom);
   const [, setLoading] = useAtom(setAuthLoadingAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
   
-  const { isLoading, message, startLoading, stopLoading, setError: setLoadingError } = useLoadingState({
+  const { isLoading: loadingState, message, startLoading, stopLoading, setError: setLoadingError } = useLoadingState({
     timeout: 30000,
     onTimeout: () => {
       console.error('Auth initialization timed out');
@@ -151,7 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthErrorBoundary>
       <LoadingOverlay 
-        isVisible={isLoading} 
+        isVisible={loadingState} 
         message={message}
         timeout={30000}
         onTimeout={() => setError(new Error('Operation timed out'))}
