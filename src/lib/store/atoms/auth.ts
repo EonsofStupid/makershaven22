@@ -1,7 +1,7 @@
 import { createAtomPair } from '@/lib/types/atom-types';
-import type { AuthUser, AuthSession } from '@/lib/auth/types/auth';
+import type { AuthUser, AuthSession } from '@/lib/auth/types';
 
-// Create atom pairs with proper typing
+// Create atom pairs with proper typing and logging
 const [sessionBaseAtom, sessionWritableAtom] = createAtomPair<AuthSession | null>({
   default: null,
   onSet: (newSession) => {
