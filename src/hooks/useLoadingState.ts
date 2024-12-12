@@ -48,11 +48,12 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
         retryCount++;
         console.log(`Retry attempt ${retryCount}/${MAX_RETRY_ATTEMPTS}`);
         
-        setLoading(prev => ({
-          ...prev,
+        setLoading({
+          isLoading: true,
+          state: 'loading',
           message: `Retrying... (Attempt ${retryCount}/${MAX_RETRY_ATTEMPTS})`,
           progress: 0
-        }));
+        });
 
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         startLoading(message);
@@ -91,10 +92,10 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
         const increment = progress < 70 ? 0.5 : 0.2;
         progress = Math.min(95, progress + increment);
         
-        setLoading(prev => ({
-          ...prev,
+        setLoading({
+          ...newState,
           progress
-        }));
+        });
       }, PROGRESS_INTERVAL);
 
       timeoutId = setTimeout(handleTimeout, timeout);

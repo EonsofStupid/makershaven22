@@ -2,17 +2,29 @@ import { atom } from 'jotai';
 
 export interface SidebarState {
   isOpen: boolean;
-  activeItem: string | null;
+  isExpanded: boolean;
+  activeTab: string | null;
+  shortcuts: string[];
 }
 
-export const sidebarAtom = atom<SidebarState>({
-  isOpen: false,
-  activeItem: null,
-});
+// Base atoms
+export const sidebarOpenAtom = atom<boolean>(false);
+export const sidebarExpandedAtom = atom<boolean>(true);
+export const sidebarActiveTabAtom = atom<string | null>(null);
+export const sidebarShortcutsAtom = atom<string[]>([]);
 
+// Setter atoms
 export const setSidebarAtom = atom(
-  (get) => get(sidebarAtom),
-  (_get, set, update: SidebarState) => {
-    set(sidebarAtom, update);
+  (get) => ({
+    isOpen: get(sidebarOpenAtom),
+    isExpanded: get(sidebarExpandedAtom),
+    activeTab: get(sidebarActiveTabAtom),
+    shortcuts: get(sidebarShortcutsAtom)
+  }),
+  (_get, set, update: Partial<SidebarState>) => {
+    if (update.isOpen !== undefined) set(sidebarOpenAtom, update.isOpen);
+    if (update.isExpanded !== undefined) set(sidebarExpandedAtom, update.isExpanded);
+    if (update.activeTab !== undefined) set(sidebarActiveTabAtom, update.activeTab);
+    if (update.shortcuts !== undefined) set(sidebarShortcutsAtom, update.shortcuts);
   }
 );
