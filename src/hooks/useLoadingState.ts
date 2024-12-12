@@ -26,7 +26,7 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
 
     if (options.timeout) {
       setTimeout(() => {
-        setLoading((prev) => {
+        setLoading((prev: LoadingState) => {
           if (prev.isLoading) {
             options.onTimeout?.();
             toast.error('Operation timed out', {
@@ -65,7 +65,7 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
   }, [setLoading]);
 
   const setProgress = useCallback((progress: number) => {
-    setLoading((prev) => ({
+    setLoading((prev: LoadingState) => ({
       ...prev,
       progress
     }));
