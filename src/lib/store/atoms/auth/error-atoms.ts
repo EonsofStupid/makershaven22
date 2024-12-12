@@ -1,11 +1,11 @@
 import { atom } from 'jotai';
 
-// Base error atom
+// Base error atom with proper WritableAtom type
 export const authErrorAtom = atom<Error | null>(null);
 
-// Setter atom for errors
+// Setter atom for errors with proper types
 export const setAuthErrorAtom = atom(
-  null,
+  (get) => get(authErrorAtom),
   (_get, set, error: Error | null) => {
     set(authErrorAtom, error);
   }

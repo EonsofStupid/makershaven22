@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
 import type { AuthSession } from '@/lib/auth/types/auth';
 
-// Base session atom
+// Base session atom with proper WritableAtom type
 export const sessionAtom = atom<AuthSession | null>(null);
 
 // Setter atom for session
 export const setSessionAtom = atom(
-  null,
+  (get) => get(sessionAtom),
   (_get, set, session: AuthSession | null) => {
     set(sessionAtom, session);
   }

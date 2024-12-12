@@ -7,7 +7,7 @@ export interface LoadingState {
   details?: string;
 }
 
-// Base loading atoms
+// Base loading atoms with proper WritableAtom type
 export const loadingStateAtom = atom<LoadingState>({
   isLoading: false,
   message: undefined,
@@ -27,23 +27,23 @@ export const loadingMessageAtom = atom(
   (get) => get(loadingStateAtom).message
 );
 
-// Setter atoms
+// Setter atoms with proper types
 export const setLoadingStateAtom = atom(
-  null,
+  (get) => get(loadingStateAtom),
   (_get, set, update: Partial<LoadingState>) => {
     set(loadingStateAtom, (prev) => ({ ...prev, ...update }));
   }
 );
 
 export const setIsTransitioningAtom = atom(
-  null,
+  (get) => get(isTransitioningAtom),
   (_get, set, isTransitioning: boolean) => {
     set(isTransitioningAtom, isTransitioning);
   }
 );
 
 export const setAuthLoadingAtom = atom(
-  null,
+  (get) => get(authLoadingAtom),
   (_get, set, isLoading: boolean) => {
     set(authLoadingAtom, isLoading);
   }

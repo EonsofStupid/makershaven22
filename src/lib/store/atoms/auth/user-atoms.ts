@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
 import type { AuthUser, UserRole } from '@/lib/auth/types/auth';
 
-// Base user atom
+// Base user atom with proper WritableAtom type
 export const userAtom = atom<AuthUser | null>(null);
 
 // Setter atom for user
 export const setUserAtom = atom(
-  null,
+  (get) => get(userAtom),
   (_get, set, user: AuthUser | null) => {
     set(userAtom, user);
   }
