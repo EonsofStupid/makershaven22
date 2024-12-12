@@ -15,6 +15,7 @@ export const loadingStateAtom = atom<LoadingState>({
   details: undefined
 });
 
+export const authLoadingAtom = atom<boolean>(false);
 export const isTransitioningAtom = atom<boolean>(false);
 
 // Derived loading atoms
@@ -38,5 +39,12 @@ export const setIsTransitioningAtom = atom(
   null,
   (_get, set, isTransitioning: boolean) => {
     set(isTransitioningAtom, isTransitioning);
+  }
+);
+
+export const setAuthLoadingAtom = atom(
+  null,
+  (_get, set, isLoading: boolean) => {
+    set(authLoadingAtom, isLoading);
   }
 );
