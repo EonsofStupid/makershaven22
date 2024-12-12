@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { 
   loadingAtom, 
-  setLoadingAtom, 
+  setLoadingAtom,
   LoadingState 
 } from '@/lib/store/atoms/loading';
 
