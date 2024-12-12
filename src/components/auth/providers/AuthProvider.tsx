@@ -8,19 +8,17 @@ import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
 import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
 import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
-import { useLoadingState } from "@/hooks/useLoadingState";
 import { useAtom } from 'jotai';
-import type { AuthSession, AuthUser } from '@/lib/auth/types/auth';
 import { 
   sessionAtom,
   userAtom,
-  authLoadingAtom,
-  authErrorAtom,
-  isTransitioningAtom,
   setSessionAtom,
   setUserAtom,
-  setAuthLoadingAtom,
+  loadingStateAtom,
+  setLoadingStateAtom,
+  authErrorAtom,
   setAuthErrorAtom,
+  isTransitioningAtom,
   setIsTransitioningAtom
 } from '@/lib/store/atoms/auth';
 
@@ -33,45 +31,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session] = useAtom(sessionAtom);
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
-  const [isLoading] = useAtom(authLoadingAtom);
-  const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
+  const [, setLoadingState] = useAtom(setLoadingStateAtom);
   const [error] = useAtom(authErrorAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [isTransitioning] = useAtom(isTransitioningAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
-
-  const { 
-    isLoading: loadingState, 
-    message, 
-    startLoading, 
-    stopLoading, 
-    setError: setLoadingError, 
-    progress 
-  } = useLoadingState({
-    timeout: 120000,
-    progressInterval: 1000,
-    onTimeout: () => {
-      console.error('Auth initialization timed out');
-      toast.error('Authentication initialization timed out', {
-        description: 'Please refresh the page and try again. If the problem persists, contact support.'
-      });
-      setError(new Error('Authentication initialization timed out'));
-    }
-  });
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
     
     const initSecurity = async () => {
       try {
-        startLoading('Initializing security...');
+        setLoadingState({ isLoading: true, message: 'Initializing security...' });
         const success = await applySecurityHeaders();
         if (!success) {
           console.warn('Security headers could not be applied, continuing with default security settings');
         }
       } catch (error) {
         console.error('Error initializing security headers:', error);
-        setLoadingError(error instanceof Error ? error : new Error('Failed to initialize security'));
+        setError(error instanceof Error ? error : new Error('Failed to initialize security'));
         return false;
       }
       return true;
@@ -79,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (initialSetupDone.current) {
       console.log('Initial setup already done, skipping');
-      stopLoading();
+      setLoadingState({ isLoading: false });
       return;
     }
     
@@ -89,10 +68,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const retryDelay = 1000;
 
     const setupAuth = async () => {
-      const cleanup = startLoading('Setting up authentication...');
+      setLoadingState({ isLoading: true, message: 'Setting up authentication...' });
       
       try {
-        setLoading(true);
         setIsTransitioning(true);
         
         const securityInitialized = await initSecurity();
@@ -117,29 +95,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             await supabase.auth.signOut();
             setSession(null);
             setUser(null);
-            stopLoading();
+            setLoadingState({ isLoading: false });
             setIsTransitioning(false);
             return;
           }
           throw sessionError;
         }
 
-        // Transform Supabase session to our AuthSession type
-        const authSession: AuthSession | null = supabaseSession ? {
-          user: {
-            id: supabaseSession.user.id,
-            email: supabaseSession.user.email,
-            role: supabaseSession.user.user_metadata?.role,
-            username: supabaseSession.user.user_metadata?.username,
-            displayName: supabaseSession.user.user_metadata?.display_name,
-            user_metadata: supabaseSession.user.user_metadata
-          },
-          expires_at: supabaseSession.expires_at
-        } : null;
-
-        console.log('Initial session check:', authSession?.user?.id || 'No session');
-        await handleAuthChange(authSession);
-        stopLoading();
+        console.log('Initial session check:', supabaseSession?.user?.id || 'No session');
+        await handleAuthChange(supabaseSession);
+        setLoadingState({ isLoading: false });
         setIsTransitioning(false);
 
       } catch (error) {
@@ -151,10 +116,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         } else {
           setError(error instanceof Error ? error : new Error('Failed to initialize authentication'));
           setIsTransitioning(false);
-          cleanup?.();
+          setLoadingState({ isLoading: false });
         }
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -165,24 +128,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } = supabase.auth.onAuthStateChange(async (event, supabaseSession) => {
       try {
         console.log('Auth state changed:', event, supabaseSession?.user?.id);
-        startLoading('Updating authentication state...');
+        setLoadingState({ 
+          isLoading: true, 
+          message: 'Updating authentication state...' 
+        });
         setIsTransitioning(true);
 
-        // Transform Supabase session to our AuthSession type
-        const authSession: AuthSession | null = supabaseSession ? {
-          user: {
-            id: supabaseSession.user.id,
-            email: supabaseSession.user.email,
-            role: supabaseSession.user.user_metadata?.role,
-            username: supabaseSession.user.user_metadata?.username,
-            displayName: supabaseSession.user.user_metadata?.display_name,
-            user_metadata: supabaseSession.user.user_metadata
-          },
-          expires_at: supabaseSession.expires_at
-        } : null;
-
-        await handleAuthChange(authSession);
-        stopLoading();
+        await handleAuthChange(supabaseSession);
+        setLoadingState({ isLoading: false });
       } catch (error) {
         console.error('Auth state change error:', error);
         setError(error instanceof Error ? error : new Error('Authentication error occurred'));
@@ -199,15 +152,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       subscription.unsubscribe();
       sessionManager.destroy();
       securityManager.cleanup();
-      stopLoading();
+      setLoadingState({ isLoading: false });
     };
-  }, [handleAuthChange, startLoading, stopLoading, setLoadingError, setSession, setUser, setLoading, setError, setIsTransitioning]);
+  }, [handleAuthChange, setLoadingState, setSession, setUser, setError, setIsTransitioning]);
 
   return (
     <AuthErrorBoundary>
       <LoadingOverlay 
-        isVisible={loadingState} 
-        message={message}
+        isVisible={loadingState.isLoading} 
+        message={loadingState.message}
         timeout={120000}
         onTimeout={() => setError(new Error('Operation timed out'))}
       />
