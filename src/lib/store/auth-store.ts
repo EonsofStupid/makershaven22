@@ -1,4 +1,5 @@
 import { useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { 
   sessionAtom, 
   userAtom, 
@@ -14,7 +15,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthSession, AuthUser } from '../auth/types';
+import { AuthSession, AuthUser } from '@/lib/auth/types';
 import { toast } from 'sonner';
 
 export const useAuthStore = () => {
