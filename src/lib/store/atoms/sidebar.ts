@@ -1,6 +1,18 @@
 import { atom } from 'jotai';
 
-export const sidebarOpenAtom = atom(true);
-export const sidebarExpandedAtom = atom(true);
-export const sidebarActiveTabAtom = atom('dashboard');
-export const sidebarShortcutsAtom = atom<string[]>([]);
+export interface SidebarState {
+  isOpen: boolean;
+  activeItem: string | null;
+}
+
+export const sidebarAtom = atom<SidebarState>({
+  isOpen: false,
+  activeItem: null,
+});
+
+export const setSidebarAtom = atom(
+  (get) => get(sidebarAtom),
+  (_get, set, update: SidebarState) => {
+    set(sidebarAtom, update);
+  }
+);

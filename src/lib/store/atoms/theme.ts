@@ -1,4 +1,20 @@
-import { atomWithStorage } from 'jotai/utils';
-import type { Settings } from "@/components/admin/settings/types";
+import { atom } from 'jotai';
 
-export const themeAtom = atomWithStorage<Settings | null>('theme', null);
+export type ThemeMode = 'light' | 'dark' | 'system';
+
+export interface ThemeState {
+  mode: ThemeMode;
+  systemTheme: 'light' | 'dark';
+}
+
+export const themeAtom = atom<ThemeState>({
+  mode: 'system',
+  systemTheme: 'dark',
+});
+
+export const setThemeAtom = atom(
+  (get) => get(themeAtom),
+  (_get, set, update: ThemeState) => {
+    set(themeAtom, update);
+  }
+);
