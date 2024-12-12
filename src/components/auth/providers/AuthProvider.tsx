@@ -10,30 +10,45 @@ import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBou
 import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { useAtom } from 'jotai';
+import type { AuthSession, AuthUser } from '@/lib/auth/types/auth';
 import { 
+  sessionAtom,
+  userAtom,
+  authLoadingAtom,
+  authErrorAtom,
+  isTransitioningAtom,
   setSessionAtom,
   setUserAtom,
   setAuthLoadingAtom,
   setAuthErrorAtom,
-  setIsTransitioningAtom,
-  authLoadingAtom,
-  authErrorAtom,
-  isTransitioningAtom
+  setIsTransitioningAtom
 } from '@/lib/store/atoms/auth';
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
+  const [session] = useAtom(sessionAtom);
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
   const [isLoading] = useAtom(authLoadingAtom);
-  const [error] = useAtom(authErrorAtom);
-  const [isTransitioning] = useAtom(isTransitioningAtom);
   const [, setLoading] = useAtom(setAuthLoadingAtom);
+  const [error] = useAtom(authErrorAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
+  const [isTransitioning] = useAtom(isTransitioningAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
-  
-  const { isLoading: loadingState, message, startLoading, stopLoading, setError: setLoadingError, progress } = useLoadingState({
-    timeout: 120000, // 2 minutes
+
+  const { 
+    isLoading: loadingState, 
+    message, 
+    startLoading, 
+    stopLoading, 
+    setError: setLoadingError, 
+    progress 
+  } = useLoadingState({
+    timeout: 120000,
     progressInterval: 1000,
     onTimeout: () => {
       console.error('Auth initialization timed out');
@@ -80,7 +95,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setLoading(true);
         setIsTransitioning(true);
         
-        // Initialize security first
         const securityInitialized = await initSecurity();
         if (!securityInitialized) {
           throw new Error('Security initialization failed');
@@ -95,7 +109,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           throw securityError;
         }
 
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session: supabaseSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           if (sessionError.message.includes('refresh_token_not_found')) {
@@ -110,8 +124,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           throw sessionError;
         }
 
-        console.log('Initial session check:', session?.user?.id || 'No session');
-        await handleAuthChange(session);
+        // Transform Supabase session to our AuthSession type
+        const authSession: AuthSession | null = supabaseSession ? {
+          user: {
+            id: supabaseSession.user.id,
+            email: supabaseSession.user.email,
+            role: supabaseSession.user.user_metadata?.role,
+            username: supabaseSession.user.user_metadata?.username,
+            displayName: supabaseSession.user.user_metadata?.display_name,
+            user_metadata: supabaseSession.user.user_metadata
+          },
+          expires_at: supabaseSession.expires_at
+        } : null;
+
+        console.log('Initial session check:', authSession?.user?.id || 'No session');
+        await handleAuthChange(authSession);
         stopLoading();
         setIsTransitioning(false);
 
@@ -135,12 +162,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, supabaseSession) => {
       try {
-        console.log('Auth state changed:', _event, session?.user?.id);
+        console.log('Auth state changed:', event, supabaseSession?.user?.id);
         startLoading('Updating authentication state...');
         setIsTransitioning(true);
-        await handleAuthChange(session);
+
+        // Transform Supabase session to our AuthSession type
+        const authSession: AuthSession | null = supabaseSession ? {
+          user: {
+            id: supabaseSession.user.id,
+            email: supabaseSession.user.email,
+            role: supabaseSession.user.user_metadata?.role,
+            username: supabaseSession.user.user_metadata?.username,
+            displayName: supabaseSession.user.user_metadata?.display_name,
+            user_metadata: supabaseSession.user.user_metadata
+          },
+          expires_at: supabaseSession.expires_at
+        } : null;
+
+        await handleAuthChange(authSession);
         stopLoading();
       } catch (error) {
         console.error('Auth state change error:', error);
