@@ -30,7 +30,7 @@ export const useAuthSetup = () => {
   
   const handleAuthChange = useCallback(async (session) => {
     console.log('Handling auth change:', session?.user?.id);
-    setLoading(true);
+    setLoading({ isLoading: true });
     setError(null);
     
     try {
@@ -111,7 +111,7 @@ export const useAuthSetup = () => {
         description: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
     } finally {
-      setLoading(false);
+      setLoading({ isLoading: false });
     }
   }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt, setSession, setUser]);
 

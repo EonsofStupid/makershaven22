@@ -1,25 +1,14 @@
 import { atom } from 'jotai';
-import type { AuthSession, AuthUser } from '@/lib/auth/types/auth';
+import type { AuthSession } from '@/lib/auth/types/auth';
 
 // Base session atom
 export const sessionAtom = atom<AuthSession | null>(null);
-
-// Base user atom
-export const userAtom = atom<AuthUser | null>(null);
 
 // Setter atom for session
 export const setSessionAtom = atom(
   null,
   (_get, set, session: AuthSession | null) => {
     set(sessionAtom, session);
-  }
-);
-
-// Setter atom for user
-export const setUserAtom = atom(
-  null,
-  (_get, set, user: AuthUser | null) => {
-    set(userAtom, user);
   }
 );
 
