@@ -17,16 +17,17 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
   const [, setLoading] = useAtom(setLoadingAtom);
 
   const startLoading = useCallback((message?: string) => {
-    setLoading({
+    const newState: LoadingState = {
       isLoading: true,
       state: 'loading',
       message,
       error: null
-    });
+    };
+    setLoading(newState);
 
     if (options.timeout) {
       setTimeout(() => {
-        setLoading((prev: LoadingState) => {
+        setLoading((prev: LoadingState): LoadingState => {
           if (prev.isLoading) {
             options.onTimeout?.();
             toast.error('Operation timed out', {
@@ -46,26 +47,28 @@ export const useLoadingState = (options: UseLoadingStateOptions = {}) => {
   }, [setLoading, options]);
 
   const stopLoading = useCallback((state: LoadingState['state'] = 'idle') => {
-    setLoading({
+    const newState: LoadingState = {
       isLoading: false,
       state,
       error: null
-    });
+    };
+    setLoading(newState);
   }, [setLoading]);
 
   const setError = useCallback((error: Error) => {
-    setLoading({
+    const newState: LoadingState = {
       isLoading: false,
       state: 'error',
       error
-    });
+    };
+    setLoading(newState);
     toast.error('Error', {
       description: error.message
     });
   }, [setLoading]);
 
   const setProgress = useCallback((progress: number) => {
-    setLoading((prev: LoadingState) => ({
+    setLoading((prev: LoadingState): LoadingState => ({
       ...prev,
       progress
     }));

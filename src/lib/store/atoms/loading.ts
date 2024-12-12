@@ -1,14 +1,14 @@
 import { atom } from 'jotai';
 import { createAtomPair } from '@/lib/types/atom-types';
 
-export interface LoadingState {
+export type LoadingState = {
   isLoading: boolean;
   message?: string;
   progress?: number;
   timeout?: number;
   error?: Error | null;
   state: 'idle' | 'loading' | 'success' | 'error';
-}
+};
 
 const defaultState: LoadingState = {
   isLoading: false,

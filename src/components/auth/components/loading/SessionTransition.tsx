@@ -7,7 +7,10 @@ interface SessionTransitionProps {
   loadingMessage?: string;
 }
 
-export const SessionTransition = ({ children, loadingMessage = "Loading session..." }: SessionTransitionProps) => {
+export const SessionTransition = ({ 
+  children, 
+  loadingMessage = "Loading session..." 
+}: SessionTransitionProps) => {
   const { isLoading, isTransitioning } = useAuthStore();
 
   return (
