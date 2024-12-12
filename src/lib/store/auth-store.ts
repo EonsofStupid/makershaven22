@@ -9,7 +9,9 @@ import {
   setLoadingStateAtom,
   setAuthErrorAtom,
   isTransitioningAtom,
-  setIsTransitioningAtom
+  setIsTransitioningAtom,
+  authLoadingAtom,
+  setAuthLoadingAtom
 } from './atoms/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
@@ -25,6 +27,7 @@ export const useAuthStore = () => {
   const [loadingState] = useAtom(loadingStateAtom);
   const [error] = useAtom(authErrorAtom);
   const [isTransitioning] = useAtom(isTransitioningAtom);
+  const [isLoading] = useAtom(authLoadingAtom);
   
   // Writable atoms
   const [, setSession] = useAtom(setSessionAtom);
@@ -32,6 +35,7 @@ export const useAuthStore = () => {
   const [, setLoading] = useAtom(setLoadingStateAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
+  const [, setAuthLoading] = useAtom(setAuthLoadingAtom);
 
   const handleAuthError = (error: Error) => {
     authLogger.error('Auth error:', error);
@@ -109,6 +113,7 @@ export const useAuthStore = () => {
     loadingState,
     error,
     isTransitioning,
+    isLoading,
     
     // Setters
     setSession,
@@ -116,6 +121,7 @@ export const useAuthStore = () => {
     setLoading,
     setError,
     setIsTransitioning,
+    setAuthLoading,
     
     // Actions
     signOut,
