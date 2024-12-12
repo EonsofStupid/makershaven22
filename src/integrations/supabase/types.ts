@@ -50,6 +50,60 @@ export type Database = {
           },
         ]
       }
+      admin_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          setting_key: string
+          setting_type: string | null
+          setting_value: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          setting_key: string
+          setting_type?: string | null
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          setting_key?: string
+          setting_type?: string | null
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      auth_error_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          error_type: string
+          id: string
+          metadata: Json | null
+          stack_trace: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          error_type: string
+          id?: string
+          metadata?: Json | null
+          stack_trace?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          error_type?: string
+          id?: string
+          metadata?: Json | null
+          stack_trace?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -246,6 +300,44 @@ export type Database = {
           },
           {
             foreignKeyName: "cms_content_revisions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_workflows: {
+        Row: {
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          steps: Json
+          triggers: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          steps: Json
+          triggers?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          steps?: Json
+          triggers?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_workflows_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -483,9 +575,11 @@ export type Database = {
           id: string
           is_banned: boolean | null
           last_login_at: string | null
+          last_password_login: string | null
           last_seen: string | null
           location: string | null
           onboarding_completed: boolean | null
+          pin_enabled: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
@@ -506,9 +600,11 @@ export type Database = {
           id: string
           is_banned?: boolean | null
           last_login_at?: string | null
+          last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -529,9 +625,11 @@ export type Database = {
           id?: string
           is_banned?: boolean | null
           last_login_at?: string | null
+          last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -546,6 +644,61 @@ export type Database = {
             columns: ["banned_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publishing_queue: {
+        Row: {
+          content_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          processed_at: string | null
+          revision_id: string
+          scheduled_for: string
+          status: string | null
+        }
+        Insert: {
+          content_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          processed_at?: string | null
+          revision_id: string
+          scheduled_for: string
+          status?: string | null
+        }
+        Update: {
+          content_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          processed_at?: string | null
+          revision_id?: string
+          scheduled_for?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publishing_queue_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_queue_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publishing_queue_revision_id_fkey"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
             referencedColumns: ["id"]
           },
         ]
@@ -682,8 +835,12 @@ export type Database = {
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
+          neon_cyan: string | null
+          neon_pink: string | null
+          neon_purple: string | null
           primary_color: string | null
           secondary_color: string | null
+          security_settings: Json | null
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
@@ -711,8 +868,12 @@ export type Database = {
           letter_spacing: string
           line_height_base: string
           logo_url?: string | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_settings?: Json | null
           shadow_color?: string | null
           site_title: string
           spacing_unit?: string | null
@@ -740,8 +901,12 @@ export type Database = {
           letter_spacing?: string
           line_height_base?: string
           logo_url?: string | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_settings?: Json | null
           shadow_color?: string | null
           site_title?: string
           spacing_unit?: string | null
@@ -880,17 +1045,153 @@ export type Database = {
           },
         ]
       }
+      workflow_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          steps: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          steps: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          steps?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      append_blog_image: {
+        Args: {
+          post_id: string
+          image_url: string
+        }
+        Returns: undefined
+      }
       check_rate_limit: {
         Args: {
           p_user_id: string
           p_action_type: string
           p_max_count: number
           p_time_window: string
+        }
+        Returns: boolean
+      }
+      initialize_user_gamification: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
+      setup_pin: {
+        Args: {
+          p_user_id: string
+          p_pin: string
+        }
+        Returns: boolean
+      }
+      update_site_settings: {
+        Args: {
+          p_site_title: string
+          p_tagline: string
+          p_primary_color: string
+          p_secondary_color: string
+          p_accent_color: string
+          p_text_primary_color: string
+          p_text_secondary_color: string
+          p_text_link_color: string
+          p_text_heading_color: string
+          p_neon_cyan: string
+          p_neon_pink: string
+          p_neon_purple: string
+          p_border_radius: string
+          p_spacing_unit: string
+          p_transition_duration: string
+          p_shadow_color: string
+          p_hover_scale: string
+          p_font_family_heading: string
+          p_font_family_body: string
+          p_font_size_base: string
+          p_font_weight_normal: string
+          p_font_weight_bold: string
+          p_line_height_base: string
+          p_letter_spacing: string
+        }
+        Returns: {
+          accent_color: string | null
+          border_radius: string | null
+          favicon_url: string | null
+          font_family_body: string
+          font_family_heading: string
+          font_size_base: string
+          font_weight_bold: string
+          font_weight_normal: string
+          hover_scale: string | null
+          id: string
+          letter_spacing: string
+          line_height_base: string
+          logo_url: string | null
+          neon_cyan: string | null
+          neon_pink: string | null
+          neon_purple: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          security_settings: Json | null
+          shadow_color: string | null
+          site_title: string
+          spacing_unit: string | null
+          tagline: string | null
+          text_heading_color: string | null
+          text_link_color: string | null
+          text_primary_color: string | null
+          text_secondary_color: string | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
+          transition_duration: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }[]
+      }
+      verify_2fa_code: {
+        Args: {
+          p_code: string
+          p_email: string
+        }
+        Returns: Json
+      }
+      verify_pin_login: {
+        Args: {
+          p_user_id: string
+          p_pin: string
         }
         Returns: boolean
       }
