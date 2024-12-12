@@ -1,5 +1,4 @@
 import { DayPickerSingleProps, DayPickerRangeProps, DayPickerMultipleProps } from 'react-day-picker';
-import { LucideIcon } from 'lucide-react';
 
 export type CalendarProps = {
   mode?: 'single' | 'multiple' | 'range';
