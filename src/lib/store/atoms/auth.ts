@@ -38,8 +38,8 @@ export const isAdminAtom = atom((get) => {
 });
 
 // Writable atoms (setters) with proper types
-export const setSessionAtom = atom(
-  null, // Read function is not needed for setters
+export const setSessionAtom = atom<null, [AuthSession | null], void>(
+  null,
   (get, set, update: AuthSession | null) => {
     set(sessionAtom, update);
     if (!update) {
@@ -48,35 +48,35 @@ export const setSessionAtom = atom(
   }
 );
 
-export const setUserAtom = atom(
+export const setUserAtom = atom<null, [AuthUser | null], void>(
   null,
   (get, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
-export const setAuthLoadingAtom = atom(
+export const setAuthLoadingAtom = atom<null, [boolean], void>(
   null,
   (get, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
-export const setAuthErrorAtom = atom(
+export const setAuthErrorAtom = atom<null, [Error | null], void>(
   null,
   (get, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
-export const setOfflineAtom = atom(
+export const setOfflineAtom = atom<null, [boolean], void>(
   null,
   (get, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
-export const setIsTransitioningAtom = atom(
+export const setIsTransitioningAtom = atom<null, [boolean], void>(
   null,
   (get, set, update: boolean) => {
     set(isTransitioningAtom, update);
@@ -84,7 +84,7 @@ export const setIsTransitioningAtom = atom(
 );
 
 // Action atoms
-export const appendSecurityLogAtom = atom(
+export const appendSecurityLogAtom = atom<null, [SecurityLog], void>(
   null,
   (get, set, log: SecurityLog) => {
     const currentLogs = get(securityLogsAtom);
@@ -92,14 +92,14 @@ export const appendSecurityLogAtom = atom(
   }
 );
 
-export const clearAuthStateAtom = atom(
+export const clearAuthStateAtom = atom<null, [], void>(
   null,
   (get, set) => {
-    set(sessionAtom, null);
-    set(userAtom, null);
-    set(authLoadingAtom, false);
-    set(authErrorAtom, null);
-    set(securityLogsAtom, []);
+    set(sessionAtom, update => null);
+    set(userAtom, update => null);
+    set(authLoadingAtom, update => false);
+    set(authErrorAtom, update => null);
+    set(securityLogsAtom, update => []);
   }
 );
 
