@@ -1,3 +1,4 @@
+import React, { createContext, useContext } from 'react';
 import { useAtom } from 'jotai';
 import { themeAtom } from '@/lib/store/atoms/theme';
 import { Settings } from '@/components/admin/settings/types';
@@ -54,15 +55,19 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
   };
 
+  const contextValue = {
+    theme,
+    updateTheme
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-// Create a context for backward compatibility during migration
-const ThemeContext = React.createContext<{
+const ThemeContext = createContext<{
   theme: Settings | null;
   updateTheme: (theme: Settings) => void;
 }>({
@@ -70,10 +75,9 @@ const ThemeContext = React.createContext<{
   updateTheme: () => {},
 });
 
-// Export the hook for backward compatibility
 export const useTheme = () => {
-  const context = React.useContext(ThemeContext);
-  if (context === undefined) {
+  const context = useContext(ThemeContext);
+  if (!context) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;

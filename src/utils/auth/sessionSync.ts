@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAtom } from 'jotai';
+import { sessionAtom, userAtom, authLoadingAtom, authErrorAtom, isOfflineAtom } from '@/lib/store/atoms/auth';
 
 const STORAGE_KEY = 'auth_session_state';
 const SYNC_CHANNEL = 'auth_sync_channel';
@@ -46,7 +47,6 @@ const handleNetworkChange = async () => {
 
   if (isOnline) {
     try {
-      // Attempt to refresh session when coming back online
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) throw error;
       
@@ -64,10 +64,10 @@ const handleNetworkChange = async () => {
 };
 
 const syncSessionState = async (newState: any) => {
+  const [, setSession] = useAtom(sessionAtom);
+  const [, setError] = useAtom(authErrorAtom);
+  
   try {
-    const { setSession, setError } = useAuthStore.getState();
-    
-    // Validate session state before applying
     if (newState && newState.access_token) {
       setSession(newState);
       

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useAtom } from 'jotai';
+import { sessionAtom, userAtom } from '@/lib/store/atoms/auth';
 import { storeSessionLocally } from '@/utils/auth/offlineAuth';
 import { registerUserSession, cleanupUserSessions } from '@/utils/auth/sessionManager';
 import { handleSecurityEvent } from '@/utils/auth/securityHandlers';
@@ -8,7 +9,8 @@ import { attachCSRFToken, clearCSRFToken } from '@/utils/auth/csrfProtection';
 import { toast } from 'sonner';
 
 export const useSessionManagement = () => {
-  const { setSession, setUser } = useAuthStore();
+  const [session, setSession] = useAtom(sessionAtom);
+  const [user, setUser] = useAtom(userAtom);
 
   const handleSessionUpdate = useCallback(async (session: any) => {
     if (session?.user) {

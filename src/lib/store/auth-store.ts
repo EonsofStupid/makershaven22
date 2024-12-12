@@ -1,4 +1,5 @@
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import { 
   sessionAtom, 
   userAtom, 
@@ -62,18 +63,3 @@ export const useAuthStore = () => {
     reset,
   };
 };
-
-// Set up online/offline listeners
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => {
-    const [, setOffline] = useAtom(isOfflineAtom);
-    setOffline(false);
-    authLogger.info('Application is online');
-  });
-  
-  window.addEventListener('offline', () => {
-    const [, setOffline] = useAtom(isOfflineAtom);
-    setOffline(true);
-    authLogger.warn('Application is offline');
-  });
-}
