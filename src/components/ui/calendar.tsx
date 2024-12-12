@@ -5,6 +5,20 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import type { CalendarProps } from "@/types/ui/calendar";
 
+const NavigationIcon = ({
+  className,
+  direction,
+}: {
+  className?: string;
+  direction: 'previous' | 'next';
+}) => {
+  return direction === 'previous' ? (
+    <ChevronLeft className={cn("h-4 w-4", className)} />
+  ) : (
+    <ChevronRight className={cn("h-4 w-4", className)} />
+  );
+};
+
 function Calendar({
   mode = "single",
   selected,
@@ -56,8 +70,7 @@ function Calendar({
         day_hidden: "invisible",
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" {...props} />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" {...props} />
+        CaptionNavigationIcon: NavigationIcon
       }}
     />
   );
