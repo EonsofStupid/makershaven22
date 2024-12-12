@@ -1,15 +1,16 @@
 import { atom } from 'jotai';
-import type { AuthSession, AuthUser } from '@/lib/auth/types';
+import type { AuthSession, AuthUser, SecurityLog } from '@/lib/auth/types/auth';
 
-// Base atoms with proper typing
+// Base atoms
 export const sessionAtom = atom<AuthSession | null>(null);
 export const userAtom = atom<AuthUser | null>(null);
 export const authLoadingAtom = atom<boolean>(true);
 export const authErrorAtom = atom<Error | null>(null);
 export const isOfflineAtom = atom<boolean>(!navigator.onLine);
 export const isTransitioningAtom = atom<boolean>(false);
+export const securityLogsAtom = atom<SecurityLog[]>([]);
 
-// Writable atoms with explicit typing
+// Writable atoms
 export const setSessionAtom = atom(
   (get) => get(sessionAtom),
   (_get, set, update: AuthSession | null) => set(sessionAtom, update)
@@ -38,4 +39,45 @@ export const setOfflineAtom = atom(
 export const setIsTransitioningAtom = atom(
   (get) => get(isTransitioningAtom),
   (_get, set, update: boolean) => set(isTransitioningAtom, update)
+);
+
+export const setSecurityLogsAtom = atom(
+  (get) => get(securityLogsAtom),
+  (_get, set, update: SecurityLog[]) => set(securityLogsAtom, update)
+);
+
+// Computed atoms
+export const hasValidSessionAtom = atom(
+  (get) => {
+    const session = get(sessionAtom);
+    if (!session) return false;
+    return session.isValid && new Date(session.expiresAt) > new Date();
+  }
+);
+
+export const isAdminAtom = atom(
+  (get) => {
+    const user = get(userAtom);
+    return user?.role === 'admin' || user?.role === 'super_admin';
+  }
+);
+
+// Action atoms
+export const appendSecurityLogAtom = atom(
+  null,
+  (get, set, log: SecurityLog) => {
+    const currentLogs = get(securityLogsAtom);
+    set(securityLogsAtom, [...currentLogs, log]);
+  }
+);
+
+export const clearAuthStateAtom = atom(
+  null,
+  (_get, set) => {
+    set(sessionAtom, null);
+    set(userAtom, null);
+    set(authLoadingAtom, false);
+    set(authErrorAtom, null);
+    set(securityLogsAtom, []);
+  }
 );

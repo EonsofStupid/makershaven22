@@ -148,6 +148,100 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_security_logs: {
+        Row: {
+          category: string
+          created_at: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          severity: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          severity: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auth_security_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auth_sessions: {
+        Row: {
+          created_at: string | null
+          device_id: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          is_valid: boolean | null
+          last_activity: string | null
+          metadata: Json | null
+          refresh_token: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_id: string
+          expires_at: string
+          id?: string
+          ip_address?: string | null
+          is_valid?: boolean | null
+          last_activity?: string | null
+          metadata?: Json | null
+          refresh_token?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_id?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          is_valid?: boolean | null
+          last_activity?: string | null
+          metadata?: Json | null
+          refresh_token?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auth_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string | null

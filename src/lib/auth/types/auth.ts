@@ -1,54 +1,52 @@
-export interface SessionConfig {
-  refreshInterval: number;
-  sessionTimeout: number;
-  storageKey: string;
-  onSessionExpired?: () => void;
-  onRefreshError?: (error: Error) => void;
-}
+import type { Session } from '@supabase/supabase-js';
 
-export interface SessionState {
-  isAuthenticated: boolean;
-  lastActivity: Date;
-  token?: string;
-}
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
-export type SessionEventType = 'mousedown' | 'keydown' | 'touchstart' | 'scroll';
-
-export interface AuthState {
-  isLoading: boolean;
-  hasAccess: boolean;
-  error: Error | { message: string } | null;
-  isTransitioning?: boolean;
-}
+export type SecurityEventSeverity = 'low' | 'medium' | 'high';
+export type SecurityEventCategory = 'auth' | 'session' | 'security' | 'pin' | 'audit';
 
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: string;
+  role?: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  lastSeen?: Date;
+  isBanned?: boolean;
+  banReason?: string;
+  bannedAt?: Date;
+  bannedBy?: string;
 }
 
 export interface AuthSession {
+  id: string;
   user: AuthUser;
-  expires_at?: number;
+  deviceId: string;
+  expiresAt: Date;
+  lastActivity: Date;
+  ipAddress?: string;
+  userAgent?: string;
+  isValid: boolean;
+  metadata?: Record<string, any>;
 }
 
-export interface AuthStore {
+export interface SecurityLog {
+  id: string;
+  userId: string;
+  eventType: string;
+  severity: SecurityEventSeverity;
+  category: SecurityEventCategory;
+  ipAddress?: string;
+  userAgent?: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+}
+
+export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
   error: Error | null;
   isOffline: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+  isTransitioning: boolean;
 }
