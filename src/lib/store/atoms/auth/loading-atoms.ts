@@ -7,7 +7,7 @@ export interface LoadingState {
   details?: string;
 }
 
-// Base atoms
+// Base loading atoms
 export const loadingStateAtom = atom<LoadingState>({
   isLoading: false,
   message: undefined,
@@ -17,7 +17,7 @@ export const loadingStateAtom = atom<LoadingState>({
 
 export const isTransitioningAtom = atom<boolean>(false);
 
-// Derived atoms
+// Derived loading atoms
 export const isLoadingAtom = atom(
   (get) => get(loadingStateAtom).isLoading
 );

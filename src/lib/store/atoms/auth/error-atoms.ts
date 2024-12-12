@@ -1,9 +1,9 @@
 import { atom } from 'jotai';
 
-// Base atoms
+// Base error atom
 export const authErrorAtom = atom<Error | null>(null);
 
-// Setter atoms
+// Setter atom for errors
 export const setAuthErrorAtom = atom(
   null,
   (_, set, error: Error | null) => {
@@ -11,7 +11,7 @@ export const setAuthErrorAtom = atom(
   }
 );
 
-// Derived atoms
+// Derived error state
 export const hasErrorAtom = atom(
   (get) => get(authErrorAtom) !== null
 );
