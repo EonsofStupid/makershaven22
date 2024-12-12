@@ -3,39 +3,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import type { CalendarProps } from "@/types/ui/calendar";
-
-const NavigationIcon = ({
-  className,
-  direction,
-}: {
-  className?: string;
-  direction: 'previous' | 'next';
-}) => {
-  return direction === 'previous' ? (
-    <ChevronLeft className={cn("h-4 w-4", className)} />
-  ) : (
-    <ChevronRight className={cn("h-4 w-4", className)} />
-  );
-};
 
 function Calendar({
-  mode = "single",
-  selected,
-  onSelect,
-  disabled,
-  initialFocus,
-  weekStartsOn = 0,
   className,
-}: CalendarProps) {
+  classNames,
+  showOutsideDays = true,
+  ...props
+}: any) {
   return (
     <DayPicker
-      mode={mode}
-      selected={selected}
-      onSelect={onSelect}
-      disabled={disabled}
-      initialFocus={initialFocus}
-      weekStartsOn={weekStartsOn}
+      showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
@@ -70,8 +47,10 @@ function Calendar({
         day_hidden: "invisible",
       }}
       components={{
-        CaptionNavigationIcon: NavigationIcon
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />
       }}
+      {...props}
     />
   );
 }
