@@ -6,7 +6,7 @@ import type {
   UserRole 
 } from '@/lib/auth/types/auth';
 
-// Base atoms with proper typing
+// Base atoms
 export const sessionAtom = atom<AuthSession | null>(null);
 export const userAtom = atom<AuthUser | null>(null);
 export const authLoadingAtom = atom<boolean>(true);
@@ -37,10 +37,10 @@ export const isAdminAtom = atom((get) => {
   return role === 'admin' || role === 'super_admin';
 });
 
-// Setter atoms with proper write types
+// Setter atoms
 export const setSessionAtom = atom(
-  null, // Read function returns null since this is a setter
-  (get, set, update: AuthSession | null) => {
+  null,
+  (_get, set, update: AuthSession | null) => {
     set(sessionAtom, update);
     if (!update) {
       set(userAtom, null);
@@ -50,35 +50,35 @@ export const setSessionAtom = atom(
 
 export const setUserAtom = atom(
   null,
-  (get, set, update: AuthUser | null) => {
+  (_get, set, update: AuthUser | null) => {
     set(userAtom, update);
   }
 );
 
 export const setAuthLoadingAtom = atom(
   null,
-  (get, set, update: boolean) => {
+  (_get, set, update: boolean) => {
     set(authLoadingAtom, update);
   }
 );
 
 export const setAuthErrorAtom = atom(
   null,
-  (get, set, update: Error | null) => {
+  (_get, set, update: Error | null) => {
     set(authErrorAtom, update);
   }
 );
 
 export const setOfflineAtom = atom(
   null,
-  (get, set, update: boolean) => {
+  (_get, set, update: boolean) => {
     set(isOfflineAtom, update);
   }
 );
 
 export const setIsTransitioningAtom = atom(
   null,
-  (get, set, update: boolean) => {
+  (_get, set, update: boolean) => {
     set(isTransitioningAtom, update);
   }
 );
@@ -94,7 +94,7 @@ export const appendSecurityLogAtom = atom(
 
 export const clearAuthStateAtom = atom(
   null,
-  (get, set) => {
+  (_get, set) => {
     set(sessionAtom, null);
     set(userAtom, null);
     set(authLoadingAtom, false);

@@ -10,7 +10,7 @@ export function createAtomPair<T>(config: AtomPairConfig<T>) {
   
   const writableAtom = atom(
     (get) => get(baseAtom),
-    (get, set, update: T) => {
+    (_get, set, update: T) => {
       set(baseAtom, update);
       config.onSet?.(update);
     }
