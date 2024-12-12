@@ -32,13 +32,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [, setError] = useAtom(setAuthErrorAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
   
-  const { isLoading: loadingState, message, startLoading, stopLoading, setError: setLoadingError } = useLoadingState({
-    timeout: 30000,
+  const { isLoading: loadingState, message, startLoading, stopLoading, setError: setLoadingError, progress } = useLoadingState({
+    timeout: 120000, // 2 minutes
+    progressInterval: 1000,
     onTimeout: () => {
       console.error('Auth initialization timed out');
       toast.error('Authentication initialization timed out', {
-        description: 'Please refresh the page and try again'
+        description: 'Please refresh the page and try again. If the problem persists, contact support.'
       });
+      setError(new Error('Authentication initialization timed out'));
     }
   });
 
@@ -55,10 +57,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error('Error initializing security headers:', error);
         setLoadingError(error instanceof Error ? error : new Error('Failed to initialize security'));
+        return false;
       }
+      return true;
     };
-
-    initSecurity();
 
     if (initialSetupDone.current) {
       console.log('Initial setup already done, skipping');
@@ -72,15 +74,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const retryDelay = 1000;
 
     const setupAuth = async () => {
+      const cleanup = startLoading('Setting up authentication...');
+      
       try {
-        console.log('Starting auth setup');
-        startLoading('Setting up authentication...');
         setLoading(true);
         setIsTransitioning(true);
         
+        // Initialize security first
+        const securityInitialized = await initSecurity();
+        if (!securityInitialized) {
+          throw new Error('Security initialization failed');
+        }
+        
         try {
-          sessionManager.startSession();
-          securityManager.initialize();
+          await sessionManager.startSession();
+          await securityManager.initialize();
           console.log('Security systems initialized');
         } catch (securityError) {
           console.error('Error initializing security systems:', securityError);
@@ -116,6 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setError(error instanceof Error ? error : new Error('Failed to initialize authentication'));
           setIsTransitioning(false);
+          cleanup?.();
         }
       } finally {
         setLoading(false);
@@ -124,7 +133,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setupAuth();
 
-    console.log('Setting up auth state change subscription');
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -159,7 +167,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       <LoadingOverlay 
         isVisible={loadingState} 
         message={message}
-        timeout={30000}
+        timeout={120000}
         onTimeout={() => setError(new Error('Operation timed out'))}
       />
       <motion.div
