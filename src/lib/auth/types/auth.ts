@@ -54,12 +54,3 @@ export interface SecurityLog {
   metadata?: Record<string, any>;
   createdAt: Date;
 }
-
-export interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-}

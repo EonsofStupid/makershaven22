@@ -17,7 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthSession, AuthUser } from '@/lib/auth/types';
+import { AuthSession, AuthUser, UserRole } from '@/lib/auth/types/auth';
 import { toast } from 'sonner';
 import { authLogger } from '@/lib/auth/AuthLogger';
 
@@ -52,15 +52,12 @@ export const useAuthStore = () => {
       setLoading(true);
       setError(null);
       
-      // Clean up session and security
       await sessionManager.handleSignOut();
       securityManager.clearSecurityData();
       
-      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Clear local state
       setSession(null);
       setUser(null);
       
@@ -83,8 +80,18 @@ export const useAuthStore = () => {
       if (error) throw error;
       
       if (session) {
-        setSession(session as AuthSession);
-        setUser(session.user as AuthUser);
+        const authSession: AuthSession = {
+          user: {
+            ...session.user,
+            role: session.user.role as UserRole
+          },
+          expires_at: session.expires_at,
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        };
+        
+        setSession(authSession);
+        setUser(authSession.user);
         authLogger.info('Session refreshed successfully');
       }
     } catch (error) {
