@@ -8,55 +8,64 @@ export interface WorkflowStage {
   description?: string;
   type: WorkflowStageType;
   order: number;
-  config: Record<string, any>;
+  config: WorkflowStageConfig;
+}
+
+export interface WorkflowStageConfig {
+  timeLimit?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required?: boolean;
+  }>;
+  [key: string]: any;
 }
 
 export interface WorkflowTemplate {
   id?: string;
   name: string;
   description: string | null;
-  steps: WorkflowStage[];
+  stages: WorkflowStage[];
   is_active: boolean;
   created_at?: string;
   created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
-export interface WorkflowFormData {
-  name: string;
-  description: string;
-  steps: WorkflowStage[];
-  is_active: boolean;
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: StageUpdateFunction;
 }
 
-export interface SecurityLog {
-  id: string;
-  user_id: string | null;
-  event_type: string;
-  severity: string;
-  details: Json;
-  ip_address: string | null;
-  user_agent: string | null;
-  created_at: string | null;
-  profiles?: {
-    username: string | null;
-    display_name: string | null;
-  } | null;
-}
-
-// Helper functions
-export const convertStepsToJson = (steps: WorkflowStage[]): Json => {
-  return JSON.parse(JSON.stringify(steps)) as Json;
+export const validateStage = (stage: WorkflowStage): boolean => {
+  return !!(stage.id && stage.name && stage.type);
 };
 
-export const parseJsonToSteps = (json: Json): WorkflowStage[] => {
-  if (!Array.isArray(json)) return [];
-  return json.map((stage: any) => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    description: stage.description || '',
-    type: stage.type || 'task',
-    order: stage.order || 0,
-    config: stage.config || {}
-  }));
+export const isValidStageUpdate = (updates: Partial<WorkflowStage>): boolean => {
+  return Object.keys(updates).length > 0;
+};
+
+export const createStageUpdate = (stage: WorkflowStage, updates: Partial<WorkflowStage>): WorkflowStage => {
+  return { ...stage, ...updates };
+};
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages as unknown as Json;
+};
+
+export const parseStages = (json: Json): WorkflowStage[] => {
+  if (Array.isArray(json)) {
+    return json.map(stage => ({
+      id: stage.id || '',
+      name: stage.name || '',
+      type: stage.type as WorkflowStageType,
+      order: stage.order || 0,
+      config: stage.config || {},
+      description: stage.description
+    }));
+  }
+  return [];
 };

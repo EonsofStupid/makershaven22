@@ -30,7 +30,6 @@ export interface Settings {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
 }
 
 export interface SettingsResponse {
