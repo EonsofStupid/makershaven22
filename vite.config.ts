@@ -18,14 +18,21 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
+    // Temporarily disable build during foundation restructuring
+    ...(process.env.SKIP_BUILD ? {
+      watch: null,
+      minify: false,
+      sourcemap: false
+    } : {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+          },
         },
       },
-    },
-    chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 1000,
+    }),
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
