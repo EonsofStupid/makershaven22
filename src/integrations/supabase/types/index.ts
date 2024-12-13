@@ -1,5 +1,5 @@
-// Base types
-export * from './base';
+// Re-export base types
+export type { Json } from './base';
 
 // Database types
 export * from './database';
@@ -13,7 +13,8 @@ export type {
 } from './auth';
 
 // Settings types
-export * from './settings';
+export type { SettingsUpdateParams } from './settings';
+export type { SiteSettings } from './settings';
 
 // Storage types
 export * from './storage';

@@ -1,142 +1,139 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useWorkflowStore } from '@/lib/store/workflow-store';
 import { toast } from 'sonner';
-import type { UserRole } from '@/components/auth/types';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();
+  const { setActiveWorkflow, addToHistory } = useWorkflowStore();
 
-  const { data: users, isLoading, error, refetch } = useQuery({
-    queryKey: ['admin-users'],
+  const { data: workflows, isLoading, error } = useQuery({
+    queryKey: ['workflows'],
     queryFn: async () => {
-      console.log('Fetching users with profiles and CMS data...');
+      console.log('Fetching workflows...');
       const { data, error } = await supabase
-        .from('profiles')
+        .from('cms_workflows')
         .select(`
           *,
-          banned_by(username),
-          cms_content!cms_content_created_by_fkey(count),
-          user_activity(count),
-          user_activity_cms(count)
+          created_by (
+            username,
+            display_name
+          )
         `)
-        .order('created_at', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching workflows:', error);
         throw error;
       }
 
       return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const getUserActivity = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_activity')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  };
-
-  const getUserCMSActivity = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_activity_cms')
-      .select('*, cms_content(*)')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  };
-
-  const updateRole = useMutation({
-    mutationFn: async ({ userId, newRole }: { userId: string; newRole: UserRole }) => {
-      console.log('Updating user role:', { userId, newRole });
-      
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
-
-      const { error: activityError } = await supabase
-        .from('user_activity')
+  const createWorkflow = useMutation({
+    mutationFn: async ({ name, description, steps, triggers }: {
+      name: string;
+      description?: string;
+      steps: any[];
+      triggers?: any[];
+    }) => {
+      console.log('Creating workflow:', { name, description, steps, triggers });
+      const { data, error } = await supabase
+        .from('cms_workflows')
         .insert({
-          user_id: userId,
-          activity_type: 'role_update',
-          details: `Role updated to ${newRole}`,
-          metadata: { previous_role: users?.find(u => u.id === userId)?.role }
-        });
-
-      if (activityError) throw activityError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('User role updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating role:', error);
-      toast.error('Failed to update user role');
-    }
-  });
-
-  const banUser = useMutation({
-    mutationFn: async ({ userId, reason }: { userId: string; reason: string }) => {
-      const { error } = await supabase.rpc('ban_user', {
-        user_id: userId,
-        reason: reason,
-        admin_id: (await supabase.auth.getUser()).data.user?.id
-      });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('User banned successfully');
-    },
-    onError: (error) => {
-      console.error('Error banning user:', error);
-      toast.error('Failed to ban user');
-    }
-  });
-
-  const unbanUser = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          is_banned: false,
-          ban_reason: null,
-          banned_at: null,
-          banned_by: null
+          name,
+          description,
+          steps,
+          triggers: triggers || [],
+          created_by: (await supabase.auth.getUser()).data.user?.id
         })
-        .eq('id', userId);
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+      setActiveWorkflow(data.id, data);
+      addToHistory(data.id, { 
+        type: 'created', 
+        timestamp: new Date().toISOString() 
+      });
+      toast.success('Workflow created successfully');
+    },
+    onError: (error) => {
+      console.error('Error creating workflow:', error);
+      toast.error('Failed to create workflow');
+    }
+  });
+
+  const updateWorkflow = useMutation({
+    mutationFn: async ({ id, ...updates }: { 
+      id: string; 
+      name?: string;
+      description?: string;
+      steps?: any[];
+      triggers?: any[];
+    }) => {
+      console.log('Updating workflow:', { id, ...updates });
+      const { data, error } = await supabase
+        .from('cms_workflows')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+      setActiveWorkflow(data.id, data);
+      addToHistory(data.id, { 
+        type: 'updated', 
+        timestamp: new Date().toISOString() 
+      });
+      toast.success('Workflow updated successfully');
+    },
+    onError: (error) => {
+      console.error('Error updating workflow:', error);
+      toast.error('Failed to update workflow');
+    }
+  });
+
+  const deleteWorkflow = useMutation({
+    mutationFn: async (id: string) => {
+      console.log('Deleting workflow:', id);
+      const { error } = await supabase
+        .from('cms_workflows')
+        .delete()
+        .eq('id', id);
 
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('User unbanned successfully');
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['workflows'] });
+      addToHistory(id, { 
+        type: 'deleted', 
+        timestamp: new Date().toISOString() 
+      });
+      toast.success('Workflow deleted successfully');
     },
     onError: (error) => {
-      console.error('Error unbanning user:', error);
-      toast.error('Failed to unban user');
+      console.error('Error deleting workflow:', error);
+      toast.error('Failed to delete workflow');
     }
   });
 
   return {
-    users,
+    workflows,
     isLoading,
     error,
-    refetch,
-    updateRole,
-    banUser,
-    unbanUser,
-    getUserActivity,
-    getUserCMSActivity
+    createWorkflow,
+    updateWorkflow,
+    deleteWorkflow
   };
 };
