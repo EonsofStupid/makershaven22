@@ -1353,7 +1353,7 @@ export type Database = {
         Args: {
           p_user_id: string
           p_activity_type: string
-          p_details: string
+          p_details?: string
           p_metadata?: Json
         }
         Returns: string
@@ -1364,13 +1364,23 @@ export type Database = {
         }
         Returns: Json
       }
-      setup_pin: {
-        Args: {
-          p_user_id: string
-          p_pin: string
-        }
-        Returns: boolean
-      }
+      setup_pin:
+        | {
+            Args: {
+              p_user_id: string
+              p_pin: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_user_id: string
+              p_pin: string
+              p_ip_address?: string
+              p_user_agent?: string
+            }
+            Returns: Json
+          }
       update_site_settings: {
         Args: {
           p_site_title: string
@@ -1442,13 +1452,23 @@ export type Database = {
         }
         Returns: Json
       }
-      verify_pin_login: {
-        Args: {
-          p_user_id: string
-          p_pin: string
-        }
-        Returns: boolean
-      }
+      verify_pin_login:
+        | {
+            Args: {
+              p_user_id: string
+              p_pin: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_user_id: string
+              p_pin: string
+              p_ip_address?: string
+              p_user_agent?: string
+            }
+            Returns: Json
+          }
     }
     Enums: {
       content_status: "draft" | "published" | "archived"
