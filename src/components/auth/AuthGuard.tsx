@@ -4,7 +4,12 @@ import { Navigate } from 'react-router-dom';
 import { useAtom } from 'jotai';
 import { userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
 
-const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true, requiredRole, fallbackPath }) => {
+export const AuthGuard: React.FC<AuthGuardProps> = ({ 
+  children, 
+  requireAuth = true, 
+  requiredRole, 
+  fallbackPath 
+}) => {
   const [user] = useAtom(userAtom);
   const [loadingState] = useAtom(loadingStateAtom);
 
