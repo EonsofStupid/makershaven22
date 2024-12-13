@@ -22,4 +22,7 @@ export default defineConfig({
     sourcemap: true,
     outDir: 'dist',
   },
+  server: {
+    port: 8080
+  }
 });
