@@ -1,11 +1,12 @@
 import { Link, Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAtom } from 'jotai';
+import { userAtom } from "@/lib/store/atoms/auth";
 import { toast } from "sonner";
 
 const FeaturedPost = () => {
-  const { user } = useAuthStore();
+  const [user] = useAtom(userAtom);
 
   const handleReadMore = () => {
     if (!user) {
@@ -49,7 +50,7 @@ const FeaturedPost = () => {
 };
 
 const PostCard = ({ delay, id }: { delay: number; id: number }) => {
-  const { user } = useAuthStore();
+  const [user] = useAtom(userAtom);
 
   const handleReadMore = () => {
     if (!user) {
@@ -94,7 +95,7 @@ const PostCard = ({ delay, id }: { delay: number; id: number }) => {
 };
 
 const Index = () => {
-  const { user } = useAuthStore();
+  const [user] = useAtom(userAtom);
 
   if (!user) {
     return <Navigate to="/login" replace />;
