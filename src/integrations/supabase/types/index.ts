@@ -1,25 +1,25 @@
-// Re-export base types
+// Base types
 export * from './base';
 
-// Re-export database types
+// Database types
 export * from './database';
 
-// Re-export auth types without conflicts
-export { 
-  type AuthSession,
-  type AuthUser,
-  type AuthError,
-  // Explicitly re-export only non-conflicting types
+// Auth types
+export type { 
+  AuthSession,
+  AuthUser,
+  UserRole,
+  Profile 
 } from './auth';
 
-// Re-export settings types
+// Settings types
 export * from './settings';
 
-// Re-export storage types
+// Storage types
 export * from './storage';
 
-// Re-export tables types
+// Tables types
 export * from './tables';
 
-// Re-export utils
+// Utils
 export * from './utils';

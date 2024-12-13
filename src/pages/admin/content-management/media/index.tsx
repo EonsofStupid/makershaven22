@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { uploadMedia } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const MediaUploadHandler = () => {
