@@ -10,6 +10,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: "::",
+    port: 8080,
+  },
   build: {
     // Temporarily disable build during foundation restructuring
     ...(process.env.SKIP_BUILD ? {
