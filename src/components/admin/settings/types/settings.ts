@@ -1,4 +1,6 @@
-export interface SettingsFormData {
+import { Json } from "@/integrations/supabase/types";
+
+export interface Settings {
   site_title: string;
   tagline: string;
   primary_color: string;
@@ -28,12 +30,15 @@ export interface SettingsFormData {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
 }
 
-export interface Settings extends SettingsFormData {
-  updated_at?: string;
-  updated_by?: string;
+export interface SettingsResponse {
+  data: Settings;
+  error: null | Error;
 }
+
+export interface SettingsFormData extends Settings {}
 
 export interface SettingsUpdateParams {
   p_site_title: string;
