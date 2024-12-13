@@ -1,40 +1,23 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import path from 'path';
-import { componentTagger } from "lovable-tagger";
+import react from '@vitejs/plugin-react';
+import checker from 'vite-plugin-checker';
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+    checker({
+      typescript: {
+        abortOnError: false, // Do not abort build on TypeScript errors
+      },
+      eslint: {
+        abortOnError: false, // Do not abort build on ESLint errors
+      },
+    }),
+  ],
   server: {
-    host: "::",
-    port: 8080,
+    hmr: false, // Disable Hot Module Replacement to disable live preview
   },
   build: {
-    // Temporarily disable build during foundation restructuring
-    ...(process.env.SKIP_BUILD ? {
-      watch: null,
-      minify: false,
-      sourcemap: false
-    } : {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-          },
-        },
-      },
-      chunkSizeWarningLimit: 1000,
-    }),
+    // Any additional build configurations
   },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-  },
-}));
+});
