@@ -11,7 +11,10 @@ export default tseslint.config(
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        React: "readonly",
+      },
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -20,15 +23,10 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
-        "warn", // Changed from "error" to "warn"
+        "warn",
         { allowConstantExport: true },
       ],
-      "@typescript-eslint/no-unused-vars": "off", // Disabled the rule
-
-      // Downgrade other rules from "error" to "warn"
-      "no-console": "warn",
-      "react/prop-types": "warn",
-      // Add more rules as needed
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   }
 );
