@@ -1,7 +1,17 @@
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { sessionAtom, setAuthErrorAtom } from '@/lib/store/atoms/auth';
 import { toast } from 'sonner';
+
+export const initializeSessionSync = () => {
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key === 'supabase.auth.token') {
+      window.location.reload();
+    }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+  return () => window.removeEventListener('storage', handleStorageChange);
+};
 
 export const syncSessionState = async (
   session: Session | null,
