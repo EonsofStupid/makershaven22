@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import checker from 'vite-plugin-checker';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -12,11 +13,13 @@ export default defineConfig({
       },
     }),
   ],
-  server: {
-    port: 8080,
-    hmr: false,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   build: {
-    // Any additional build configurations
+    sourcemap: true,
+    outDir: 'dist',
   },
 });
