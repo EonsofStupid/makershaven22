@@ -8,6 +8,7 @@ import {
   sidebarActiveTabAtom, 
   sidebarShortcutsAtom 
 } from '@/lib/store/atoms/sidebar';
+import type { AdminToolbarShortcut } from '@/integrations/supabase/types/tables/admin';
 
 interface AdminSidebarProviderProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('admin_toolbar_shortcuts')
+        .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
         .select('item_id')
         .eq('user_id', user.id)
         .order('position');
@@ -48,7 +49,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     if (!user) return;
 
     const { error } = await supabase
-      .from('admin_toolbar_shortcuts')
+      .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
       .insert({
         user_id: user.id,
         item_id: id,
@@ -69,7 +70,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     if (!user) return;
 
     const { error } = await supabase
-      .from('admin_toolbar_shortcuts')
+      .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
       .delete()
       .eq('user_id', user.id)
       .eq('item_id', id);
@@ -83,7 +84,6 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     setShortcuts(shortcuts.filter(s => s !== id));
   };
 
-  // Provide context for backward compatibility during migration
   const contextValue = {
     isOpen,
     isExpanded,
@@ -103,7 +103,6 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
   );
 };
 
-// Create context for backward compatibility
 const AdminSidebarContext = React.createContext<any>(undefined);
 
 export const useAdminSidebar = () => {

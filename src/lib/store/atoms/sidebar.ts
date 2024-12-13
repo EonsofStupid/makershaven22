@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 export interface SidebarState {
   isOpen: boolean;
@@ -8,10 +9,10 @@ export interface SidebarState {
 }
 
 // Base atoms
-export const sidebarOpenAtom = atom<boolean>(false);
-export const sidebarExpandedAtom = atom<boolean>(true);
-export const sidebarActiveTabAtom = atom<string | null>(null);
-export const sidebarShortcutsAtom = atom<string[]>([]);
+export const sidebarOpenAtom = atomWithStorage<boolean>('sidebar_open', false);
+export const sidebarExpandedAtom = atomWithStorage<boolean>('sidebar_expanded', true);
+export const sidebarActiveTabAtom = atomWithStorage<string | null>('sidebar_active_tab', null);
+export const sidebarShortcutsAtom = atomWithStorage<string[]>('sidebar_shortcuts', []);
 
 // Setter atoms
 export const setSidebarAtom = atom(
