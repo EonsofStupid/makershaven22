@@ -6,11 +6,9 @@ export default defineConfig({
   plugins: [
     react(),
     checker({
-      typescript: {
-        abortOnError: false,
-      },
+      typescript: true,
       eslint: {
-        abortOnError: false,
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
       },
     }),
   ],

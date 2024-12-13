@@ -1,7 +1,7 @@
-export * from './core';
+export * from './auth';
 export * from './loading';
 export * from './sidebar';
 export * from './theme';
+export * from './core';
 
-// Re-export auth atoms with namespace to avoid conflicts
-export * as authAtoms from './auth';
+// Add any new atom categories here
