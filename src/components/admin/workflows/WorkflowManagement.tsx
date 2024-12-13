@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useWorkflowStore } from '@/lib/store/workflow-store';
+import { useAtom } from 'jotai';
+import { workflowStateAtom, setActiveWorkflowAtom, addToWorkflowHistoryAtom } from '@/lib/store/atoms/workflow/workflow-atoms';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus } from 'lucide-react';
@@ -20,7 +21,9 @@ interface Workflow {
 }
 
 export const WorkflowManagement = () => {
-  const { activeWorkflows, setActiveWorkflow, addToHistory } = useWorkflowStore();
+  const [workflowState] = useAtom(workflowStateAtom);
+  const [, setActiveWorkflow] = useAtom(setActiveWorkflowAtom);
+  const [, addToHistory] = useAtom(addToWorkflowHistoryAtom);
 
   const { data: workflows, isLoading } = useQuery({
     queryKey: ['workflows'],
@@ -44,10 +47,13 @@ export const WorkflowManagement = () => {
   const handleActivateWorkflow = async (workflow: Workflow) => {
     try {
       console.log('Activating workflow:', workflow.id);
-      setActiveWorkflow(workflow.id, workflow);
-      addToHistory(workflow.id, {
-        action: 'activated',
-        timestamp: new Date().toISOString(),
+      setActiveWorkflow({ id: workflow.id, data: workflow });
+      addToHistory({ 
+        id: workflow.id, 
+        data: {
+          action: 'activated',
+          timestamp: new Date().toISOString(),
+        }
       });
       toast.success(`Workflow ${workflow.name} activated`);
     } catch (error) {
@@ -87,7 +93,7 @@ export const WorkflowManagement = () => {
         </div>
 
         <TabsContent value="active" className="space-y-4">
-          {Object.entries(activeWorkflows).map(([id, workflow]) => (
+          {Object.entries(workflowState.activeWorkflows).map(([id, workflow]) => (
             <motion.div
               key={id}
               initial={{ opacity: 0, y: 20 }}
@@ -112,7 +118,7 @@ export const WorkflowManagement = () => {
               </div>
             </motion.div>
           ))}
-          {Object.keys(activeWorkflows).length === 0 && (
+          {Object.keys(workflowState.activeWorkflows).length === 0 && (
             <div className="text-center py-8 text-gray-400">
               No active workflows
             </div>
@@ -145,7 +151,7 @@ export const WorkflowManagement = () => {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          {Object.entries(useWorkflowStore.getState().workflowHistory).map(([id, history]) => (
+          {Object.entries(workflowState.workflowHistory).map(([id, history]) => (
             <div key={id} className="bg-gray-800/50 border border-white/10 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Workflow {workflows?.find(w => w.id === id)?.name || id}

@@ -1,17 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, Search, User, LogOut } from "lucide-react";
 import { useState } from "react";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAtom } from 'jotai';
+import { userAtom, sessionAtom } from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut } = useAuthStore();
+  const [user] = useAtom(userAtom);
+  const [, setSession] = useAtom(sessionAtom);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setSession(null);
       toast.success("Successfully signed out");
       navigate("/login");
     } catch (error) {
