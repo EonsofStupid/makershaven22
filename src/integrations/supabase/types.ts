@@ -1289,6 +1289,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_user_activity: {
+        Args: {
+          p_user_id: string
+          p_activity_type: string
+          p_details: string
+          p_metadata?: Json
+        }
+        Returns: string
+      }
       resend_2fa_code: {
         Args: {
           p_email: string
