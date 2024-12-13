@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [, setUser] = useAtom(setUserAtom);
   const [loadingState] = useAtom(loadingStateAtom);
   const [, setLoadingState] = useAtom(setLoadingStateAtom);
-  const [error] = useAtom(authErrorAtom);
   const [, setError] = useAtom(setAuthErrorAtom);
   const [isTransitioning] = useAtom(isTransitioningAtom);
   const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
@@ -52,7 +51,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .eq('id', session.user.id)
             .single();
             
-          if (profileError) throw profileError;
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
 
           setSession(session);
           setUser({ ...session.user, role: profile?.role || 'subscriber' });
@@ -83,7 +85,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .eq('id', session.user.id)
             .single();
             
-          if (profileError) throw profileError;
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
 
           setSession(session);
           setUser({ ...session.user, role: profile?.role || 'subscriber' });

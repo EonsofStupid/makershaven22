@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { useAtom } from 'jotai';
+import { sessionAtom, userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,7 +20,9 @@ export const AuthGuard = ({
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const navigate = useNavigate();
-  const { session, user, isLoading } = useAuthStore();
+  const [session] = useAtom(sessionAtom);
+  const [user] = useAtom(userAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
 
   useEffect(() => {
     console.log('AuthGuard: Checking access', {
@@ -29,7 +32,7 @@ export const AuthGuard = ({
       userRole: user?.role
     });
 
-    if (!isLoading) {
+    if (!loadingState.isLoading) {
       if (requireAuth && !session) {
         console.log('AuthGuard: No session, redirecting to', fallbackPath);
         toast.error('Please sign in to continue');
@@ -47,9 +50,9 @@ export const AuthGuard = ({
         }
       }
     }
-  }, [session, user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
+  }, [session, user, loadingState.isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (isLoading) {
+  if (loadingState.isLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

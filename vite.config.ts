@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import checker from 'vite-plugin-checker';
 
 export default defineConfig({
@@ -7,15 +7,16 @@ export default defineConfig({
     react(),
     checker({
       typescript: {
-        abortOnError: false, // Do not abort build on TypeScript errors
+        abortOnError: false,
       },
       eslint: {
-        abortOnError: false, // Do not abort build on ESLint errors
+        abortOnError: false,
       },
     }),
   ],
   server: {
-    hmr: false, // Disable Hot Module Replacement to disable live preview
+    port: 8080,
+    hmr: false,
   },
   build: {
     // Any additional build configurations

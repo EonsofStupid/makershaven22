@@ -6,9 +6,17 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useAtom } from 'jotai';
+import { sessionAtom } from '@/lib/store/atoms/auth';
 
 export const Register = () => {
   const navigate = useNavigate();
+  const [session] = useAtom(sessionAtom);
+
+  if (session) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1A1F2C] px-4">
