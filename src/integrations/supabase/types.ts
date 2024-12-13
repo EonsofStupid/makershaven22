@@ -166,6 +166,47 @@ export type Database = {
           },
         ]
       }
+      cms_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          parent_id: string | null
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          parent_id?: string | null
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cms_content: {
         Row: {
           content: Json | null
@@ -267,28 +308,40 @@ export type Database = {
       }
       cms_content_revisions: {
         Row: {
+          change_summary: string | null
           content: Json
           content_id: string | null
           created_at: string | null
           created_by: string | null
           id: string
           metadata: Json | null
+          publish_status: string | null
+          rollback_metadata: Json | null
+          version_number: number | null
         }
         Insert: {
+          change_summary?: string | null
           content: Json
           content_id?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
           metadata?: Json | null
+          publish_status?: string | null
+          rollback_metadata?: Json | null
+          version_number?: number | null
         }
         Update: {
+          change_summary?: string | null
           content?: Json
           content_id?: string | null
           created_at?: string | null
           created_by?: string | null
           id?: string
           metadata?: Json | null
+          publish_status?: string | null
+          rollback_metadata?: Json | null
+          version_number?: number | null
         }
         Relationships: [
           {
@@ -338,6 +391,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cms_workflows_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      erd_visualizations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          data: Json
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          data: Json
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          data?: Json
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "erd_visualizations_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -744,6 +832,44 @@ export type Database = {
           },
         ]
       }
+      revision_history: {
+        Row: {
+          changes: Json
+          created_at: string | null
+          created_by: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          revision_type: string
+        }
+        Insert: {
+          changes: Json
+          created_at?: string | null
+          created_by?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          revision_type: string
+        }
+        Update: {
+          changes?: Json
+          created_at?: string | null
+          created_by?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          revision_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_logs: {
         Row: {
           action_type: string
@@ -813,6 +939,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "security_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_logs: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          severity: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          severity: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1107,11 +1274,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      create_rollback_revision: {
+        Args: {
+          p_content_id: string
+          p_target_version_number: number
+          p_current_content: Json
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       initialize_user_gamification: {
         Args: {
           user_id: string
         }
         Returns: undefined
+      }
+      resend_2fa_code: {
+        Args: {
+          p_email: string
+        }
+        Returns: Json
       }
       setup_pin: {
         Args: {
