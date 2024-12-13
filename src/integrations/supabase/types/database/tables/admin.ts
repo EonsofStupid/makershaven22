@@ -1,5 +1,12 @@
-import type { TableDefinition } from '../base';
-import type { AdminToolbarShortcut, ImportSession } from '../../tables/admin';
+import { TableDefinition } from "../base";
 
-export interface AdminToolbarShortcutsTable extends TableDefinition<AdminToolbarShortcut> {}
-export interface ImportSessionsTable extends TableDefinition<ImportSession> {}
+export interface AdminSettings {
+  id: string;
+  setting_key: string;
+  setting_value: string | null;
+  setting_type: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export type AdminSettingsTable = TableDefinition<AdminSettings>;

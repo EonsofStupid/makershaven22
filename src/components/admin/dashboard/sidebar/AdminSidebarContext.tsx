@@ -26,8 +26,8 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
       if (!user) return;
 
       const { data, error } = await supabase
-        .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
-        .select('item_id')
+        .from('admin_toolbar_shortcuts')
+        .select('*')
         .eq('user_id', user.id)
         .order('position');
 
@@ -49,7 +49,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     if (!user) return;
 
     const { error } = await supabase
-      .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
+      .from('admin_toolbar_shortcuts')
       .insert({
         user_id: user.id,
         item_id: id,
@@ -70,7 +70,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     if (!user) return;
 
     const { error } = await supabase
-      .from<AdminToolbarShortcut>('admin_toolbar_shortcuts')
+      .from('admin_toolbar_shortcuts')
       .delete()
       .eq('user_id', user.id)
       .eq('item_id', id);

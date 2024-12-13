@@ -550,8 +550,10 @@ export type Database = {
           file_name: string | null
           file_size: number | null
           id: string
+          metadata: Json | null
           row_count: number | null
           status: string
+          type: string | null
           user_id: string | null
         }
         Insert: {
@@ -561,8 +563,10 @@ export type Database = {
           file_name?: string | null
           file_size?: number | null
           id?: string
+          metadata?: Json | null
           row_count?: number | null
           status: string
+          type?: string | null
           user_id?: string | null
         }
         Update: {
@@ -572,8 +576,10 @@ export type Database = {
           file_name?: string | null
           file_size?: number | null
           id?: string
+          metadata?: Json | null
           row_count?: number | null
           status?: string
+          type?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -691,6 +697,7 @@ export type Database = {
           bio: string | null
           created_at: string | null
           display_name: string | null
+          failed_login_attempts: number | null
           gamification_enabled: boolean | null
           id: string
           is_banned: boolean | null
@@ -698,6 +705,7 @@ export type Database = {
           last_password_login: string | null
           last_seen: string | null
           location: string | null
+          lockout_until: string | null
           onboarding_completed: boolean | null
           pin_enabled: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
@@ -716,6 +724,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
           gamification_enabled?: boolean | null
           id: string
           is_banned?: boolean | null
@@ -723,6 +732,7 @@ export type Database = {
           last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
+          lockout_until?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -741,6 +751,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
           gamification_enabled?: boolean | null
           id?: string
           is_banned?: boolean | null
@@ -748,6 +759,7 @@ export type Database = {
           last_password_login?: string | null
           last_seen?: string | null
           location?: string | null
+          lockout_until?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
@@ -1022,7 +1034,9 @@ export type Database = {
       site_settings: {
         Row: {
           accent_color: string | null
+          backdrop_blur: string | null
           border_radius: string | null
+          box_shadow: string | null
           favicon_url: string | null
           font_family_body: string
           font_family_heading: string
@@ -1050,12 +1064,15 @@ export type Database = {
           text_secondary_color: string | null
           theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
+          transition_type: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           accent_color?: string | null
+          backdrop_blur?: string | null
           border_radius?: string | null
+          box_shadow?: string | null
           favicon_url?: string | null
           font_family_body: string
           font_family_heading: string
@@ -1083,12 +1100,15 @@ export type Database = {
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
+          transition_type?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           accent_color?: string | null
+          backdrop_blur?: string | null
           border_radius?: string | null
+          box_shadow?: string | null
           favicon_url?: string | null
           font_family_body?: string
           font_family_heading?: string
@@ -1116,6 +1136,7 @@ export type Database = {
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
+          transition_type?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -1297,6 +1318,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      ban_user: {
+        Args: {
+          p_user_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
       check_rate_limit: {
         Args: {
           p_user_id: string
@@ -1372,7 +1400,9 @@ export type Database = {
         }
         Returns: {
           accent_color: string | null
+          backdrop_blur: string | null
           border_radius: string | null
+          box_shadow: string | null
           favicon_url: string | null
           font_family_body: string
           font_family_heading: string
@@ -1400,6 +1430,7 @@ export type Database = {
           text_secondary_color: string | null
           theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
+          transition_type: string | null
           updated_at: string | null
           updated_by: string | null
         }[]
