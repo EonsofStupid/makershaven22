@@ -1,24 +1,38 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { checkRateLimit } from "@/utils/errorHandling";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Check rate limit before retrying
+        if (!checkRateLimit('query-retry')) {
+          toast.error('Too many requests. Please try again later.');
+          return false;
+        }
+        return failureCount < 3;
+      },
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000,
-      throwOnError: true,
+      gcTime: 30 * 60 * 1000,
       meta: {
-        errorMessage: 'Failed to fetch data'
-      }
+        errorMessage: "Failed to fetch data",
+      },
     },
     mutations: {
-      retry: 1,
-      meta: {
-        successMessage: 'Operation completed successfully',
-        errorMessage: 'Operation failed'
+      retry: (failureCount, error) => {
+        if (!checkRateLimit('mutation-retry')) {
+          toast.error('Too many requests. Please try again later.');
+          return false;
+        }
+        return failureCount < 2;
       },
-      onError: (error: Error) => {
+      meta: {
+        successMessage: "Operation completed successfully",
+        errorMessage: "Operation failed",
+      },
+      onError: (error: Error, variables: unknown, context: unknown) => {
         console.error('Mutation error:', error);
         toast.error('Operation failed', {
           description: error.message,

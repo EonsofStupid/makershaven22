@@ -2,17 +2,21 @@ import { BrowserRouter } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RootLayout } from "@/components/layouts/RootLayout";
 import { AppRoutes } from "@/routes";
-import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
+import { GlobalErrorBoundary } from "@/components/shared/error-handling/GlobalErrorBoundary";
 import { ThemeProvider } from "@/components/theme/ThemeContext";
 import { AdminSidebarProvider } from "@/components/admin/dashboard/sidebar/AdminSidebarContext";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/auth/providers/QueryProvider";
 import { AuthProvider } from "@/components/auth/providers/AuthProvider";
 import { StoreProvider } from '@/lib/store/providers/StoreProvider';
+import { setupGlobalErrorHandlers } from "@/utils/errorHandling";
+
+// Setup global error handlers
+setupGlobalErrorHandlers();
 
 const App = () => {
   return (
-    <ErrorBoundary>
+    <GlobalErrorBoundary>
       <StoreProvider>
         <QueryProvider>
           <BrowserRouter>
@@ -47,7 +51,7 @@ const App = () => {
           </BrowserRouter>
         </QueryProvider>
       </StoreProvider>
-    </ErrorBoundary>
+    </GlobalErrorBoundary>
   );
 };
 
