@@ -35,12 +35,3 @@ export interface AuthUIState {
   rememberMe: boolean;
   validationErrors: Record<string, string>;
 }
-
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
-}
