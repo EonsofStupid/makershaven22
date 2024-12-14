@@ -1,4 +1,4 @@
-export type ComponentType = 'text' | 'image' | 'button' | 'container' | 'form';
+export type ComponentType = 'text' | 'image' | 'button' | 'container' | 'form' | 'bearings' | 'extruders' | 'addons';
 
 export interface ComponentConfig {
   type: ComponentType;
