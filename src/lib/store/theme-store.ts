@@ -12,7 +12,8 @@ export const useThemeStore = create<ThemeState>()(
       setMode: (mode: ThemeMode) => set({ mode }),
       updateSettings: (newSettings: Partial<Settings>) => 
         set((state) => ({
-          settings: state.settings ? { ...state.settings, ...newSettings } : null
+          settings: state.settings ? { ...state.settings, ...newSettings } : null,
+          error: null
         })),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
       setError: (error: Error | null) => set({ error }),

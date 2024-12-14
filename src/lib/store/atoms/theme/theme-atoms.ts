@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { useThemeStore } from '../../theme-store';
 import type { Settings, Theme, ThemeMode, ThemeAtomState } from '@/lib/types/settings';
+import { useThemeStore } from '../../theme-store';
 
 // Base theme atom with storage
 export const themeAtom = atomWithStorage<ThemeAtomState>('theme', {
