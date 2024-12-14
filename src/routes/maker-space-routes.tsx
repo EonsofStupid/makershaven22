@@ -1,8 +1,9 @@
+import React from 'react';
 import { Routes, Route } from "react-router-dom";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { MakerSpaceDashboard } from "@/pages/maker-space/Dashboard";
-import { MakerSpaceSettings } from "@/pages/maker-space/Settings";
-import { MakerSpaceProjects } from "@/pages/maker-space/Projects";
+import MakerSpaceDashboard from "@/pages/maker-space/Dashboard";
+import MakerSpaceSettings from "@/pages/maker-space/Settings";
+import MakerSpaceProjects from "@/pages/maker-space/Projects";
 
 export const makerSpaceRoutes = (
   <Routes>
