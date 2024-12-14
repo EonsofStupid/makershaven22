@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useAuthStore } from '@/lib/store/auth';
+import { useAuthStore } from '@/lib/store/auth/auth-store';
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { toast } from "sonner";
-import type { AuthSession } from '@/lib/store/auth';
+import type { AuthSession } from '@/lib/types/auth';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (sessionError) throw sessionError;
 
         if (session?.user) {
+          console.log('Valid session found, checking profile');
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -29,44 +30,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
             
           if (profileError) {
-            const { data: newProfile, error: createError } = await supabase
-              .from('profiles')
-              .insert([{ 
-                id: session.user.id,
-                role: 'subscriber'
-              }])
-              .select()
-              .single();
-              
-            if (createError) throw createError;
-            
-            const authSession: AuthSession = {
-              user: { ...session.user, role: newProfile?.role || 'subscriber' },
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-              expires_in: session.expires_in
-            };
-            
-            setSession(authSession);
-            setUser(authSession.user);
-            toast.success('Profile created successfully');
-          } else {
-            const authSession: AuthSession = {
-              user: { ...session.user, role: profile?.role || 'subscriber' },
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-              expires_in: session.expires_in
-            };
-            
-            setSession(authSession);
-            setUser(authSession.user);
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
           }
+
+          console.log('Profile data:', profile);
+
+          const authSession: AuthSession = {
+            user: { 
+              ...session.user, 
+              role: profile?.role || 'subscriber',
+              username: profile?.username,
+              displayName: profile?.display_name
+            },
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_in: session.expires_in
+          };
+          
+          setSession(authSession);
+          setUser(authSession.user);
         } else {
           setSession(null);
           setUser(null);
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Session check error:", error);
         setError(error instanceof Error ? error : new Error('Failed to initialize auth'));
         toast.error('Failed to initialize authentication');
       } finally {
@@ -87,41 +76,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .eq('id', session.user.id)
             .single();
             
-          if (profileError) {
-            const { data: newProfile, error: createError } = await supabase
-              .from('profiles')
-              .insert([{ 
-                id: session.user.id,
-                role: 'subscriber'
-              }])
-              .select()
-              .single();
-              
-            if (createError) throw createError;
-            
-            const authSession: AuthSession = {
-              user: { ...session.user, role: newProfile?.role || 'subscriber' },
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-              expires_in: session.expires_in
-            };
-            
-            setSession(authSession);
-            setUser(authSession.user);
-            toast.success('Profile created successfully');
-          } else {
-            const authSession: AuthSession = {
-              user: { ...session.user, role: profile?.role || 'subscriber' },
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-              expires_in: session.expires_in
-            };
-            
-            setSession(authSession);
-            setUser(authSession.user);
+          if (profileError) throw profileError;
+
+          const authSession: AuthSession = {
+            user: { 
+              ...session.user, 
+              role: profile?.role || 'subscriber',
+              username: profile?.username,
+              displayName: profile?.display_name
+            },
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_in: session.expires_in
+          };
+          
+          setSession(authSession);
+          setUser(authSession.user);
+          
+          if (event === 'SIGNED_IN') {
+            toast.success('Successfully signed in');
           }
         } catch (error) {
-          console.error('Auth state change error:', error);
+          console.error('Error in auth state change:', error);
           setError(error instanceof Error ? error : new Error('Auth state change failed'));
           toast.error('Authentication error occurred');
         }
