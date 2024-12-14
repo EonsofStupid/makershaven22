@@ -11,27 +11,27 @@ export const HeroSection = () => {
       <div 
         className="absolute inset-0 opacity-20 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/lovable-uploads/4edf410a-5bd3-426b-8efe-fb8acb60e39c.png')",
+          backgroundImage: "url('/lovable-uploads/8bf77016-aea3-48bd-8212-e42940268b03.png')",
           backgroundPosition: "center 40%"
         }}
       />
       
-      <div className="container mx-auto px-6 pt-24 relative z-10">
+      <div className="relative z-10 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center relative"
+          className="text-center px-6"
         >
-          <h1 className="landing-title text-[#41f0db] text-4xl md:text-6xl font-bold mb-6">
+          <h1 className="text-[#41f0db] text-4xl md:text-6xl font-bold mb-6">
             Build your 3D Printer Dream
           </h1>
           
-          <p className="landing-text text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
             Your hub for 3D printing innovation. Discover builds, parts, and join our community of makers.
           </p>
 
-          <div className="max-w-2xl mx-auto mb-12">
+          <div className="max-w-2xl mx-auto">
             <div className="relative">
               <input
                 type="text"
