@@ -54,3 +54,10 @@ export interface SecurityLog {
   metadata?: Record<string, any>;
   createdAt: Date;
 }
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+}
