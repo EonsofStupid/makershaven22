@@ -3,36 +3,33 @@ import { atomWithStorage } from 'jotai/utils';
 import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 import { supabase } from "@/integrations/supabase/client";
 
-export const DEFAULT_SETTINGS: Settings = {
-  site_title: 'MakersImpulse',
-  tagline: 'Create, Share, Inspire',
-  primary_color: '#7FFFD4',
-  secondary_color: '#FFB6C1',
-  accent_color: '#E6E6FA',
-  text_primary_color: '#FFFFFF',
-  text_secondary_color: '#A1A1AA',
-  text_link_color: '#3B82F6',
-  text_heading_color: '#FFFFFF',
-  neon_cyan: '#41f0db',
-  neon_pink: '#ff0abe',
-  neon_purple: '#8000ff',
-  border_radius: '0.5rem',
-  spacing_unit: '1rem',
-  transition_duration: '0.3s',
-  shadow_color: '#000000',
-  hover_scale: '1.05',
-  font_family_heading: 'Inter',
-  font_family_body: 'Inter',
-  font_size_base: '16px',
-  font_weight_normal: '400',
-  font_weight_bold: '700',
-  line_height_base: '1.5',
-  letter_spacing: 'normal',
-  transition_type: 'fade'
-};
-
 export const themeAtom = atomWithStorage<Theme>('theme', {
-  settings: DEFAULT_SETTINGS,
+  settings: {
+    site_title: 'MakersImpulse',
+    primary_color: '#7FFFD4',
+    secondary_color: '#FFB6C1',
+    accent_color: '#E6E6FA',
+    text_primary_color: '#FFFFFF',
+    text_secondary_color: '#A1A1AA',
+    text_link_color: '#3B82F6',
+    text_heading_color: '#FFFFFF',
+    neon_cyan: '#41f0db',
+    neon_pink: '#ff0abe',
+    neon_purple: '#8000ff',
+    font_family_heading: 'Inter',
+    font_family_body: 'Inter',
+    font_size_base: '16px',
+    font_weight_normal: '400',
+    font_weight_bold: '700',
+    line_height_base: '1.5',
+    letter_spacing: 'normal',
+    border_radius: '0.5rem',
+    spacing_unit: '1rem',
+    transition_duration: '0.3s',
+    shadow_color: '#000000',
+    hover_scale: '1.05',
+    transition_type: 'fade'
+  },
   mode: 'system'
 });
 
@@ -43,43 +40,6 @@ export const effectiveThemeAtom = atom((get) => {
   const themeMode = get(themeModeAtom);
   const systemTheme = get(systemThemeAtom);
   return themeMode === 'system' ? systemTheme : themeMode;
-});
-
-export const themeStateAtom = atom((get) => ({
-  settings: get(themeAtom).settings,
-  mode: get(themeAtom).mode,
-  isLoading: false,
-  error: null
-}));
-
-export const cssVariablesAtom = atom((get) => {
-  const theme = get(themeAtom);
-  return {
-    '--primary-color': theme.settings.primary_color,
-    '--secondary-color': theme.settings.secondary_color,
-    '--accent-color': theme.settings.accent_color,
-    '--text-primary-color': theme.settings.text_primary_color,
-    '--text-secondary-color': theme.settings.text_secondary_color,
-    '--text-link-color': theme.settings.text_link_color,
-    '--text-heading-color': theme.settings.text_heading_color,
-    '--neon-cyan': theme.settings.neon_cyan,
-    '--neon-pink': theme.settings.neon_pink,
-    '--neon-purple': theme.settings.neon_purple,
-    '--font-family-heading': theme.settings.font_family_heading,
-    '--font-family-body': theme.settings.font_family_body,
-    '--font-size-base': theme.settings.font_size_base,
-    '--font-weight-normal': theme.settings.font_weight_normal,
-    '--font-weight-bold': theme.settings.font_weight_bold,
-    '--line-height-base': theme.settings.line_height_base,
-    '--letter-spacing': theme.settings.letter_spacing,
-    '--border-radius': theme.settings.border_radius,
-    '--spacing-unit': theme.settings.spacing_unit,
-    '--transition-duration': theme.settings.transition_duration,
-    '--shadow-color': theme.settings.shadow_color,
-    '--hover-scale': theme.settings.hover_scale,
-    '--box-shadow': theme.settings.box_shadow || 'none',
-    '--backdrop-blur': theme.settings.backdrop_blur || '0',
-  };
 });
 
 export const updateThemeAtom = atom(
