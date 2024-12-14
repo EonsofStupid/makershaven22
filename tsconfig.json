@@ -1,19 +1,11 @@
 {
   "compilerOptions": {
-    "noEmitOnError": false,    // Allow emitting files even if there are errors
-    "strict": false,           // Disable strict type checking (optional)
-    "skipLibCheck": true,      // Skip type checking of declaration files
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
-    "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   },
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["vite.config.ts"]
 }
