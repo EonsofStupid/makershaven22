@@ -38,10 +38,20 @@ export interface Theme {
   mode: ThemeMode;
 }
 
+// Bridge type for Zustand store
 export interface ThemeState {
-  theme: Theme | null;
+  settings: Settings | null;
+  mode: ThemeMode;
   isLoading: boolean;
   error: Error | null;
+  setMode: (mode: ThemeMode) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+}
+
+// Bridge type for Jotai atoms
+export interface ThemeAtomState {
+  settings: Settings | null;
+  mode: ThemeMode;
 }
 
 export interface DatabaseSettingsRow {
@@ -111,7 +121,3 @@ export interface SettingsUpdateParams {
   p_logo_url?: string;
   p_favicon_url?: string;
 }
-
-export type ThemeSettings = Settings & {
-  mode: ThemeMode;
-};
