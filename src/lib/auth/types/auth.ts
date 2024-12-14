@@ -22,6 +22,7 @@ export interface AuthState {
   hasAccess: boolean;
   error: Error | null;
   isTransitioning?: boolean;
+  reset?: () => void;
 }
 
 export interface AuthGuardProps {
@@ -33,16 +34,17 @@ export interface AuthGuardProps {
 export type SecurityEventSeverity = 'low' | 'medium' | 'high';
 export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
 
-export interface SessionConfig {
-  refreshInterval: number;
-  sessionTimeout: number;
-  storageKey: string;
-  onSessionExpired?: () => void;
-  onRefreshError?: (error: Error) => void;
-}
-
-export interface SessionState {
-  isAuthenticated: boolean;
-  lastActivity: Date;
-  token?: string;
+export interface SecurityLog {
+  id: string;
+  user_id: string;
+  event_type: string;
+  severity: SecurityEventSeverity;
+  details: any;
+  metadata: any;
+  ip_address?: string;
+  created_at: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+  };
 }

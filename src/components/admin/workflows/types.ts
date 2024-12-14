@@ -53,6 +53,8 @@ export interface StageConfigUpdateProps {
   onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
 
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -71,12 +73,24 @@ export const validateStage = (stage: WorkflowStage): ValidationResult => {
   };
 };
 
+export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
+  return {
+    ...updates,
+    id: stageId
+  };
+};
+
+export const isValidStageUpdate = (updates: Partial<WorkflowStage>): boolean => {
+  if (!updates.id) return false;
+  return true;
+};
+
 export const parseStages = (stagesJson: Json): WorkflowStage[] => {
   if (!Array.isArray(stagesJson)) return [];
   return stagesJson.map(stage => ({
     id: stage.id || crypto.randomUUID(),
     name: stage.name || '',
-    type: stage.type || 'task',
+    type: (stage.type as WorkflowStageType) || 'task',
     order: stage.order || 0,
     config: stage.config || {},
     description: stage.description
