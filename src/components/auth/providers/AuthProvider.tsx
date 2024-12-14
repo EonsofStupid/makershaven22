@@ -52,12 +52,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
             
           if (profileError) {
-            console.error('Profile fetch error:', profileError);
-            throw profileError;
+            // If profile doesn't exist, create it
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert([{ 
+                id: session.user.id,
+                role: 'subscriber'
+              }])
+              .select()
+              .single();
+              
+            if (createError) {
+              console.error('Error creating profile:', createError);
+              throw createError;
+            }
+            
+            setSession(session);
+            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            toast.success('Profile created successfully');
+          } else {
+            setSession(session);
+            setUser({ ...session.user, role: profile?.role || 'subscriber' });
           }
-
-          setSession(session);
-          setUser({ ...session.user, role: profile?.role || 'subscriber' });
           console.log('Auth initialized with session:', session.user.id);
         } else {
           setSession(null);
@@ -86,12 +102,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
             
           if (profileError) {
-            console.error('Profile fetch error:', profileError);
-            throw profileError;
+            // If profile doesn't exist, create it
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert([{ 
+                id: session.user.id,
+                role: 'subscriber'
+              }])
+              .select()
+              .single();
+              
+            if (createError) {
+              console.error('Error creating profile:', createError);
+              throw createError;
+            }
+            
+            setSession(session);
+            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            toast.success('Profile created successfully');
+          } else {
+            setSession(session);
+            setUser({ ...session.user, role: profile?.role || 'subscriber' });
           }
-
-          setSession(session);
-          setUser({ ...session.user, role: profile?.role || 'subscriber' });
         } else {
           setSession(null);
           setUser(null);
