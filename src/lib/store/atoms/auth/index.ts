@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession, AuthState } from '@/lib/auth/types';
+import type { AuthUser, AuthSession, AuthState } from '@/lib/types/auth';
 
 // Session atoms
 export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
@@ -47,16 +47,6 @@ export const setAuthErrorAtom = atom(
   null,
   (_get, set, error: Error | null) => {
     set(authErrorAtom, error);
-  }
-);
-
-// Transition state atoms
-export const isTransitioningAtom = atom<boolean>(false);
-
-export const setIsTransitioningAtom = atom(
-  null,
-  (_get, set, isTransitioning: boolean) => {
-    set(isTransitioningAtom, isTransitioning);
   }
 );
 

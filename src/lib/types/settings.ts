@@ -32,5 +32,14 @@ export interface Settings {
 
 export interface Theme {
   settings: Settings;
-  mode: 'light' | 'dark' | 'system';
+  mode: ThemeMode;
+}
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+
+export interface ThemeContextType {
+  theme: Theme | null;
+  mode: ThemeMode;
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (settings: Settings) => void;
 }
