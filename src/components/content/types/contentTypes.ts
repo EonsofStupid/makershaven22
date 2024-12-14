@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Json } from '@/integrations/supabase/types';
 
-export type ContentType = 'page' | 'component' | 'template' | 'post';
+export type ContentType = 'page' | 'component' | 'template' | 'post' | 'workflow';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
 export interface BaseContent {

@@ -1,3 +1,20 @@
+export interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  onError?: (error: Error) => void;
+}
+
+export interface AuthErrorBoundaryState {
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+}
+
+export interface AuthErrorRecoveryState {
+  isRecovering: boolean;
+  error: Error | null;
+  recoveryAttempts: number;
+}
+
 export interface AuthError extends Error {
   code: string;
   details?: string;

@@ -1,3 +1,7 @@
+export type ThemeMode = 'light' | 'dark' | 'system';
+
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -31,13 +35,9 @@ export interface Settings {
 }
 
 export interface Theme {
-  settings: Settings;
+  settings: Settings | null;
   mode: ThemeMode;
 }
-
-export type ThemeMode = 'light' | 'dark' | 'system';
-
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface ThemeSettings extends Settings {
   mode: ThemeMode;
