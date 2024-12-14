@@ -3,24 +3,25 @@ import { useAtom } from 'jotai';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
-  sessionAtom,
-  userAtom,
+  setSessionAtom,
+  setUserAtom,
   isLoadingAtom,
-  errorAtom,
-  isTransitioningAtom
+  setErrorAtom,
+  setTransitioningAtom
 } from '@/lib/store/atoms/auth/auth-atoms';
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import type { AuthUser } from '@/lib/types/auth';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [, setSession] = useAtom(sessionAtom);
-  const [, setUser] = useAtom(userAtom);
   const [isLoading] = useAtom(isLoadingAtom);
-  const [, setError] = useAtom(errorAtom);
-  const [isTransitioning, setTransitioning] = useAtom(isTransitioningAtom);
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
+  const [, setError] = useAtom(setErrorAtom);
+  const [, setTransitioning] = useAtom(setTransitioningAtom);
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -51,11 +52,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             if (createError) throw createError;
             
             setSession(session);
-            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            setUser({ ...session.user, role: newProfile?.role || 'subscriber' } as AuthUser);
             toast.success('Profile created successfully');
           } else {
             setSession(session);
-            setUser({ ...session.user, role: profile?.role || 'subscriber' });
+            setUser({ ...session.user, role: profile?.role || 'subscriber' } as AuthUser);
           }
         } else {
           setSession(null);
@@ -95,11 +96,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             if (createError) throw createError;
             
             setSession(session);
-            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            setUser({ ...session.user, role: newProfile?.role || 'subscriber' } as AuthUser);
             toast.success('Profile created successfully');
           } else {
             setSession(session);
-            setUser({ ...session.user, role: profile?.role || 'subscriber' });
+            setUser({ ...session.user, role: profile?.role || 'subscriber' } as AuthUser);
           }
         } else {
           setSession(null);
@@ -120,7 +121,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [setSession, setUser, setError, setTransitioning]);
 
-  if (isLoading || isTransitioning) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />

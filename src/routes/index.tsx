@@ -89,7 +89,7 @@ export const AppRoutes = () => {
           <Route 
             path="/login" 
             element={
-              <AuthGuard requireAuth={false}>
+              <AuthGuard requireAuth={false} fallbackPath="/">
                 <Login />
               </AuthGuard>
             } 
@@ -97,7 +97,7 @@ export const AppRoutes = () => {
           <Route 
             path="/register" 
             element={
-              <AuthGuard requireAuth={false}>
+              <AuthGuard requireAuth={false} fallbackPath="/">
                 <Register />
               </AuthGuard>
             } 
