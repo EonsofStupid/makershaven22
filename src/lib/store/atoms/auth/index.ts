@@ -50,6 +50,16 @@ export const setAuthErrorAtom = atom(
   }
 );
 
+// Transition atoms
+export const isTransitioningAtom = atom<boolean>(false);
+
+export const setIsTransitioningAtom = atom(
+  null,
+  (_get, set, isTransitioning: boolean) => {
+    set(isTransitioningAtom, isTransitioning);
+  }
+);
+
 // Auth state atoms
 export const authStateAtom = atom<AuthState>({
   isLoading: true,
