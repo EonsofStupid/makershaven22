@@ -26,12 +26,12 @@ export interface Settings {
   box_shadow?: string;
   backdrop_blur?: string;
   transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  logo_url?: string;
+  favicon_url?: string;
 }
 
 export interface SettingsFormData extends Settings {
-  logo_url?: string;
-  favicon_url?: string;
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
 }
 
 export interface SettingsResponse {
@@ -64,8 +64,6 @@ export interface SettingsUpdateParams {
   p_transition_duration: string;
   p_shadow_color: string;
   p_hover_scale: string;
-  p_box_shadow?: string;
-  p_backdrop_blur?: string;
-  p_transition_type?: string;
-  p_menu_animation_type?: string;
+  p_logo_url?: string;
+  p_favicon_url?: string;
 }

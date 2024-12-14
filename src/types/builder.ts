@@ -1,9 +1,11 @@
+import type { Json } from "@/integrations/supabase/types";
+
 export interface BuilderElement {
   id: string;
   type: string;
   props: Record<string, any>;
   children?: BuilderElement[];
-  styles?: Record<string, string | number>;
+  content?: any;
 }
 
 export interface BuilderState {

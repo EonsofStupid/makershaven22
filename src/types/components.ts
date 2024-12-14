@@ -1,16 +1,19 @@
-export interface ValidationSchema {
-  type: string;
-  rules: ValidationRule[];
+export type ComponentType = 'text' | 'image' | 'button' | 'container' | 'form';
+
+export interface ComponentConfig {
+  type: ComponentType;
+  label: string;
+  icon?: string;
+  defaultProps?: Record<string, any>;
+  validationRules?: ValidationRule[];
 }
 
 export interface ValidationRule {
   type: string;
-  params?: any;
   message: string;
+  value?: any;
 }
 
-export interface ComponentConfig {
-  name: string;
-  schema: ValidationSchema;
-  defaultProps?: Record<string, any>;
+export interface ValidationSchema {
+  [key: string]: ValidationRule[];
 }
