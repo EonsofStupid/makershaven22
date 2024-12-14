@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthState, AuthUser, AuthSession } from './types';
+import type { AuthState, AuthUser, AuthSession } from '@/lib/types/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface AuthStore extends AuthState {
-  // Global auth actions
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setSession: (session: AuthSession | null) => void;
@@ -16,10 +15,6 @@ interface AuthStore extends AuthState {
   reset: () => void;
 }
 
-/**
- * Global auth store using Zustand
- * Handles authentication state and persistence
- */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
@@ -40,9 +35,21 @@ export const useAuthStore = create<AuthStore>()(
           });
           if (error) throw error;
           
+          const authSession: AuthSession = {
+            user: {
+              id: data.user.id,
+              email: data.user.email,
+              role: data.user.role as UserRole,
+              ...data.user.user_metadata
+            },
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+            expires_in: data.session.expires_in
+          };
+          
           set({ 
-            session: data.session,
-            user: data.user as AuthUser,
+            session: authSession,
+            user: authSession.user,
             isLoading: false 
           });
           

@@ -1,4 +1,4 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'guest';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
@@ -16,15 +16,24 @@ export interface AuthSession {
   user: AuthUser;
   access_token: string;
   refresh_token?: string;
-  expires_at?: number;
+  expires_in: number;
 }
 
+// Global auth state managed by Zustand
 export interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
   isLoading: boolean;
-  hasAccess: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  reset: () => void;
+}
+
+// Component-level state managed by Jotai
+export interface AuthUIState {
+  isAuthenticating: boolean;
+  showPassword: boolean;
+  rememberMe: boolean;
+  validationErrors: Record<string, string>;
 }
 
 export interface AuthGuardProps {

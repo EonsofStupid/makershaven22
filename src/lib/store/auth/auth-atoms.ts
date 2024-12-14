@@ -1,11 +1,6 @@
 import { atom } from 'jotai';
-import type { AuthUIState } from './types';
+import type { AuthUIState } from '@/lib/types/auth';
 import { useAuthStore } from './auth-store';
-
-/**
- * Component-level UI state using Jotai
- * Handles temporary form state and UI interactions
- */
 
 // Base UI state atom
 export const authUIStateAtom = atom<AuthUIState>({

@@ -10,18 +10,6 @@ import {
   resetAuthUIStateAtom,
 } from './auth-atoms';
 
-/**
- * Unified auth hook that provides access to both global and component-level state
- * 
- * Global state (Zustand):
- * - Authentication state (user, session)
- * - Loading and error states
- * - Auth actions (signIn, signOut)
- * 
- * Component state (Jotai):
- * - UI state (form visibility, validation)
- * - Temporary form data
- */
 export const useAuth = () => {
   // Global auth state from Zustand
   const { signIn, signOut } = useAuthStore();
