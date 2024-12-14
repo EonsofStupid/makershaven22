@@ -25,7 +25,7 @@ export interface Settings {
   hover_scale: string;
   box_shadow?: string;
   backdrop_blur?: string;
-  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
+  transition_type: 'fade' | 'slide' | 'scale' | 'blur';
   logo_url?: string;
   favicon_url?: string;
 }
@@ -34,5 +34,3 @@ export interface Theme {
   settings: Settings;
   mode: 'light' | 'dark' | 'system';
 }
-
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
