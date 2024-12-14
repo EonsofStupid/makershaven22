@@ -57,14 +57,7 @@ export const AppRoutes = () => {
             <Route
               key={route.path}
               path={route.path}
-              element={
-                <AuthGuard 
-                  requireAuth={true}
-                  fallbackPath="/login"
-                >
-                  {route.element}
-                </AuthGuard>
-              }
+              element={route.element}
             />
           ))}
 
