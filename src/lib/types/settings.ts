@@ -43,6 +43,10 @@ export interface ThemeState extends Theme {
   error: Error | null;
 }
 
+export type ThemeSettings = Settings & {
+  mode: ThemeMode;
+};
+
 export type SettingsUpdateParams = {
   [K in keyof Settings as `p_${string & K}`]: Settings[K];
 };

@@ -3,7 +3,7 @@ import { atomWithStorage } from 'jotai/utils';
 import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 import { supabase } from "@/integrations/supabase/client";
 
-const DEFAULT_SETTINGS: Settings = {
+export const DEFAULT_SETTINGS: Settings = {
   site_title: 'MakersImpulse',
   tagline: 'Create, Share, Inspire',
   primary_color: '#7FFFD4',
@@ -91,3 +91,33 @@ export const updateThemeAtom = atom(
     }
   }
 );
+
+export const cssVariablesAtom = atom((get) => {
+  const theme = get(themeAtom);
+  return {
+    '--primary-color': theme.settings.primary_color,
+    '--secondary-color': theme.settings.secondary_color,
+    '--accent-color': theme.settings.accent_color,
+    '--text-primary-color': theme.settings.text_primary_color,
+    '--text-secondary-color': theme.settings.text_secondary_color,
+    '--text-link-color': theme.settings.text_link_color,
+    '--text-heading-color': theme.settings.text_heading_color,
+    '--neon-cyan': theme.settings.neon_cyan,
+    '--neon-pink': theme.settings.neon_pink,
+    '--neon-purple': theme.settings.neon_purple,
+    '--font-family-heading': theme.settings.font_family_heading,
+    '--font-family-body': theme.settings.font_family_body,
+    '--font-size-base': theme.settings.font_size_base,
+    '--font-weight-normal': theme.settings.font_weight_normal,
+    '--font-weight-bold': theme.settings.font_weight_bold,
+    '--line-height-base': theme.settings.line_height_base,
+    '--letter-spacing': theme.settings.letter_spacing,
+    '--border-radius': theme.settings.border_radius,
+    '--spacing-unit': theme.settings.spacing_unit,
+    '--transition-duration': theme.settings.transition_duration,
+    '--shadow-color': theme.settings.shadow_color,
+    '--hover-scale': theme.settings.hover_scale,
+    '--box-shadow': theme.settings.box_shadow || 'none',
+    '--backdrop-blur': theme.settings.backdrop_blur || '0',
+  };
+});
