@@ -1,49 +1,26 @@
-import { z } from "zod";
-import type { Json } from "@/integrations/supabase/types";
-
-export type ContentType = "component" | "page" | "template";
-
-export interface ComponentContent {
-  type: "component";
+export interface BaseContent {
   id?: string;
-  title?: string;
+  title: string;
+  type: ContentType;
   content?: any;
   metadata?: Record<string, any>;
+  status?: 'draft' | 'published' | 'archived';
+  version?: number;
 }
 
-export interface PageContent {
-  type: "page";
+export interface PageContent extends BaseContent {
+  type: 'page';
   layout?: string;
-  id?: string;
-  title?: string;
-  content?: any;
-  metadata?: Record<string, any>;
 }
 
-export const componentContentSchema = z.object({
-  type: z.literal("component"),
-  id: z.string().optional(),
-  title: z.string().optional(),
-  content: z.any().optional(),
-  metadata: z.record(z.any()).optional()
-});
+export interface ComponentContent extends BaseContent {
+  type: 'component';
+}
 
-export const pageContentSchema = z.object({
-  type: z.literal("page"),
-  layout: z.string().optional(),
-  id: z.string().optional(),
-  title: z.string().optional(),
-  content: z.any().optional(),
-  metadata: z.record(z.any()).optional()
-});
+export type ContentType = 'page' | 'component' | 'workflow';
 
-export const getSchemaByType = (type: ContentType) => {
-  switch (type) {
-    case "component":
-      return componentContentSchema;
-    case "page":
-      return pageContentSchema;
-    default:
-      throw new Error(`Unknown content type: ${type}`);
-  }
+export const CONTENT_TYPES: Record<ContentType, ContentType[]> = {
+  page: ['page'],
+  component: ['component'],
+  workflow: ['workflow']
 };

@@ -26,14 +26,13 @@ export interface Settings {
   box_shadow?: string;
   backdrop_blur?: string;
   transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
-}
-
-export interface SettingsFormData extends Settings {
   logo_url?: string;
   favicon_url?: string;
 }
 
-export interface SettingsResponse {
-  data: Settings;
-  error: Error | null;
+export interface Theme {
+  settings: Settings;
+  mode: 'light' | 'dark' | 'system';
 }
+
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
