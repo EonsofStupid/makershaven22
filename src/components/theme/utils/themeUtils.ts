@@ -1,5 +1,4 @@
-import { Theme, Settings } from '@/lib/types/settings';
-import type { DatabaseSettingsRow } from '../types/theme';
+import type { Theme, Settings, DatabaseSettingsRow } from '@/lib/types/settings';
 
 export const applyThemeToDocument = (theme: Theme | null) => {
   if (!theme?.settings) {
@@ -33,12 +32,21 @@ export const applyThemeToDocument = (theme: Theme | null) => {
   document.documentElement.style.setProperty('--letter-spacing', settings.letter_spacing);
 
   // Apply layout
-  document.documentElement.style.setProperty('--border-radius', settings.border_radius);
-  document.documentElement.style.setProperty('--spacing-unit', settings.spacing_unit);
-  document.documentElement.style.setProperty('--transition-duration', settings.transition_duration);
-  document.documentElement.style.setProperty('--shadow-color', settings.shadow_color);
-  document.documentElement.style.setProperty('--hover-scale', settings.hover_scale);
-  
+  if (settings.border_radius) {
+    document.documentElement.style.setProperty('--border-radius', settings.border_radius);
+  }
+  if (settings.spacing_unit) {
+    document.documentElement.style.setProperty('--spacing-unit', settings.spacing_unit);
+  }
+  if (settings.transition_duration) {
+    document.documentElement.style.setProperty('--transition-duration', settings.transition_duration);
+  }
+  if (settings.shadow_color) {
+    document.documentElement.style.setProperty('--shadow-color', settings.shadow_color);
+  }
+  if (settings.hover_scale) {
+    document.documentElement.style.setProperty('--hover-scale', settings.hover_scale);
+  }
   if (settings.box_shadow) {
     document.documentElement.style.setProperty('--box-shadow', settings.box_shadow);
   }
