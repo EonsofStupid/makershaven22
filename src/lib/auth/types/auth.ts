@@ -1,4 +1,4 @@
-import type { UserRole } from '@/integrations/supabase/types';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'guest';
 
 export interface AuthUser {
   id: string;
@@ -34,4 +34,21 @@ export interface AuthGuardProps {
   fallbackPath?: string;
   loadingComponent?: React.ReactNode;
   unauthorizedComponent?: React.ReactNode;
+}
+
+export type SecurityEventSeverity = 'info' | 'warning' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'content' | 'system' | 'user';
+
+export interface SessionConfig {
+  refreshInterval: number;
+  sessionTimeout: number;
+  storageKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
+}
+
+export interface SessionState {
+  isAuthenticated: boolean;
+  lastActivity: Date;
+  token?: string;
 }
