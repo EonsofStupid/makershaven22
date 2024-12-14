@@ -11,85 +11,62 @@
   --neon-pink: #ff0abe;
   --neon-purple: #8000ff;
 
+  /* Neon Text Effects */
+  --neon-text-shadow-cyan: 
+    0 0 7px var(--neon-cyan),
+    0 0 10px var(--neon-cyan),
+    0 0 21px var(--neon-cyan),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  
+  --neon-text-shadow-pink: 
+    0 0 7px var(--neon-pink),
+    0 0 10px var(--neon-pink),
+    0 0 21px var(--neon-pink),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+
   /* Layout */
   --border-radius: 0.5rem;
   --spacing-unit: 1rem;
   --transition-duration: 0.3s;
   --shadow-color: #000000;
   --hover-scale: 1.05;
-
-  /* Typography */
-  --font-heading: 'Inter';
-  --font-size-base: 16px;
-  --font-weight-normal: 400;
-  --font-weight-bold: 700;
-  --line-height-base: 1.5;
-  --letter-spacing: normal;
 }
 
-/* Glass effects */
-.glass {
-  @apply bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+/* Neon Text Classes */
+.neon-text-cyan {
+  color: var(--neon-cyan);
+  text-shadow: var(--neon-text-shadow-cyan);
 }
 
-.glass-nav {
-  @apply fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-b border-[#8000ff]/30;
-  transition: border-color 0.3s ease;
+.neon-text-pink {
+  color: var(--neon-pink);
+  text-shadow: var(--neon-text-shadow-pink);
 }
 
-.glass-nav:hover {
-  border-color: rgba(128, 0, 255, 0.6);
+/* Cyber Grid Animation */
+@keyframes gridPulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.3; }
 }
 
-/* Card effects */
-.glass-card {
-  @apply relative overflow-hidden backdrop-blur-lg bg-black/20 border-white/10 hover:border-white/20 transition-all duration-300;
+@keyframes circuitFlow {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
-.glass-card::before {
-  content: '';
-  @apply absolute inset-0 opacity-10 hover:opacity-20 transition-opacity duration-300;
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+/* Background Effects */
+.cyber-grid {
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(65, 240, 219, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(65, 240, 219, 0.1) 1px, transparent 1px);
+  animation: gridPulse 4s infinite;
 }
 
-/* Admin layout specific */
-.admin-layout {
-  @apply min-h-screen bg-gradient-to-b from-black/90 to-black/95;
-}
-
-.admin-content {
-  @apply relative z-10 space-y-8;
-}
-
-/* Navigation elements */
-.nav-item {
-  @apply flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/80 hover:text-neon-cyan transition-all duration-300 hover:bg-white/5 relative group;
-}
-
-.nav-item-highlight {
-  @apply absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100;
-  background: linear-gradient(45deg, rgba(65, 240, 219, 0.1), rgba(255, 10, 190, 0.1));
-}
-
-/* Stats cards */
-.stat-card {
-  @apply relative p-6 rounded-xl overflow-hidden;
-  background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(65,240,219,0.1) 100%);
-}
-
-.stat-card::before {
-  content: '';
-  @apply absolute inset-0 opacity-10;
-  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
-}
-
-/* Animations */
-@keyframes glow {
-  0%, 100% { filter: brightness(100%); }
-  50% { filter: brightness(120%); }
-}
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
+.circuit-overlay {
+  background-image: url('/lovable-uploads/518770660439-4636190af475');
+  background-size: 200% 200%;
+  opacity: 0.15;
+  animation: circuitFlow 20s linear infinite;
 }
