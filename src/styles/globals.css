@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -24,7 +23,7 @@
     @apply bg-background text-foreground font-['Inter'];
     background-image: radial-gradient(
       circle at center,
-      rgba(0, 255, 208, 0.1) 0%,
+      rgba(110, 89, 165, 0.1) 0%,
       rgba(26, 31, 44, 1) 100%
     );
   }
@@ -38,53 +37,27 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-[#00ffd0]/50 rounded-full;
+    @apply bg-primary/50 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-[#00ffd0];
+    @apply bg-primary;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
+    @apply bg-glass backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
   }
 
   .glass-input {
-    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00ffd0]/50;
+    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50;
   }
 
   .nav-link {
-    @apply relative px-4 py-2 text-sm font-['Share_Tech_Mono'] text-foreground/80 hover:text-[#00ffd0] transition-colors
+    @apply relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5
-    after:bg-[#00ffd0] after:scale-x-0 after:origin-right after:transition-transform
+    after:bg-primary after:scale-x-0 after:origin-right after:transition-transform
     hover:after:scale-x-100 hover:after:origin-left;
   }
-
-  .cyber-button {
-    @apply px-4 py-2 bg-transparent border border-[#00ffd0] text-[#00ffd0] hover:bg-[#00ffd0]/10
-    font-['Share_Tech_Mono'] relative overflow-hidden transition-all duration-300
-    before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r
-    before:from-[#00ffd0]/20 before:to-transparent before:translate-x-[-100%]
-    hover:before:translate-x-[100%] before:transition-transform before:duration-500;
-  }
-}
-
-/* Cyberpunk animations */
-@keyframes neon-pulse {
-  0%, 100% { 
-    text-shadow: 0 0 7px #00ffd0,
-                0 0 10px #00ffd0,
-                0 0 21px #00ffd0;
-  }
-  50% { 
-    text-shadow: 0 0 5px #00ffd0,
-                0 0 7px #00ffd0,
-                0 0 15px #00ffd0;
-  }
-}
-
-.neon-text {
-  animation: neon-pulse 2s ease-in-out infinite;
 }
