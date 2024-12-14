@@ -1,28 +1,34 @@
 import { useAtom } from 'jotai';
-import { appReadyAtom, appErrorAtom, globalLoadingAtom, globalErrorAtom, userPreferencesAtom } from '../atoms/core';
+import { useGlobalStore } from '../global-store';
+import { themeAtom, settingsAtom } from '../atoms/sync-atoms';
+import { userAtom, sessionAtom } from '../atoms/auth/auth-atoms';
 
 export const useStore = () => {
-  const [appReady, setAppReady] = useAtom(appReadyAtom);
-  const [appError, setAppError] = useAtom(appErrorAtom);
-  const [globalLoading, setGlobalLoading] = useAtom(globalLoadingAtom);
-  const [globalError, setGlobalError] = useAtom(globalErrorAtom);
-  const [userPreferences, setUserPreferences] = useAtom(userPreferencesAtom);
+  const [theme] = useAtom(themeAtom);
+  const [settings] = useAtom(settingsAtom);
+  const [user] = useAtom(userAtom);
+  const [session] = useAtom(sessionAtom);
+
+  const {
+    setTheme,
+    setSettings,
+    setUser,
+    setSession,
+    reset
+  } = useGlobalStore();
 
   return {
-    // App State
-    appReady,
-    setAppReady,
-    appError,
-    setAppError,
+    // State
+    theme,
+    settings,
+    user,
+    session,
 
-    // Global UI State
-    globalLoading,
-    setGlobalLoading,
-    globalError,
-    setGlobalError,
-
-    // User Preferences
-    userPreferences,
-    setUserPreferences,
+    // Actions
+    setTheme,
+    setSettings,
+    setUser,
+    setSession,
+    reset
   };
 };
