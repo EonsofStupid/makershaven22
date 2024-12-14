@@ -1,5 +1,5 @@
 import { Theme, Settings } from '@/lib/types/settings';
-import { DatabaseSettingsRow } from '../types/theme';
+import type { DatabaseSettingsRow } from '../types/theme';
 
 export const applyThemeToDocument = (theme: Theme | null) => {
   if (!theme?.settings) {
