@@ -28,7 +28,11 @@ export interface AuthState {
 export interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth: boolean;
+  requiredRole?: UserRole | UserRole[];
   fallbackPath: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error) => void;
 }
 
 export type SecurityEventSeverity = 'low' | 'medium' | 'high';
@@ -47,4 +51,18 @@ export interface SecurityLog {
     username: string;
     display_name: string;
   };
+}
+
+export interface SessionConfig {
+  refreshInterval: number;
+  sessionTimeout: number;
+  storageKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
+}
+
+export interface SessionState {
+  isAuthenticated: boolean;
+  lastActivity: Date;
+  token?: string;
 }

@@ -39,6 +39,7 @@ export interface WorkflowTemplate {
   created_at?: string;
   created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
 export interface WorkflowFormData {
@@ -48,12 +49,12 @@ export interface WorkflowFormData {
   is_active: boolean;
 }
 
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
 export interface StageConfigUpdateProps {
   stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
+  onUpdate: StageUpdateFunction;
 }
-
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
 export interface ValidationResult {
   isValid: boolean;
@@ -88,12 +89,12 @@ export const isValidStageUpdate = (updates: Partial<WorkflowStage>): boolean => 
 export const parseStages = (stagesJson: Json): WorkflowStage[] => {
   if (!Array.isArray(stagesJson)) return [];
   return stagesJson.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: (stage.type as WorkflowStageType) || 'task',
-    order: stage.order || 0,
-    config: stage.config || {},
-    description: stage.description
+    id: (stage as any).id || crypto.randomUUID(),
+    name: (stage as any).name || '',
+    type: ((stage as any).type as WorkflowStageType) || 'task',
+    order: (stage as any).order || 0,
+    config: (stage as any).config || {},
+    description: (stage as any).description
   }));
 };
 
