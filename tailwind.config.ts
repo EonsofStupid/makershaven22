@@ -34,6 +34,7 @@ export default {
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--text-primary)",
+          50: "rgb(var(--primary) / 0.5)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",
