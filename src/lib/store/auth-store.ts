@@ -1,81 +1,59 @@
-import { atom, useAtom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
-import { Session } from '@supabase/supabase-js';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { AuthUser, AuthSession } from '../types/auth';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-
-// Types
-interface AuthUser {
-  id: string;
-  email?: string | null;
-  role?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
 
 interface AuthState {
-  session: Session | null;
   user: AuthUser | null;
+  session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-  isTransitioning: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
 }
 
-// Atoms
-export const sessionAtom = atomWithStorage<Session | null>('auth_session', null);
-export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
-export const loadingAtom = atom<boolean>(true);
-export const errorAtom = atom<Error | null>(null);
-export const isTransitioningAtom = atom<boolean>(false);
-
-// Custom hook for auth store
-export const useAuthStore = () => {
-  const [session, setSession] = useAtom(sessionAtom);
-  const [user, setUser] = useAtom(userAtom);
-  const [isLoading, setLoading] = useAtom(loadingAtom);
-  const [error, setError] = useAtom(errorAtom);
-  const [isTransitioning, setIsTransitioning] = useAtom(isTransitioningAtom);
-
-  const signOut = async () => {
-    try {
-      setIsTransitioning(true);
-      const { error: signOutError } = await supabase.auth.signOut();
-      if (signOutError) throw signOutError;
-      
-      setSession(null);
-      setUser(null);
-      toast.success("Successfully signed out");
-    } catch (err) {
-      console.error("Sign out error:", err);
-      setError(err instanceof Error ? err : new Error('Failed to sign out'));
-      toast.error("Failed to sign out");
-    } finally {
-      setIsTransitioning(false);
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      session: null,
+      isLoading: true,
+      error: null,
+      signIn: async (email: string, password: string) => {
+        try {
+          set({ isLoading: true, error: null });
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (error) throw error;
+          set({ 
+            session: data.session as AuthSession,
+            user: data.user as AuthUser,
+            isLoading: false 
+          });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+        }
+      },
+      signOut: async () => {
+        try {
+          set({ isLoading: true, error: null });
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          set({ user: null, session: null, isLoading: false });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+        }
+      },
+      setSession: (session) => set({ session }),
+      setUser: (user) => set({ user }),
+    }),
+    {
+      name: 'auth-store',
+      partialize: (state) => ({ user: state.user, session: state.session }),
     }
-  };
-
-  const reset = () => {
-    setSession(null);
-    setUser(null);
-    setError(null);
-    setLoading(false);
-    setIsTransitioning(false);
-  };
-
-  return {
-    session,
-    user,
-    isLoading,
-    error,
-    isTransitioning,
-    setSession,
-    setUser,
-    setLoading,
-    setError,
-    setIsTransitioning,
-    signOut,
-    reset
-  };
-};
+  )
+);
