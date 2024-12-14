@@ -11,17 +11,26 @@ import { Settings } from '@/components/admin/settings/types';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { applyThemeToDocument } from './utils/themeUtils';
+import { DEFAULT_SETTINGS } from '../admin/settings/hooks/useSettingsDefaults';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [themeSettings] = useAtom(themeSettingsAtom);
+  const [themeSettings, setThemeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
   const [, setSystemTheme] = useAtom(systemThemeAtom);
   const [effectiveTheme] = useAtom(effectiveThemeAtom);
   const [, updateTheme] = useAtom(updateThemeAtom);
+
+  // Initialize theme settings if not present
+  useEffect(() => {
+    if (!themeSettings) {
+      console.log("Initializing theme with default settings");
+      setThemeSettings(DEFAULT_SETTINGS);
+    }
+  }, [themeSettings, setThemeSettings]);
 
   // Handle system theme changes
   useEffect(() => {
@@ -38,6 +47,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // Apply theme settings to document
   useEffect(() => {
     if (themeSettings) {
+      console.log("Applying theme settings:", themeSettings);
       applyThemeToDocument(themeSettings);
       document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
     }
