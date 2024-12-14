@@ -1,3 +1,6 @@
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -25,7 +28,7 @@ export interface Settings {
   hover_scale: string;
   box_shadow?: string;
   backdrop_blur?: string;
-  transition_type: 'fade' | 'slide' | 'scale' | 'blur';
+  transition_type: TransitionType;
   logo_url?: string;
   favicon_url?: string;
 }
@@ -35,6 +38,6 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export type ThemeMode = 'light' | 'dark' | 'system';
-
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+export interface ThemeSettings extends Settings {
+  mode: ThemeMode;
+}
