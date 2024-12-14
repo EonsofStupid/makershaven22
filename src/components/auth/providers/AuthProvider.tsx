@@ -1,48 +1,35 @@
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAtom } from 'jotai';
-import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
   sessionAtom,
   userAtom,
-  loadingStateAtom,
-  authErrorAtom,
-  setSessionAtom,
-  setUserAtom,
-  setLoadingStateAtom,
-  setAuthErrorAtom,
-  isTransitioningAtom,
-  setIsTransitioningAtom
-} from '@/lib/store/atoms/auth';
-import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
-import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
+  isLoadingAtom,
+  errorAtom,
+  isTransitioningAtom
+} from '@/lib/store/atoms/auth/auth-atoms';
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [, setSession] = useAtom(setSessionAtom);
-  const [, setUser] = useAtom(setUserAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
-  const [, setLoadingState] = useAtom(setLoadingStateAtom);
-  const [, setError] = useAtom(setAuthErrorAtom);
-  const [isTransitioning] = useAtom(isTransitioningAtom);
-  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
+  const [, setSession] = useAtom(sessionAtom);
+  const [, setUser] = useAtom(userAtom);
+  const [isLoading] = useAtom(isLoadingAtom);
+  const [, setError] = useAtom(errorAtom);
+  const [isTransitioning, setTransitioning] = useAtom(isTransitioningAtom);
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
-    
-    setLoadingState({ isLoading: true, message: 'Initializing auth...' });
     
     const initializeAuth = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          throw sessionError;
-        }
+        if (sessionError) throw sessionError;
 
         if (session?.user) {
           const { data: profile, error: profileError } = await supabase
@@ -52,7 +39,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
             
           if (profileError) {
-            // If profile doesn't exist, create it
             const { data: newProfile, error: createError } = await supabase
               .from('profiles')
               .insert([{ 
@@ -62,10 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               .select()
               .single();
               
-            if (createError) {
-              console.error('Error creating profile:', createError);
-              throw createError;
-            }
+            if (createError) throw createError;
             
             setSession(session);
             setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
@@ -74,24 +57,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setSession(session);
             setUser({ ...session.user, role: profile?.role || 'subscriber' });
           }
-          console.log('Auth initialized with session:', session.user.id);
         } else {
           setSession(null);
           setUser(null);
-          console.log('Auth initialized with no session');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         setError(error instanceof Error ? error : new Error('Failed to initialize auth'));
         toast.error('Failed to initialize authentication');
-      } finally {
-        setLoadingState({ isLoading: false });
       }
     };
 
+    initializeAuth();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      setIsTransitioning(true);
+      setTransitioning(true);
       
       try {
         if (session?.user) {
@@ -102,7 +83,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
             
           if (profileError) {
-            // If profile doesn't exist, create it
             const { data: newProfile, error: createError } = await supabase
               .from('profiles')
               .insert([{ 
@@ -112,10 +92,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               .select()
               .single();
               
-            if (createError) {
-              console.error('Error creating profile:', createError);
-              throw createError;
-            }
+            if (createError) throw createError;
             
             setSession(session);
             setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
@@ -133,33 +110,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setError(error instanceof Error ? error : new Error('Auth state change failed'));
         toast.error('Authentication error occurred');
       } finally {
-        setIsTransitioning(false);
+        setTransitioning(false);
       }
     });
-
-    initializeAuth();
 
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
-      setLoadingState({ isLoading: false });
     };
-  }, [setSession, setUser, setLoadingState, setError, setIsTransitioning]);
+  }, [setSession, setUser, setError, setTransitioning]);
 
-  return (
-    <AuthErrorBoundary>
-      <LoadingOverlay 
-        isVisible={loadingState.isLoading} 
-        message={loadingState.message}
-      />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
-    </AuthErrorBoundary>
-  );
+  if (isLoading || isTransitioning) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 };
