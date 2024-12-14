@@ -13,7 +13,6 @@
     --input: 231 25% 24%;
     --ring: 231 25% 24%;
     --radius: 0.75rem;
-    --primary: #41f0db;
   }
 
   * {
@@ -48,7 +47,7 @@
 
 @layer components {
   .glass-card {
-    @apply bg-glass backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
+    @apply bg-card/80 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
   }
 
   .glass-input {
