@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession } from '@/lib/types/auth';
+import type { AuthUser, AuthSession, UserRole } from '@/lib/types/auth';
 
 export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
 export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
@@ -42,4 +42,13 @@ export const setTransitioningAtom = atom(
   (get, set, transitioning: boolean) => {
     set(isTransitioningAtom, transitioning);
   }
+);
+
+// Computed atoms
+export const isAuthenticatedAtom = atom(
+  (get) => !!get(sessionAtom)?.user
+);
+
+export const userRoleAtom = atom<UserRole | undefined>(
+  (get) => get(userAtom)?.role
 );
