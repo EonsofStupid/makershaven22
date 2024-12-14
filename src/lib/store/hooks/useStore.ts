@@ -1,34 +1,37 @@
 import { useAtom } from 'jotai';
-import { useGlobalStore } from '../global-store';
-import { themeAtom, settingsAtom } from '../atoms/sync-atoms';
-import { userAtom, sessionAtom } from '../atoms/auth/auth-atoms';
+import { useCoreStore } from '../core-store';
+import { useWorkflowStore } from '../workflow-store';
+import { appReadyAtom, maintenanceModeAtom, globalErrorAtom, globalLoadingAtom } from '../atoms/core/core-atoms';
+import { workflowStateAtom, setActiveWorkflowAtom } from '../atoms/workflow/workflow-atoms';
 
 export const useStore = () => {
-  const [theme] = useAtom(themeAtom);
-  const [settings] = useAtom(settingsAtom);
-  const [user] = useAtom(userAtom);
-  const [session] = useAtom(sessionAtom);
+  // Core state
+  const [isReady] = useAtom(appReadyAtom);
+  const [isMaintenanceMode] = useAtom(maintenanceModeAtom);
+  const [error] = useAtom(globalErrorAtom);
+  const [isLoading] = useAtom(globalLoadingAtom);
 
-  const {
-    setTheme,
-    setSettings,
-    setUser,
-    setSession,
-    reset
-  } = useGlobalStore();
+  // Workflow state
+  const [workflowState] = useAtom(workflowStateAtom);
+  const [, setActiveWorkflow] = useAtom(setActiveWorkflowAtom);
 
   return {
-    // State
-    theme,
-    settings,
-    user,
-    session,
+    // Core state and actions
+    isReady,
+    isMaintenanceMode,
+    error,
+    isLoading,
+    setReady: useCoreStore.getState().setReady,
+    setMaintenanceMode: useCoreStore.getState().setMaintenanceMode,
+    setError: useCoreStore.getState().setError,
+    setLoading: useCoreStore.getState().setLoading,
+    resetCore: useCoreStore.getState().reset,
 
-    // Actions
-    setTheme,
-    setSettings,
-    setUser,
-    setSession,
-    reset
+    // Workflow state and actions
+    workflowState,
+    setActiveWorkflow,
+    addToHistory: useWorkflowStore.getState().addToHistory,
+    clearHistory: useWorkflowStore.getState().clearHistory,
+    resetWorkflow: useWorkflowStore.getState().reset,
   };
 };
