@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAuth } from "@/lib/store/auth/use-auth";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AvatarFallbackContent } from "./components/AvatarFallbackContent";
@@ -20,7 +20,7 @@ export const UserAvatar = ({
   onClick 
 }: UserAvatarProps) => {
   const navigate = useNavigate();
-  const { session, user } = useAuthStore();
+  const { user, isAuthenticated } = useAuth();
   const [imageError, setImageError] = useState(false);
 
   const sizeClasses = {
@@ -35,7 +35,7 @@ export const UserAvatar = ({
       return;
     }
 
-    if (!session) {
+    if (!isAuthenticated) {
       navigate("/login");
       toast.info("Sign in to access your profile");
       return;
@@ -56,7 +56,7 @@ export const UserAvatar = ({
       )}
       onClick={handleAvatarClick}
     >
-      {session?.user && !imageError ? (
+      {user && !imageError ? (
         <AvatarImage
           src={user?.user_metadata?.avatar_url || "/admin/placeholder-avatar.png"}
           alt="User avatar"

@@ -1,115 +1,91 @@
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/lib/store/auth-store";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/store/auth/use-auth";
 import { 
-  UserCircle, Settings, Activity, 
-  LayoutDashboard, LogOut, Database,
-  Image, FileText, Zap, Radio
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  User,
+  Settings,
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
-import { UserMenuHeader } from "./menu/UserMenuHeader";
-import { UserMenuItem } from "./menu/UserMenuItem";
-import { motion } from "framer-motion";
+import { toast } from "sonner";
 
-export const UserMenu = ({ onClose }: { onClose: () => void }) => {
+interface UserMenuProps {
+  onClose: () => void;
+}
+
+export const UserMenu = ({ onClose }: UserMenuProps) => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuthStore();
+  const { user, signOut } = useAuth();
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    onClose();
-    toast.success(`Navigating to ${path.split('/').pop()?.toUpperCase() || 'Home'}`);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Successfully signed out");
+      navigate("/login");
+      onClose();
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
   };
 
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
-
   return (
-    <motion.div 
-      className="fixed md:absolute right-0 mt-2 w-72 rounded-xl bg-[#221a2b] backdrop-blur-xl border border-[#95bf0b]/20 shadow-xl z-[100] 
-                 overflow-hidden"
-      initial={{ opacity: 0, scale: 0.95, y: -20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: -20 }}
-      style={{
-        background: `linear-gradient(135deg, #221a2b 0%, #1e0430 50%, #3281f0 100%)`,
-      }}
-    >
-      <UserMenuHeader />
-      
-      <div className="p-3 space-y-2">
-        <UserMenuItem
-          icon={UserCircle}
-          label="Profile"
-          onClick={() => handleNavigation("/profile")}
-        />
-
-        <UserMenuItem
-          icon={Image}
-          label="Media"
-          onClick={() => handleNavigation("/media")}
-        />
-
-        <UserMenuItem
-          icon={Activity}
-          label="Activity"
-          onClick={() => handleNavigation("/activity")}
-        />
-
-        {isAdmin && (
-          <>
-            <div className="h-px bg-[#95bf0b]/20 my-2" />
-            
-            <UserMenuItem
-              icon={LayoutDashboard}
-              label="Admin Dashboard"
-              onClick={() => handleNavigation("/admin/dashboard")}
-            />
-            
-            <UserMenuItem
-              icon={Database}
-              label="Data Maestro"
-              onClick={() => handleNavigation("/admin/data-maestro")}
-            />
-
-            <UserMenuItem
-              icon={Zap}
-              label="Performance"
-              onClick={() => handleNavigation("/admin/performance")}
-            />
-
-            <UserMenuItem
-              icon={Radio}
-              label="Monitoring"
-              onClick={() => handleNavigation("/admin/monitoring")}
-            />
-          </>
-        )}
-
-        <div className="h-px bg-[#95bf0b]/20 my-2" />
+    <DropdownMenu>
+      <DropdownMenuContent align="end" className="w-56 glass-menu">
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user?.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user?.role?.toUpperCase()}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         
-        <UserMenuItem
-          icon={Settings}
-          label="Settings"
-          onClick={() => handleNavigation("/settings")}
-        />
-
-        <UserMenuItem
-          icon={LogOut}
-          label="Sign Out"
-          variant="danger"
-          onClick={async () => {
-            try {
-              await signOut();
-              toast.success("Signed out successfully");
-              navigate("/");
-            } catch (error) {
-              console.error("Sign out error:", error);
-              toast.error("Failed to sign out");
-            } finally {
-              onClose();
-            }
-          }}
-        />
-      </div>
-    </motion.div>
+        <DropdownMenuItem onClick={() => {
+          navigate("/profile");
+          onClose();
+        }}>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        
+        {user?.role === 'admin' && (
+          <DropdownMenuItem onClick={() => {
+            navigate("/admin/dashboard");
+            onClose();
+          }}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <span>Dashboard</span>
+          </DropdownMenuItem>
+        )}
+        
+        <DropdownMenuItem onClick={() => {
+          navigate("/settings");
+          onClose();
+        }}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem 
+          onClick={handleSignOut}
+          className="text-red-600 focus:text-red-600"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Sign Out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
