@@ -1,46 +1,46 @@
 import { atom } from 'jotai';
-import type { AuthUser, AuthSession } from '@/lib/types/auth';
+import { atomWithStorage } from 'jotai/utils';
+import type { AuthUser, AuthSession } from '@/lib/auth/types/auth';
 
-// Core auth atoms
-export const userAtom = atom<AuthUser | null>(null);
-export const sessionAtom = atom<AuthSession | null>(null);
-export const loadingStateAtom = atom<{ isLoading: boolean }>({ isLoading: true });
-export const authErrorAtom = atom<Error | null>(null);
+// Persistent storage atoms
+export const sessionAtom = atomWithStorage<AuthSession | null>('session', null);
+export const userAtom = atomWithStorage<AuthUser | null>('user', null);
 
-// Computed atoms
-export const isAuthenticatedAtom = atom((get) => !!get(sessionAtom));
-export const userRoleAtom = atom((get) => get(userAtom)?.role || null);
-
-// Action atoms
-export const setSessionAtom = atom(
-  null,
-  (_, set, session: AuthSession | null) => {
+// Writable derived atoms
+export const sessionWriteAtom = atom(
+  (get) => get(sessionAtom),
+  (_get, set, session: AuthSession | null) => {
     set(sessionAtom, session);
-    if (session?.user) {
-      set(userAtom, session.user);
-    } else {
-      set(userAtom, null);
-    }
   }
 );
 
-export const setUserAtom = atom(
-  null,
-  (_, set, user: AuthUser | null) => {
+export const userWriteAtom = atom(
+  (get) => get(userAtom),
+  (_get, set, user: AuthUser | null) => {
     set(userAtom, user);
   }
 );
 
-export const setLoadingStateAtom = atom(
-  null,
-  (_, set, loadingState: { isLoading: boolean }) => {
-    set(loadingStateAtom, loadingState);
-  }
+// Loading state
+export const authLoadingAtom = atom<boolean>(false);
+
+// Error handling
+export const authErrorAtom = atom<Error | null>(null);
+
+// Computed auth state
+export const isAuthenticatedAtom = atom(
+  (get) => get(sessionAtom) !== null && get(userAtom) !== null
 );
 
-export const setAuthErrorAtom = atom(
-  null,
-  (_, set, error: Error | null) => {
-    set(authErrorAtom, error);
+// Role-based access control
+export const hasRoleAtom = atom(
+  (get) => (requiredRole: string | string[]) => {
+    const user = get(userAtom);
+    if (!user?.role) return false;
+    
+    if (Array.isArray(requiredRole)) {
+      return requiredRole.includes(user.role);
+    }
+    return user.role === requiredRole;
   }
 );

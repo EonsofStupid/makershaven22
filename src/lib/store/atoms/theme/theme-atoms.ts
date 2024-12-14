@@ -3,37 +3,56 @@ import { atomWithStorage } from 'jotai/utils';
 import { useThemeStore } from '../../theme-store';
 import type { Settings, Theme, ThemeMode, ThemeAtomState } from '@/lib/types/settings';
 
-// Sync with Zustand store
-export const themeAtom = atom<ThemeAtomState>((get) => ({
-  settings: useThemeStore.getState().settings,
-  mode: useThemeStore.getState().mode
-}));
+// Base theme atom with storage
+export const themeAtom = atomWithStorage<ThemeAtomState>('theme', {
+  settings: null,
+  mode: 'system'
+});
 
-// Mode management
+// Mode management with storage persistence
 export const themeModeAtom = atomWithStorage<ThemeMode>('themeMode', 'system');
+
+// System theme detection
 export const systemThemeAtom = atom<'light' | 'dark'>('dark');
 
 // Computed effective theme
-export const effectiveThemeAtom = atom((get) => {
-  const themeMode = get(themeModeAtom);
-  const systemTheme = get(systemThemeAtom);
-  return themeMode === 'system' ? systemTheme : themeMode;
-});
+export const effectiveThemeAtom = atom(
+  (get) => {
+    const themeMode = get(themeModeAtom);
+    const systemTheme = get(systemThemeAtom);
+    return themeMode === 'system' ? systemTheme : themeMode;
+  }
+);
 
-// Theme update action
+// Writable derived atom for theme updates
 export const updateThemeAtom = atom(
-  null,
-  async (get, set, updates: Partial<Settings>) => {
+  (get) => get(themeAtom),
+  (get, set, updates: Partial<Settings>) => {
     const currentState = get(themeAtom);
     if (!currentState.settings) return;
 
-    useThemeStore.setState({
-      settings: { ...currentState.settings, ...updates }
-    });
-
+    const newSettings = { ...currentState.settings, ...updates };
+    
+    // Update both Jotai and Zustand states
     set(themeAtom, {
       ...currentState,
-      settings: { ...currentState.settings, ...updates }
+      settings: newSettings
+    });
+    
+    useThemeStore.setState({
+      settings: newSettings
+    });
+  }
+);
+
+// Sync atom for Zustand store
+export const zustandSyncAtom = atom(
+  (get) => get(themeAtom),
+  (get, set) => {
+    const zustandState = useThemeStore.getState();
+    set(themeAtom, {
+      settings: zustandState.settings,
+      mode: zustandState.mode
     });
   }
 );
