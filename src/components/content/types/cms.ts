@@ -1,22 +1,28 @@
-import { Json } from "@/integrations/supabase/types";
+import { Json } from '@/integrations/supabase/types';
 
 export interface BaseContent {
-  id: string;
+  id?: string;
   title: string;
-  type: string;
-  content: Json;
-  metadata?: Record<string, any>;
-  status?: string;
+  content?: any;
+  metadata?: { [key: string]: any };
+  status?: 'draft' | 'published' | 'archived';
   version?: number;
-  created_at?: string;
-  updated_at?: string;
+}
+
+export interface ComponentContent extends BaseContent {
+  type: 'component';
+}
+
+export interface PageContent extends BaseContent {
+  type: 'page';
+  layout?: string;
 }
 
 export interface ContentRevision {
   id: string;
   content_id: string;
   content: Json;
-  metadata?: Record<string, any>;
+  metadata?: Json;
   version_number: number;
   created_at: string;
   created_by?: string;
