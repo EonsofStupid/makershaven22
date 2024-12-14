@@ -1,26 +1,15 @@
 import { useEffect } from "react";
-import { useAtom } from 'jotai';
+import { useAuthStore } from '@/lib/store/auth/auth-store';
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { 
-  sessionAtom,
-  userAtom,
-  isLoadingAtom,
-  errorAtom,
-  isTransitioningAtom
-} from '@/lib/store/atoms/auth/auth-atoms';
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { toast } from "sonner";
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [, setSession] = useAtom(sessionAtom);
-  const [, setUser] = useAtom(userAtom);
-  const [isLoading] = useAtom(isLoadingAtom);
-  const [, setError] = useAtom(errorAtom);
-  const [isTransitioning, setTransitioning] = useAtom(isTransitioningAtom);
+  const { setSession, setUser, setLoading, setError, isLoading } = useAuthStore();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -65,6 +54,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.error('Auth initialization error:', error);
         setError(error instanceof Error ? error : new Error('Failed to initialize auth'));
         toast.error('Failed to initialize authentication');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -72,7 +63,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      setTransitioning(true);
       
       try {
         if (session?.user) {
@@ -109,8 +99,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.error('Auth state change error:', error);
         setError(error instanceof Error ? error : new Error('Auth state change failed'));
         toast.error('Authentication error occurred');
-      } finally {
-        setTransitioning(false);
       }
     });
 
@@ -118,9 +106,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
     };
-  }, [setSession, setUser, setError, setTransitioning]);
+  }, [setSession, setUser, setLoading, setError]);
 
-  if (isLoading || isTransitioning) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />
