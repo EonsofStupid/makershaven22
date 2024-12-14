@@ -11,10 +11,10 @@ export enum WorkflowStageType {
 export interface WorkflowStage {
   id: string;
   name: string;
-  description?: string;
   type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
+  description?: string;
 }
 
 export interface WorkflowStageConfig {

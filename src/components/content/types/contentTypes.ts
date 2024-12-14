@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Json } from '@/integrations/supabase/types';
 
 export type ContentType = 'page' | 'component' | 'template' | 'post';
@@ -26,21 +27,26 @@ export interface PageContent extends BaseContent {
   type: 'page';
 }
 
-export const componentContentSchema = {
-  // Add schema definition
-  type: 'object',
-  properties: {
-    // Define component properties
-  }
-};
+export const componentContentSchema = z.object({
+  type: z.literal('component'),
+  title: z.string().min(1, 'Title is required'),
+  content: z.object({
+    componentType: z.string(),
+    props: z.record(z.any()),
+    styles: z.record(z.any())
+  }),
+  status: z.enum(['draft', 'published', 'archived']).default('draft')
+});
 
-export const pageContentSchema = {
-  // Add schema definition
-  type: 'object',
-  properties: {
-    // Define page properties
-  }
-};
+export const pageContentSchema = z.object({
+  type: z.literal('page'),
+  title: z.string().min(1, 'Title is required'),
+  content: z.object({
+    body: z.string(),
+    seo: z.record(z.any())
+  }),
+  status: z.enum(['draft', 'published', 'archived']).default('draft')
+});
 
 export const getSchemaByType = (type: ContentType) => {
   switch (type) {
