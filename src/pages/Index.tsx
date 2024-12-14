@@ -1,7 +1,8 @@
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { useAtom } from 'jotai';
-import { userAtom } from "@/lib/store/atoms/auth";
+import { userAtom, sessionAtom } from "@/lib/store/atoms/auth";
 import { FeaturedPost } from "@/components/home/FeaturedPost";
 import { PostCard } from "@/components/home/PostCard";
 
@@ -52,8 +53,17 @@ const posts = [
 
 const Index = () => {
   const [user] = useAtom(userAtom);
+  const [session] = useAtom(sessionAtom);
+  const navigate = useNavigate();
 
-  if (!user) {
+  useEffect(() => {
+    if (!session || !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [session, user, navigate]);
+
+  // If no session or user, redirect to login
+  if (!session || !user) {
     return <Navigate to="/login" replace />;
   }
 
