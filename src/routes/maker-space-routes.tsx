@@ -1,32 +1,48 @@
-import React from 'react';
+import { lazy } from "react";
+import { RouteObject } from "react-router-dom";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import MakerSpaceDashboard from "@/pages/maker-space/Dashboard";
-import MakerSpaceSettings from "@/pages/maker-space/Settings";
-import MakerSpaceProjects from "@/pages/maker-space/Projects";
 
-export const makerSpaceRoutes = [
+const MakerSpace = lazy(() => import("@/pages/content/maker-space"));
+const Builds = lazy(() => import("@/pages/content/maker-space/builds"));
+const BuildDetails = lazy(() => import("@/pages/content/maker-space/builds/[buildId]"));
+const Guides = lazy(() => import("@/pages/content/maker-space/guides"));
+const GuideDetails = lazy(() => import("@/pages/content/maker-space/guides/[guideId]"));
+const Parts = lazy(() => import("@/pages/content/maker-space/parts"));
+const PartDetails = lazy(() => import("@/pages/content/maker-space/parts/[partId]"));
+
+export const makerSpaceRoutes: RouteObject[] = [
   {
     path: "/maker-space",
     element: (
-      <AuthGuard requireAuth={true} fallbackPath="/login">
-        <MakerSpaceDashboard />
+      <AuthGuard>
+        <MakerSpace />
       </AuthGuard>
-    )
-  },
-  {
-    path: "/maker-space/settings",
-    element: (
-      <AuthGuard requireAuth={true} fallbackPath="/login">
-        <MakerSpaceSettings />
-      </AuthGuard>
-    )
-  },
-  {
-    path: "/maker-space/projects",
-    element: (
-      <AuthGuard requireAuth={true} fallbackPath="/login">
-        <MakerSpaceProjects />
-      </AuthGuard>
-    )
+    ),
+    children: [
+      {
+        path: "builds",
+        element: <Builds />,
+      },
+      {
+        path: "builds/:buildId",
+        element: <BuildDetails />,
+      },
+      {
+        path: "guides",
+        element: <Guides />,
+      },
+      {
+        path: "guides/:guideId",
+        element: <GuideDetails />,
+      },
+      {
+        path: "parts",
+        element: <Parts />,
+      },
+      {
+        path: "parts/:partId",
+        element: <PartDetails />,
+      }
+    ]
   }
 ];

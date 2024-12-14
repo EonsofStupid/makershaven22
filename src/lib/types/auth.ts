@@ -1,8 +1,8 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'guest';
 
 export interface AuthUser {
   id: string;
-  email?: string | null;
+  email?: string;
   role?: UserRole;
   username?: string;
   displayName?: string;
@@ -14,31 +14,24 @@ export interface AuthUser {
 
 export interface AuthSession {
   user: AuthUser;
-  expires_in?: number;
-  access_token?: string;
+  access_token: string;
   refresh_token?: string;
+  expires_at?: number;
 }
 
 export interface AuthState {
   isLoading: boolean;
   hasAccess: boolean;
-  error: Error | { message: string } | null;
-  isTransitioning?: boolean;
-  reset?: () => void;
+  error: Error | null;
+  isTransitioning: boolean;
+  reset: () => void;
 }
 
-export interface AuthStore {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
 }

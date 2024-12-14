@@ -1,6 +1,3 @@
-export type ThemeMode = 'light' | 'dark' | 'system';
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
-
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -28,10 +25,9 @@ export interface Settings {
   hover_scale: string;
   box_shadow?: string;
   backdrop_blur?: string;
-  transition_type: TransitionType;
+  transition_type: 'fade' | 'slide' | 'scale' | 'blur';
   logo_url?: string;
   favicon_url?: string;
-  mode?: ThemeMode;
 }
 
 export interface Theme {
@@ -39,38 +35,6 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export interface ThemeSettings extends Settings {
-  mode: ThemeMode;
-}
+export type ThemeMode = 'light' | 'dark' | 'system';
 
-export interface SettingsUpdateParams {
-  p_site_title: string;
-  p_tagline: string;
-  p_primary_color: string;
-  p_secondary_color: string;
-  p_accent_color: string;
-  p_text_primary_color: string;
-  p_text_secondary_color: string;
-  p_text_link_color: string;
-  p_text_heading_color: string;
-  p_neon_cyan: string;
-  p_neon_pink: string;
-  p_neon_purple: string;
-  p_border_radius: string;
-  p_spacing_unit: string;
-  p_transition_duration: string;
-  p_shadow_color: string;
-  p_hover_scale: string;
-  p_font_family_heading: string;
-  p_font_family_body: string;
-  p_font_size_base: string;
-  p_font_weight_normal: string;
-  p_font_weight_bold: string;
-  p_line_height_base: string;
-  p_letter_spacing: string;
-  p_logo_url?: string;
-  p_favicon_url?: string;
-  p_box_shadow?: string;
-  p_backdrop_blur?: string;
-  p_transition_type: TransitionType;
-}
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';

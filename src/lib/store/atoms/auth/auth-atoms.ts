@@ -1,88 +1,63 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+import { useAuthStore } from '../../auth-store';
 import type { AuthUser, AuthSession } from '@/lib/types/auth';
 
-// Base atoms
-export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
-export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
-export const loadingAtom = atom(false);
-export const errorAtom = atom<Error | null>(null);
-export const isTransitioningAtom = atom(false);
-
-// Loading state atoms
-export interface LoadingState {
-  isLoading: boolean;
-  message?: string;
-}
-
-export const loadingStateAtom = atom<LoadingState>({
-  isLoading: false,
-  message: undefined
-});
-
-// Setter atoms
-export const setUserAtom = atom(
-  null,
-  (_get, set, user: AuthUser | null) => {
-    set(userAtom, user);
+// Sync atoms with Zustand store
+export const userAtom = atom(
+  (get) => useAuthStore.getState().user,
+  (_get, set, newUser: AuthUser | null) => {
+    useAuthStore.setState({ user: newUser });
   }
 );
 
-export const setSessionAtom = atom(
-  null,
-  (_get, set, session: AuthSession | null) => {
-    set(sessionAtom, session);
+export const sessionAtom = atom(
+  (get) => useAuthStore.getState().session,
+  (_get, set, newSession: AuthSession | null) => {
+    useAuthStore.setState({ session: newSession });
   }
 );
 
-export const setLoadingAtom = atom(
-  null,
-  (_get, set, state: LoadingState) => {
-    set(loadingStateAtom, state);
-  }
+export const isLoadingAtom = atom(
+  (get) => useAuthStore.getState().isLoading
 );
 
-export const setErrorAtom = atom(
-  null,
-  (_get, set, error: Error | null) => {
-    set(errorAtom, error);
-  }
+export const errorAtom = atom(
+  (get) => useAuthStore.getState().error
 );
 
-export const setTransitioningAtom = atom(
-  null,
-  (_get, set, transitioning: boolean) => {
-    set(isTransitioningAtom, transitioning);
-  }
+export const isTransitioningAtom = atom(
+  (get) => useAuthStore.getState().isTransitioning
 );
 
-// Auth action atoms
+// Computed atoms
+export const isAuthenticatedAtom = atom(
+  (get) => !!get(sessionAtom)?.user
+);
+
+export const userRoleAtom = atom(
+  (get) => get(userAtom)?.role || 'guest'
+);
+
+// Persist some data in localStorage
+export const lastLoginAtom = atomWithStorage<string | null>(
+  'last_login',
+  null
+);
+
+// Action atoms
 export const signInAtom = atom(
   null,
-  async (_get, set, credentials: { email: string; password: string }) => {
-    set(loadingStateAtom, { isLoading: true, message: "Signing in..." });
-    try {
-      // Implement sign in logic here
-      set(loadingStateAtom, { isLoading: false });
-    } catch (error) {
-      set(errorAtom, error as Error);
-      set(loadingStateAtom, { isLoading: false });
-    }
+  async (_get, set, { email, password }: { email: string; password: string }) => {
+    await useAuthStore.getState().signIn(email, password);
+    set(lastLoginAtom, new Date().toISOString());
   }
 );
 
 export const signOutAtom = atom(
   null,
   async (_get, set) => {
-    set(loadingStateAtom, { isLoading: true, message: "Signing out..." });
-    try {
-      // Implement sign out logic here
-      set(sessionAtom, null);
-      set(userAtom, null);
-      set(loadingStateAtom, { isLoading: false });
-    } catch (error) {
-      set(errorAtom, error as Error);
-      set(loadingStateAtom, { isLoading: false });
-    }
+    await useAuthStore.getState().signOut();
+    set(lastLoginAtom, null);
   }
 );

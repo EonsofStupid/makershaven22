@@ -26,11 +26,11 @@ export interface WorkflowTemplate {
   name: string;
   description: string | null;
   stages: WorkflowStage[];
-  steps: Json;
   is_active: boolean;
   created_at?: string;
   created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
 export interface WorkflowFormData {
@@ -46,3 +46,21 @@ export interface StageConfigUpdateProps {
   stage: WorkflowStage;
   onUpdate: StageUpdateFunction;
 }
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
+
+export const validateStage = (stage: WorkflowStage): ValidationResult => {
+  const errors: string[] = [];
+  
+  if (!stage.id) errors.push('Stage ID is required');
+  if (!stage.name) errors.push('Stage name is required');
+  if (!stage.type) errors.push('Stage type is required');
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};

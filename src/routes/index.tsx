@@ -57,7 +57,14 @@ export const AppRoutes = () => {
             <Route
               key={route.path}
               path={route.path}
-              element={route.element}
+              element={
+                <AuthGuard 
+                  requireAuth={true}
+                  fallbackPath="/login"
+                >
+                  {route.element}
+                </AuthGuard>
+              }
             />
           ))}
 
@@ -82,7 +89,7 @@ export const AppRoutes = () => {
           <Route 
             path="/login" 
             element={
-              <AuthGuard requireAuth={false} fallbackPath="/">
+              <AuthGuard requireAuth={false}>
                 <Login />
               </AuthGuard>
             } 
@@ -90,7 +97,7 @@ export const AppRoutes = () => {
           <Route 
             path="/register" 
             element={
-              <AuthGuard requireAuth={false} fallbackPath="/">
+              <AuthGuard requireAuth={false}>
                 <Register />
               </AuthGuard>
             } 
