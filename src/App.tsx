@@ -8,7 +8,7 @@ import { AdminSidebarProvider } from "@/components/admin/dashboard/sidebar/Admin
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/auth/providers/QueryProvider";
 import { AuthProvider } from "@/components/auth/providers/AuthProvider";
-import { StoreProvider } from '@/lib/store/providers/JotaiProvider';
+import { StoreProvider } from '@/lib/store/providers/StoreProvider';
 
 const App = () => {
   return (
