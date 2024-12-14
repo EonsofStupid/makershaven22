@@ -1,5 +1,4 @@
 export type ThemeMode = 'light' | 'dark' | 'system';
-
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings {
@@ -35,12 +34,13 @@ export interface Settings {
 }
 
 export interface Theme {
-  settings: Settings | null;
+  settings: Settings;
   mode: ThemeMode;
 }
 
-export interface ThemeSettings extends Settings {
-  mode: ThemeMode;
+export interface ThemeState extends Theme {
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export type SettingsUpdateParams = {
