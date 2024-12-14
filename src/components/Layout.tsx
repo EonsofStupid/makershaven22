@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, User, LogOut, Settings, Code, Cpu, Book, Wrench, Globe } from "lucide-react";
+import { Menu, Search, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAtom } from 'jotai';
 import { userAtom, sessionAtom } from '@/lib/store/atoms/auth';
@@ -28,75 +28,42 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen">
-      <header className="fixed top-0 left-0 right-0 z-50 h-[4.2rem]">
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-b border-neon-cyan/20">
-          <div className="cyber-grid" />
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center justify-between h-[4.2rem]">
-            <Link to="/" className="flex items-center space-x-2 group">
+      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/10">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/lovable-uploads/ff432201-0b9c-442d-924b-80eedc673b73.png"
                 alt="Logo"
-                className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
+                className="w-8 h-8 object-contain"
               />
-              <span className="text-xl font-['Orbitron'] font-semibold text-neon-cyan animate-neon-pulse">
-                MakersImpulse
-              </span>
+              <span className="text-xl font-semibold">PopCulture</span>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link to="/maker-space" className="nav-link">
-                <Cpu className="w-4 h-4 inline-block mr-2" />
-                Maker Space
-              </Link>
-              <Link to="/builds" className="nav-link">
-                <Code className="w-4 h-4 inline-block mr-2" />
-                Builds
-              </Link>
-              <Link to="/parts" className="nav-link">
-                <Wrench className="w-4 h-4 inline-block mr-2" />
-                Parts
-              </Link>
-              <Link to="/guides" className="nav-link">
-                <Book className="w-4 h-4 inline-block mr-2" />
-                Guides
-              </Link>
-              <div className="relative group">
-                <button className="nav-link">
-                  <Globe className="w-4 h-4 inline-block mr-2" />
-                  Community
-                </button>
-                <div className="mega-menu p-6 grid grid-cols-3 gap-8">
-                  {/* Mega menu content will go here */}
-                </div>
-              </div>
+            <nav className="hidden md:flex items-center space-x-4">
+              <Link to="/" className="nav-link">Home</Link>
+              <Link to="/reviews" className="nav-link">Reviews</Link>
+              <Link to="/podcasts" className="nav-link">Podcasts</Link>
+              <Link to="/tv-shows" className="nav-link">TV Shows</Link>
             </nav>
 
             <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-neon-cyan hover:animate-neon-pulse">
+              <button className="p-2 hover:bg-white/5 rounded-full transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              
               {user?.role === 'admin' && (
-                <Link 
-                  to="/admin" 
-                  className="cyber-button"
-                >
-                  <Settings className="w-5 h-5" />
+                <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                  <User className="w-5 h-5" />
                 </Link>
               )}
-              
               <button
                 onClick={handleSignOut}
-                className="p-2 hover:bg-white/5 rounded-full transition-colors text-neon-magenta hover:animate-neon-pulse"
+                className="p-2 hover:bg-white/5 rounded-full transition-colors"
               >
                 <LogOut className="w-5 h-5" />
               </button>
-              
               <button
-                className="md:hidden cyber-button"
+                className="md:hidden p-2 hover:bg-white/5 rounded-full transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 <Menu className="w-5 h-5" />
@@ -106,7 +73,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </header>
 
-      <main className="pt-[4.2rem] min-h-screen">
+      <main className="pt-16 min-h-screen">
         <div className="container mx-auto px-4 py-8">{children}</div>
       </main>
 
