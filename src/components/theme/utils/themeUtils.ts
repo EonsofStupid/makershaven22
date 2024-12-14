@@ -8,8 +8,6 @@ export const applyThemeToDocument = (theme: Theme | null) => {
 
   const settings = theme.settings;
   
-  console.log("Applying theme to document:", settings);
-  
   // Apply colors
   document.documentElement.style.setProperty('--primary-color', settings.primary_color);
   document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
@@ -109,14 +107,14 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
       font_weight_bold: dbSettings.font_weight_bold,
       line_height_base: dbSettings.line_height_base,
       letter_spacing: dbSettings.letter_spacing,
-      border_radius: dbSettings.border_radius || '0.5rem',
-      spacing_unit: dbSettings.spacing_unit || '1rem',
-      transition_duration: dbSettings.transition_duration || '0.3s',
-      shadow_color: dbSettings.shadow_color || '#000000',
-      hover_scale: dbSettings.hover_scale || '1.05',
+      border_radius: dbSettings.border_radius,
+      spacing_unit: dbSettings.spacing_unit,
+      transition_duration: dbSettings.transition_duration,
+      shadow_color: dbSettings.shadow_color,
+      hover_scale: dbSettings.hover_scale,
       box_shadow: dbSettings.box_shadow,
       backdrop_blur: dbSettings.backdrop_blur,
-      transition_type: dbSettings.transition_type || 'fade',
+      transition_type: dbSettings.transition_type,
       logo_url: dbSettings.logo_url,
       favicon_url: dbSettings.favicon_url
     },

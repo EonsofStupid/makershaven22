@@ -21,14 +21,14 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
+  border_radius?: string;
+  spacing_unit?: string;
+  transition_duration?: string;
+  shadow_color?: string;
+  hover_scale?: string;
   box_shadow?: string;
   backdrop_blur?: string;
-  transition_type: TransitionType;
+  transition_type?: TransitionType;
   logo_url?: string;
   favicon_url?: string;
 }
@@ -38,7 +38,8 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export interface ThemeState extends Theme {
+export interface ThemeState {
+  theme: Theme | null;
   isLoading: boolean;
   error: Error | null;
 }
@@ -81,7 +82,7 @@ export interface DatabaseSettingsRow {
 
 export interface SettingsUpdateParams {
   p_site_title: string;
-  p_tagline?: string;
+  p_tagline: string;
   p_primary_color: string;
   p_secondary_color: string;
   p_accent_color: string;
@@ -105,3 +106,7 @@ export interface SettingsUpdateParams {
   p_shadow_color: string;
   p_hover_scale: string;
 }
+
+export type ThemeSettings = Settings & {
+  mode: ThemeMode;
+};
