@@ -9,12 +9,13 @@ export const useThemeStore = create<ThemeState>()(
       mode: 'system',
       isLoading: false,
       error: null,
-      setMode: (mode) => set({ mode }),
-      updateSettings: (newSettings) => set((state) => ({
-        settings: state.settings ? { ...state.settings, ...newSettings } : null
-      })),
-      setLoading: (loading) => set({ isLoading: loading }),
-      setError: (error) => set({ error }),
+      setMode: (mode: ThemeMode) => set({ mode }),
+      updateSettings: (newSettings: Partial<Settings>) => 
+        set((state) => ({
+          settings: state.settings ? { ...state.settings, ...newSettings } : null
+        })),
+      setLoading: (loading: boolean) => set({ isLoading: loading }),
+      setError: (error: Error | null) => set({ error }),
       resetToDefaults: () => set({ 
         settings: null,
         mode: 'system',
