@@ -6,7 +6,7 @@ import {
   loadingStateAtom,
   authErrorAtom,
   isAuthenticatedAtom,
-  userRoleAtom,
+  hasRoleAtom
 } from '../atoms/auth';
 
 export const useAuth = () => {
@@ -14,22 +14,23 @@ export const useAuth = () => {
 
   const [user] = useAtom(userAtom);
   const [session] = useAtom(sessionAtom);
-  const [isLoading] = useAtom(loadingStateAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
   const [error] = useAtom(authErrorAtom);
   const [isAuthenticated] = useAtom(isAuthenticatedAtom);
-  const [role] = useAtom(userRoleAtom);
+  const [hasRole] = useAtom(hasRoleAtom);
 
   return {
     // Global state
     user,
     session,
-    isLoading,
+    isLoading: loadingState.isLoading,
+    loadingMessage: loadingState.message,
     error,
     signIn,
     signOut,
 
     // Computed
     isAuthenticated,
-    role,
+    hasRole,
   };
 };
