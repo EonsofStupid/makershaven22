@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AvatarLoadingState } from "./components/AvatarLoadingState";
 import { AvatarFallbackContent } from "./components/AvatarFallbackContent";
+import { motion } from "framer-motion";
 
 interface UserAvatarProps {
   className?: string;
@@ -36,7 +37,7 @@ export const UserAvatar = ({
   const sizeClasses = {
     sm: "h-8 w-8",
     md: "h-10 w-10",
-    lg: "h-12 w-12"
+    lg: "h-16 w-16" // Increased size for oversized avatar
   };
 
   const handleAvatarClick = () => {
@@ -61,40 +62,46 @@ export const UserAvatar = ({
   }
 
   return (
-    <Avatar 
-      className={cn(
-        sizeClasses[size],
-        "relative cursor-pointer transition-all duration-300",
-        isHovered && "scale-110",
-        className
-      )}
-      onClick={handleAvatarClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      transition={{ type: "spring", stiffness: 400, damping: 10 }}
     >
-      {session?.user && !imageError ? (
-        <AvatarImage
-          src={user?.user_metadata?.avatar_url || "/admin/placeholder-avatar.png"}
-          alt="User avatar"
-          onError={() => setImageError(true)}
-          className="object-cover"
-        />
-      ) : showFallback ? (
-        <AvatarFallbackContent email={user?.email} />
-      ) : null}
-      
-      {/* Hover effect */}
-      <div 
+      <Avatar 
         className={cn(
-          "absolute inset-0 rounded-full opacity-0 transition-opacity duration-300",
-          isHovered && "opacity-100"
+          sizeClasses[size],
+          "relative cursor-pointer transition-all duration-300 group",
+          isHovered && "scale-110",
+          "border-2 border-transparent hover:border-[#41f0db]",
+          className
         )}
-        style={{
-          background: `linear-gradient(135deg, #4d00b3, #72228c, #b0e653)`,
-          filter: 'blur(8px)',
-          zIndex: -1
-        }}
-      />
-    </Avatar>
+        onClick={handleAvatarClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {session?.user && !imageError ? (
+          <AvatarImage
+            src={user?.user_metadata?.avatar_url || "/admin/placeholder-avatar.png"}
+            alt="User avatar"
+            onError={() => setImageError(true)}
+            className="object-cover"
+          />
+        ) : showFallback ? (
+          <AvatarFallbackContent email={user?.email} />
+        ) : null}
+        
+        {/* Cyberpunk glow effect */}
+        <div 
+          className={cn(
+            "absolute -inset-1 rounded-full opacity-0 transition-opacity duration-300 z-[-1]",
+            "bg-gradient-to-r from-[#41f0db] via-[#ff0abe] to-[#8000ff]",
+            "blur-md",
+            isHovered && "opacity-50"
+          )}
+        />
+        
+        {/* Cyber grid overlay */}
+        <div className="absolute inset-0 bg-cyber-grid opacity-20" />
+      </Avatar>
+    </motion.div>
   );
 };
