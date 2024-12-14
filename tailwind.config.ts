@@ -32,7 +32,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         primary: {
-          DEFAULT: "var(--primary)",
+          DEFAULT: "#41f0db",
           foreground: "var(--text-primary)",
         },
         secondary: {

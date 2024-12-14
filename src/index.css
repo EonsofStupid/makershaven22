@@ -38,11 +38,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-[#41f0db]/50 rounded-full;
+    @apply bg-primary/50 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-[#41f0db];
+    @apply bg-primary;
   }
 }
 
@@ -52,13 +52,13 @@
   }
 
   .glass-input {
-    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#41f0db]/50;
+    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50;
   }
 
   .nav-link {
     @apply relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5
-    after:bg-[#41f0db] after:scale-x-0 after:origin-right after:transition-transform
+    after:bg-primary after:scale-x-0 after:origin-right after:transition-transform
     hover:after:scale-x-100 hover:after:origin-left;
   }
 }
