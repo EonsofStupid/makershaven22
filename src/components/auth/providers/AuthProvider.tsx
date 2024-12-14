@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useAuthStore } from '@/lib/store/auth/auth-store';
+import { useAuthStore } from '@/lib/store/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { toast } from "sonner";
+import type { AuthSession } from '@/lib/store/auth';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -39,12 +40,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               
             if (createError) throw createError;
             
-            setSession(session);
-            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            const authSession: AuthSession = {
+              user: { ...session.user, role: newProfile?.role || 'subscriber' },
+              access_token: session.access_token,
+              refresh_token: session.refresh_token,
+              expires_in: session.expires_in
+            };
+            
+            setSession(authSession);
+            setUser(authSession.user);
             toast.success('Profile created successfully');
           } else {
-            setSession(session);
-            setUser({ ...session.user, role: profile?.role || 'subscriber' });
+            const authSession: AuthSession = {
+              user: { ...session.user, role: profile?.role || 'subscriber' },
+              access_token: session.access_token,
+              refresh_token: session.refresh_token,
+              expires_in: session.expires_in
+            };
+            
+            setSession(authSession);
+            setUser(authSession.user);
           }
         } else {
           setSession(null);
@@ -64,8 +79,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
-      try {
-        if (session?.user) {
+      if (session?.user) {
+        try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -84,21 +99,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               
             if (createError) throw createError;
             
-            setSession(session);
-            setUser({ ...session.user, role: newProfile?.role || 'subscriber' });
+            const authSession: AuthSession = {
+              user: { ...session.user, role: newProfile?.role || 'subscriber' },
+              access_token: session.access_token,
+              refresh_token: session.refresh_token,
+              expires_in: session.expires_in
+            };
+            
+            setSession(authSession);
+            setUser(authSession.user);
             toast.success('Profile created successfully');
           } else {
-            setSession(session);
-            setUser({ ...session.user, role: profile?.role || 'subscriber' });
+            const authSession: AuthSession = {
+              user: { ...session.user, role: profile?.role || 'subscriber' },
+              access_token: session.access_token,
+              refresh_token: session.refresh_token,
+              expires_in: session.expires_in
+            };
+            
+            setSession(authSession);
+            setUser(authSession.user);
           }
-        } else {
-          setSession(null);
-          setUser(null);
+        } catch (error) {
+          console.error('Auth state change error:', error);
+          setError(error instanceof Error ? error : new Error('Auth state change failed'));
+          toast.error('Authentication error occurred');
         }
-      } catch (error) {
-        console.error('Auth state change error:', error);
-        setError(error instanceof Error ? error : new Error('Auth state change failed'));
-        toast.error('Authentication error occurred');
+      } else {
+        setSession(null);
+        setUser(null);
       }
     });
 

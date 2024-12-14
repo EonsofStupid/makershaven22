@@ -19,7 +19,6 @@ export interface AuthSession {
   expires_in: number;
 }
 
-// Global auth state managed by Zustand
 export interface AuthState {
   user: AuthUser | null;
   session: AuthSession | null;
@@ -28,7 +27,6 @@ export interface AuthState {
   isTransitioning: boolean;
 }
 
-// Component-level state managed by Jotai
 export interface AuthUIState {
   isAuthenticating: boolean;
   showPassword: boolean;

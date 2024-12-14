@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/auth';
+import type { AuthState, AuthUser, AuthSession } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,14 +18,12 @@ interface AuthStore extends AuthState {
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
-      // Initial state
       user: null,
       session: null,
       isLoading: false,
       error: null,
       isTransitioning: false,
 
-      // Auth actions
       signIn: async (email: string, password: string) => {
         try {
           set({ isLoading: true, error: null });
@@ -35,11 +33,17 @@ export const useAuthStore = create<AuthStore>()(
           });
           if (error) throw error;
           
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+
           const authSession: AuthSession = {
             user: {
               id: data.user.id,
               email: data.user.email,
-              role: data.user.role as UserRole,
+              role: profile?.role || 'subscriber',
               ...data.user.user_metadata
             },
             access_token: data.session.access_token,

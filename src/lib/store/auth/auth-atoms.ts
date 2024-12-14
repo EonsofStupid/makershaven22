@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import type { AuthUIState } from '@/lib/types/auth';
+import type { AuthUIState } from './types';
 import { useAuthStore } from './auth-store';
 
 // Base UI state atom
