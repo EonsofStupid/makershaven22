@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/lib/store/auth/use-auth";
 import { NavigationContainer } from "./navigation/core/NavigationContainer";
 import { NavigationSection } from "./navigation/core/NavigationSection";
 import { Logo } from "./navigation/Logo";
@@ -12,6 +13,7 @@ import { MobileNav } from "./navigation/mobile/MobileNav";
 export const Navigation = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <NavigationContainer>
@@ -26,14 +28,16 @@ export const Navigation = () => {
       <NavigationSection className="space-x-4">
         <SearchButton onClick={() => setSearchOpen(true)} />
   
-        <div className="hidden md:block relative z-[60]">
-          <UserAvatar
-            size="lg"
-            className="transform translate-y-2"
-            onClick={() => setShowUserMenu(!showUserMenu)}
-          />
-          {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
-        </div>
+        {isAuthenticated && (
+          <div className="hidden md:block relative z-[60]">
+            <UserAvatar
+              size="lg"
+              className="transform translate-y-2"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            />
+            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
+          </div>
+        )}
   
         <MobileNav />
       </NavigationSection>

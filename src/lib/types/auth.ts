@@ -27,6 +27,13 @@ export interface AuthState {
   isTransitioning: boolean;
 }
 
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole[];
+  fallbackPath?: string;
+}
+
 export interface AuthUIState {
   isAuthenticating: boolean;
   showPassword: boolean;

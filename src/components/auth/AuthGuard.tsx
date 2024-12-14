@@ -1,31 +1,42 @@
-import React from 'react';
-import type { AuthGuardProps } from '@/lib/auth/types/auth';
-import { Navigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/store/auth/use-auth";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { toast } from "sonner";
+import type { AuthGuardProps } from "@/lib/types/auth";
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({ 
+export const AuthGuard = ({ 
   children, 
-  requireAuth = true, 
-  requiredRole, 
-  fallbackPath 
-}) => {
-  const [user] = useAtom(userAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
+  requireAuth = false,
+  requiredRole = [],
+  fallbackPath = "/login"
+}: AuthGuardProps) => {
+  const navigate = useNavigate();
+  const { isLoading, isAuthenticated, user } = useAuth();
 
-  if (loadingState.isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (!isLoading) {
+      if (requireAuth && !isAuthenticated) {
+        toast.error("Please sign in to access this page");
+        navigate(fallbackPath);
+        return;
+      }
 
-  if (requireAuth && !user) {
-    return <Navigate to={fallbackPath || '/login'} replace />;
-  }
+      if (requiredRole.length > 0 && user?.role && !requiredRole.includes(user.role)) {
+        toast.error("You don't have permission to access this page");
+        navigate("/");
+        return;
+      }
+    }
+  }, [isLoading, isAuthenticated, user, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (requiredRole && user && !user.role) {
-    return <Navigate to={fallbackPath || '/unauthorized'} replace />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return <>{children}</>;
 };
-
-export default AuthGuard;
