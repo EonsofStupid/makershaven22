@@ -1,33 +1,19 @@
-import { Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types/base';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+export enum WorkflowStageType {
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification'
+}
 
 export interface WorkflowStage {
   id: string;
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: WorkflowStageConfig;
+  config: Record<string, any>;
   description?: string;
-}
-
-export interface WorkflowStageConfig {
-  timeLimit?: number;
-  requiredApprovers?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required?: boolean;
-  }>;
 }
 
 export interface WorkflowTemplate {
@@ -79,17 +65,26 @@ export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStag
 };
 
 export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages as unknown as Json;
+  return JSON.stringify(stages) as Json;
 };
 
 export const parseStages = (stepsJson: Json): WorkflowStage[] => {
-  if (!Array.isArray(stepsJson)) return [];
-  return stepsJson.map(step => ({
-    id: step.id || crypto.randomUUID(),
-    name: step.name || '',
-    type: step.type || 'task',
-    order: step.order || 0,
-    config: step.config || {},
-    description: step.description
-  }));
+  try {
+    if (typeof stepsJson === 'string') {
+      const parsed = JSON.parse(stepsJson);
+      if (Array.isArray(parsed)) {
+        return parsed.map(stage => ({
+          id: stage.id,
+          name: stage.name,
+          type: stage.type,
+          order: stage.order,
+          config: stage.config,
+          description: stage.description
+        }));
+      }
+    }
+    return [];
+  } catch {
+    return [];
+  }
 };

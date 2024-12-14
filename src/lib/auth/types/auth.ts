@@ -14,8 +14,6 @@ export interface AuthUser {
 
 export interface AuthSession {
   user: AuthUser;
-  access_token: string;
-  refresh_token?: string;
   expires_at?: number;
 }
 
@@ -30,7 +28,6 @@ export interface AuthState {
 export interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
   fallbackPath?: string;
   loadingComponent?: React.ReactNode;
   unauthorizedComponent?: React.ReactNode;

@@ -1,8 +1,8 @@
 import { atom } from 'jotai';
-import type { Settings } from '@/components/admin/settings/types';
+import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 
 export interface ThemeSettings extends Settings {
-  mode: 'light' | 'dark' | 'system';
+  mode: ThemeMode;
 }
 
 // Read-only atom that syncs with Zustand theme store

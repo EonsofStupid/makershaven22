@@ -37,9 +37,4 @@ export interface Theme {
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => void;
-}
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
