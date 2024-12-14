@@ -7,7 +7,7 @@ export const applyThemeToDocument = (theme: Theme | null) => {
   }
 
   const settings = theme.settings;
-  
+
   // Apply colors
   document.documentElement.style.setProperty('--primary-color', settings.primary_color);
   document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
@@ -30,21 +30,11 @@ export const applyThemeToDocument = (theme: Theme | null) => {
   document.documentElement.style.setProperty('--letter-spacing', settings.letter_spacing);
 
   // Apply layout
-  if (settings.border_radius) {
-    document.documentElement.style.setProperty('--border-radius', settings.border_radius);
-  }
-  if (settings.spacing_unit) {
-    document.documentElement.style.setProperty('--spacing-unit', settings.spacing_unit);
-  }
-  if (settings.transition_duration) {
-    document.documentElement.style.setProperty('--transition-duration', settings.transition_duration);
-  }
-  if (settings.shadow_color) {
-    document.documentElement.style.setProperty('--shadow-color', settings.shadow_color);
-  }
-  if (settings.hover_scale) {
-    document.documentElement.style.setProperty('--hover-scale', settings.hover_scale);
-  }
+  document.documentElement.style.setProperty('--border-radius', settings.border_radius);
+  document.documentElement.style.setProperty('--spacing-unit', settings.spacing_unit);
+  document.documentElement.style.setProperty('--transition-duration', settings.transition_duration);
+  document.documentElement.style.setProperty('--shadow-color', settings.shadow_color);
+  document.documentElement.style.setProperty('--hover-scale', settings.hover_scale);
   if (settings.box_shadow) {
     document.documentElement.style.setProperty('--box-shadow', settings.box_shadow);
   }
@@ -58,6 +48,7 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
     return {
       settings: {
         site_title: 'MakersImpulse',
+        tagline: 'Create, Share, Inspire',
         primary_color: '#7FFFD4',
         secondary_color: '#FFB6C1',
         accent_color: '#E6E6FA',
@@ -90,16 +81,16 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
     settings: {
       site_title: dbSettings.site_title,
       tagline: dbSettings.tagline,
-      primary_color: dbSettings.primary_color || '#7FFFD4',
-      secondary_color: dbSettings.secondary_color || '#FFB6C1',
-      accent_color: dbSettings.accent_color || '#E6E6FA',
-      text_primary_color: dbSettings.text_primary_color || '#FFFFFF',
-      text_secondary_color: dbSettings.text_secondary_color || '#A1A1AA',
-      text_link_color: dbSettings.text_link_color || '#3B82F6',
-      text_heading_color: dbSettings.text_heading_color || '#FFFFFF',
-      neon_cyan: dbSettings.neon_cyan || '#41f0db',
-      neon_pink: dbSettings.neon_pink || '#ff0abe',
-      neon_purple: dbSettings.neon_purple || '#8000ff',
+      primary_color: dbSettings.primary_color,
+      secondary_color: dbSettings.secondary_color,
+      accent_color: dbSettings.accent_color,
+      text_primary_color: dbSettings.text_primary_color,
+      text_secondary_color: dbSettings.text_secondary_color,
+      text_link_color: dbSettings.text_link_color,
+      text_heading_color: dbSettings.text_heading_color,
+      neon_cyan: dbSettings.neon_cyan,
+      neon_pink: dbSettings.neon_pink,
+      neon_purple: dbSettings.neon_purple,
       font_family_heading: dbSettings.font_family_heading,
       font_family_body: dbSettings.font_family_body,
       font_size_base: dbSettings.font_size_base,
@@ -114,7 +105,7 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
       hover_scale: dbSettings.hover_scale,
       box_shadow: dbSettings.box_shadow,
       backdrop_blur: dbSettings.backdrop_blur,
-      transition_type: dbSettings.transition_type,
+      transition_type: dbSettings.transition_type || 'fade',
       logo_url: dbSettings.logo_url,
       favicon_url: dbSettings.favicon_url
     },
