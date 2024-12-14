@@ -46,7 +46,11 @@ export const useContentStore = create<ContentState>()(
       })
     }),
     {
-      name: 'content-store'
+      name: 'content-store',
+      partialize: (state) => ({
+        activeContent: state.activeContent,
+        contentHistory: state.contentHistory
+      })
     }
   )
 );

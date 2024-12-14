@@ -3,4 +3,4 @@ export * from './loading';
 export * from './sidebar';
 export * from './theme';
 export * from './core';
-export * from './content';
+export * from './content/content-atoms';
