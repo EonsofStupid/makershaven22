@@ -4,32 +4,30 @@ import type { AuthUser, AuthSession, UserRole } from '@/lib/types/auth';
 
 export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
 export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
-export const isLoadingAtom = atom<boolean>(true);
+
+export const loadingAtom = atom(false);
 export const errorAtom = atom<Error | null>(null);
-export const isTransitioningAtom = atom<boolean>(false);
+export const isTransitioningAtom = atom(false);
 
-// Setter atoms
-export const setUserAtom = atom(
-  null,
-  (get, set, user: AuthUser | null) => {
-    set(userAtom, user);
-  }
-);
+// Loading state atoms
+export interface LoadingState {
+  isLoading: boolean;
+  message?: string;
+}
 
-export const setSessionAtom = atom(
-  null,
-  (get, set, session: AuthSession | null) => {
-    set(sessionAtom, session);
-  }
-);
+export const loadingStateAtom = atom<LoadingState>({
+  isLoading: false,
+  message: undefined
+});
 
 export const setLoadingAtom = atom(
   null,
-  (get, set, loading: boolean) => {
-    set(isLoadingAtom, loading);
+  (get, set, state: LoadingState) => {
+    set(loadingStateAtom, state);
   }
 );
 
+// Error handling atoms
 export const setErrorAtom = atom(
   null,
   (get, set, error: Error | null) => {
@@ -37,6 +35,7 @@ export const setErrorAtom = atom(
   }
 );
 
+// Transition state atoms
 export const setTransitioningAtom = atom(
   null,
   (get, set, transitioning: boolean) => {
