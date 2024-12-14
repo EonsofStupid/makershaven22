@@ -11,44 +11,37 @@ export const HeroSection = () => {
       <div 
         className="absolute inset-0 opacity-20 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/lovable-uploads/8bf77016-aea3-48bd-8212-e42940268b03.png')",
+          backgroundImage: "url('/lovable-uploads/4edf410a-5bd3-426b-8efe-fb8acb60e39c.png')",
           backgroundPosition: "center 40%"
         }}
       />
       
-      <div className="relative z-10 w-full">
+      <div className="container mx-auto px-6 pt-24 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center px-6"
+          className="text-center relative"
         >
-          <h1 className="text-[#41f0db] text-4xl md:text-6xl font-bold mb-6 drop-shadow-[0_0_10px_rgba(65,240,219,0.5)]">
+          <h1 className="landing-title text-[#41f0db] text-4xl md:text-6xl font-bold mb-6">
             Build your 3D Printer Dream
           </h1>
           
-          <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+          <p className="landing-text text-xl text-white/80 mb-12 max-w-2xl mx-auto">
             Your hub for 3D printing innovation. Discover builds, parts, and join our community of makers.
           </p>
 
-          <div className="max-w-2xl mx-auto">
-            <div className="relative group">
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="relative">
               <input
                 type="text"
                 placeholder="Search builds, parts, or guides..."
-                className="w-full px-6 py-4 bg-black/20 backdrop-blur-xl border border-[#8000ff] rounded-xl text-white placeholder:text-white/50 
-                         focus:outline-none focus:ring-2 focus:ring-[#41f0db] focus:border-transparent transition-all duration-300
-                         group-hover:border-[#41f0db] group-hover:bg-black/30"
+                className="w-full px-6 py-4 bg-white/5 backdrop-blur-xl border border-[#8000ff] rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#8000ff] transition-all duration-300"
               />
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#41f0db] opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
+              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50" />
             </div>
           </div>
         </motion.div>
-      </div>
-
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(65,240,219,0.1)_0%,transparent_60%)]" />
       </div>
     </div>
   );
