@@ -1,6 +1,3 @@
-@import './admin/layout.css';
-@import './admin/components.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,43 +75,30 @@
   background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
 }
 
-/* Admin layout specific */
-.admin-layout {
-  @apply min-h-screen bg-gradient-to-b from-black/90 to-black/95;
+/* Cyber Grid Animation */
+@keyframes gridPulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.3; }
 }
 
-.admin-content {
-  @apply relative z-10 space-y-8;
+@keyframes circuitFlow {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
-/* Navigation elements */
-.nav-item {
-  @apply flex items-center gap-2 px-3 py-1.5 rounded-lg text-white/80 hover:text-neon-cyan transition-all duration-300 hover:bg-white/5 relative;
+/* Background Effects */
+.cyber-grid {
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(65, 240, 219, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(65, 240, 219, 0.1) 1px, transparent 1px);
+  animation: gridPulse 4s infinite;
 }
 
-.nav-item-highlight {
-  @apply absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100;
-  background: linear-gradient(45deg, rgba(65, 240, 219, 0.1), rgba(255, 10, 190, 0.1));
-}
-
-/* Stats cards */
-.stat-card {
-  @apply relative p-6 rounded-xl overflow-hidden;
-  background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(65,240,219,0.1) 100%);
-}
-
-.stat-card::before {
-  content: '';
-  @apply absolute inset-0 opacity-10;
-  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
-}
-
-/* Animations */
-@keyframes glow {
-  0%, 100% { filter: brightness(100%); }
-  50% { filter: brightness(120%); }
-}
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
+.circuit-overlay {
+  background-image: url('/lovable-uploads/518770660439-4636190af475');
+  background-size: 200% 200%;
+  opacity: 0.15;
+  animation: circuitFlow 20s linear infinite;
 }
