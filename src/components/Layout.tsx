@@ -17,14 +17,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Clear session and user state
+      // Clear all auth state
       setSession(null);
       
       // Show success message
       toast.success("Successfully signed out");
       
-      // Force navigation to login page
-      navigate("/login", { replace: true });
+      // Force a hard navigation to login page
+      window.location.href = "/login";
       
     } catch (error) {
       console.error("Sign out error:", error);
