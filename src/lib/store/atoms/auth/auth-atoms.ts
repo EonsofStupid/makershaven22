@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession, UserRole } from '@/lib/types/auth';
+import type { AuthUser, AuthSession } from '@/lib/types/auth';
 
+// Base atoms
 export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
 export const sessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
-
 export const loadingAtom = atom(false);
 export const errorAtom = atom<Error | null>(null);
 export const isTransitioningAtom = atom(false);
@@ -20,34 +20,69 @@ export const loadingStateAtom = atom<LoadingState>({
   message: undefined
 });
 
+// Setter atoms
+export const setUserAtom = atom(
+  null,
+  (_get, set, user: AuthUser | null) => {
+    set(userAtom, user);
+  }
+);
+
+export const setSessionAtom = atom(
+  null,
+  (_get, set, session: AuthSession | null) => {
+    set(sessionAtom, session);
+  }
+);
+
 export const setLoadingAtom = atom(
   null,
-  (get, set, state: LoadingState) => {
+  (_get, set, state: LoadingState) => {
     set(loadingStateAtom, state);
   }
 );
 
-// Error handling atoms
 export const setErrorAtom = atom(
   null,
-  (get, set, error: Error | null) => {
+  (_get, set, error: Error | null) => {
     set(errorAtom, error);
   }
 );
 
-// Transition state atoms
 export const setTransitioningAtom = atom(
   null,
-  (get, set, transitioning: boolean) => {
+  (_get, set, transitioning: boolean) => {
     set(isTransitioningAtom, transitioning);
   }
 );
 
-// Computed atoms
-export const isAuthenticatedAtom = atom(
-  (get) => !!get(sessionAtom)?.user
+// Auth action atoms
+export const signInAtom = atom(
+  null,
+  async (_get, set, credentials: { email: string; password: string }) => {
+    set(loadingStateAtom, { isLoading: true, message: "Signing in..." });
+    try {
+      // Implement sign in logic here
+      set(loadingStateAtom, { isLoading: false });
+    } catch (error) {
+      set(errorAtom, error as Error);
+      set(loadingStateAtom, { isLoading: false });
+    }
+  }
 );
 
-export const userRoleAtom = atom<UserRole | undefined>(
-  (get) => get(userAtom)?.role
+export const signOutAtom = atom(
+  null,
+  async (_get, set) => {
+    set(loadingStateAtom, { isLoading: true, message: "Signing out..." });
+    try {
+      // Implement sign out logic here
+      set(sessionAtom, null);
+      set(userAtom, null);
+      set(loadingStateAtom, { isLoading: false });
+    } catch (error) {
+      set(errorAtom, error as Error);
+      set(loadingStateAtom, { isLoading: false });
+    }
+  }
 );

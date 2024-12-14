@@ -3,11 +3,13 @@ import { useAtom } from 'jotai';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
-  setSessionAtom,
-  setUserAtom,
-  isLoadingAtom,
+  sessionAtom,
+  userAtom,
+  loadingStateAtom,
   setErrorAtom,
-  setTransitioningAtom
+  setTransitioningAtom,
+  setSessionAtom,
+  setUserAtom
 } from '@/lib/store/atoms/auth/auth-atoms';
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import type { AuthUser } from '@/lib/types/auth';
@@ -17,7 +19,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [isLoading] = useAtom(isLoadingAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
   const [, setSession] = useAtom(setSessionAtom);
   const [, setUser] = useAtom(setUserAtom);
   const [, setError] = useAtom(setErrorAtom);
@@ -121,7 +123,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [setSession, setUser, setError, setTransitioning]);
 
-  if (isLoading) {
+  if (loadingState.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />
