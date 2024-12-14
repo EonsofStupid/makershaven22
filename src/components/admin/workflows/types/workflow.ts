@@ -1,4 +1,4 @@
-import { Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types';
 
 export enum WorkflowStageType {
   APPROVAL = 'approval',
@@ -13,27 +13,13 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: WorkflowStageConfig;
+  config: Record<string, any>;
   description?: string;
 }
 
 export interface WorkflowStageConfig {
-  timeLimit?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required?: boolean;
-  }>;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  [key: string]: any;
+  type: WorkflowStageType;
+  config: Record<string, any>;
 }
 
 export interface WorkflowTemplate {
@@ -61,46 +47,3 @@ export interface StageConfigUpdateProps {
   stage: WorkflowStage;
   onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
-
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-}
-
-export const validateStage = (stage: WorkflowStage): ValidationResult => {
-  const errors: string[] = [];
-  
-  if (!stage.id) errors.push('Stage ID is required');
-  if (!stage.name) errors.push('Stage name is required');
-  if (!stage.type) errors.push('Stage type is required');
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
-};
-
-export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return JSON.stringify(stages) as Json;
-};
-
-export const parseStages = (stepsJson: Json): WorkflowStage[] => {
-  try {
-    if (typeof stepsJson === 'string') {
-      const parsed = JSON.parse(stepsJson);
-      if (Array.isArray(parsed)) {
-        return parsed.map(stage => ({
-          id: stage.id,
-          name: stage.name,
-          type: stage.type,
-          order: stage.order,
-          config: stage.config,
-          description: stage.description
-        }));
-      }
-    }
-    return [];
-  } catch {
-    return [];
-  }
-};

@@ -24,3 +24,5 @@ export const settingsLoadingAtom = atom<boolean>(false);
 
 // Error state atom
 export const settingsErrorAtom = atom<Error | null>(null);
+
+export { Settings };
