@@ -23,7 +23,7 @@ export const HeroSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center px-6"
         >
-          <h1 className="text-[#41f0db] text-4xl md:text-6xl font-bold mb-6">
+          <h1 className="text-[#41f0db] text-4xl md:text-6xl font-bold mb-6 drop-shadow-[0_0_10px_rgba(65,240,219,0.5)]">
             Build your 3D Printer Dream
           </h1>
           
@@ -32,16 +32,23 @@ export const HeroSection = () => {
           </p>
 
           <div className="max-w-2xl mx-auto">
-            <div className="relative">
+            <div className="relative group">
               <input
                 type="text"
                 placeholder="Search builds, parts, or guides..."
-                className="w-full px-6 py-4 bg-white/5 backdrop-blur-xl border border-[#8000ff] rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#8000ff] transition-all duration-300"
+                className="w-full px-6 py-4 bg-black/20 backdrop-blur-xl border border-[#8000ff] rounded-xl text-white placeholder:text-white/50 
+                         focus:outline-none focus:ring-2 focus:ring-[#41f0db] focus:border-transparent transition-all duration-300
+                         group-hover:border-[#41f0db] group-hover:bg-black/30"
               />
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50" />
+              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#41f0db] opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </div>
         </motion.div>
+      </div>
+
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(65,240,219,0.1)_0%,transparent_60%)]" />
       </div>
     </div>
   );
