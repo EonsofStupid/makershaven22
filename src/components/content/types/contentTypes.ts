@@ -1,26 +1,54 @@
+import { Json } from '@/integrations/supabase/types';
+
+export type ContentType = 'page' | 'component' | 'template' | 'post';
+export type ContentStatus = 'draft' | 'published' | 'archived';
+
 export interface BaseContent {
-  id?: string;
+  id: string;
   title: string;
   type: ContentType;
-  content?: any;
-  metadata?: Record<string, any>;
-  status?: 'draft' | 'published' | 'archived';
+  content: Json;
+  metadata?: Json;
+  slug?: string;
+  status?: ContentStatus;
   version?: number;
-}
-
-export interface PageContent extends BaseContent {
-  type: 'page';
-  layout?: string;
+  created_by?: string;
+  updated_by?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ComponentContent extends BaseContent {
   type: 'component';
 }
 
-export type ContentType = 'page' | 'component' | 'workflow';
+export interface PageContent extends BaseContent {
+  type: 'page';
+}
 
-export const CONTENT_TYPES: Record<ContentType, ContentType[]> = {
-  page: ['page'],
-  component: ['component'],
-  workflow: ['workflow']
+export const componentContentSchema = {
+  // Add schema definition
+  type: 'object',
+  properties: {
+    // Define component properties
+  }
+};
+
+export const pageContentSchema = {
+  // Add schema definition
+  type: 'object',
+  properties: {
+    // Define page properties
+  }
+};
+
+export const getSchemaByType = (type: ContentType) => {
+  switch (type) {
+    case 'component':
+      return componentContentSchema;
+    case 'page':
+      return pageContentSchema;
+    default:
+      return null;
+  }
 };

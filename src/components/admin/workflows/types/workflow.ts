@@ -1,6 +1,12 @@
 import { Json } from '@/integrations/supabase/types';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+export enum WorkflowStageType {
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification',
+  CONDITIONAL = 'conditional'
+}
 
 export interface WorkflowStage {
   id: string;
@@ -18,6 +24,15 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required?: boolean;
   }>;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
   [key: string]: any;
 }
 
@@ -44,7 +59,7 @@ export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowSta
 
 export interface StageConfigUpdateProps {
   stage: WorkflowStage;
-  onUpdate: StageUpdateFunction;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
 
 export interface ValidationResult {
@@ -63,4 +78,29 @@ export const validateStage = (stage: WorkflowStage): ValidationResult => {
     isValid: errors.length === 0,
     errors
   };
+};
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return JSON.stringify(stages) as Json;
+};
+
+export const parseStages = (stepsJson: Json): WorkflowStage[] => {
+  try {
+    if (typeof stepsJson === 'string') {
+      const parsed = JSON.parse(stepsJson);
+      if (Array.isArray(parsed)) {
+        return parsed.map(stage => ({
+          id: stage.id,
+          name: stage.name,
+          type: stage.type,
+          order: stage.order,
+          config: stage.config,
+          description: stage.description
+        }));
+      }
+    }
+    return [];
+  } catch {
+    return [];
+  }
 };

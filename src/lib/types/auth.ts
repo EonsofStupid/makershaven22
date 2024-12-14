@@ -40,3 +40,8 @@ export interface AuthUIState {
   rememberMe: boolean;
   validationErrors: Record<string, string>;
 }
+
+export interface AuthError extends Error {
+  code: string;
+  details?: string;
+}
