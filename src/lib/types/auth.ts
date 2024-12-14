@@ -14,24 +14,30 @@ export interface AuthUser {
 
 export interface AuthSession {
   user: AuthUser;
-  access_token: string;
+  expires_in?: number;
+  access_token?: string;
   refresh_token?: string;
-  expires_at?: number;
 }
 
 export interface AuthState {
   isLoading: boolean;
   hasAccess: boolean;
   error: Error | null;
-  isTransitioning: boolean;
-  reset: () => void;
+  isTransitioning?: boolean;
 }
 
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
+export interface SecurityLog {
+  id: string;
+  user_id: string;
+  event_type: string;
+  severity: string;
+  details: any;
+  ip_address: string;
+  user_agent: string;
+  metadata: any;
+  created_at: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+  };
 }
