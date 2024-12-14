@@ -5,7 +5,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from '@/lib/store/auth-store';
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { PinLogin } from "@/components/auth/components/PinLogin";
 import { toast } from "sonner";
@@ -13,14 +12,18 @@ import { motion } from "framer-motion";
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
+import { useAtom } from 'jotai';
+import { sessionAtom, loadingStateAtom, userAtom } from '@/lib/store/atoms/auth';
 
 const LoginContent = () => {
   const navigate = useNavigate();
-  const { session, isLoading } = useAuthStore();
+  const [session] = useAtom(sessionAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
+  const [, setUser] = useAtom(userAtom);
   const [usePinLogin, setUsePinLogin] = useState(false);
 
   useEffect(() => {
-    console.log('Login page render:', { session, isLoading });
+    console.log('Login page render:', { session, loadingState });
     
     if (session?.user) {
       console.log("Existing session found, redirecting to home");
@@ -35,6 +38,10 @@ const LoginContent = () => {
         try {
           await sessionManager.startSession();
           securityManager.initialize();
+          
+          if (session.user) {
+            setUser(session.user);
+          }
           
           console.log("User signed in, redirecting to home");
           toast.success("Successfully signed in!");
@@ -53,9 +60,9 @@ const LoginContent = () => {
       console.log("Cleaning up auth listener in login page");
       subscription.unsubscribe();
     };
-  }, [session, navigate, isLoading]);
+  }, [session, navigate, loadingState, setUser]);
 
-  if (isLoading) {
+  if (loadingState.isLoading) {
     return (
       <motion.div 
         initial={{ opacity: 0 }}
