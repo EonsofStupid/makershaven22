@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useAtom } from 'jotai';
+import { userAtom, sessionAtom } from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
 import { 
   UserCircle, Settings, Activity, 
@@ -9,10 +10,12 @@ import {
 import { UserMenuHeader } from "./menu/UserMenuHeader";
 import { UserMenuItem } from "./menu/UserMenuItem";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 export const UserMenu = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuthStore();
+  const [user] = useAtom(userAtom);
+  const [, setSession] = useAtom(sessionAtom);
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -20,7 +23,21 @@ export const UserMenu = ({ onClose }: { onClose: () => void }) => {
     toast.success(`Navigating to ${path.split('/').pop()?.toUpperCase() || 'Home'}`);
   };
 
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setSession(null);
+      toast.success("Successfully signed out");
+      navigate("/login");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
+  };
+
+  const isAdmin = user?.role === 'admin';
 
   return (
     <motion.div 
@@ -96,18 +113,7 @@ export const UserMenu = ({ onClose }: { onClose: () => void }) => {
           icon={LogOut}
           label="Sign Out"
           variant="danger"
-          onClick={async () => {
-            try {
-              await signOut();
-              toast.success("Signed out successfully");
-              navigate("/");
-            } catch (error) {
-              console.error("Sign out error:", error);
-              toast.error("Failed to sign out");
-            } finally {
-              onClose();
-            }
-          }}
+          onClick={handleSignOut}
         />
       </div>
     </motion.div>
