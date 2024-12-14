@@ -2,8 +2,7 @@ import { useState } from "react";
 import { NavigationContainer } from "./navigation/core/NavigationContainer";
 import { NavigationSection } from "./navigation/core/NavigationSection";
 import { Logo } from "./navigation/Logo";
-import { NavigationLinks } from "./navigation/NavigationLinks";
-import { MegaMenu } from "./navigation/MegaMenu";
+import { UnifiedNavigation } from "./navigation/UnifiedNavigation";
 import { SearchButton } from "./navigation/SearchButton";
 import { SearchDialog } from "./navigation/SearchDialog";
 import { UserAvatar } from "./avatar/UserAvatar";
@@ -20,9 +19,8 @@ export const Navigation = () => {
         <Logo />
       </NavigationSection>
 
-      <NavigationSection className="hidden md:flex space-x-6">
-        <NavigationLinks />
-        <MegaMenu />
+      <NavigationSection className="hidden md:flex">
+        <UnifiedNavigation />
       </NavigationSection>
 
       <NavigationSection className="space-x-4">
@@ -31,7 +29,7 @@ export const Navigation = () => {
         <div className="hidden md:block relative z-[60]">
           <UserAvatar
             size="lg"
-            className="transform translate-y-2 scale-115"
+            className="transform translate-y-2"
             onClick={() => setShowUserMenu(!showUserMenu)}
           />
           {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
