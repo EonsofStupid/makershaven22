@@ -1,10 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthState, AuthUser, AuthSession } from './types';
+import type { AuthUser, AuthSession } from '@/lib/types/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-interface AuthStore extends AuthState {
+interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setSession: (session: AuthSession | null) => void;
@@ -15,12 +20,12 @@ interface AuthStore extends AuthState {
   reset: () => void;
 }
 
-export const useAuthStore = create<AuthStore>()(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
       session: null,
-      isLoading: false,
+      isLoading: true,
       error: null,
       isTransitioning: false,
 
