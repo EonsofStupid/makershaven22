@@ -43,6 +43,10 @@ export default {
           cyan: "var(--neon-cyan)",
           pink: "var(--neon-pink)",
           purple: "var(--neon-purple)",
+          lime: "#c8f542",
+          green: "#84f542",
+          teal: "#00ffd0",
+          magenta: "#ff008c"
         },
         brand: {
           purple: "#4d00b3",
@@ -61,6 +65,7 @@ export default {
         'scratch-overlay': 'linear-gradient(45deg, rgba(255,255,255,0.02) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.02) 75%, rgba(255,255,255,0.02))',
         'brand-gradient': 'linear-gradient(135deg, #4d00b3, #72228c, #b0e653)',
         'admin-gradient': 'linear-gradient(135deg, #41f0db, #4d00b3, #b0e653)',
+        'cyber-pulse': 'radial-gradient(circle at center, var(--neon-cyan) 0%, transparent 50%)',
       },
       keyframes: {
         "accordion-down": {
@@ -83,6 +88,20 @@ export default {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        "neon-pulse": {
+          "0%, 100%": {
+            textShadow: "0 0 7px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 21px var(--neon-cyan)",
+            boxShadow: "0 0 7px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 21px var(--neon-cyan)"
+          },
+          "50%": {
+            textShadow: "0 0 14px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 42px var(--neon-cyan)",
+            boxShadow: "0 0 14px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 42px var(--neon-cyan)"
+          }
+        },
+        "cyber-grid-move": {
+          "0%": { backgroundPosition: "0% 0%" },
+          "100%": { backgroundPosition: "100% 100%" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -90,6 +109,8 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
+        "neon-pulse": "neon-pulse 2s infinite",
+        "cyber-grid": "cyber-grid-move 20s linear infinite"
       },
     },
   },

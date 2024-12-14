@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -13,6 +13,16 @@
     --input: 231 25% 24%;
     --ring: 231 25% 24%;
     --radius: 0.75rem;
+    
+    /* Neon Colors */
+    --primary: #41f0db;
+    --secondary: #ff0abe;
+    --accent: #8000ff;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --neon-cyan: #41f0db;
+    --neon-pink: #ff0abe;
+    --neon-purple: #8000ff;
   }
 
   * {
@@ -20,7 +30,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-['Inter'];
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
     background-image: radial-gradient(
       circle at center,
       rgba(110, 89, 165, 0.1) 0%,
@@ -37,27 +48,51 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/50 rounded-full;
+    @apply bg-neon-cyan/50 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary;
+    @apply bg-neon-cyan;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
+    @apply bg-glass backdrop-blur-lg border border-white/10 rounded-lg shadow-lg;
   }
 
   .glass-input {
-    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50;
+    @apply bg-card/50 backdrop-blur-sm border border-white/10 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-neon-cyan/50;
   }
 
   .nav-link {
-    @apply relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors
+    @apply relative px-4 py-2 text-sm font-['Orbitron'] text-foreground/80 hover:text-neon-cyan transition-all duration-300
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5
-    after:bg-primary after:scale-x-0 after:origin-right after:transition-transform
+    after:bg-neon-cyan after:scale-x-0 after:origin-right after:transition-transform after:duration-300
     hover:after:scale-x-100 hover:after:origin-left;
+  }
+
+  .cyber-button {
+    @apply relative px-6 py-2 font-['Orbitron'] text-sm font-medium bg-transparent
+    border border-neon-cyan text-neon-cyan rounded transition-all duration-300
+    hover:bg-neon-cyan/10 hover:shadow-[0_0_15px_rgba(65,240,219,0.5)]
+    before:content-[''] before:absolute before:inset-0 before:bg-neon-cyan/0
+    before:transition-all before:duration-300 hover:before:bg-neon-cyan/10
+    active:scale-95;
+  }
+
+  .mega-menu {
+    @apply absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl
+    border-t border-neon-cyan/20 shadow-lg shadow-neon-cyan/10
+    opacity-0 invisible transition-all duration-300 transform translate-y-2
+    group-hover:opacity-100 group-hover:visible group-hover:translate-y-0;
+  }
+
+  .cyber-grid {
+    @apply absolute inset-0 bg-cyber-grid opacity-30 pointer-events-none animate-cyber-grid;
+  }
+
+  .neon-text {
+    @apply font-['Orbitron'] text-neon-cyan animate-neon-pulse;
   }
 }
