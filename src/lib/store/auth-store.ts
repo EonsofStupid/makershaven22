@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthUser, AuthSession } from '@/lib/types';
+import type { AuthUser, AuthSession } from '@/lib/types';
 import { toast } from 'sonner';
 
 interface AuthStore {

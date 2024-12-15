@@ -1080,6 +1080,7 @@ export type Database = {
           font_weight_normal: string
           hover_scale: string | null
           id: string
+          last_sync: string | null
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
@@ -1092,6 +1093,7 @@ export type Database = {
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
+          state_version: number | null
           tagline: string | null
           text_heading_color: string | null
           text_link_color: string | null
@@ -1115,6 +1117,7 @@ export type Database = {
           font_weight_normal: string
           hover_scale?: string | null
           id?: string
+          last_sync?: string | null
           letter_spacing: string
           line_height_base: string
           logo_url?: string | null
@@ -1127,6 +1130,7 @@ export type Database = {
           shadow_color?: string | null
           site_title: string
           spacing_unit?: string | null
+          state_version?: number | null
           tagline?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
@@ -1150,6 +1154,7 @@ export type Database = {
           font_weight_normal?: string
           hover_scale?: string | null
           id?: string
+          last_sync?: string | null
           letter_spacing?: string
           line_height_base?: string
           logo_url?: string | null
@@ -1162,6 +1167,7 @@ export type Database = {
           shadow_color?: string | null
           site_title?: string
           spacing_unit?: string | null
+          state_version?: number | null
           tagline?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
@@ -1227,6 +1233,8 @@ export type Database = {
           details: string | null
           id: string
           metadata: Json | null
+          state_data: Json | null
+          sync_status: string | null
           user_id: string
         }
         Insert: {
@@ -1235,6 +1243,8 @@ export type Database = {
           details?: string | null
           id?: string
           metadata?: Json | null
+          state_data?: Json | null
+          sync_status?: string | null
           user_id: string
         }
         Update: {
@@ -1243,6 +1253,8 @@ export type Database = {
           details?: string | null
           id?: string
           metadata?: Json | null
+          state_data?: Json | null
+          sync_status?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1453,6 +1465,7 @@ export type Database = {
           font_weight_normal: string
           hover_scale: string | null
           id: string
+          last_sync: string | null
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
@@ -1465,6 +1478,7 @@ export type Database = {
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
+          state_version: number | null
           tagline: string | null
           text_heading_color: string | null
           text_link_color: string | null

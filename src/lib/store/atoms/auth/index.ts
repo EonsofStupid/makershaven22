@@ -1,10 +1,22 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import type { AuthUser, AuthSession } from '@/lib/auth/types/auth';
+import { useAuthStore } from '../../auth-store';
 
-// Persistent storage atoms
-export const sessionAtom = atomWithStorage<AuthSession | null>('session', null);
-export const userAtom = atomWithStorage<AuthUser | null>('user', null);
+// Persistent storage atoms that sync with Zustand
+export const sessionAtom = atom(
+  (get) => useAuthStore.getState().session,
+  (_get, _set, newSession: AuthSession | null) => {
+    useAuthStore.getState().setSession(newSession);
+  }
+);
+
+export const userAtom = atom(
+  (get) => useAuthStore.getState().user,
+  (_get, _set, newUser: AuthUser | null) => {
+    useAuthStore.getState().setUser(newUser);
+  }
+);
 
 // Loading state atom
 export const loadingStateAtom = atom<{ isLoading: boolean; message?: string }>({
@@ -30,34 +42,5 @@ export const hasRoleAtom = atom(
       return requiredRole.includes(user.role);
     }
     return user.role === requiredRole;
-  }
-);
-
-// Writable atoms for state updates
-export const setSessionAtom = atom(
-  null,
-  (_get, set, session: AuthSession | null) => {
-    set(sessionAtom, session);
-  }
-);
-
-export const setUserAtom = atom(
-  null,
-  (_get, set, user: AuthUser | null) => {
-    set(userAtom, user);
-  }
-);
-
-export const setLoadingAtom = atom(
-  null,
-  (_get, set, loading: { isLoading: boolean; message?: string }) => {
-    set(loadingStateAtom, loading);
-  }
-);
-
-export const setAuthErrorAtom = atom(
-  null,
-  (_get, set, error: Error | null) => {
-    set(authErrorAtom, error);
   }
 );
