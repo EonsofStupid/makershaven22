@@ -903,6 +903,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_publishing_queue_content"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_publishing_queue_revision"
+            columns: ["revision_id"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "publishing_queue_content_id_fkey"
             columns: ["content_id"]
             isOneToOne: false
