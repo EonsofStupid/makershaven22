@@ -1,22 +1,32 @@
 import { atom } from 'jotai';
-import { formErrorsAtom, formDirtyAtom, formSubmittingAtom } from './index';
+
+export interface FormState {
+  errors: Record<string, string>;
+  isDirty: boolean;
+  isSubmitting: boolean;
+}
+
+export const formStateAtom = atom<FormState>({
+  errors: {},
+  isDirty: false,
+  isSubmitting: false
+});
 
 export const useFormState = () => {
-  const [errors, setErrors] = atom(formErrorsAtom);
-  const [isDirty, setIsDirty] = atom(formDirtyAtom);
-  const [isSubmitting, setIsSubmitting] = atom(formSubmittingAtom);
+  const [formState, setFormState] = atom(formStateAtom);
 
   return {
-    errors,
-    setErrors,
-    isDirty,
-    setIsDirty,
-    isSubmitting,
-    setIsSubmitting,
-    resetForm: () => {
-      setErrors({});
-      setIsDirty(false);
-      setIsSubmitting(false);
-    }
+    ...formState,
+    setErrors: (errors: Record<string, string>) => 
+      setFormState(prev => ({ ...prev, errors })),
+    setDirty: (isDirty: boolean) => 
+      setFormState(prev => ({ ...prev, isDirty })),
+    setSubmitting: (isSubmitting: boolean) => 
+      setFormState(prev => ({ ...prev, isSubmitting })),
+    reset: () => setFormState({
+      errors: {},
+      isDirty: false,
+      isSubmitting: false
+    })
   };
 };

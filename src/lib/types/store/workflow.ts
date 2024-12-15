@@ -1,7 +1,21 @@
-export type WorkflowStageType = 'TASK' | 'APPROVAL' | 'REVIEW' | 'NOTIFICATION' | 'CONDITIONAL';
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowStageConfig {
-  [key: string]: any;
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
 }
 
 export interface WorkflowStage {
@@ -9,7 +23,7 @@ export interface WorkflowStage {
   type: WorkflowStageType;
   name: string;
   order: number;
-  config?: WorkflowStageConfig;
+  config: WorkflowStageConfig;
 }
 
 export interface WorkflowTemplate {
@@ -22,5 +36,3 @@ export interface WorkflowTemplate {
   created_at?: string;
   updated_at?: string;
 }
-
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;

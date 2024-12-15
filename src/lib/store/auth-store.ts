@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store';
+import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 

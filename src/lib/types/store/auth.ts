@@ -1,4 +1,4 @@
-import type { User } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
@@ -9,7 +9,6 @@ export interface AuthUser {
   username?: string;
   displayName?: string;
   metadata?: Record<string, any>;
-  user_metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
@@ -25,8 +24,7 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  hasAccess?: boolean;
-  reset?: () => void;
+  hasAccess: boolean;
 }
 
 export interface SecuritySettings {

@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import { viewPreferencesAtom } from './index';
 
 export interface ViewPreferences {
   sortOrder: 'asc' | 'desc';
@@ -9,12 +8,19 @@ export interface ViewPreferences {
   currentPage: number;
 }
 
+export const viewPreferencesAtom = atom<ViewPreferences>({
+  sortOrder: 'asc',
+  sortBy: 'created_at',
+  filterBy: {},
+  pageSize: 10,
+  currentPage: 1
+});
+
 export const useViewState = () => {
   const [preferences, setPreferences] = atom(viewPreferencesAtom);
 
   return {
     preferences,
-    setPreferences,
     updateSort: (sortBy: string, sortOrder: 'asc' | 'desc') => {
       setPreferences(prev => ({
         ...prev,
@@ -26,7 +32,7 @@ export const useViewState = () => {
       setPreferences(prev => ({
         ...prev,
         filterBy,
-        currentPage: 1 // Reset to first page when filter changes
+        currentPage: 1
       }));
     },
     updatePage: (page: number) => {
@@ -39,7 +45,7 @@ export const useViewState = () => {
       setPreferences(prev => ({
         ...prev,
         pageSize: size,
-        currentPage: 1 // Reset to first page when page size changes
+        currentPage: 1
       }));
     }
   };
