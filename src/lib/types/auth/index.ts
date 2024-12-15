@@ -1,44 +1,37 @@
-import type { User } from '@supabase/supabase-js';
+import { UserRole } from '../base';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-}
-
-export interface AuthState {
-  user: AuthUser | null;
-  session: AuthSession | null;
-  isLoading: boolean;
-  error: Error | null;
-  isTransitioning: boolean;
-  hasAccess: boolean;
+export interface AuthError extends Error {
+  code: string;
+  details?: string;
 }
 
 export interface AuthGuardProps {
   children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
+  requiredRole?: UserRole;
+  fallback?: React.ReactNode;
 }
 
-export const mapSupabaseUser = (user: User): AuthUser => ({
-  id: user.id,
-  email: user.email!,
-  role: (user.user_metadata?.role || 'subscriber') as UserRole,
-  username: user.user_metadata?.username,
-  displayName: user.user_metadata?.display_name,
-  metadata: user.user_metadata
-});
+export interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+export interface AuthErrorBoundaryState {
+  error: Error | null;
+}
+
+export interface AuthErrorRecoveryState {
+  retryCount: number;
+  lastError: AuthError | null;
+}
+
+export interface PinVerificationResponse {
+  success: boolean;
+  error?: string;
+  lockout_until?: string;
+}
+
+export interface PinSetupResponse {
+  success: boolean;
+  error?: string;
+}
