@@ -28,7 +28,6 @@ export interface AuthUIState {
   isLoading: boolean;
   error: Error | null;
   user: AuthUser | null;
-  isAuthenticating: boolean;
   showPassword: boolean;
   rememberMe: boolean;
   validationErrors: Record<string, string>;
