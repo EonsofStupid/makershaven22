@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Settings, Theme } from '@/lib/types/settings';
-import type { AuthUser, AuthSession } from '@/lib/auth/types';
+import type { AuthUser, AuthSession } from '@/lib/types/auth';
 
 interface GlobalState {
   // Theme state

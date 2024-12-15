@@ -1,4 +1,4 @@
-import type { Json } from '@/integrations/supabase/types';
+import { BaseEntity, UserOwned, Json } from './base';
 
 export enum WorkflowStageType {
   APPROVAL = 'approval',
@@ -17,15 +17,11 @@ export interface WorkflowStage {
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id?: string;
+export interface WorkflowTemplate extends BaseEntity, UserOwned {
   name: string;
   description: string | null;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_at?: string;
-  created_by?: string;
-  updated_at?: string;
   steps: Json;
 }
 
@@ -40,11 +36,11 @@ export interface WorkflowStageConfig {
     onComplete?: boolean;
     reminderInterval?: number;
   };
-  conditions?: {
+  conditions?: Array<{
     field: string;
     operator: string;
     value: any;
-  }[];
+  }>;
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
@@ -56,9 +52,4 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
-}
-
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }

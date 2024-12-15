@@ -1,44 +1,23 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
+import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 
-export interface ThemeSettings extends Settings {
-  mode: ThemeMode;
-}
+export const settingsAtom = atomWithStorage<Settings | null>('settings', null);
 
-// Base settings atom with storage
-export const settingsAtom = atomWithStorage<ThemeSettings | null>('settings', null);
+export const themeModeAtom = atomWithStorage<ThemeMode>('themeMode', 'system');
 
-// Loading state atom
+export const themeAtom = atom<Theme | null>(null);
+
 export const settingsLoadingAtom = atom<boolean>(false);
 
-// Error state atom
 export const settingsErrorAtom = atom<Error | null>(null);
 
-// Computed validation atom
-export const settingsValidAtom = atom(
-  (get) => {
-    const settings = get(settingsAtom);
-    return settings !== null && Object.keys(settings).length > 0;
-  }
-);
-
-// Writable settings atom with validation
-export const settingsWriteAtom = atom(
-  (get) => get(settingsAtom),
-  (get, set, updates: Partial<ThemeSettings>) => {
+export const updateSettingsAtom = atom(
+  null,
+  (get, set, updates: Partial<Settings>) => {
     const current = get(settingsAtom);
     if (current) {
-      const newSettings = { ...current, ...updates };
-      // Validate required fields before updating
-      if (!newSettings.site_title || !newSettings.primary_color) {
-        set(settingsErrorAtom, new Error('Required settings fields are missing'));
-        return;
-      }
-      set(settingsAtom, newSettings);
-      set(settingsErrorAtom, null);
+      set(settingsAtom, { ...current, ...updates });
     }
   }
 );
-
-export { Settings };

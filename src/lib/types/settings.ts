@@ -1,7 +1,9 @@
+import { BaseEntity, UserOwned } from './base';
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
-export interface Settings {
+export interface Settings extends BaseEntity, UserOwned {
   site_title: string;
   tagline?: string;
   primary_color: string;
@@ -21,39 +23,31 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
-  box_shadow?: string;
-  backdrop_blur?: string;
+  border_radius?: string;
+  spacing_unit?: string;
+  shadow_color?: string;
+  hover_scale?: string;
+  transition_duration?: string;
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: ThemeMode;
   transition_type?: TransitionType;
-  security_settings?: Record<string, any>;
+  box_shadow?: string;
+  backdrop_blur?: string;
+  security_settings?: SecuritySettings;
+}
+
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
 }
 
 export interface Theme {
   settings: Settings;
   mode: ThemeMode;
-}
-
-export interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => Promise<void>;
-}
-
-export interface DatabaseSettingsRow extends Settings {
-  id: string;
-  updated_at?: string;
-  updated_by?: string;
-}
-
-export interface SettingsResponse {
-  data: Settings;
-  error: Error | null;
 }

@@ -1,8 +1,9 @@
+import { BaseEntity } from './base';
+
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
-export interface AuthUser {
-  id: string;
-  email: string;
+export interface AuthUser extends BaseEntity {
+  email?: string;
   role?: UserRole;
   username?: string;
   displayName?: string;
@@ -25,52 +26,13 @@ export interface AuthState {
   isTransitioning: boolean;
 }
 
-export interface AuthUIState {
-  isLoading: boolean;
-  error: Error | null;
-  user: AuthUser | null;
-}
-
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
-  onError?: (error: Error) => void;
-}
-
-export interface AuthErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{
-    error: Error;
-    reset: () => void;
-  }>;
-}
-
-export interface AuthErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-export interface AuthErrorRecoveryState {
-  error: Error;
-  attemptCount: number;
-  lastAttempt: Date;
-  nextAttemptDelay: number;
-}
-
-export interface SecurityLog {
-  id: string;
+export interface SecurityLog extends BaseEntity {
   user_id: string;
   event_type: string;
-  severity: string;
-  details: Json;
-  metadata: Record<string, any>;
+  severity: 'low' | 'medium' | 'high';
+  details: Record<string, any>;
   ip_address?: string;
   user_agent?: string;
-  created_at: string;
   profiles?: {
     username: string;
     display_name: string;

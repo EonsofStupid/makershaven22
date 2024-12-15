@@ -1,38 +1,33 @@
 import { atom } from 'jotai';
-import type { AuthUIState } from '@/lib/types/auth';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { atomWithStorage } from 'jotai/utils';
+import type { AuthUser, AuthSession, AuthState } from '@/lib/types/auth';
 
-// Base UI state atom
-export const authUIStateAtom = atom<AuthUIState>({
-  isAuthenticating: false,
-  showPassword: false,
-  rememberMe: true,
-  validationErrors: {},
+export const userAtom = atomWithStorage<AuthUser | null>('user', null);
+
+export const sessionAtom = atomWithStorage<AuthSession | null>('session', null);
+
+export const authStateAtom = atom<AuthState>({
+  user: null,
+  session: null,
+  isLoading: true,
+  error: null,
+  isTransitioning: false
 });
 
-// Derived atoms that sync with Zustand store
-export const currentUserAtom = atom((get) => useAuthStore.getState().user);
-export const currentSessionAtom = atom((get) => useAuthStore.getState().session);
-export const authLoadingAtom = atom((get) => useAuthStore.getState().isLoading);
-export const authErrorAtom = atom((get) => useAuthStore.getState().error);
+export const isAuthenticatedAtom = atom(
+  (get) => get(sessionAtom) !== null && get(userAtom) !== null
+);
 
-// UI state actions
-export const setAuthUIStateAtom = atom(
+export const setUserAtom = atom(
   null,
-  (get, set, updates: Partial<AuthUIState>) => {
-    const currentState = get(authUIStateAtom);
-    set(authUIStateAtom, { ...currentState, ...updates });
+  (_get, set, user: AuthUser | null) => {
+    set(userAtom, user);
   }
 );
 
-export const resetAuthUIStateAtom = atom(
+export const setSessionAtom = atom(
   null,
-  (_get, set) => {
-    set(authUIStateAtom, {
-      isAuthenticating: false,
-      showPassword: false,
-      rememberMe: true,
-      validationErrors: {},
-    });
+  (_get, set, session: AuthSession | null) => {
+    set(sessionAtom, session);
   }
 );
