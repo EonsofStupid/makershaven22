@@ -16,19 +16,9 @@ export interface BaseContent {
   updated_at?: string;
 }
 
-export interface ContentRevision {
-  id: string;
-  content_id: string;
-  version: number;
-  content: any;
-  created_by: string;
-  created_at: string;
-}
-
-export interface PublishQueueItem {
-  id: string;
-  content_id: string;
-  scheduled_for: string;
-  status: 'pending' | 'published' | 'failed';
-  created_by: string;
+export interface ContentState {
+  activeContent: BaseContent | null;
+  contentHistory: Record<string, BaseContent[]>;
+  isLoading: boolean;
+  error: Error | null;
 }

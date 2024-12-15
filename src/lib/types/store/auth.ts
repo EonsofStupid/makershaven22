@@ -1,22 +1,4 @@
-import { User } from '@supabase/supabase-js';
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-}
+import type { AuthUser, AuthSession } from '@/lib/auth/types';
 
 export interface AuthState {
   user: AuthUser | null;
@@ -24,13 +6,11 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  hasAccess: boolean;
 }
 
-export interface SecuritySettings {
-  maxLoginAttempts: number;
-  lockoutDuration: number;
-  sessionTimeout: number;
-  ipWhitelist: string[];
-  ipBlacklist: string[];
+export interface AuthSelectors {
+  isAuthenticated: boolean;
+  hasRole: (role: string | string[]) => boolean;
+  isAdmin: boolean;
+  isMaker: boolean;
 }

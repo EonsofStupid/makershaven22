@@ -11,11 +11,6 @@ export interface WorkflowStageConfig {
     onComplete?: boolean;
     reminderInterval?: number;
   };
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
 }
 
 export interface WorkflowStage {
@@ -35,4 +30,11 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface WorkflowState {
+  activeWorkflows: Record<string, WorkflowTemplate>;
+  workflowHistory: Record<string, any[]>;
+  isLoading: boolean;
+  error: Error | null;
 }
