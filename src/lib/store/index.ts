@@ -1,28 +1,19 @@
 import { create } from 'zustand';
-import { AuthUser, AuthSession, Settings } from '../types';
+import type { GlobalState, Settings, AuthUser, AuthSession } from '../types';
 
-interface Store {
-  // Auth
-  user: AuthUser | null;
-  session: AuthSession | null;
-  
-  // Settings
-  settings: Settings | null;
-  
-  // Actions
-  setUser: (user: AuthUser | null) => void;
-  setSession: (session: AuthSession | null) => void;
-  setSettings: (settings: Settings | null) => void;
-}
-
-export const useStore = create<Store>((set) => ({
+export const useStore = create<GlobalState>((set) => ({
   // Initial state
+  settings: null,
   user: null,
   session: null,
-  settings: null,
+  isLoading: false,
+  error: null,
 
   // Actions
-  setUser: (user) => set({ user }),
-  setSession: (session) => set({ session }),
-  setSettings: (settings) => set({ settings }),
+  setSettings: (settings: Settings | null) => set({ settings }),
+  setUser: (user: AuthUser | null) => set({ user }),
+  setSession: (session: AuthSession | null) => set({ session }),
+  setLoading: (isLoading: boolean) => set({ isLoading }),
+  setError: (error: Error | null) => set({ error }),
+  reset: () => set({ settings: null, user: null, session: null, isLoading: false, error: null })
 }));
