@@ -43,6 +43,8 @@ export interface SessionConfig {
   timeout: number;
   refreshInterval: number;
   persistKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
 }
 
 export interface SessionState {

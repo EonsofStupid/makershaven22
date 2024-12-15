@@ -40,3 +40,5 @@ export const settingsWriteAtom = atom(
     }
   }
 );
+
+export { Settings };
