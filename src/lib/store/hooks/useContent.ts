@@ -1,58 +1,33 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { useCallback } from 'react';
-import { useContentStore } from '../content-store';
-import {
-  activeContentAtom,
-  contentHistoryAtom,
-  contentLoadingAtom,
-  contentErrorAtom,
-  setActiveContentAtom,
-  addToHistoryAtom,
-  clearHistoryAtom
-} from '../atoms/content/content-atoms';
-import type { BaseContent } from '@/components/content/types/cms';
+import { activeContentAtom, contentHistoryAtom } from '../atoms/content';
+import type { BaseContent } from '@/lib/types/content';
 
 export const useContent = () => {
-  // Zustand state
-  const zustandState = useContentStore();
-
-  // Jotai atoms
   const [activeContent, setActiveContent] = useAtom(activeContentAtom);
-  const [contentHistory] = useAtom(contentHistoryAtom);
-  const isLoading = useAtomValue(contentLoadingAtom);
-  const error = useAtomValue(contentErrorAtom);
-  const [, addToHistory] = useAtom(addToHistoryAtom);
-  const [, clearHistory] = useAtom(clearHistoryAtom);
+  const [contentHistory, setContentHistory] = useAtom(contentHistoryAtom);
 
-  // Memoized actions
-  const updateContent = useCallback((content: BaseContent | null) => {
-    setActiveContent(content);
-    if (content) {
-      addToHistory({ contentId: content.id, content });
-    }
-  }, [setActiveContent, addToHistory]);
+  const addToHistory = useCallback((contentId: string, content: BaseContent) => {
+    setContentHistory((prev) => ({
+      ...prev,
+      [contentId]: [...(prev[contentId] || []), content],
+    }));
+  }, [setContentHistory]);
 
-  const resetContent = useCallback(() => {
-    zustandState.reset();
-  }, [zustandState]);
+  const clearHistory = useCallback((contentId: string) => {
+    setContentHistory((prev) => {
+      const { [contentId]: _, ...rest } = prev;
+      return rest;
+    });
+  }, [setContentHistory]);
 
   return {
-    // State
     activeContent,
+    setActiveContent,
     contentHistory,
-    isLoading,
-    error,
-
-    // Actions
-    setActiveContent: updateContent,
     addToHistory,
     clearHistory,
-    resetContent,
-
-    // Utility functions
-    hasHistory: (contentId: string) => 
-      Boolean(contentHistory[contentId]?.length),
-    getHistoryForContent: (contentId: string) => 
-      contentHistory[contentId] || [],
+    hasHistory: (contentId: string) => Boolean(contentHistory[contentId]?.length),
+    getHistoryForContent: (contentId: string) => contentHistory[contentId] || [],
   };
 };
