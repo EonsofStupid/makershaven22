@@ -8,9 +8,16 @@ export enum WorkflowStageType {
   CONDITIONAL = 'conditional'
 }
 
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  description?: string;
+}
+
 export interface WorkflowStageConfig {
-  timeLimit?: number;
-  requiredApprovers?: number;
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
@@ -20,20 +27,13 @@ export interface WorkflowStageConfig {
     onComplete?: boolean;
     reminderInterval?: number;
   };
+  timeLimit?: number;
+  requiredApprovers?: number;
   customFields?: Array<{
     name: string;
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
-}
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
 }
 
 export interface WorkflowTemplate {

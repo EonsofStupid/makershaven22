@@ -6,10 +6,8 @@ export interface AuthUser {
   role: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  user_metadata?: Record<string, any>;
+  app_metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
@@ -24,7 +22,6 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-  isTransitioning: boolean;
 }
 
 export interface AuthUIState {
@@ -38,10 +35,10 @@ export interface AuthUIState {
 }
 
 export interface AuthErrorRecoveryState {
-  error: Error;
   attemptCount: number;
   lastAttempt: Date;
   nextAttemptDelay: number;
+  error: Error | null;
 }
 
 export interface SessionConfig {
