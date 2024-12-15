@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { sessionAtom, userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
+import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { UserRole } from '@/lib/types/auth';
 
 interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: string | string[];
+  requiredRole?: UserRole | UserRole[];
   fallbackPath?: string;
 }
 
@@ -20,21 +20,12 @@ export const AuthGuard = ({
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const navigate = useNavigate();
-  const [session] = useAtom(sessionAtom);
-  const [user] = useAtom(userAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    console.log('AuthGuard: Checking access', {
-      requireAuth,
-      requiredRole,
-      hasSession: !!session,
-      userRole: user?.role
-    });
-
-    if (!loadingState.isLoading) {
-      if (requireAuth && !session) {
-        console.log('AuthGuard: No session, redirecting to', fallbackPath);
+    if (!isLoading) {
+      if (requireAuth && !user) {
+        console.log('AuthGuard: No user found, redirecting to', fallbackPath);
         toast.error('Please sign in to continue');
         navigate(fallbackPath);
         return;
@@ -42,17 +33,17 @@ export const AuthGuard = ({
 
       if (requiredRole && user) {
         const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-        if (!roles.includes(user.role as string)) {
+        if (!user.role || !roles.includes(user.role)) {
           console.log('AuthGuard: Insufficient permissions');
           toast.error('You do not have permission to access this page');
-          navigate(fallbackPath);
+          navigate('/');
           return;
         }
       }
     }
-  }, [session, user, loadingState.isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
+  }, [user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (loadingState.isLoading) {
+  if (isLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

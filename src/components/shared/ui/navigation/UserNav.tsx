@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAtom } from 'jotai';
-import { userAtom, sessionAtom } from '@/lib/store/atoms/auth';
+import { useAuth } from "@/hooks/useAuth";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "../avatar/UserAvatar";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
   User,
@@ -22,22 +20,20 @@ import {
 
 export const UserNav = () => {
   const navigate = useNavigate();
-  const [user] = useAtom(userAtom);
-  const [, setSession] = useAtom(sessionAtom);
+  const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      setSession(null);
+      await signOut();
       toast.success("Successfully signed out");
-      window.location.href = "/login";
+      navigate("/login");
     } catch (error) {
       console.error("Sign out error:", error);
       toast.error("Failed to sign out");
     }
   };
+
+  if (!user) return null;
 
   return (
     <DropdownMenu>
@@ -50,9 +46,9 @@ export const UserNav = () => {
       <DropdownMenuContent align="end" className="w-56 glass-menu">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.email}</p>
+            <p className="text-sm font-medium leading-none">{user.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user?.role?.toUpperCase()}
+              {user.role?.toUpperCase()}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -63,7 +59,7 @@ export const UserNav = () => {
           <span>Profile</span>
         </DropdownMenuItem>
         
-        {user?.role === 'admin' && (
+        {user.role === 'admin' && (
           <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             <span>Dashboard</span>

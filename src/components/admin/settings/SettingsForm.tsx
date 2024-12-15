@@ -1,10 +1,10 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { useSettingsState } from "@/hooks/useSettingsState";
+import { useSettingsForm } from "./hooks/useSettingsForm";
 import { SettingsFormContainer } from "./components/SettingsFormContainer";
 
 export const SettingsForm = () => {
-  const { settings, isLoading } = useSettingsState();
+  const { isLoading } = useSettingsForm();
 
   if (isLoading) {
     return (
