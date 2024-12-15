@@ -1,4 +1,4 @@
-export type ContentType = 'page' | 'component' | 'template' | 'workflow';
+export type ContentType = 'page' | 'post' | 'component' | 'workflow' | 'template';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
 export interface BaseContent {
@@ -7,18 +7,17 @@ export interface BaseContent {
   type: ContentType;
   content: any;
   metadata?: Record<string, any>;
-  slug?: string;
-  status?: ContentStatus;
-  version?: number;
+  status: ContentStatus;
+  version: number;
+  created_at: string;
+  updated_at: string;
   created_by?: string;
   updated_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface ContentState {
-  activeContent: BaseContent | null;
-  contentHistory: Record<string, BaseContent[]>;
+  currentContent: BaseContent | null;
+  contentList: BaseContent[];
   isLoading: boolean;
   error: Error | null;
 }
