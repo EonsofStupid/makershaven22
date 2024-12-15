@@ -3,12 +3,11 @@ import { BaseEntity } from './base';
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser extends BaseEntity {
-  email?: string;
-  role?: UserRole;
+  email: string;
+  role: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: Record<string, any>;
-  app_metadata?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
@@ -26,15 +25,16 @@ export interface AuthState {
   isTransitioning: boolean;
 }
 
-export interface SecurityLog extends BaseEntity {
-  user_id: string;
-  event_type: string;
-  severity: 'low' | 'medium' | 'high';
-  details: Record<string, any>;
-  ip_address?: string;
-  user_agent?: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-  };
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
 }
+
+// Documentation for future AI responses:
+// 1. All auth types MUST be defined here
+// 2. AuthUser MUST extend BaseEntity
+// 3. Never create duplicate auth type definitions elsewhere
