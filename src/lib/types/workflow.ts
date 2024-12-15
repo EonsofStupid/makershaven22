@@ -34,9 +34,6 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  created_at: string;
-  updated_at?: string;
 }
 
 export interface WorkflowTemplate {
@@ -51,11 +48,6 @@ export interface WorkflowTemplate {
 }
 
 export interface Workflow extends Omit<WorkflowTemplate, 'stages'> {
-  instance_id: string;
   steps: Json;
   triggers?: Json;
-  current_stage: number;
-  status: 'active' | 'completed' | 'cancelled';
-  started_at: string;
-  completed_at?: string;
 }

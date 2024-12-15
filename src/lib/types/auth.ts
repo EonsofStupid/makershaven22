@@ -8,12 +8,13 @@ export interface AuthUser {
   displayName: string;
   user_metadata: Record<string, any>;
   app_metadata: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
   user: AuthUser;
   access_token: string;
-  refresh_token: string;
+  refresh_token?: string;
   expires_at: number;
 }
 
@@ -22,14 +23,12 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-  isTransitioning: boolean;
 }
 
 export interface AuthUIState {
   isLoading: boolean;
   error: Error | null;
   user: AuthUser | null;
-  isAuthenticating: boolean;
   showPassword: boolean;
   rememberMe: boolean;
   validationErrors: Record<string, string>;
@@ -44,6 +43,8 @@ export interface AuthErrorRecoveryState {
 
 export interface SessionConfig {
   timeout: number;
+  refreshInterval: number;
+  persistKey: string;
   maxAttempts: number;
   lockoutDuration: number;
 }
