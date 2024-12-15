@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Settings } from "@/lib/types/settings";
 
 export const useSettingsForm = () => {
   const queryClient = useQueryClient();
@@ -19,17 +20,17 @@ export const useSettingsForm = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Settings;
     }
   });
 
-  const form = useForm({
+  const form = useForm<Settings>({
     resolver: zodResolver(settingsSchema),
     defaultValues: settings || {}
   });
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: Settings) => {
       const { data, error } = await supabase
         .rpc("update_site_settings", values);
 
@@ -49,7 +50,7 @@ export const useSettingsForm = () => {
     }
   });
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Settings) => {
     await updateSettingsMutation.mutateAsync(values);
   };
 

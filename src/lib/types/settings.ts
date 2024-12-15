@@ -1,5 +1,5 @@
 import { BaseEntity } from './base';
-import { Json } from '@supabase/supabase-js';
+import type { Json } from '@/integrations/supabase/types/base';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
@@ -31,11 +31,23 @@ export interface Settings extends BaseEntity {
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
-  security_settings?: Json;
+  security_settings?: SecuritySettings;
   transition_type?: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
+  state_version?: number;
+  last_sync?: string;
+}
+
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
 }
 
 export interface Theme {
