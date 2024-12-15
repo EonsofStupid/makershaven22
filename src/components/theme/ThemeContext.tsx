@@ -4,49 +4,38 @@ import { useThemeStore } from '@/lib/store/theme-store';
 import { themeSettingsAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme';
 import { applyThemeToDocument } from './utils/themeUtils';
 import { toast } from "sonner";
-import type { Settings, Theme } from '@/lib/types/settings';
-
-interface ThemeContextType {
-  theme: Theme | null;
-  mode: 'light' | 'dark' | 'system';
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (theme: Settings) => Promise<void>;
-}
+import type { Settings, Theme, ThemeContextType } from '@/lib/types/settings';
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Jotai state
   const [themeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
   const effectiveTheme = useAtom(effectiveThemeAtom)[0];
 
-  // Zustand state and actions
   const { 
     settings: zustandSettings,
     updateSettings: updateZustandSettings,
     setError
   } = useThemeStore();
 
-  // Apply theme settings to document
   useEffect(() => {
-    if (themeSettings?.settings) {
-      console.log("Applying theme settings:", themeSettings.settings);
-      applyThemeToDocument(themeSettings);
+    if (themeSettings) {
+      console.log("Applying theme settings:", themeSettings);
+      const theme: Theme = {
+        settings: themeSettings,
+        mode: themeMode
+      };
+      applyThemeToDocument(theme);
     } else {
       console.warn("Theme settings are not defined, skipping theme application");
     }
-  }, [themeSettings]);
+  }, [themeSettings, themeMode]);
 
-  // Update theme in both stores
   const updateTheme = async (newSettings: Settings) => {
     try {
-      // Update Zustand store
       updateZustandSettings(newSettings);
-      
-      // Update document
       applyThemeToDocument({ settings: newSettings, mode: themeMode });
-      
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
@@ -55,8 +44,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const contextValue = {
-    theme: themeSettings,
+  const contextValue: ThemeContextType = {
+    theme: themeSettings ? { settings: themeSettings, mode: themeMode } : null,
     mode: themeMode,
     effectiveTheme,
     updateTheme
