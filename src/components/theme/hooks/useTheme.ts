@@ -6,9 +6,9 @@ import {
   effectiveThemeAtom,
   themeAtom,
   updateThemeAtom
-} from '@/lib/store/atoms/theme/theme-atoms';
-import { useThemeStore } from '@/lib/store/theme-store';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
+} from '@/lib/store/atoms/theme';
+import { useSyncedStore } from '@/lib/store/hooks/useSyncedStore';
+import type { Settings } from '@/lib/types/settings';
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
@@ -16,13 +16,7 @@ export const useTheme = () => {
   const effectiveTheme = useAtomValue(effectiveThemeAtom);
   const [theme] = useAtom(themeAtom);
   const [, updateTheme] = useAtom(updateThemeAtom);
-  
-  const { 
-    isLoading, 
-    error,
-    setMode: setStoreMode,
-    updateSettings: updateStoreSettings
-  } = useThemeStore();
+  const { state, setState } = useSyncedStore();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -35,23 +29,23 @@ export const useTheme = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setSystemTheme]);
 
-  const setMode = (mode: ThemeMode) => {
+  const setMode = (mode: 'light' | 'dark' | 'system') => {
     setThemeMode(mode);
-    setStoreMode(mode);
+    setState({ mode });
   };
 
   const updateSettings = async (updates: Settings) => {
     await updateTheme(updates);
-    updateStoreSettings(updates);
+    setState({ settings: updates });
   };
 
   return {
     mode: themeMode,
     setMode,
     effectiveTheme,
-    settings: theme?.settings,
-    isLoading,
-    error,
+    settings: theme?.settings || null,
+    isLoading: state.isThemeLoading,
+    error: state.themeError,
     updateSettings
   };
 };

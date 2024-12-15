@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { useThemeStore } from '@/lib/store/theme-store';
 import { themeSettingsAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme';
 import { applyThemeToDocument } from './utils/themeUtils';
 import { toast } from "sonner";
 import type { Settings, Theme, ThemeContextType } from '@/lib/types/settings';
+import { useSyncedStore } from '@/lib/store/hooks/useSyncedStore';
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
@@ -12,21 +12,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [themeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
   const effectiveTheme = useAtom(effectiveThemeAtom)[0];
-
-  const { 
-    settings: zustandSettings,
-    updateSettings: updateZustandSettings,
-    setError
-  } = useThemeStore();
+  const { state, setState } = useSyncedStore();
 
   useEffect(() => {
     if (themeSettings) {
       console.log("Applying theme settings:", themeSettings);
-      const theme: Theme = {
-        settings: themeSettings,
-        mode: themeMode
-      };
-      applyThemeToDocument(theme);
+      applyThemeToDocument(themeSettings);
     } else {
       console.warn("Theme settings are not defined, skipping theme application");
     }
@@ -34,12 +25,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateTheme = async (newSettings: Settings) => {
     try {
-      updateZustandSettings(newSettings);
-      applyThemeToDocument({ settings: newSettings, mode: themeMode });
+      setState({ settings: newSettings });
+      applyThemeToDocument(newSettings);
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
-      setError(error instanceof Error ? error : new Error('Failed to update theme'));
       toast.error("Failed to update theme");
     }
   };
