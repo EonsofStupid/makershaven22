@@ -1,22 +1,15 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { useThemeStore } from '@/lib/store/theme-store';
-import { themeAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme/theme-atoms';
+import { themeSettingsAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme';
 import { applyThemeToDocument } from './utils/themeUtils';
 import { toast } from "sonner";
-import type { Theme } from '@/lib/types/settings';
-
-interface ThemeContextType {
-  theme: Theme | null;
-  mode: 'light' | 'dark' | 'system';
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (theme: Theme) => Promise<void>;
-}
+import type { Settings, Theme, ThemeContextType } from '@/lib/types/settings';
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [themeSettings] = useAtom(themeAtom);
+  const [themeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
   const effectiveTheme = useAtom(effectiveThemeAtom)[0];
 
@@ -27,18 +20,18 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   } = useThemeStore();
 
   useEffect(() => {
-    if (themeSettings?.settings) {
-      console.log("Applying theme settings:", themeSettings.settings);
-      applyThemeToDocument(themeSettings);
+    if (themeSettings) {
+      console.log("Applying theme settings:", themeSettings);
+      applyThemeToDocument({ settings: themeSettings, mode: themeMode });
     } else {
       console.warn("Theme settings are not defined, skipping theme application");
     }
-  }, [themeSettings]);
+  }, [themeSettings, themeMode]);
 
-  const updateTheme = async (newTheme: Theme) => {
+  const updateTheme = async (newSettings: Settings) => {
     try {
-      updateZustandSettings(newTheme.settings);
-      applyThemeToDocument(newTheme);
+      updateZustandSettings(newSettings);
+      applyThemeToDocument({ settings: newSettings, mode: themeMode });
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
@@ -47,8 +40,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const contextValue = {
-    theme: themeSettings,
+  const contextValue: ThemeContextType = {
+    theme: themeSettings ? { settings: themeSettings, mode: themeMode } : null,
     mode: themeMode,
     effectiveTheme,
     updateTheme

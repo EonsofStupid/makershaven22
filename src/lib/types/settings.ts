@@ -38,11 +38,11 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export interface ThemeState {
-  settings: Settings | null;
+export interface ThemeContextType {
+  theme: Theme | null;
   mode: ThemeMode;
-  isLoading: boolean;
-  error: Error | null;
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (settings: Settings) => Promise<void>;
 }
 
 export interface DatabaseSettingsRow extends Settings {

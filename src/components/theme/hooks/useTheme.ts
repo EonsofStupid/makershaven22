@@ -42,8 +42,9 @@ export const useTheme = () => {
 
   const updateSettings = async (updates: Partial<Settings>) => {
     if (!theme?.settings) return;
-    await updateTheme(updates);
-    updateStoreSettings(updates);
+    const newSettings = { ...theme.settings, ...updates };
+    await updateTheme(newSettings);
+    updateStoreSettings(newSettings);
   };
 
   return {
