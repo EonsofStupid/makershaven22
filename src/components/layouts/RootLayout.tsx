@@ -3,6 +3,7 @@ import { Navigation } from '../shared/ui/Navigation';
 import { Toaster } from '@/components/ui/sonner';
 import { useTheme } from '@/components/theme/ThemeContext';
 import { motion } from 'framer-motion';
+import { useNavigationState } from '@/hooks/useNavigationState';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface RootLayoutProps {
 
 export const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const { theme } = useTheme();
+  const { settings } = useNavigationState();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -18,13 +20,13 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    console.log('RootLayout mounted, theme:', theme?.site_title);
+    console.log('RootLayout mounted, settings:', settings);
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       console.log('RootLayout unmounted');
     };
-  }, [theme]);
+  }, [settings]);
 
   return (
     <motion.div 

@@ -1,16 +1,15 @@
 import { Link } from "react-router-dom";
-import { Menu, Search, LogOut } from "lucide-react";
+import { Menu, Search, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { UnifiedNavigation } from "./shared/ui/navigation/UnifiedNavigation";
-import { useNavigation } from "@/hooks/useNavigation";
+import { useNavigationState } from "@/hooks/useNavigationState";
 import { useAuth } from "@/hooks/useAuth";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { handleNavigation } = useNavigation();
+  const { handleNavigation } = useNavigationState();
 
   const handleSignOut = async () => {
     try {
