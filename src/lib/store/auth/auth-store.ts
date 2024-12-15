@@ -1,18 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store/auth';
 import { supabase } from '@/integrations/supabase/client';
+import type { AuthStore, AuthUser, AuthSession } from '@/lib/types/auth';
 import { toast } from 'sonner';
-
-interface AuthStore extends AuthState {
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  setUser: (user: AuthUser | null) => void;
-  setSession: (session: AuthSession | null) => void;
-  setError: (error: Error | null) => void;
-  setTransitioning: (isTransitioning: boolean) => void;
-  reset: () => void;
-}
+import { handleAuthError } from '@/utils/errorHandling';
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -39,23 +30,23 @@ export const useAuthStore = create<AuthStore>()(
             .eq('id', data.user.id)
             .single();
 
-          const user: AuthUser = {
+          const authUser: AuthUser = {
             id: data.user.id,
             email: data.user.email!,
             role: profile?.role || 'subscriber',
-            metadata: data.user.user_metadata
+            user_metadata: data.user.user_metadata
           };
 
-          const session: AuthSession = {
+          const authSession: AuthSession = {
+            user: authUser,
             access_token: data.session!.access_token,
             refresh_token: data.session!.refresh_token!,
-            expires_at: data.session!.expires_at!,
-            user
+            expires_in: data.session!.expires_in!
           };
 
           set({ 
-            user,
-            session,
+            user: authUser,
+            session: authSession,
             isLoading: false,
             hasAccess: true
           });
@@ -63,12 +54,13 @@ export const useAuthStore = create<AuthStore>()(
           toast.success('Successfully signed in');
         } catch (error) {
           console.error('Sign in error:', error);
+          const handledError = handleAuthError(error);
           set({ 
-            error: error as Error,
+            error: handledError,
             isLoading: false,
             hasAccess: false
           });
-          toast.error('Failed to sign in');
+          toast.error(handledError.message);
         }
       },
 
@@ -88,11 +80,12 @@ export const useAuthStore = create<AuthStore>()(
           toast.success('Successfully signed out');
         } catch (error) {
           console.error('Sign out error:', error);
+          const handledError = handleAuthError(error);
           set({ 
-            error: error as Error,
+            error: handledError,
             isLoading: false
           });
-          toast.error('Failed to sign out');
+          toast.error(handledError.message);
         }
       },
 

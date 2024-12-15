@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import type { AuthError, ErrorState } from '@/lib/types';
 
 // Rate limiting configuration
 const rateLimits: { [key: string]: { count: number; timestamp: number } } = {};
@@ -22,6 +23,34 @@ export const checkRateLimit = (key: string): boolean => {
   return true;
 };
 
+export const handleAuthError = (error: any): Error => {
+  console.error('Auth error:', error);
+  
+  // Handle Supabase auth errors
+  if (error?.message) {
+    switch (error.message) {
+      case 'Invalid login credentials':
+        return new Error('Invalid email or password');
+      case 'Email not confirmed':
+        return new Error('Please verify your email address');
+      case 'User not found':
+        return new Error('No account found with this email');
+      case 'Too many requests':
+        return new Error('Too many attempts. Please try again later');
+      default:
+        return new Error(error.message);
+    }
+  }
+
+  // Handle network errors
+  if (error instanceof TypeError && error.message === 'Failed to fetch') {
+    return new Error('Network error. Please check your connection');
+  }
+
+  // Handle unexpected errors
+  return new Error('An unexpected error occurred');
+};
+
 export const handlePromiseError = async <T>(
   promise: Promise<T>,
   errorMessage: string = 'An error occurred'
@@ -30,10 +59,11 @@ export const handlePromiseError = async <T>(
     return await promise;
   } catch (error) {
     console.error('Promise error:', error);
+    const handledError = error instanceof Error ? error : new Error(errorMessage);
     toast.error(errorMessage, {
-      description: error instanceof Error ? error.message : 'Unknown error',
+      description: handledError.message,
     });
-    throw error;
+    throw handledError;
   }
 };
 
@@ -51,4 +81,21 @@ export const setupGlobalErrorHandlers = () => {
       description: event.error?.message || 'Runtime error',
     });
   });
+};
+
+export const logError = (error: Error | ErrorState | AuthError, context?: string) => {
+  const timestamp = new Date().toISOString();
+  const errorDetails = {
+    timestamp,
+    context,
+    message: error.message,
+    stack: error instanceof Error ? error.stack : undefined,
+    ...(error as AuthError).code && { code: (error as AuthError).code },
+    ...(error as ErrorState).details && { details: (error as ErrorState).details }
+  };
+
+  console.error('Error logged:', errorDetails);
+
+  // Here you could also send the error to your error tracking service
+  // e.g., Sentry, LogRocket, etc.
 };
