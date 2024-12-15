@@ -1,4 +1,4 @@
-import { UserRole } from '../base';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
@@ -6,7 +6,7 @@ export interface AuthUser {
   role?: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
@@ -21,14 +21,7 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-  isTransitioning: boolean;
-  hasAccess: boolean;
-}
-
-export interface AuthError extends Error {
-  code?: string;
-  statusCode?: number;
-  details?: string;
+  isTransitioning?: boolean;
 }
 
 export interface AuthGuardProps {

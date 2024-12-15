@@ -21,13 +21,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .eq("id", session.user.id)
               .single();
 
+            const user = {
+              ...session.user,
+              email: session.user.email!,
+              role: profile?.role || "subscriber",
+              ...profile
+            };
+
             setAuthState({
-              user: {
-                ...session.user,
-                role: profile?.role || "subscriber",
-                ...profile
+              user,
+              session: {
+                user,
+                access_token: session.access_token,
+                refresh_token: session.refresh_token ?? undefined,
+                expires_in: session.expires_in ?? 3600
               },
-              session,
               isLoading: false,
               error: null
             });
