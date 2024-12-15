@@ -1,5 +1,3 @@
-import type { Json } from '@/integrations/supabase/types';
-
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
@@ -47,4 +45,9 @@ export interface GlobalState {
   isReady: boolean;
   isMaintenanceMode: boolean;
   error: Error | null;
+  setState: (state: Partial<GlobalState>) => void;
+  updateSettings: (settings: Settings) => void;
+  setMode: (mode: ThemeMode) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
 }
