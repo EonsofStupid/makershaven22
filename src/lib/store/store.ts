@@ -14,7 +14,20 @@ export const useStore = create<GlobalState>()(
       ...createThemeSlice(...a),
       ...createAuthSlice(...a),
       ...createContentSlice(...a),
-      ...createWorkflowSlice(...a)
+      ...createWorkflowSlice(...a),
+      
+      // Global actions
+      setState: (state: Partial<GlobalState>) => 
+        a[0]((prev) => ({ ...prev, ...state })),
+      
+      reset: () => 
+        a[0](() => ({
+          ...createCoreSlice(...a),
+          ...createThemeSlice(...a),
+          ...createAuthSlice(...a),
+          ...createContentSlice(...a),
+          ...createWorkflowSlice(...a)
+        }))
     }),
     {
       name: 'global-store',

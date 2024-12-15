@@ -1,18 +1,18 @@
-import type { AuthUser, AuthSession } from '../types/auth';
-import type { Settings, Theme, ThemeMode } from '../types/settings';
-import type { BaseContent } from '../types/content';
-import type { WorkflowTemplate } from '../types/workflow';
+import { AuthUser, AuthSession } from '../types/base';
+import { Settings, ThemeMode } from '../types/base';
+import { BaseContent } from '../types/content';
+import { WorkflowTemplate } from '../types/workflow';
 
 // Core state interfaces
 export interface CoreState {
   isReady: boolean;
   isMaintenanceMode: boolean;
   error: Error | null;
-  isLoading: boolean; // Added missing isLoading
+  isLoading: boolean;
 }
 
 export interface ThemeState {
-  theme: Theme | null;
+  theme: Settings | null;
   settings: Settings | null;
   mode: ThemeMode;
   isThemeLoading: boolean;
@@ -49,7 +49,7 @@ export interface GlobalState extends
   AuthState,
   ContentState,
   WorkflowState {
-  // Add any additional global state properties here
+  // Actions
   setState: (state: Partial<GlobalState>) => void;
   updateSettings: (settings: Settings) => void;
   setMode: (mode: ThemeMode) => void;

@@ -1,9 +1,9 @@
 import { StateCreator } from 'zustand';
 import { GlobalState } from '../types';
-import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
+import type { Settings, ThemeMode } from '@/lib/types/base';
 
 export interface ThemeSlice {
-  theme: Theme | null;
+  theme: Settings | null;
   settings: Settings | null;
   mode: ThemeMode;
   isLoading: boolean;
