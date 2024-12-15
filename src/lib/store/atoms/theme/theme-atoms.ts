@@ -1,7 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
-import { useThemeStore } from '../../theme-store';
 
 // Base theme atom with storage
 export const themeAtom = atomWithStorage<Theme | null>('theme', null);
@@ -29,12 +28,11 @@ export const updateThemeAtom = atom(
     if (!currentState?.settings) return;
 
     const newTheme: Theme = {
-      settings: updates,
+      settings: { ...currentState.settings, ...updates },
       mode: currentState.mode
     };
     
     set(themeAtom, newTheme);
-    useThemeStore.setState({ settings: updates });
   }
 );
 

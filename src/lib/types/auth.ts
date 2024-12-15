@@ -1,3 +1,7 @@
+import type { Json } from '@/integrations/supabase/types/base';
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -5,8 +9,6 @@ export interface AuthUser {
   app_metadata?: Record<string, any>;
   role?: UserRole;
 }
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthSession {
   user: AuthUser;
@@ -44,4 +46,23 @@ export interface SecurityLog {
     username: string;
     display_name: string;
   };
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole[];
+  fallbackPath?: string;
+}
+
+export interface AuthUIState {
+  isAuthenticating: boolean;
+  showPassword: boolean;
+  rememberMe: boolean;
+  validationErrors: Record<string, string>;
+}
+
+export interface AuthError extends Error {
+  code: string;
+  details?: string;
 }
