@@ -24,10 +24,20 @@ export interface AuthSession {
   access_token: string;
   refresh_token?: string;
   expires_at?: number;
-  user?: AuthUser;
+  user: AuthUser;
 }
 
 // Core settings types
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
+}
+
 export interface Settings extends BaseEntity {
   site_title: string;
   tagline?: string;
@@ -55,12 +65,11 @@ export interface Settings extends BaseEntity {
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
-  security_settings?: Json;
+  security_settings?: SecuritySettings;
   transition_type?: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
-  updated_by?: string;
   state_version?: number;
   last_sync?: string;
 }
@@ -70,12 +79,18 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export interface SecuritySettings {
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
-  max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
+export interface WorkflowStage {
+  id: string;
+  type: string;
+  name: string;
+  config: Record<string, any>;
+  order: number;
+}
+
+export interface WorkflowTemplate extends BaseEntity {
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+  steps: Json;
 }

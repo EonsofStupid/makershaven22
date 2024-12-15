@@ -1,5 +1,5 @@
-import { AuthUser, AuthSession } from './base';
-import { Settings, ThemeMode } from './base';
+import { AuthUser, AuthSession } from './auth';
+import { Settings, ThemeMode } from './settings';
 import { BaseContent } from './content';
 import { WorkflowTemplate } from './workflow';
 
