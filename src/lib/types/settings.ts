@@ -34,8 +34,20 @@ export interface Settings {
 }
 
 export interface Theme {
+  settings: Settings;
+  mode: ThemeMode;
+}
+
+export interface ThemeState {
   settings: Settings | null;
   mode: ThemeMode;
+  isLoading: boolean;
+  error: Error | null;
+  setMode: (mode: ThemeMode) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  resetToDefaults: () => void;
 }
 
 export interface DatabaseSettingsRow extends Settings {

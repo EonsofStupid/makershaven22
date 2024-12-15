@@ -6,18 +6,11 @@ export interface AuthUser {
   role?: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
+  avatarUrl?: string;
 }
 
 export interface AuthState {
+  user: AuthUser | null;
   isLoading: boolean;
   hasAccess: boolean;
   error: Error | null;
@@ -40,4 +33,26 @@ export interface AuthGuardProps {
   loadingComponent?: React.ReactNode;
   unauthorizedComponent?: React.ReactNode;
   onError?: (error: Error) => void;
+}
+
+export interface SecurityEventSeverity {
+  type: 'info' | 'warning' | 'error' | 'critical';
+}
+
+export interface SecurityEventCategory {
+  type: 'auth' | 'content' | 'system' | 'user';
+}
+
+export interface SessionConfig {
+  refreshInterval: number;
+  sessionTimeout: number;
+  storageKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
+}
+
+export interface SessionState {
+  isAuthenticated: boolean;
+  lastActivity: Date;
+  token?: string;
 }

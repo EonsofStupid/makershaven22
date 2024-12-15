@@ -41,11 +41,11 @@ export interface WorkflowTemplate {
   name: string;
   description: string | null;
   stages: WorkflowStage[];
+  steps: Json;
   is_active: boolean;
   created_at?: string;
   created_by?: string;
   updated_at?: string;
-  steps: Json;
 }
 
 export interface WorkflowFormData {
