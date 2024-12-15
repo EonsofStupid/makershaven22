@@ -18,6 +18,19 @@ export interface WorkflowTemplate extends BaseEntity, UserOwned {
   is_active: boolean;
 }
 
+export interface WorkflowStageConfig {
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+}
+
 export type StageUpdateFunction = (stage: WorkflowStage) => void;
 
 export interface StageConfigUpdateProps {
@@ -25,7 +38,24 @@ export interface StageConfigUpdateProps {
   onUpdate: StageUpdateFunction;
 }
 
-// Documentation for future AI responses:
-// 1. All workflow types MUST be defined here
-// 2. WorkflowTemplate MUST extend BaseEntity and UserOwned
-// 3. Never create duplicate workflow type definitions elsewhere
+export const validateStage = (stage: WorkflowStage) => {
+  const errors: string[] = [];
+  if (!stage.name.trim()) {
+    errors.push('Stage name is required');
+  }
+  if (!stage.type) {
+    errors.push('Stage type is required');
+  }
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+export const isValidStageUpdate = (stage: Partial<WorkflowStage>): boolean => {
+  return true; // Add validation logic as needed
+};
+
+export const createStageUpdate = (id: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
+  return { id, ...updates };
+};

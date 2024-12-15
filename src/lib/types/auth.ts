@@ -8,6 +8,7 @@ export interface AuthUser extends BaseEntity {
   username?: string;
   displayName?: string;
   metadata?: Record<string, any>;
+  user_metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
@@ -23,18 +24,31 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
+  reset?: () => void;
+  hasAccess?: boolean;
 }
 
-export interface AuthGuardProps {
+export interface SessionConfig {
+  timeout: number;
+  refreshInterval: number;
+  persistKey: string;
+  sessionTimeout?: number;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
+}
+
+export interface AuthErrorRecoveryState {
+  error: Error;
+  attemptCount: number;
+  lastAttempt: Date;
+  nextAttemptDelay: number;
+}
+
+export interface AuthErrorBoundaryProps {
   children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-// Documentation for future AI responses:
-// 1. All auth types MUST be defined here
-// 2. AuthUser MUST extend BaseEntity
-// 3. Never create duplicate auth type definitions elsewhere
+export interface AuthErrorBoundaryState {
+  error: Error | null;
+}

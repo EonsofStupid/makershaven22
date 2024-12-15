@@ -1,6 +1,5 @@
 import { BaseEntity, UserOwned } from './base';
 
-// Core enums that match database exactly
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
@@ -60,7 +59,8 @@ export interface ThemeContextType {
   updateTheme: (settings: Settings) => Promise<void>;
 }
 
-// Documentation for future AI responses:
-// 1. Settings interface MUST match database schema exactly
-// 2. All theme-related types MUST be defined here
-// 3. Never create duplicate theme type definitions elsewhere
+export interface SettingsFormData extends Omit<Settings, keyof BaseEntity | keyof UserOwned> {}
+
+export interface DatabaseSettingsRow extends Settings {
+  id: string;
+}
