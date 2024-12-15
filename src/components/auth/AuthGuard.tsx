@@ -1,41 +1,51 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/lib/store/auth/use-auth";
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
 import { toast } from "sonner";
-import type { AuthGuardProps } from "@/lib/types/auth";
 
-export const AuthGuard = ({ 
-  children, 
-  requireAuth = false,
-  requiredRole = [],
-  fallbackPath = "/login"
+interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: string | string[];
+  fallbackPath?: string;
+}
+
+export const AuthGuard = ({
+  children,
+  requireAuth = true,
+  requiredRole,
+  fallbackPath = "/login",
 }: AuthGuardProps) => {
-  const navigate = useNavigate();
-  const { isLoading, isAuthenticated, user } = useAuth();
+  const { user, session, isAuthLoading } = useSyncedAuth();
+  const location = useLocation();
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (requireAuth && !isAuthenticated) {
-        toast.error("Please sign in to access this page");
-        navigate(fallbackPath);
-        return;
-      }
-
-      if (requiredRole.length > 0 && user?.role && !requiredRole.includes(user.role)) {
-        toast.error("You don't have permission to access this page");
-        navigate("/");
-        return;
-      }
-    }
-  }, [isLoading, isAuthenticated, user, requireAuth, requiredRole, navigate, fallbackPath]);
-
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
       </div>
     );
+  }
+
+  // Not authenticated but authentication required
+  if (requireAuth && !session) {
+    toast.error("Please sign in to access this page");
+    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
+  }
+
+  // Authenticated but authentication not allowed (e.g., login page)
+  if (!requireAuth && session) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Role check if required
+  if (requireAuth && requiredRole && user) {
+    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    if (!roles.includes(user.role)) {
+      toast.error("You don't have permission to access this page");
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

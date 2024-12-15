@@ -1,55 +1,52 @@
 import { useEffect } from "react";
-import { useAuthState } from '@/hooks/useAuthState';
+import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
 import { supabase } from "@/integrations/supabase/client";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { toast } from "sonner";
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const { isLoading } = useAuthState();
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const { setUser, setSession, setAuthLoading } = useSyncedAuth();
 
   useEffect(() => {
-    console.log('AuthProvider mounted - Starting initialization');
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
-      
-      if (session?.user) {
-        try {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("Auth state changed:", event, session);
+        
+        setAuthLoading(true);
+        
+        if (session) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
             .single();
-            
-          if (profileError) throw profileError;
 
-          console.log('Profile data:', profile);
-          toast.success('Successfully authenticated');
-        } catch (error) {
-          console.error('Error in auth state change:', error);
-          toast.error('Authentication error occurred');
-          await supabase.auth.signOut();
+          setUser({
+            ...session.user,
+            role: profile?.role || "subscriber",
+            ...profile
+          });
+          setSession(session);
+          
+          if (event === "SIGNED_IN") {
+            toast.success("Successfully signed in");
+          }
+        } else {
+          setUser(null);
+          setSession(null);
+          
+          if (event === "SIGNED_OUT") {
+            toast.success("Successfully signed out");
+          }
         }
+        
+        setAuthLoading(false);
       }
-    });
+    );
 
     return () => {
-      console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
     };
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  }, [setUser, setSession, setAuthLoading]);
 
   return <>{children}</>;
 };
