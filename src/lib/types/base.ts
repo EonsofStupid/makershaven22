@@ -1,13 +1,8 @@
 import type { Json } from '@/integrations/supabase/types';
 
-// Core Enums
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-export type ContentStatus = 'draft' | 'published' | 'archived';
-export type ContentType = 'page' | 'component' | 'template' | 'workflow';
 
-// Settings Types
 export interface Settings {
   id: string;
   site_title: string;
@@ -26,15 +21,23 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
+  border_radius?: string;
+  spacing_unit?: string;
+  shadow_color?: string;
+  hover_scale?: string;
+  transition_duration?: string;
+  logo_url?: string;
+  favicon_url?: string;
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
   transition_type?: TransitionType;
+  box_shadow?: string;
+  backdrop_blur?: string;
   updated_at?: string;
   updated_by?: string;
 }
 
-// Core State Interface
 export interface GlobalState {
   theme: Settings | null;
   settings: Settings | null;
