@@ -7,19 +7,25 @@ export interface AuthUser extends User {
   email: string;
   username: string;
   displayName: string;
+  user_metadata: UserMetadata;
 }
 
 export interface AuthSession extends Session {
   expires_at: number;
+  user: AuthUser;
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 export interface AuthUIState {
   isLoading: boolean;
   error: Error | null;
   user: AuthUser | null;
-  showPassword: boolean;
-  rememberMe: boolean;
-  validationErrors: Record<string, string>;
 }
 
 export interface AuthErrorRecoveryState {
@@ -32,4 +38,14 @@ export interface AuthErrorRecoveryState {
 export interface SessionConfig {
   expires_at: number;
   refresh_token?: string;
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error) => void;
 }

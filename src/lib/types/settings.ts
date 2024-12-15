@@ -31,32 +31,12 @@ export interface Settings {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-}
-
-export interface Theme {
-  settings: Settings;
-  mode: ThemeMode;
-}
-
-export interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => Promise<void>;
-}
-
-export interface DatabaseSettingsRow extends Settings {
-  id: string;
   theme_mode?: ThemeMode;
-  updated_at?: string;
-  updated_by?: string;
   security_settings?: Record<string, any>;
 }
 
 export interface SettingsFormData extends Settings {
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-  box_shadow?: 'none' | 'sm' | 'md' | 'lg';
-  backdrop_blur?: string;
 }
 
 export interface SettingsResponse {
@@ -92,4 +72,10 @@ export interface SettingsUpdateParams {
   p_transition_type: TransitionType;
   p_logo_url?: string;
   p_favicon_url?: string;
+}
+
+export interface DatabaseSettingsRow extends Settings {
+  id: string;
+  updated_at?: string;
+  updated_by?: string;
 }

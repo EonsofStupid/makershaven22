@@ -10,29 +10,31 @@ export enum WorkflowStageType {
 
 export interface WorkflowStage {
   id: string;
+  name: string;
   type: WorkflowStageType;
-  title: string;
-  description?: string;
-  config: Record<string, any>;
   order: number;
+  config: Record<string, any>;
+  description?: string;
 }
 
 export interface WorkflowTemplate {
   id?: string;
   name: string;
-  description?: string;
+  description: string | null;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
   created_at?: string;
+  created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
-export interface Workflow extends WorkflowTemplate {
-  triggers?: Json;
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
 }
-
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
 export interface StageConfigUpdateProps {
   stage: WorkflowStage;
@@ -40,7 +42,20 @@ export interface StageConfigUpdateProps {
 }
 
 export interface WorkflowStageConfig {
-  title: string;
-  description?: string;
-  config: Record<string, any>;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  timeLimit?: number;
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
 }
