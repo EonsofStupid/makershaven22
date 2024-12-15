@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { GlobalState } from '../types/base';
-import type { Settings, ThemeMode } from '../types/base';
 
 export const useStore = create<GlobalState>()(
   persist(
@@ -18,9 +17,9 @@ export const useStore = create<GlobalState>()(
 
       // Actions
       setState: (state: Partial<GlobalState>) => set(state),
-      updateSettings: (settings: Settings) => set({ settings, error: null }),
-      setMode: (mode: ThemeMode) => set({ mode }),
-      setError: (error: Error | null) => set({ error }),
+      updateSettings: (settings) => set({ settings, error: null }),
+      setMode: (mode) => set({ mode }),
+      setError: (error) => set({ error }),
       reset: () => set({
         isReady: false,
         isMaintenanceMode: false,

@@ -36,6 +36,15 @@ export interface Settings {
   backdrop_blur?: string;
   updated_at?: string;
   updated_by?: string;
+  security_settings?: {
+    ip_whitelist: string[];
+    ip_blacklist: string[];
+    rate_limit_requests: number;
+    rate_limit_window_minutes: number;
+    max_login_attempts: number;
+    lockout_duration_minutes: number;
+    session_timeout_minutes: number;
+  };
 }
 
 export interface Theme {
@@ -57,21 +66,4 @@ export interface GlobalState {
   setMode: (mode: ThemeMode) => void;
   setError: (error: Error | null) => void;
   reset: () => void;
-}
-
-export interface ImportConfig {
-  type: string;
-  schema: Record<string, any>;
-  validator: (data: any) => boolean;
-}
-
-export interface ImportValidationResult {
-  isValid: boolean;
-  errors?: string[];
-}
-
-export interface ImportWizardProps {
-  type?: string;
-  acceptedTypes?: string[];
-  onImport: (files: File[]) => void;
 }
