@@ -1,4 +1,4 @@
-import { BaseEntity, UserOwned, Json } from './base';
+import { Json } from '@/integrations/supabase/types';
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
@@ -7,15 +7,8 @@ export interface WorkflowStage {
   type: WorkflowStageType;
   name: string;
   description?: string;
-  config: Json;
+  config: WorkflowStageConfig;
   order: number;
-}
-
-export interface WorkflowTemplate extends BaseEntity, UserOwned {
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
 }
 
 export interface WorkflowStageConfig {
@@ -29,13 +22,28 @@ export interface WorkflowStageConfig {
     onComplete?: boolean;
     reminderInterval?: number;
   };
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
 }
 
-export type StageUpdateFunction = (stage: WorkflowStage) => void;
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: StageUpdateFunction;
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
 }
 
 export const validateStage = (stage: WorkflowStage) => {
@@ -58,4 +66,16 @@ export const isValidStageUpdate = (stage: Partial<WorkflowStage>): boolean => {
 
 export const createStageUpdate = (id: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
   return { id, ...updates };
+};
+
+export const serializeStages = (stages: WorkflowStage[]) => {
+  return JSON.stringify(stages);
+};
+
+export const parseStages = (stagesJson: string): WorkflowStage[] => {
+  try {
+    return JSON.parse(stagesJson);
+  } catch {
+    return [];
+  }
 };

@@ -1,12 +1,25 @@
 import { StateCreator } from 'zustand';
-import { WorkflowState, WorkflowTemplate } from '../types/store/workflow';
 import { GlobalState } from '../types';
+import type { WorkflowTemplate } from '@/lib/types/workflow';
+
+export interface WorkflowSlice {
+  activeWorkflows: Record<string, WorkflowTemplate>;
+  workflowHistory: Record<string, any[]>;
+  isLoading: boolean;
+  error: Error | null;
+  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
+  addToHistory: (id: string, entry: any) => void;
+  clearHistory: (id: string) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
+}
 
 export const createWorkflowSlice: StateCreator<
   GlobalState,
   [],
   [],
-  WorkflowState
+  WorkflowSlice
 > = (set) => ({
   activeWorkflows: {},
   workflowHistory: {},

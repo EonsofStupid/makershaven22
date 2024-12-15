@@ -1,9 +1,10 @@
-import { BaseEntity, UserOwned } from './base';
+import { BaseEntity, UserOwned } from './base/entity';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings extends BaseEntity, UserOwned {
+  id: string;
   site_title: string;
   tagline?: string;
   primary_color: string;
@@ -34,17 +35,6 @@ export interface Settings extends BaseEntity, UserOwned {
   transition_type?: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
-  security_settings?: SecuritySettings;
-}
-
-export interface SecuritySettings {
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
 }
 
 export interface Theme {
