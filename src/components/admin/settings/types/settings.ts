@@ -1,16 +1,7 @@
 import type { Settings as BaseSettings } from '@/lib/types/settings';
 
-export interface Settings extends BaseSettings {
-  // Additional settings specific to admin components
-}
-
-export interface SettingsFormData extends Settings {
+export interface SettingsFormData extends BaseSettings {
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-}
-
-export interface SettingsResponse {
-  data: Settings;
-  error: Error | null;
 }
 
 export interface SettingsUpdateParams {
@@ -43,4 +34,9 @@ export interface SettingsUpdateParams {
   p_transition_type?: string;
   p_box_shadow?: string;
   p_backdrop_blur?: string;
+}
+
+export interface SettingsResponse {
+  data: SettingsFormData;
+  error: Error | null;
 }

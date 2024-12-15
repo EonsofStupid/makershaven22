@@ -1,11 +1,11 @@
-import type { Json } from '@/integrations/supabase/types/base';
+import type { Json } from '@/integrations/supabase/types';
 
 export enum WorkflowStageType {
-  APPROVAL = 'APPROVAL',
-  REVIEW = 'REVIEW',
-  TASK = 'TASK',
-  NOTIFICATION = 'NOTIFICATION',
-  CONDITIONAL = 'CONDITIONAL'
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification',
+  CONDITIONAL = 'conditional'
 }
 
 export interface WorkflowStage {
@@ -36,10 +36,10 @@ export interface WorkflowStageConfig {
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
   notifications?: {
-    type: string;
-    template: string;
-    recipients: string[];
-  }[];
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
   conditions?: {
     field: string;
     operator: string;
@@ -49,11 +49,6 @@ export interface WorkflowStageConfig {
     type: 'user' | 'role' | 'group';
     value: string;
   };
-  settings?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
   timeLimit?: number;
   requiredApprovers?: number;
   customFields?: Array<{
@@ -61,4 +56,9 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
+}
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }

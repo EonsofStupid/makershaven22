@@ -1,4 +1,2 @@
 export * from './settings';
-export * from '@/lib/types/settings';
-export * from '@/lib/types/auth';
-export * from '@/lib/types/workflow';
+export type { Settings } from '@/lib/types/settings';

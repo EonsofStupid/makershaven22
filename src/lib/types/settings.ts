@@ -36,7 +36,7 @@ export interface Settings {
 }
 
 export interface Theme {
-  settings: Settings | null;
+  settings: Settings;
   mode: ThemeMode;
 }
 
