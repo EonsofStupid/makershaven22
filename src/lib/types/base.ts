@@ -32,6 +32,8 @@ export interface Settings {
   transition_type?: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
+  theme_mode?: ThemeMode;
+  menu_animation_type?: string;
   updated_at?: string;
   updated_by?: string;
 }
