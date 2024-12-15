@@ -46,3 +46,5 @@ export interface ThemeContextType {
   effectiveTheme: 'light' | 'dark';
   updateTheme: (settings: Settings) => Promise<void>;
 }
+
+export type SettingsFormData = Settings;
