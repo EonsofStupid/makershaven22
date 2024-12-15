@@ -1,15 +1,18 @@
 import { Provider } from 'jotai';
 import { DevTools } from 'jotai-devtools';
-import { useGlobalStore } from '../global-store';
+import { useStore } from '../store';
+import { StoreSyncProvider } from './SyncProvider';
 
 export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
   // Initialize Zustand store
-  useGlobalStore();
+  useStore();
 
   return (
     <Provider>
       <DevTools />
-      {children}
+      <StoreSyncProvider>
+        {children}
+      </StoreSyncProvider>
     </Provider>
   );
 };
