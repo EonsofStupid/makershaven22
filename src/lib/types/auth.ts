@@ -9,6 +9,7 @@ export interface AuthUser extends User {
   role: UserRole;
   user_metadata: UserMetadata;
   app_metadata: UserAppMetadata;
+  factors?: Factor[];
 }
 
 export interface AuthSession {
@@ -24,6 +25,7 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
+  hasAccess?: boolean;
 }
 
 export interface AuthUIState {

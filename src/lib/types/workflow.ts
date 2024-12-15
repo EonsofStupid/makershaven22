@@ -1,6 +1,12 @@
 import type { Json } from '@/integrations/supabase/types';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+export enum WorkflowStageType {
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification',
+  CONDITIONAL = 'conditional'
+}
 
 export interface WorkflowStage {
   id: string;

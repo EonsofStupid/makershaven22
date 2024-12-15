@@ -1,25 +1,16 @@
 export interface AuthError extends Error {
   code: string;
   message: string;
-  stack?: string;
+  status?: number;
 }
 
-export interface AuthErrorBoundaryState {
-  hasError: boolean;
-  error: AuthError | null;
-}
-
-export interface AuthErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{
-    error: AuthError;
-    reset: () => void;
-  }>;
-}
-
-export interface AuthErrorRecoveryState {
-  attemptCount: number;
-  lastAttempt: Date | null;
-  nextAttemptDelay: number;
-  error: AuthError | null;
+export enum AuthErrorCode {
+  INVALID_CREDENTIALS = 'auth/invalid-credentials',
+  USER_NOT_FOUND = 'auth/user-not-found',
+  EMAIL_IN_USE = 'auth/email-already-in-use',
+  WEAK_PASSWORD = 'auth/weak-password',
+  INVALID_EMAIL = 'auth/invalid-email',
+  SESSION_EXPIRED = 'auth/session-expired',
+  UNAUTHORIZED = 'auth/unauthorized',
+  FORBIDDEN = 'auth/forbidden'
 }
