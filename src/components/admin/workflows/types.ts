@@ -1,21 +1,19 @@
-import { Json } from '@supabase/supabase-js';
+import { BaseEntity } from '@/lib/types/base';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface WorkflowFormData {
   name: string;
   description: string;
   steps: WorkflowStage[];
+  is_active?: boolean;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends BaseEntity {
   name: string;
   description?: string;
   steps: Json;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface WorkflowStage {
@@ -30,9 +28,14 @@ export interface WorkflowStage {
 export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
 export interface WorkflowStageConfig {
+  timeLimit?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
   approvers?: string[];
   deadline?: string;
-  timeLimit?: number;
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
@@ -45,11 +48,7 @@ export interface WorkflowStageConfig {
     recipients: string[];
     template: string;
   }[];
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
+  requiredApprovers?: number;
 }
 
 export interface StageConfigUpdateProps {
@@ -87,11 +86,11 @@ export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStag
   return { id: stageId, ...updates };
 };
 
-export const parseWorkflowSteps = (steps: Json): WorkflowStage[] => {
+export const parseStages = (steps: Json): WorkflowStage[] => {
   if (!steps || !Array.isArray(steps)) return [];
   return steps as WorkflowStage[];
 };
 
-export const serializeWorkflowSteps = (stages: WorkflowStage[]): Json => {
+export const serializeStages = (stages: WorkflowStage[]): Json => {
   return stages as unknown as Json;
 };
