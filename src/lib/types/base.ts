@@ -1,15 +1,19 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-
-export type DatabaseId = string;
-export type Timestamp = string;
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export interface BaseEntity {
-  id: DatabaseId;
-  created_at?: Timestamp;
-  updated_at?: Timestamp;
+  id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface UserOwned {
-  created_by?: DatabaseId;
-  updated_by?: DatabaseId;
-}
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type ContentStatus = 'draft' | 'published' | 'archived';
+export type ContentType = 'page' | 'component' | 'template' | 'workflow';
