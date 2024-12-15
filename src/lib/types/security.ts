@@ -1,12 +1,14 @@
+import type { Json } from '@/integrations/supabase/types';
+
 export interface SecurityLog {
   id: string;
   user_id: string;
   event_type: string;
   severity: string;
-  details: any;
+  details: Json;
+  metadata: Json;
   ip_address?: string;
   user_agent?: string;
-  metadata: Record<string, any>;
   created_at: string;
   profiles?: {
     username: string;
