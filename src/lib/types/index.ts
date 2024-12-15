@@ -1,27 +1,35 @@
-// Basic types from Supabase schema
-export type Json = any;
+import { Database } from '@/integrations/supabase/types';
 
-// Auth types
+// Auth Types
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
   email?: string;
   role?: UserRole;
+  username?: string;
+  displayName?: string;
+  metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
 }
 
 export interface AuthSession {
   user: AuthUser;
   access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
 }
 
-// Settings types
+// Settings Types
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings {
   id: string;
   site_title: string;
+  tagline?: string;
   primary_color: string;
   secondary_color: string;
   accent_color: string;
@@ -50,30 +58,12 @@ export interface Settings {
   backdrop_blur?: string;
 }
 
-// Store types
-export interface GlobalState {
-  settings: Settings | null;
-  user: AuthUser | null;
-  session: AuthSession | null;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-// Content types
-export interface BaseContent {
-  id: string;
-  title: string;
-  content?: Json;
-  created_at?: string;
-  updated_at?: string;
-}
-
-// Workflow types
+// Workflow Types
 export interface WorkflowStage {
   id: string;
   name: string;
   type: string;
-  config: Json;
+  config: any;
   order: number;
 }
 
@@ -83,4 +73,24 @@ export interface WorkflowTemplate {
   description?: string;
   stages: WorkflowStage[];
   is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
 }
+
+// Store Types
+export interface GlobalState {
+  settings: Settings | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isLoading: boolean;
+  error: Error | null;
+  isReady: boolean;
+  isMaintenanceMode: boolean;
+  activeWorkflows: Record<string, WorkflowTemplate>;
+  workflowHistory: Record<string, any[]>;
+}
+
+// Database Row Types
+export type Tables = Database['public']['Tables'];
+export type Row<T extends keyof Tables> = Tables[T]['Row'];
