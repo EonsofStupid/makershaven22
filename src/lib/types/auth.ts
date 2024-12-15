@@ -1,6 +1,6 @@
-import type { Session, User, UserMetadata, UserAppMetadata, Factor } from '@supabase/supabase-js';
+import type { User, UserMetadata, UserAppMetadata, Factor } from '@supabase/supabase-js';
 
-export type UserRole = 'guest' | 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser extends User {
   email: string;
@@ -11,9 +11,11 @@ export interface AuthUser extends User {
   app_metadata: UserAppMetadata;
 }
 
-export interface AuthSession extends Session {
+export interface AuthSession {
   user: AuthUser;
-  expires_at: number;
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
 }
 
 export interface AuthState {
@@ -43,8 +45,12 @@ export interface AuthErrorRecoveryState {
 export interface SessionConfig {
   access_token: string;
   refresh_token?: string;
-  expires_at: number;
-  sessionTimeout?: number;
+  expires_in: number;
+  timeout: number;
+  refreshInterval: number;
+  persistKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
 }
 
 export interface AuthError extends Error {

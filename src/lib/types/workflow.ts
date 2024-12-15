@@ -20,6 +20,22 @@ export interface WorkflowStageConfig {
   priority?: 'low' | 'medium' | 'high';
   notificationTemplate?: string;
   conditions?: WorkflowCondition[];
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  timeLimit?: number;
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
 }
 
 export interface WorkflowCondition {
@@ -37,4 +53,16 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+}
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
