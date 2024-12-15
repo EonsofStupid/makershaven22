@@ -1,4 +1,4 @@
-import type { UserRole } from '@/integrations/supabase/types/enums';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
@@ -52,6 +52,6 @@ export interface SessionConfig {
 export interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: UserRole[];
+  requiredRole?: UserRole | UserRole[];
   fallbackPath?: string;
 }

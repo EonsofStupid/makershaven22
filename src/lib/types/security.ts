@@ -7,8 +7,8 @@ export interface SecurityLog {
   severity: string;
   details: Json;
   metadata: Json;
-  ip_address: string;
-  user_agent: string;
+  ip_address?: string;
+  user_agent?: string;
   created_at: string;
   profiles?: {
     username: string;
@@ -16,16 +16,5 @@ export interface SecurityLog {
   };
 }
 
-export interface SecurityEvent {
-  type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  details: Record<string, any>;
-  timestamp: string;
-}
-
-export interface SecurityConfig {
-  maxLoginAttempts: number;
-  lockoutDuration: number;
-  sessionTimeout: number;
-  requireMFA: boolean;
-}
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

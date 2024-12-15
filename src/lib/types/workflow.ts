@@ -37,14 +37,15 @@ export interface WorkflowStage {
 }
 
 export interface WorkflowTemplate {
-  id: string;
+  id?: string;
   name: string;
-  description?: string;
+  description: string | null;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
   created_at?: string;
+  created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
 export interface Workflow extends Omit<WorkflowTemplate, 'stages'> {
