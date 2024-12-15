@@ -4,7 +4,7 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings {
-  id?: string;
+  id: string;
   site_title: string;
   tagline?: string;
   primary_color?: string;
@@ -43,4 +43,11 @@ export interface Settings {
 export interface Theme {
   settings: Settings | null;
   mode: ThemeMode;
+}
+
+export interface ThemeContextType {
+  theme: Theme | null;
+  mode: ThemeMode;
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (settings: Settings) => Promise<void>;
 }
