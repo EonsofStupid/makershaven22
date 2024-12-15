@@ -1,5 +1,3 @@
-import { Json } from '@/integrations/supabase/types';
-
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale';

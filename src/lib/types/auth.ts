@@ -6,7 +6,7 @@ export interface AuthUser {
   role?: UserRole;
   username?: string;
   displayName?: string;
-  metadata?: Record<string, any>;
+  user_metadata?: Record<string, any>;
 }
 
 export interface AuthSession {

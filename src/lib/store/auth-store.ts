@@ -1,16 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthUser, AuthSession } from '@/lib/types';
+import type { AuthUser, AuthSession, AuthState } from '@/lib/types/auth';
 import { toast } from 'sonner';
 
-interface AuthStore {
-  user: AuthUser | null;
-  session: AuthSession | null;
-  isLoading: boolean;
-  error: Error | null;
-  isTransitioning: boolean;
-  hasAccess: boolean;
+interface AuthStore extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: AuthUser | null) => void;
@@ -45,14 +39,23 @@ export const useAuthStore = create<AuthStore>()(
             .eq('id', data.user.id)
             .single();
 
+          const authUser: AuthUser = {
+            id: data.user.id,
+            email: data.user.email!,
+            role: profile?.role || 'subscriber',
+            user_metadata: data.user.user_metadata
+          };
+
+          const authSession: AuthSession = {
+            user: authUser,
+            access_token: data.session!.access_token,
+            refresh_token: data.session!.refresh_token,
+            expires_in: data.session!.expires_in!
+          };
+
           set({ 
-            user: {
-              id: data.user.id,
-              email: data.user.email!,
-              role: profile?.role || 'subscriber',
-              metadata: data.user.user_metadata
-            },
-            session: data.session,
+            user: authUser,
+            session: authSession,
             isLoading: false,
             hasAccess: true
           });

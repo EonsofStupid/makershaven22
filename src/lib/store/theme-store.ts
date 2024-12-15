@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Settings, Theme, ThemeMode } from '@/lib/types/store';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 interface ThemeState {
   settings: Settings | null;

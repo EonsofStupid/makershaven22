@@ -1,9 +1,8 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession } from '@/lib/auth/types/auth';
+import type { AuthUser, AuthSession } from '@/lib/types/auth';
 import { useAuthStore } from '../../auth-store';
 
-// Persistent storage atoms that sync with Zustand
+// Atoms that sync with Zustand store
 export const sessionAtom = atom(
   (get) => useAuthStore.getState().session,
   (_get, _set, newSession: AuthSession | null) => {
