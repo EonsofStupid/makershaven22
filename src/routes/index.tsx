@@ -3,8 +3,7 @@ import { Suspense } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { useAtom } from 'jotai';
-import { sessionAtom, userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
 import { toast } from "sonner";
 import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
@@ -15,11 +14,9 @@ import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 
 export const AppRoutes = () => {
-  const [session] = useAtom(sessionAtom);
-  const [user] = useAtom(userAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
+  const { session, isAuthLoading } = useSyncedAuth();
   
-  if (loadingState.isLoading) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner />

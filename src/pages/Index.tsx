@@ -1,15 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { userAtom } from '@/lib/store/atoms/auth';
 import { Hammer, Wrench, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
 
 const Index = () => {
   const navigate = useNavigate();
-  const [user] = useAtom(userAtom);
+  const { user } = useSyncedAuth();
 
   const handleNavigation = (path: string) => {
     if (!user) {
