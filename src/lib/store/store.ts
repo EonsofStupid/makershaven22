@@ -1,15 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
-import type { AuthUser, AuthSession } from '@/lib/types/auth';
+import type { Settings, ThemeMode } from '@/lib/types/base';
 
 interface StoreState {
-  // Auth state
-  user: AuthUser | null;
-  session: AuthSession | null;
-  isAuthLoading: boolean;
-  authError: Error | null;
-
   // Theme state
   theme: Settings | null;
   settings: Settings | null;
@@ -33,12 +26,6 @@ interface StoreState {
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
-      // Initial auth state
-      user: null,
-      session: null,
-      isAuthLoading: true,
-      authError: null,
-
       // Initial theme state
       theme: null,
       settings: null,
@@ -57,10 +44,6 @@ export const useStore = create<StoreState>()(
       setMode: (mode) => set({ mode }),
       setError: (error) => set({ error }),
       reset: () => set({
-        user: null,
-        session: null,
-        isAuthLoading: false,
-        authError: null,
         theme: null,
         settings: null,
         mode: 'system',

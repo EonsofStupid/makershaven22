@@ -7,26 +7,6 @@ export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 export type ContentType = 'page' | 'component' | 'template' | 'workflow';
 
-// Auth Types
-export interface AuthUser {
-  id: string;
-  email?: string;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-}
-
 // Settings Types
 export interface Settings {
   id: string;
