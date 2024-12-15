@@ -1,25 +1,22 @@
 import { Link } from "react-router-dom";
-import { Menu, Search, User, LogOut } from "lucide-react";
+import { Menu, Search, LogOut } from "lucide-react";
 import { useState } from "react";
-import { useAtom } from 'jotai';
-import { userAtom, sessionAtom } from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { UnifiedNavigation } from "./shared/ui/navigation/UnifiedNavigation";
+import { useNavigation } from "@/hooks/useNavigation";
+import { useAuth } from "@/hooks/useAuth";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user] = useAtom(userAtom);
-  const [, setSession] = useAtom(sessionAtom);
+  const { user, signOut } = useAuth();
+  const { handleNavigation } = useNavigation();
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      setSession(null);
+      await signOut();
       toast.success("Successfully signed out");
-      window.location.href = "/login";
+      handleNavigation("/login");
     } catch (error) {
       console.error("Sign out error:", error);
       toast.error("Failed to sign out");
@@ -31,7 +28,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <header className="fixed top-0 left-0 right-0 z-50 glass-nav">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2"
+              onClick={() => handleNavigation("/")}
+            >
               <img
                 src="/lovable-uploads/ff432201-0b9c-442d-924b-80eedc673b73.png"
                 alt="Logo"
@@ -49,7 +50,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <Search className="w-5 h-5" />
               </button>
               {user?.role === 'admin' && (
-                <Link to="/admin" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <Link 
+                  to="/admin" 
+                  className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                  onClick={() => handleNavigation("/admin")}
+                >
                   <User className="w-5 h-5" />
                 </Link>
               )}
