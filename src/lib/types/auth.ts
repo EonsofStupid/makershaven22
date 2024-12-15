@@ -1,4 +1,4 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+import { UserRole } from './base';
 
 export interface AuthUser {
   id: string;
@@ -25,27 +25,34 @@ export interface AuthState {
   hasAccess: boolean;
 }
 
-export interface AuthError extends Error {
-  code?: string;
-  statusCode?: number;
-  details?: string;
+export interface AuthStore extends AuthState {
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  setUser: (user: AuthUser | null) => void;
+  setSession: (session: AuthSession | null) => void;
+  setError: (error: Error | null) => void;
+  setTransitioning: (isTransitioning: boolean) => void;
+  reset: () => void;
 }
 
-export interface AuthGuardProps {
+export interface AuthErrorCode {
+  code: string;
+  message: string;
+  details?: Record<string, any>;
+}
+
+export interface AuthErrorBoundaryProps {
   children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
+  fallback?: React.ReactNode;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
-export interface PinVerificationResponse {
-  success: boolean;
-  message: string;
-  locked_until?: string;
-  attempts_remaining?: number;
+export interface AuthErrorBoundaryState {
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
 }
 
-export interface PinSetupResponse {
-  success: boolean;
-  message: string;
+export interface AuthErrorRecoveryState {
+  retryCount: number;
+  lastError: Error | null;
 }
