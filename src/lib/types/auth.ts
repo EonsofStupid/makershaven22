@@ -3,15 +3,17 @@ import { UserRole } from './base';
 export interface AuthUser {
   id: string;
   email: string;
-  role: UserRole;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
   metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
+  user: AuthUser;
   access_token: string;
   refresh_token?: string;
   expires_in: number;
-  user: AuthUser;
 }
 
 export interface AuthState {
@@ -25,5 +27,7 @@ export interface AuthState {
 
 export interface AuthGuardProps {
   children: React.ReactNode;
+  requireAuth?: boolean;
   requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
 }

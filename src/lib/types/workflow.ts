@@ -4,6 +4,7 @@ import { Json } from '@/integrations/supabase/types';
 export interface WorkflowTemplate extends BaseEntity {
   name: string;
   description?: string;
+  steps: Json;
   stages: WorkflowStage[];
   is_active: boolean;
 }
@@ -32,5 +33,3 @@ export interface StageConfigUpdateProps {
   stage: WorkflowStage;
   onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
-
-export const createStageUpdate = (updates: Partial<WorkflowStage>) => updates;
