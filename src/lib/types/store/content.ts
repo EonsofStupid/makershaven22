@@ -1,14 +1,20 @@
-import { BaseEntity, ContentStatus, ContentType } from '../base';
-import { Json } from '@/integrations/supabase/types';
-
-export interface BaseContent extends BaseEntity {
+export interface BaseContent {
+  id: string;
   title: string;
-  type: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
-  status?: ContentStatus;
+  type: 'page' | 'component' | 'template' | 'workflow';
+  content?: any;
+  metadata?: Record<string, any>;
+  status?: 'draft' | 'published' | 'archived';
   version?: number;
+  created_at?: string;
+  updated_at?: string;
   created_by?: string;
   updated_by?: string;
+}
+
+export interface ContentState {
+  activeContent: BaseContent | null;
+  contentHistory: Record<string, BaseContent[]>;
+  isLoading: boolean;
+  error: Error | null;
 }

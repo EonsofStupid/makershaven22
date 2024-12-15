@@ -6,4 +6,5 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
+  hasAccess: boolean;
 }
