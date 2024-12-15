@@ -6,17 +6,17 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: Record<string, any>;
-  app_metadata?: Record<string, any>;
+  username: string;
+  displayName: string;
+  user_metadata: Record<string, any>;
+  app_metadata: Record<string, any>;
 }
 
 export interface AuthSession {
-  user: AuthUser;
-  expires_at: number;
   access_token: string;
-  refresh_token?: string;
+  refresh_token: string;
+  expires_at: number;
+  user: AuthUser;
 }
 
 export interface AuthState {
@@ -44,14 +44,7 @@ export interface AuthUIState {
 }
 
 export interface SessionConfig {
-  sessionTimeout: number;
+  timeout: number;
   maxAttempts: number;
   lockoutDuration: number;
-}
-
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole[];
-  fallbackPath?: string;
 }

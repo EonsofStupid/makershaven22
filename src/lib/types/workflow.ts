@@ -4,7 +4,7 @@ export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' 
 
 export interface WorkflowStageConfig {
   type: WorkflowStageType;
-  name: string;
+  title: string;
   description?: string;
   assignees?: string[];
   dueDate?: string;
@@ -14,7 +14,9 @@ export interface WorkflowStageConfig {
 export interface WorkflowStage extends WorkflowStageConfig {
   id: string;
   order: number;
-  config: Record<string, any>;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface WorkflowTemplate {
@@ -29,7 +31,9 @@ export interface WorkflowTemplate {
 }
 
 export interface Workflow extends WorkflowTemplate {
+  instance_id: string;
+  current_stage: number;
   status: 'active' | 'completed' | 'cancelled';
-  currentStage?: number;
-  metadata?: Record<string, any>;
+  started_at: string;
+  completed_at?: string;
 }
