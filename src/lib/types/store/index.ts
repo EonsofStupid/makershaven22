@@ -1,6 +1,5 @@
 import { AuthUser, AuthSession } from '../auth';
 import { Settings, Theme } from '../settings';
-import { WorkflowTemplate } from '../workflow';
 import { BaseContent } from './content';
 
 export interface GlobalState {
@@ -23,14 +22,7 @@ export interface GlobalState {
   contentHistory: Record<string, BaseContent[]>;
   isContentLoading: boolean;
   contentError: Error | null;
-
-  // Workflow state
-  activeWorkflows: Record<string, WorkflowTemplate>;
-  workflowHistory: Record<string, any[]>;
-  isWorkflowLoading: boolean;
-  workflowError: Error | null;
 }
 
 export * from './auth';
 export * from './content';
-export * from './workflow';

@@ -1,4 +1,5 @@
 import { BaseEntity, ThemeMode, TransitionType } from './base';
+import { Json } from '@/integrations/supabase/types';
 
 export interface Settings extends BaseEntity {
   site_title: string;
