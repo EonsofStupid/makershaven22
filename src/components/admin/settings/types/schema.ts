@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { TransitionType } from '@/lib/types/settings';
 
 export const settingsSchema = z.object({
   site_title: z.string().min(1, "Site title is required"),
@@ -27,10 +28,22 @@ export const settingsSchema = z.object({
   neon_cyan: z.string().optional(),
   neon_pink: z.string().optional(),
   neon_purple: z.string().optional(),
-  transition_type: z.string().optional(),
+  transition_type: z.string().optional() as z.ZodType<TransitionType>,
   box_shadow: z.string().optional(),
   backdrop_blur: z.string().optional(),
-  is_active: z.boolean().optional()
+  security_settings: z.object({
+    ip_whitelist: z.array(z.string()),
+    ip_blacklist: z.array(z.string()),
+    rate_limit_requests: z.number(),
+    rate_limit_window_minutes: z.number(),
+    max_login_attempts: z.number(),
+    lockout_duration_minutes: z.number(),
+    session_timeout_minutes: z.number()
+  }).optional(),
+  theme_mode: z.enum(['light', 'dark', 'system']).optional(),
+  menu_animation_type: z.string().optional(),
+  updated_at: z.string().optional(),
+  updated_by: z.string().optional()
 });
 
 export type SettingsSchema = z.infer<typeof settingsSchema>;

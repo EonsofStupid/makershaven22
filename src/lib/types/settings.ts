@@ -1,3 +1,5 @@
+import { Json } from '@supabase/supabase-js';
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
@@ -44,6 +46,8 @@ export interface Settings {
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
   menu_animation_type?: string;
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export interface Theme {
