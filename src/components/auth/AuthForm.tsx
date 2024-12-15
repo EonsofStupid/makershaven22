@@ -7,6 +7,7 @@ import { Lock, Mail, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,6 +32,7 @@ export const AuthForm = ({
   const { register, handleSubmit, formState: { errors } } = useForm<AuthFormData>({
     resolver: zodResolver(authSchema)
   });
+  const { authError } = useSyncedAuth();
 
   const formVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -91,13 +93,13 @@ export const AuthForm = ({
         </div>
       </motion.div>
 
-      {error && (
+      {(error || authError) && (
         <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-red-400 text-sm"
         >
-          {error}
+          {error || (authError instanceof Error ? authError.message : "An error occurred")}
         </motion.p>
       )}
 
