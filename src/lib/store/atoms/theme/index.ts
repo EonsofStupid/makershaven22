@@ -23,8 +23,7 @@ export const effectiveThemeAtom = atom(
 // Sync with Zustand store
 export const syncWithZustandAtom = atom(
   null,
-  (get, set) => {
-    const theme = get(themeSettingsAtom);
+  (get, set, theme: Theme) => {
     if (theme?.settings) {
       useThemeStore.getState().updateSettings(theme.settings);
     }
