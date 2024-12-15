@@ -138,7 +138,7 @@ export type Database = {
       }
       blog_posts: {
         Row: {
-          author_id: string | null
+          author_id: string
           category: Database["public"]["Enums"]["post_category"] | null
           content: string
           excerpt: string | null
@@ -155,7 +155,7 @@ export type Database = {
           views_count: number | null
         }
         Insert: {
-          author_id?: string | null
+          author_id: string
           category?: Database["public"]["Enums"]["post_category"] | null
           content: string
           excerpt?: string | null
@@ -172,7 +172,7 @@ export type Database = {
           views_count?: number | null
         }
         Update: {
-          author_id?: string | null
+          author_id?: string
           category?: Database["public"]["Enums"]["post_category"] | null
           content?: string
           excerpt?: string | null
@@ -243,7 +243,7 @@ export type Database = {
         Row: {
           content: Json | null
           created_at: string | null
-          created_by: string | null
+          created_by: string
           id: string
           metadata: Json | null
           slug: string | null
@@ -257,7 +257,7 @@ export type Database = {
         Insert: {
           content?: Json | null
           created_at?: string | null
-          created_by?: string | null
+          created_by: string
           id?: string
           metadata?: Json | null
           slug?: string | null
@@ -271,7 +271,7 @@ export type Database = {
         Update: {
           content?: Json | null
           created_at?: string | null
-          created_by?: string | null
+          created_by?: string
           id?: string
           metadata?: Json | null
           slug?: string | null
@@ -467,27 +467,27 @@ export type Database = {
       }
       forum_replies: {
         Row: {
-          author_id: string | null
+          author_id: string
           content: string
           created_at: string | null
           id: string
-          thread_id: string | null
+          thread_id: string
           updated_at: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_id: string
           content: string
           created_at?: string | null
           id?: string
-          thread_id?: string | null
+          thread_id: string
           updated_at?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_id?: string
           content?: string
           created_at?: string | null
           id?: string
-          thread_id?: string | null
+          thread_id?: string
           updated_at?: string | null
         }
         Relationships: [
@@ -509,7 +509,7 @@ export type Database = {
       }
       forum_threads: {
         Row: {
-          author_id: string | null
+          author_id: string
           content: string
           created_at: string | null
           id: string
@@ -517,7 +517,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_id: string
           content: string
           created_at?: string | null
           id?: string
@@ -525,7 +525,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_id?: string
           content?: string
           created_at?: string | null
           id?: string
