@@ -1,6 +1,4 @@
-import type { Json } from '@/integrations/supabase/types';
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'guest';
+import type { UserRole } from '@/integrations/supabase/types/enums';
 
 export interface AuthUser {
   id: string;
@@ -13,10 +11,10 @@ export interface AuthUser {
 }
 
 export interface AuthSession {
+  user: AuthUser;
   access_token: string;
   refresh_token: string;
   expires_at: number;
-  user: AuthUser;
 }
 
 export interface AuthState {
@@ -24,13 +22,7 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-}
-
-export interface AuthErrorRecoveryState {
-  error: Error;
-  attemptCount: number;
-  lastAttempt: Date;
-  nextAttemptDelay: number;
+  isTransitioning: boolean;
 }
 
 export interface AuthUIState {
@@ -43,8 +35,22 @@ export interface AuthUIState {
   validationErrors: Record<string, string>;
 }
 
+export interface AuthErrorRecoveryState {
+  error: Error;
+  attemptCount: number;
+  lastAttempt: Date;
+  nextAttemptDelay: number;
+}
+
 export interface SessionConfig {
   timeout: number;
   maxAttempts: number;
   lockoutDuration: number;
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole[];
+  fallbackPath?: string;
 }

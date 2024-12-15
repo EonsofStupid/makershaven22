@@ -1,19 +1,39 @@
-import type { Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types/base';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
-
-export interface WorkflowStageConfig {
-  type: WorkflowStageType;
-  title: string;
-  description?: string;
-  assignees?: string[];
-  dueDate?: string;
-  metadata?: Record<string, any>;
+export enum WorkflowStageType {
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification',
+  CONDITIONAL = 'conditional'
 }
 
-export interface WorkflowStage extends WorkflowStageConfig {
+export interface WorkflowStageConfig {
+  timeLimit?: number;
+  requiredApprovers?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
+}
+
+export interface WorkflowStage {
   id: string;
+  name: string;
+  type: WorkflowStageType;
   order: number;
+  config: WorkflowStageConfig;
+  description?: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   created_at: string;
   updated_at?: string;
@@ -30,8 +50,10 @@ export interface WorkflowTemplate {
   updated_at?: string;
 }
 
-export interface Workflow extends WorkflowTemplate {
+export interface Workflow extends Omit<WorkflowTemplate, 'stages'> {
   instance_id: string;
+  steps: Json;
+  triggers?: Json;
   current_stage: number;
   status: 'active' | 'completed' | 'cancelled';
   started_at: string;
