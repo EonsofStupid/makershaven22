@@ -14,6 +14,7 @@ export interface SecuritySettings {
 }
 
 export interface Settings {
+  id?: string;
   site_title: string;
   tagline?: string;
   primary_color?: string;

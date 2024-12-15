@@ -1,6 +1,6 @@
-import { Settings as BaseSettings } from '@/lib/types/settings';
+import { Settings } from '@/lib/types/settings';
 
-export interface SettingsFormData extends BaseSettings {
+export interface SettingsFormData extends Settings {
   // Add any form-specific fields here
 }
 
