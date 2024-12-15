@@ -22,7 +22,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (themeSettings) {
       console.log("Applying theme settings:", themeSettings);
-      applyThemeToDocument({ settings: themeSettings, mode: themeMode });
+      const theme: Theme = {
+        settings: themeSettings,
+        mode: themeMode
+      };
+      applyThemeToDocument(theme);
     } else {
       console.warn("Theme settings are not defined, skipping theme application");
     }
