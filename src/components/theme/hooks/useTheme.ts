@@ -8,7 +8,7 @@ import {
   updateThemeAtom
 } from '@/lib/store/atoms/theme/theme-atoms';
 import { useThemeStore } from '@/lib/store/theme-store';
-import type { ThemeMode, Settings } from '@/lib/types/settings';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);

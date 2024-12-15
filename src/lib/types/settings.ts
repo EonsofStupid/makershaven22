@@ -77,4 +77,7 @@ export interface SettingsUpdateParams {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
+  p_transition_type: TransitionType;
+  p_logo_url?: string;
+  p_favicon_url?: string;
 }

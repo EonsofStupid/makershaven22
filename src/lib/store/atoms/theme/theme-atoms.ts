@@ -28,16 +28,12 @@ export const updateThemeAtom = atom(
     const currentState = get(themeAtom);
     if (!currentState?.settings) return;
 
-    const newSettings = { ...currentState.settings, ...updates };
+    const newTheme: Theme = {
+      settings: updates,
+      mode: currentState.mode
+    };
     
-    // Update both Jotai and Zustand states
-    set(themeAtom, {
-      ...currentState,
-      settings: newSettings
-    });
-    
-    useThemeStore.setState({
-      settings: newSettings
-    });
+    set(themeAtom, newTheme);
+    useThemeStore.setState({ settings: updates });
   }
 );
