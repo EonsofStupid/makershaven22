@@ -29,13 +29,6 @@ export interface WorkflowTemplate {
   steps: Json;
 }
 
-export interface WorkflowFormData {
-  name: string;
-  description: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
-}
-
 export interface WorkflowStageConfig {
   title?: string;
   description?: string;
@@ -68,9 +61,4 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
-}
-
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }

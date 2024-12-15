@@ -1,5 +1,3 @@
-import type { Json } from '@/integrations/supabase/types/base';
-
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
@@ -50,23 +48,6 @@ export interface AuthError extends Error {
   status?: number;
 }
 
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
-  onError?: (error: Error) => void;
-}
-
-export interface AuthErrorRecoveryState {
-  error: Error;
-  attemptCount: number;
-  lastAttempt: Date;
-  nextAttemptDelay: number;
-}
-
 export interface AuthErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ComponentType<{
@@ -80,18 +61,9 @@ export interface AuthErrorBoundaryState {
   error: AuthError | null;
 }
 
-export interface SecurityLog {
-  id: string;
-  user_id: string;
-  event_type: string;
-  severity: string;
-  details: Json;
-  metadata: Json;
-  ip_address?: string;
-  user_agent?: string;
-  created_at: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-  };
+export interface AuthErrorRecoveryState {
+  error: Error;
+  attemptCount: number;
+  lastAttempt: Date;
+  nextAttemptDelay: number;
 }

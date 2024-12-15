@@ -47,6 +47,12 @@ export interface ThemeContextType {
   updateTheme: (settings: Settings) => Promise<void>;
 }
 
+export interface DatabaseSettingsRow extends Settings {
+  id: string;
+  updated_at?: string;
+  updated_by?: string;
+}
+
 export interface SettingsResponse {
   data: Settings;
   error: Error | null;
