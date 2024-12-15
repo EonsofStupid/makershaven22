@@ -1,10 +1,17 @@
-import { BaseEntity } from './base';
-import type { Json } from '@/integrations/supabase/types/base';
-
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
-export interface Settings extends BaseEntity {
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
+}
+
+export interface Settings {
   site_title: string;
   tagline?: string;
   primary_color?: string;
@@ -40,16 +47,6 @@ export interface Settings extends BaseEntity {
   last_sync?: string;
 }
 
-export interface SecuritySettings {
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
-  max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
-}
-
 export interface Theme {
   settings: Settings;
   mode: ThemeMode;
@@ -61,5 +58,3 @@ export interface ThemeContextType {
   effectiveTheme: 'light' | 'dark';
   updateTheme: (settings: Settings) => Promise<void>;
 }
-
-export type SettingsFormData = Settings;
