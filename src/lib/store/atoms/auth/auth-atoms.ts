@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession } from '@/lib/types/auth';
+import type { AuthUser, AuthSession } from '@/lib/types/store/auth';
 
 // Base atoms
 export const userAtom = atomWithStorage<AuthUser | null>('user', null);

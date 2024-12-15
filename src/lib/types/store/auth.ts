@@ -1,10 +1,12 @@
-import { UserRole } from '@/lib/auth/types';
+import type { UserRole } from '@/lib/types/auth';
 
 export interface AuthState {
   user: AuthUser | null;
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
+  isTransitioning: boolean;
+  hasAccess: boolean;
 }
 
 export interface AuthUser {
@@ -19,4 +21,11 @@ export interface AuthSession {
   refresh_token: string;
   expires_at: number;
   user: AuthUser;
+}
+
+export interface SecuritySettings {
+  maxLoginAttempts: number;
+  sessionTimeout: number;
+  requireTwoFactor: boolean;
+  allowedIPs: string[];
 }
