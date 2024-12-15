@@ -1,3 +1,5 @@
+import { Json } from '@supabase/supabase-js';
+
 export type BaseEntity = {
   id: string;
   created_at?: string;
@@ -10,8 +12,6 @@ export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 export type ContentType = 'template' | 'page' | 'component' | 'workflow';
 
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
-
 // Unified auth types
 export interface AuthUser {
   id: string;
@@ -23,7 +23,7 @@ export interface AuthUser {
 export interface AuthSession {
   access_token: string;
   refresh_token?: string;
-  expires_at?: number;
+  expires_in: number;
   user: AuthUser;
 }
 
@@ -70,8 +70,7 @@ export interface Settings extends BaseEntity {
   box_shadow?: string;
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
-  state_version?: number;
-  last_sync?: string;
+  menu_animation_type?: string;
 }
 
 export interface Theme {

@@ -43,8 +43,7 @@ export interface Settings {
   box_shadow?: string;
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
-  state_version?: number;
-  last_sync?: string;
+  menu_animation_type?: string;
 }
 
 export interface Theme {

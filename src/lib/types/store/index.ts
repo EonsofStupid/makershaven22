@@ -1,12 +1,13 @@
 import { AuthUser, AuthSession } from '../auth';
 import { Settings, Theme } from '../settings';
-import { BaseContent } from './content';
+import { BaseContent } from '../content';
 import { WorkflowTemplate } from '../workflow';
 
 export interface GlobalState {
   // Core state
   isReady: boolean;
   isMaintenanceMode: boolean;
+  error: Error | null;
   
   // Theme state
   theme: Theme | null;
@@ -21,6 +22,7 @@ export interface GlobalState {
   isAuthLoading: boolean;
   authError: Error | null;
   isTransitioning: boolean;
+  hasAccess: boolean;
   
   // Content state
   activeContent: BaseContent | null;
@@ -33,6 +35,13 @@ export interface GlobalState {
   workflowHistory: Record<string, any[]>;
   isWorkflowLoading: boolean;
   workflowError: Error | null;
+
+  // Actions
+  setState: (state: Partial<GlobalState>) => void;
+  updateSettings: (settings: Settings) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
 }
 
 export * from './auth';
