@@ -1,13 +1,25 @@
 import { motion } from "framer-motion";
 import { useNavigationStore } from "../NavigationState";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 interface NavigationContainerProps {
   children: ReactNode;
 }
 
 export const NavigationContainer = ({ children }: NavigationContainerProps) => {
-  const { isScrolled, mousePosition } = useNavigationStore();
+  const { isScrolled } = useNavigationStore();
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 }); // Default position
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      setMousePosition({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   return (
     <motion.nav 

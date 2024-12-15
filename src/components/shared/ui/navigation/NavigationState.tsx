@@ -4,8 +4,8 @@ import { useSyncedStore } from '@/lib/store/hooks/useSyncedStore';
 interface NavigationState {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  mousePosition: { x: number; y: number } | null;
-  setMousePosition: (position: { x: number; y: number } | null) => void;
+  mousePosition: { x: number; y: number };
+  setMousePosition: (position: { x: number; y: number }) => void;
   isScrolled: boolean;
   setIsScrolled: (isScrolled: boolean) => void;
 }
@@ -13,7 +13,7 @@ interface NavigationState {
 export const useNavigationStore = create<NavigationState>((set) => ({
   isOpen: false,
   setIsOpen: (isOpen) => set({ isOpen }),
-  mousePosition: null,
+  mousePosition: { x: 50, y: 50 }, // Default center position
   setMousePosition: (position) => set({ mousePosition: position }),
   isScrolled: false,
   setIsScrolled: (isScrolled) => set({ isScrolled }),

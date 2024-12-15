@@ -1,15 +1,26 @@
 import { Link } from "react-router-dom";
 import { Menu, Search, LogOut, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { UnifiedNavigation } from "./shared/ui/navigation/UnifiedNavigation";
 import { useNavigationState } from "@/hooks/useNavigationState";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigationStore } from "./shared/ui/navigation/NavigationState";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { handleNavigation } = useNavigationState();
+  const { setIsScrolled } = useNavigationStore();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [setIsScrolled]);
 
   const handleSignOut = async () => {
     try {
