@@ -37,18 +37,17 @@ export interface WorkflowStage {
 }
 
 export interface WorkflowTemplate {
-  id?: string;
+  id: string;
   name: string;
-  description: string | null;
+  description?: string;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_at?: string;
   created_by?: string;
+  created_at?: string;
   updated_at?: string;
   steps: Json;
 }
 
-export interface Workflow extends Omit<WorkflowTemplate, 'stages'> {
-  steps: Json;
+export interface Workflow extends WorkflowTemplate {
   triggers?: Json;
 }

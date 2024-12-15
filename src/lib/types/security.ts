@@ -1,10 +1,13 @@
 import type { Json } from '@/integrations/supabase/types/base';
 
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
+
 export interface SecurityLog {
   id: string;
   user_id: string;
   event_type: string;
-  severity: string;
+  severity: SecurityEventSeverity;
   details: Json;
   metadata: Json;
   ip_address?: string;
@@ -15,6 +18,3 @@ export interface SecurityLog {
     display_name: string;
   };
 }
-
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
