@@ -37,3 +37,9 @@ export const updateThemeAtom = atom(
     useThemeStore.setState({ settings: updates });
   }
 );
+
+// Settings validation atom
+export const settingsValidAtom = atom((get) => {
+  const theme = get(themeAtom);
+  return theme?.settings !== null && Object.keys(theme?.settings || {}).length > 0;
+});

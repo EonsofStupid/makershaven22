@@ -8,6 +8,7 @@ import {
   updateThemeAtom
 } from '../atoms/theme/theme-atoms';
 import { useThemeStore } from '../theme-store';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
@@ -34,12 +35,12 @@ export const useTheme = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setSystemTheme]);
 
-  const setMode = (mode: typeof themeMode) => {
+  const setMode = (mode: ThemeMode) => {
     setThemeMode(mode);
     setStoreMode(mode);
   };
 
-  const updateSettings = async (updates: Partial<typeof theme.settings>) => {
+  const updateSettings = async (updates: Settings) => {
     await updateTheme(updates);
     updateStoreSettings(updates);
   };
@@ -48,7 +49,7 @@ export const useTheme = () => {
     mode: themeMode,
     setMode,
     effectiveTheme,
-    settings: theme.settings,
+    settings: theme?.settings || null,
     isLoading,
     error,
     updateSettings
