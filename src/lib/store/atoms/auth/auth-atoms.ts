@@ -23,6 +23,19 @@ export const isAuthenticatedAtom = atom(
   (get) => get(sessionAtom) !== null && get(userAtom) !== null
 );
 
+// Role-based access control
+export const hasRoleAtom = atom(
+  (get) => (requiredRole: string | string[]) => {
+    const user = get(userAtom);
+    if (!user?.role) return false;
+    
+    if (Array.isArray(requiredRole)) {
+      return requiredRole.includes(user.role);
+    }
+    return user.role === requiredRole;
+  }
+);
+
 // Action atoms
 export const setUserAtom = atom(
   null,
