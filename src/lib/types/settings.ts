@@ -26,9 +26,9 @@ export interface Settings {
   transition_duration: string;
   shadow_color: string;
   hover_scale: string;
+  transition_type: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
-  transition_type: TransitionType;
   logo_url?: string;
   favicon_url?: string;
 }
@@ -36,13 +36,6 @@ export interface Settings {
 export interface Theme {
   settings: Settings;
   mode: ThemeMode;
-}
-
-export interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => Promise<void>;
 }
 
 export interface DatabaseSettingsRow extends Settings {

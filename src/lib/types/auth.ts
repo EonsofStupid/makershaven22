@@ -1,47 +1,47 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
 export interface AuthUser {
   id: string;
-  email?: string;
+  email: string;
+  user_metadata?: Record<string, any>;
+  app_metadata?: Record<string, any>;
   role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
 }
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthSession {
   user: AuthUser;
   access_token: string;
   refresh_token?: string;
-  expires_in: number;
+  expires_at?: number;
 }
 
-export interface AuthState {
-  user: AuthUser | null;
-  session: AuthSession | null;
-  isLoading: boolean;
-  error: Error | null;
-  isTransitioning: boolean;
+export interface SessionConfig {
+  timeout: number;
+  refreshInterval: number;
+  onExpired?: () => void;
+  onRefresh?: () => void;
+  onError?: (error: Error) => void;
 }
 
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole[];
-  fallbackPath?: string;
+export interface AuthErrorRecoveryState {
+  error: Error;
+  attemptCount: number;
+  lastAttempt: Date;
+  nextAttemptDelay: number;
 }
 
-export interface AuthUIState {
-  isAuthenticating: boolean;
-  showPassword: boolean;
-  rememberMe: boolean;
-  validationErrors: Record<string, string>;
-}
-
-export interface AuthError extends Error {
-  code: string;
-  details?: string;
+export interface SecurityLog {
+  id: string;
+  user_id?: string;
+  event_type: string;
+  severity: string;
+  details: Json;
+  metadata: Json;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+  };
 }
