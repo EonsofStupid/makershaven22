@@ -1,20 +1,11 @@
 import type { Json } from '@/integrations/supabase/types/base';
 
 export enum WorkflowStageType {
-  APPROVAL = 'APPROVAL',
-  REVIEW = 'REVIEW',
-  TASK = 'TASK',
-  NOTIFICATION = 'NOTIFICATION',
-  CONDITIONAL = 'CONDITIONAL'
-}
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
+  APPROVAL = 'approval',
+  REVIEW = 'review',
+  TASK = 'task',
+  NOTIFICATION = 'notification',
+  CONDITIONAL = 'conditional'
 }
 
 export interface WorkflowStageConfig {
@@ -28,6 +19,15 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
+}
+
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  description?: string;
 }
 
 export interface WorkflowTemplate {
@@ -44,11 +44,4 @@ export interface WorkflowTemplate {
 
 export interface Workflow extends WorkflowTemplate {
   triggers?: Json;
-}
-
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
-
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }

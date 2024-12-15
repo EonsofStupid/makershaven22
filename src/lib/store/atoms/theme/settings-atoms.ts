@@ -1,12 +1,13 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export interface ThemeSettings extends Settings {
   mode: ThemeMode;
 }
 
-// Base settings atom
-export const settingsAtom = atom<ThemeSettings | null>(null);
+// Base settings atom with storage
+export const settingsAtom = atomWithStorage<ThemeSettings | null>('settings', null);
 
 // Loading state atom
 export const settingsLoadingAtom = atom<boolean>(false);
@@ -39,5 +40,3 @@ export const settingsWriteAtom = atom(
     }
   }
 );
-
-export { Settings };

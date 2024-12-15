@@ -1,17 +1,19 @@
+import type { Json } from '@/integrations/supabase/types/base';
+
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
-  user_metadata?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
   user: AuthUser;
   access_token: string;
-  refresh_token: string;
-  expires_at: number;
+  refresh_token?: string;
+  expires_at?: number;
 }
 
 export interface AuthErrorRecoveryState {
@@ -21,26 +23,34 @@ export interface AuthErrorRecoveryState {
   nextAttemptDelay: number;
 }
 
-export interface SecurityEventSeverity {
-  type: 'info' | 'warning' | 'error' | 'critical';
-}
-
-export interface SecurityEventCategory {
-  type: 'auth' | 'content' | 'system' | 'user';
-}
-
 export interface SecurityLog {
   id: string;
   user_id: string;
   event_type: string;
   severity: string;
   details: Json;
-  metadata: Record<string, any>;
-  ip_address: string;
-  user_agent: string;
+  metadata: Json;
+  ip_address?: string;
+  user_agent?: string;
   created_at: string;
   profiles?: {
     username: string;
     display_name: string;
   };
 }
+
+export interface SessionConfig {
+  timeout: number;
+  refreshInterval: number;
+  persistKey: string;
+}
+
+export interface SessionState {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  loading: boolean;
+  error: Error | null;
+}
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
