@@ -40,11 +40,9 @@ export const useTheme = () => {
     setStoreMode(mode);
   };
 
-  const updateSettings = async (updates: Partial<Settings>) => {
-    if (!theme?.settings) return;
-    const newSettings = { ...theme.settings, ...updates };
-    await updateTheme(newSettings);
-    updateStoreSettings(newSettings);
+  const updateSettings = async (updates: Settings) => {
+    await updateTheme(updates);
+    updateStoreSettings(updates);
   };
 
   return {

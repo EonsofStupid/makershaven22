@@ -24,7 +24,7 @@ export const effectiveThemeAtom = atom(
 // Writable derived atom for theme updates
 export const updateThemeAtom = atom(
   (get) => get(themeAtom),
-  (get, set, updates: Partial<Settings>) => {
+  (get, set, updates: Settings) => {
     const currentState = get(themeAtom);
     if (!currentState?.settings) return;
 
