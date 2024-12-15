@@ -1,56 +1,57 @@
-import { Json } from '@/integrations/supabase/types';
+import { BaseEntity } from '@/lib/types/base';
+import { Json } from '@supabase/supabase-js';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  description?: string;
-  type: WorkflowStageType;
-  order: number;
-  config: Record<string, any>;
-}
-
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends BaseEntity {
   name: string;
   description?: string;
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
-export interface WorkflowFormData {
+export interface WorkflowStage {
+  id: string;
+  type: string;
   name: string;
+  config: WorkflowStageConfig;
+  order: number;
+}
+
+export interface WorkflowStageConfig {
+  approvers?: string[];
+  deadline?: string;
   description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
+  notifications?: {
+    type: string;
+    recipients: string[];
+    template: string;
+  }[];
+  [key: string]: any;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
-export const validateStage = (stage: WorkflowStage) => {
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages as unknown as Json;
+};
+
+export const parseStages = (data: Json): WorkflowStage[] => {
+  return (data as unknown as WorkflowStage[]) || [];
+};
+
+export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors?: string[] } => {
   const errors: string[] = [];
   
-  if (!stage.name.trim()) {
+  if (!stage.name?.trim()) {
     errors.push('Stage name is required');
   }
   
+  if (!stage.type) {
+    errors.push('Stage type is required');
+  }
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors: errors.length > 0 ? errors : undefined
   };
-};
-
-export const isValidStageUpdate = (update: Partial<WorkflowStage>) => {
-  return true; // Add validation logic as needed
-};
-
-export const createStageUpdate = (id: string, updates: Partial<WorkflowStage>) => {
-  return updates;
 };
