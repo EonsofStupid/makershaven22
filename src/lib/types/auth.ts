@@ -1,4 +1,4 @@
-import type { Json } from '@/integrations/supabase/types/base';
+import type { Json } from '@/integrations/supabase/types';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
@@ -55,4 +55,11 @@ export interface SecurityLog {
     username: string;
     display_name: string;
   };
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole[];
+  fallbackPath?: string;
 }

@@ -9,31 +9,19 @@ export enum WorkflowStageType {
 }
 
 export interface WorkflowStageConfig {
-  timeLimit?: number;
-  requiredApprovers?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
+  type: WorkflowStageType;
+  title: string;
+  description?: string;
+  assignees?: string[];
+  dueDate?: string;
+  metadata?: Record<string, any>;
 }
 
-export interface WorkflowStage {
+export interface WorkflowStage extends WorkflowStageConfig {
   id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface WorkflowTemplate {
@@ -41,13 +29,14 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   stages: WorkflowStage[];
-  steps: Json;
   is_active: boolean;
-  created_by?: string;
-  created_at?: string;
+  created_by: string;
+  created_at: string;
   updated_at?: string;
+  steps: Json;
 }
 
 export interface Workflow extends WorkflowTemplate {
+  status: 'draft' | 'active' | 'completed' | 'archived';
   triggers?: Json;
 }
