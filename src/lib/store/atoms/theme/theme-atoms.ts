@@ -1,13 +1,10 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { Settings, Theme, ThemeMode, ThemeAtomState } from '@/lib/types/settings';
+import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 import { useThemeStore } from '../../theme-store';
 
 // Base theme atom with storage
-export const themeAtom = atomWithStorage<ThemeAtomState>('theme', {
-  settings: null,
-  mode: 'system'
-});
+export const themeAtom = atomWithStorage<Theme | null>('theme', null);
 
 // Mode management with storage persistence
 export const themeModeAtom = atomWithStorage<ThemeMode>('themeMode', 'system');
@@ -29,7 +26,7 @@ export const updateThemeAtom = atom(
   (get) => get(themeAtom),
   (get, set, updates: Partial<Settings>) => {
     const currentState = get(themeAtom);
-    if (!currentState.settings) return;
+    if (!currentState?.settings) return;
 
     const newSettings = { ...currentState.settings, ...updates };
     
@@ -41,18 +38,6 @@ export const updateThemeAtom = atom(
     
     useThemeStore.setState({
       settings: newSettings
-    });
-  }
-);
-
-// Sync atom for Zustand store
-export const zustandSyncAtom = atom(
-  (get) => get(themeAtom),
-  (get, set) => {
-    const zustandState = useThemeStore.getState();
-    set(themeAtom, {
-      settings: zustandState.settings,
-      mode: zustandState.mode
     });
   }
 );
