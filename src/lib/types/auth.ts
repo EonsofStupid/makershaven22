@@ -5,7 +5,7 @@ export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 export interface AuthUser {
   id: string;
   email: string;
-  role?: UserRole;
+  role: UserRole;
   username?: string;
   displayName?: string;
   user_metadata?: {
@@ -17,15 +17,13 @@ export interface AuthUser {
 
 export interface AuthSession {
   user: AuthUser;
-  expires_at?: number;
+  expires_at: number;
 }
 
 export interface AuthState {
   isLoading: boolean;
   hasAccess: boolean;
   error: Error | null;
-  isTransitioning?: boolean;
-  reset?: () => void;
 }
 
 export interface AuthErrorRecoveryState {
@@ -62,4 +60,10 @@ export interface AuthGuardProps {
   requireAuth?: boolean;
   requiredRole?: UserRole[];
   fallbackPath?: string;
+}
+
+export interface AuthUIState {
+  isLoading: boolean;
+  error: Error | null;
+  user: AuthUser | null;
 }
