@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/lib/store/auth/use-auth";
+import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
 import { NavigationContainer } from "./navigation/core/NavigationContainer";
 import { NavigationSection } from "./navigation/core/NavigationSection";
 import { Logo } from "./navigation/Logo";
@@ -13,7 +13,7 @@ import { MobileNav } from "./navigation/mobile/MobileNav";
 export const Navigation = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { session, user } = useSyncedAuth();
 
   return (
     <NavigationContainer>
@@ -28,11 +28,12 @@ export const Navigation = () => {
       <NavigationSection className="space-x-4">
         <SearchButton onClick={() => setSearchOpen(true)} />
   
-        {isAuthenticated && (
+        {session && (
           <div className="hidden md:block relative z-[60]">
             <UserAvatar
+              user={user}
               size="lg"
-              className="transform translate-y-2"
+              className="transform translate-y-2 cursor-pointer"
               onClick={() => setShowUserMenu(!showUserMenu)}
             />
             {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}

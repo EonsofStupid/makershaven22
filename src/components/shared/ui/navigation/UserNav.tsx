@@ -26,19 +26,24 @@ export const UserNav = () => {
     }
   };
 
+  if (!user) return null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <UserAvatar user={user} className="h-8 w-8" />
+          <UserAvatar 
+            user={user} 
+            className="h-8 w-8"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.email}</p>
+            <p className="text-sm font-medium leading-none">{user.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user?.role || 'User'}
+              {user.role || 'User'}
             </p>
           </div>
         </DropdownMenuLabel>
