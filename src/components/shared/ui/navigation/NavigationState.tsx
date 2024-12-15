@@ -1,15 +1,23 @@
 import { create } from 'zustand';
+import { useSyncedStore } from '@/lib/store/hooks/useSyncedStore';
 
 interface NavigationState {
-  isScrolled: boolean;
-  mousePosition: { x: number; y: number };
-  setIsScrolled: (value: boolean) => void;
-  setMousePosition: (position: { x: number; y: number }) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 export const useNavigationStore = create<NavigationState>((set) => ({
-  isScrolled: false,
-  mousePosition: { x: 0, y: 0 },
-  setIsScrolled: (value) => set({ isScrolled: value }),
-  setMousePosition: (position) => set({ mousePosition: position }),
+  isOpen: false,
+  setIsOpen: (isOpen) => set({ isOpen }),
 }));
+
+export const useNavigationState = () => {
+  const store = useSyncedStore();
+  const navigationStore = useNavigationStore();
+
+  return {
+    ...navigationStore,
+    isAuthenticated: !!store.state.session,
+    user: store.state.user,
+  };
+};

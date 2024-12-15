@@ -1,48 +1,32 @@
-import { useState } from "react";
-import { useAuth } from "@/lib/store/auth/use-auth";
-import { NavigationContainer } from "./core/NavigationContainer";
-import { NavigationSection } from "./core/NavigationSection";
-import { Logo } from "./Logo";
-import { UnifiedNavigation } from "./UnifiedNavigation";
-import { SearchButton } from "./SearchButton";
-import { SearchDialog } from "./SearchDialog";
-import { UserAvatar } from "../avatar/UserAvatar";
-import { UserMenu } from "./UserMenu";
-import { MobileNav } from "./mobile/MobileNav";
+import React from 'react';
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
+import { MainNav } from './MainNav';
+import { UserNav } from './UserNav';
+import { Logo } from './Logo';
 
 export const Navigation = () => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, session } = useSyncedAuth();
 
   return (
-    <NavigationContainer>
-      <NavigationSection>
+    <div className="border-b border-white/10 bg-black/40 backdrop-blur-xl">
+      <div className="flex h-16 items-center px-4">
         <Logo />
-      </NavigationSection>
-
-      <NavigationSection className="hidden md:flex">
-        <UnifiedNavigation />
-      </NavigationSection>
-
-      <NavigationSection className="space-x-4">
-        <SearchButton onClick={() => setSearchOpen(true)} />
-  
-        {isAuthenticated && (
-          <div className="hidden md:block relative z-[60]">
-            <UserAvatar
-              size="lg"
-              className="transform translate-y-2"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            />
-            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
-          </div>
-        )}
-  
-        <MobileNav />
-      </NavigationSection>
-
-      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
-    </NavigationContainer>
+        <MainNav className="mx-6" />
+        <div className="ml-auto flex items-center space-x-4">
+          {session ? (
+            <UserNav user={user} />
+          ) : (
+            <div className="flex items-center space-x-4">
+              <a href="/login" className="text-sm font-medium text-white hover:text-white/80">
+                Login
+              </a>
+              <a href="/register" className="text-sm font-medium text-white hover:text-white/80">
+                Register
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
