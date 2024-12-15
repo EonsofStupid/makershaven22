@@ -1,10 +1,5 @@
 import { create } from 'zustand';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
-
-// Documentation for future AI responses:
-// 1. Use this store for complex theme state management
-// 2. Keep atoms for simple state, use Zustand for complex state
-// 3. Always type the store interface
+import type { Settings, Theme, ThemeMode } from '@/lib/types/store';
 
 interface ThemeState {
   settings: Settings | null;
@@ -26,9 +21,9 @@ export const useThemeStore = create<ThemeState>((set) => ({
   setMode: (mode) => set({ mode }),
   setError: (error) => set({ error }),
   reset: () => set({ 
-    settings: null, 
-    mode: 'system', 
-    isLoading: false, 
-    error: null 
+    settings: null,
+    mode: 'system',
+    isLoading: false,
+    error: null
   })
 }));

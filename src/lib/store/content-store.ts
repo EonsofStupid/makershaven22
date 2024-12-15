@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { BaseContent } from '@/components/content/types/cms';
+import type { BaseContent } from '@/lib/types/store';
 
 interface ContentState {
   activeContent: BaseContent | null;
   contentHistory: Record<string, BaseContent[]>;
   isLoading: boolean;
   error: Error | null;
-  // Actions
   setActiveContent: (content: BaseContent | null) => void;
   addToHistory: (contentId: string, content: BaseContent) => void;
   clearHistory: (contentId: string) => void;

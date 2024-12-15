@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { WorkflowTemplate } from '@/components/admin/workflows/types';
+import type { WorkflowTemplate } from '@/lib/types/store';
 
 interface WorkflowState {
   activeWorkflows: Record<string, WorkflowTemplate>;
   workflowHistory: Record<string, any[]>;
   isLoading: boolean;
   error: Error | null;
-  // Actions
   setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
   addToHistory: (id: string, entry: any) => void;
   clearHistory: (id: string) => void;
