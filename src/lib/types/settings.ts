@@ -38,13 +38,6 @@ export interface Theme {
   mode: ThemeMode;
 }
 
-export interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => Promise<void>;
-}
-
 export interface DatabaseSettingsRow extends Settings {
   id: string;
   theme_mode?: ThemeMode;

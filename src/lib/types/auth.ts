@@ -1,6 +1,4 @@
-import type { Json } from '@/integrations/supabase/types';
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+import type { UserRole } from '@/integrations/supabase/types';
 
 export interface AuthUser {
   id: string;
@@ -8,16 +6,15 @@ export interface AuthUser {
   role: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  user_metadata?: Record<string, any>;
   app_metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
   user: AuthUser;
   expires_at: number;
+  access_token: string;
+  refresh_token?: string;
 }
 
 export interface AuthState {
@@ -27,32 +24,23 @@ export interface AuthState {
 }
 
 export interface AuthErrorRecoveryState {
-  error: Error;
   attemptCount: number;
   lastAttempt: Date;
   nextAttemptDelay: number;
+  error: Error;
+}
+
+export interface AuthUIState {
+  isLoading: boolean;
+  error: Error | null;
+  user: AuthUser | null;
+  isAuthenticating: boolean;
 }
 
 export interface SessionConfig {
-  expires_at: number;
-  timeout_minutes: number;
-  max_attempts: number;
-}
-
-export interface SecurityLog {
-  id: string;
-  user_id: string;
-  event_type: string;
-  severity: string;
-  details: Json;
-  metadata: Json;
-  ip_address: string;
-  user_agent: string;
-  created_at: string;
-  profiles: {
-    username: string;
-    display_name: string;
-  };
+  sessionTimeout: number;
+  maxAttempts: number;
+  lockoutDuration: number;
 }
 
 export interface AuthGuardProps {
@@ -60,10 +48,4 @@ export interface AuthGuardProps {
   requireAuth?: boolean;
   requiredRole?: UserRole[];
   fallbackPath?: string;
-}
-
-export interface AuthUIState {
-  isLoading: boolean;
-  error: Error | null;
-  user: AuthUser | null;
 }
