@@ -39,3 +39,10 @@ export interface Theme {
   settings: Settings;
   mode: ThemeMode;
 }
+
+export interface ThemeContextType {
+  theme: Theme | null;
+  mode: ThemeMode;
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (settings: Settings) => Promise<void>;
+}

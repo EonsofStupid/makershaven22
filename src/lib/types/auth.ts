@@ -1,4 +1,4 @@
-import { BaseEntity, UserRole } from './base';
+import { UserRole } from './base';
 
 export interface AuthUser {
   id: string;
@@ -14,7 +14,8 @@ export interface AuthSession {
   user: AuthUser;
 }
 
-export interface Profile extends BaseEntity {
+export interface Profile {
+  id: string;
   username?: string;
   display_name?: string;
   avatar_url?: string;
@@ -22,6 +23,9 @@ export interface Profile extends BaseEntity {
   bio?: string;
   website?: string;
   location?: string;
+  created_at: string;
+  updated_at: string;
+  last_seen?: string;
   is_banned?: boolean;
   ban_reason?: string;
   banned_at?: string;
@@ -32,4 +36,18 @@ export interface Profile extends BaseEntity {
   gamification_enabled?: boolean;
   visual_editor_enabled?: boolean;
   last_login_at?: string;
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
+}
+
+export interface PinAuthConfig {
+  maxAttempts: number;
+  lockoutDuration: number;
+  pinLength: number;
 }
