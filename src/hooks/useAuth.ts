@@ -1,31 +1,34 @@
 import { useAtom } from 'jotai';
 import { useAuthStore } from '@/lib/store/auth-store';
 import {
-  currentUserAtom,
-  currentSessionAtom,
-  authLoadingAtom,
+  userAtom,
+  sessionAtom,
+  loadingStateAtom,
   authErrorAtom,
+  isAuthenticatedAtom
 } from '@/lib/store/atoms/auth/auth-atoms';
 
 export const useAuth = () => {
   const { signIn, signOut } = useAuthStore();
   
-  const [user] = useAtom(currentUserAtom);
-  const [session] = useAtom(currentSessionAtom);
-  const [isLoading] = useAtom(authLoadingAtom);
+  const [user] = useAtom(userAtom);
+  const [session] = useAtom(sessionAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
   const [error] = useAtom(authErrorAtom);
+  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
 
   return {
     // Global state
     user,
     session,
-    isLoading,
+    isLoading: loadingState.isLoading,
+    loadingMessage: loadingState.message,
     error,
     signIn,
     signOut,
 
     // Computed
-    isAuthenticated: !!session,
-    role: user?.role,
+    isAuthenticated,
+    role: user?.role
   };
 };
