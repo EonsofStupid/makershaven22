@@ -10,55 +10,23 @@ export enum WorkflowStageType {
 
 export interface WorkflowStage {
   id: string;
-  type: WorkflowStageType;
   name: string;
-  description?: string;
-  config: WorkflowStageConfig;
+  type: WorkflowStageType;
   order: number;
-  dependencies?: string[];
-}
-
-export interface WorkflowStageConfig {
-  approvers?: string[];
-  reviewers?: string[];
-  assignees?: string[];
-  dueDate?: string;
-  priority?: 'low' | 'medium' | 'high';
-  notificationTemplate?: string;
-  conditions?: WorkflowCondition[];
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  timeLimit?: number;
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
-}
-
-export interface WorkflowCondition {
-  field: string;
-  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains';
-  value: string | number | boolean;
+  config: Record<string, any>;
+  description?: string;
 }
 
 export interface WorkflowTemplate {
-  id: string;
+  id?: string;
   name: string;
-  description?: string;
+  description: string | null;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
   created_at?: string;
+  created_by?: string;
   updated_at?: string;
+  steps: Json;
 }
 
 export interface WorkflowFormData {
@@ -68,7 +36,20 @@ export interface WorkflowFormData {
   is_active: boolean;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
+export interface WorkflowStageConfig {
+  title?: string;
+  description?: string;
+  assignees?: string[];
+  dueDate?: string;
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    type: string;
+    template: string;
+    recipients: string[];
+  }[];
+  conditions?: {
+    field: string;
+    operator: string;
+    value: any;
+  }[];
 }

@@ -35,19 +35,10 @@ export interface AuthUIState {
   showPassword: boolean;
   rememberMe: boolean;
   validationErrors: Record<string, string>;
-}
-
-export interface AuthErrorRecoveryState {
-  error: Error;
-  attemptCount: number;
-  lastAttempt: Date;
-  nextAttemptDelay: number;
+  isAuthenticating?: boolean;
 }
 
 export interface SessionConfig {
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
   timeout: number;
   refreshInterval: number;
   persistKey: string;
@@ -69,4 +60,24 @@ export interface AuthGuardProps {
   loadingComponent?: React.ReactNode;
   unauthorizedComponent?: React.ReactNode;
   onError?: (error: Error) => void;
+}
+
+export interface AuthErrorRecoveryState {
+  error: Error;
+  attemptCount: number;
+  lastAttempt: Date;
+  nextAttemptDelay: number;
+}
+
+export interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{
+    error: AuthError;
+    reset: () => void;
+  }>;
+}
+
+export interface AuthErrorBoundaryState {
+  hasError: boolean;
+  error: AuthError | null;
 }
