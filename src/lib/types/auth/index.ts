@@ -1,3 +1,5 @@
+import type { User } from '@supabase/supabase-js';
+
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
@@ -21,7 +23,8 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
-  isTransitioning?: boolean;
+  isTransitioning: boolean;
+  hasAccess: boolean;
 }
 
 export interface AuthGuardProps {
@@ -30,3 +33,12 @@ export interface AuthGuardProps {
   requiredRole?: UserRole | UserRole[];
   fallbackPath?: string;
 }
+
+export const mapSupabaseUser = (user: User): AuthUser => ({
+  id: user.id,
+  email: user.email!,
+  role: (user.user_metadata?.role || 'subscriber') as UserRole,
+  username: user.user_metadata?.username,
+  displayName: user.user_metadata?.display_name,
+  metadata: user.user_metadata
+});
