@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
+import type { Settings, ThemeMode } from '@/lib/types/base';
 
 export const themeModeAtom = atomWithStorage<ThemeMode>('themeMode', 'system');
 export const themeSettingsAtom = atomWithStorage<Settings | null>('themeSettings', null);

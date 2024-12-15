@@ -1,44 +1,10 @@
-import { Json } from '@supabase/supabase-js';
+import type { Json } from '@/integrations/supabase/types';
 
-export type BaseEntity = {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
-export type ContentStatus = 'draft' | 'published' | 'archived';
-export type ContentType = 'template' | 'page' | 'component' | 'workflow';
 
-// Unified auth types
-export interface AuthUser {
+export interface Settings {
   id: string;
-  email: string;
-  role?: UserRole;
-  metadata?: Record<string, any>;
-}
-
-export interface AuthSession {
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-  user: AuthUser;
-}
-
-// Core settings types
-export interface SecuritySettings {
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
-  max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
-}
-
-export interface Settings extends BaseEntity {
   site_title: string;
   tagline?: string;
   primary_color?: string;
@@ -65,31 +31,47 @@ export interface Settings extends BaseEntity {
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
-  security_settings?: SecuritySettings;
   transition_type?: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
-  theme_mode?: ThemeMode;
-  menu_animation_type?: string;
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export interface Theme {
-  settings: Settings;
+  settings: Settings | null;
   mode: ThemeMode;
 }
 
-export interface WorkflowStage {
-  id: string;
-  type: string;
-  name: string;
-  config: Record<string, any>;
-  order: number;
+export interface GlobalState {
+  isReady: boolean;
+  isMaintenanceMode: boolean;
+  error: Error | null;
+  theme: Settings | null;
+  settings: Settings | null;
+  mode: ThemeMode;
+  isThemeLoading: boolean;
+  themeError: Error | null;
+  setState: (state: Partial<GlobalState>) => void;
+  updateSettings: (settings: Settings) => void;
+  setMode: (mode: ThemeMode) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
 }
 
-export interface WorkflowTemplate extends BaseEntity {
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active?: boolean;
-  steps: Json;
+export interface ImportConfig {
+  type: string;
+  schema: Record<string, any>;
+  validator: (data: any) => boolean;
+}
+
+export interface ImportValidationResult {
+  isValid: boolean;
+  errors?: string[];
+}
+
+export interface ImportWizardProps {
+  type?: string;
+  acceptedTypes?: string[];
+  onImport: (files: File[]) => void;
 }
