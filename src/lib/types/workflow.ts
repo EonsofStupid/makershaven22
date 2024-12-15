@@ -1,11 +1,11 @@
 import type { Json } from '@/integrations/supabase/types/base';
 
 export enum WorkflowStageType {
-  APPROVAL = 'approval',
-  REVIEW = 'review',
-  TASK = 'task',
-  NOTIFICATION = 'notification',
-  CONDITIONAL = 'conditional'
+  APPROVAL = 'APPROVAL',
+  REVIEW = 'REVIEW',
+  TASK = 'TASK',
+  NOTIFICATION = 'NOTIFICATION',
+  CONDITIONAL = 'CONDITIONAL'
 }
 
 export interface WorkflowStage {
@@ -56,7 +56,7 @@ export interface WorkflowStageConfig {
     type: 'user' | 'role' | 'group';
     value: string;
   };
-  notifications?: {
+  settings?: {
     onStart?: boolean;
     onComplete?: boolean;
     reminderInterval?: number;

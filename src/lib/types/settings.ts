@@ -35,10 +35,6 @@ export interface Settings {
   security_settings?: Record<string, any>;
 }
 
-export interface SettingsFormData extends Settings {
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-}
-
 export interface Theme {
   settings: Settings | null;
   mode: ThemeMode;
