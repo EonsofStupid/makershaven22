@@ -3,7 +3,7 @@ export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings {
   site_title: string;
-  tagline: string;
+  tagline?: string;
   primary_color: string;
   secondary_color: string;
   accent_color: string;
@@ -34,23 +34,6 @@ export interface Settings {
 }
 
 export interface Theme {
-  settings: Settings | null;
-  mode: ThemeMode;
-}
-
-export interface ThemeState {
-  settings: Settings | null;
-  mode: ThemeMode;
-  isLoading: boolean;
-  error: Error | null;
-  setMode: (mode: ThemeMode) => void;
-  updateSettings: (settings: Partial<Settings>) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  resetToDefaults: () => void;
-}
-
-export interface ThemeAtomState {
   settings: Settings | null;
   mode: ThemeMode;
 }

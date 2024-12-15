@@ -13,13 +13,27 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: Record<string, any>;
+  config: WorkflowStageConfig;
   description?: string;
 }
 
 export interface WorkflowStageConfig {
   type: WorkflowStageType;
-  config: Record<string, any>;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  timeLimit?: number;
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
 }
 
 export interface WorkflowTemplate {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types';
 
 export type ContentType = 'page' | 'component' | 'template' | 'post' | 'workflow';
 export type ContentStatus = 'draft' | 'published' | 'archived';
@@ -8,7 +8,7 @@ export interface BaseContent {
   id: string;
   title: string;
   type: ContentType;
-  content: Json;
+  content: ContentData;
   metadata?: Json;
   slug?: string;
   status?: ContentStatus;
@@ -19,12 +19,29 @@ export interface BaseContent {
   updated_at?: string;
 }
 
+export interface ContentData {
+  body?: string;
+  seo?: Record<string, any>;
+  componentType?: string;
+  props?: Record<string, any>;
+  styles?: Record<string, any>;
+}
+
 export interface ComponentContent extends BaseContent {
   type: 'component';
+  content: {
+    componentType: string;
+    props: Record<string, any>;
+    styles: Record<string, any>;
+  };
 }
 
 export interface PageContent extends BaseContent {
   type: 'page';
+  content: {
+    body: string;
+    seo: Record<string, any>;
+  };
 }
 
 export const componentContentSchema = z.object({
