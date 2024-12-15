@@ -15,9 +15,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { state, setState } = useSyncedStore();
 
   useEffect(() => {
-    if (themeSettings) {
-      console.log("Applying theme settings:", themeSettings);
-      applyThemeToDocument(themeSettings);
+    if (themeSettings?.settings) {
+      console.log("Applying theme settings:", themeSettings.settings);
+      applyThemeToDocument(themeSettings.settings);
     } else {
       console.warn("Theme settings are not defined, skipping theme application");
     }
@@ -35,7 +35,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const contextValue: ThemeContextType = {
-    theme: themeSettings ? { settings: themeSettings, mode: themeMode } : null,
+    theme: themeSettings,
     mode: themeMode,
     effectiveTheme,
     updateTheme

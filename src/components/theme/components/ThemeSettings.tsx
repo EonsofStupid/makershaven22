@@ -4,11 +4,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useTheme } from '../hooks/useTheme';
 import { toast } from 'sonner';
+import type { ThemeMode } from '@/lib/types/settings';
 
 export const ThemeSettings = () => {
   const { mode, setMode } = useTheme();
 
-  const handleModeChange = (newMode: 'light' | 'dark' | 'system') => {
+  const handleModeChange = (newMode: ThemeMode) => {
     setMode(newMode);
     toast.success(`Theme mode changed to ${newMode}`);
   };
@@ -19,7 +20,7 @@ export const ThemeSettings = () => {
         <h3 className="text-lg font-medium text-white">Theme Settings</h3>
         <RadioGroup
           value={mode}
-          onValueChange={handleModeChange}
+          onValueChange={handleModeChange as (value: string) => void}
           className="grid grid-cols-3 gap-4"
         >
           <div>

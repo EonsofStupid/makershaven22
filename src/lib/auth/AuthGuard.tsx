@@ -1,17 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { UserRole } from '@/lib/types/auth';
-
-interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-}
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
+import type { AuthGuardProps } from '@/lib/types/auth';
 
 export const AuthGuard = ({ 
   children, 
@@ -20,10 +13,10 @@ export const AuthGuard = ({
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
+  const { user, isAuthLoading } = useSyncedAuth();
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isAuthLoading) {
       if (requireAuth && !user) {
         console.log('AuthGuard: No user found, redirecting to', fallbackPath);
         toast.error('Please sign in to continue');
@@ -41,9 +34,9 @@ export const AuthGuard = ({
         }
       }
     }
-  }, [user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
+  }, [user, isAuthLoading, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

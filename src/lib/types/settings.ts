@@ -1,5 +1,8 @@
-import { BaseEntity, ThemeMode, TransitionType } from './base';
-import { Json } from '@/integrations/supabase/types';
+import { BaseEntity } from './base';
+import { Json } from '@supabase/supabase-js';
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings extends BaseEntity {
   site_title: string;
