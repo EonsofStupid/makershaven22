@@ -1,18 +1,19 @@
-import type { User, UserMetadata, Session } from '@supabase/supabase-js';
+import type { Session, User, UserMetadata, UserAppMetadata, Factor } from '@supabase/supabase-js';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type UserRole = 'guest' | 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser extends User {
-  role: UserRole;
   email: string;
   username: string;
   displayName: string;
+  role: UserRole;
   user_metadata: UserMetadata;
+  app_metadata: UserAppMetadata;
 }
 
 export interface AuthSession extends Session {
-  expires_at: number;
   user: AuthUser;
+  expires_at: number;
 }
 
 export interface AuthState {
@@ -20,12 +21,16 @@ export interface AuthState {
   session: AuthSession | null;
   isLoading: boolean;
   error: Error | null;
+  isTransitioning: boolean;
 }
 
 export interface AuthUIState {
   isLoading: boolean;
   error: Error | null;
   user: AuthUser | null;
+  showPassword: boolean;
+  rememberMe: boolean;
+  validationErrors: Record<string, string>;
 }
 
 export interface AuthErrorRecoveryState {
@@ -36,16 +41,14 @@ export interface AuthErrorRecoveryState {
 }
 
 export interface SessionConfig {
-  expires_at: number;
+  access_token: string;
   refresh_token?: string;
+  expires_at: number;
+  sessionTimeout?: number;
 }
 
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
-  onError?: (error: Error) => void;
+export interface AuthError extends Error {
+  code: string;
+  message: string;
+  status?: number;
 }

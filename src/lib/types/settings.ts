@@ -26,13 +26,25 @@ export interface Settings {
   transition_duration: string;
   shadow_color: string;
   hover_scale: string;
-  transition_type: TransitionType;
   box_shadow?: string;
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: ThemeMode;
   security_settings?: Record<string, any>;
+  transition_type?: TransitionType;
+}
+
+export interface Theme {
+  settings: Settings;
+  mode: ThemeMode;
+}
+
+export interface ThemeContextType {
+  theme: Theme | null;
+  mode: ThemeMode;
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (settings: Settings) => Promise<void>;
 }
 
 export interface SettingsFormData extends Settings {
@@ -42,6 +54,12 @@ export interface SettingsFormData extends Settings {
 export interface SettingsResponse {
   data: Settings;
   error: Error | null;
+}
+
+export interface DatabaseSettingsRow extends Settings {
+  id: string;
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export interface SettingsUpdateParams {
@@ -69,13 +87,7 @@ export interface SettingsUpdateParams {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
-  p_transition_type: TransitionType;
+  p_transition_type?: TransitionType;
   p_logo_url?: string;
   p_favicon_url?: string;
-}
-
-export interface DatabaseSettingsRow extends Settings {
-  id: string;
-  updated_at?: string;
-  updated_by?: string;
 }
