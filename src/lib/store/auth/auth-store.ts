@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import type { AuthStore, AuthUser, AuthSession } from '@/lib/types/auth';
+import { mapSupabaseUser } from '@/lib/types/auth';
 import { toast } from 'sonner';
-import { handleAuthError } from '@/utils/errorHandling';
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -30,12 +30,10 @@ export const useAuthStore = create<AuthStore>()(
             .eq('id', data.user.id)
             .single();
 
-          const authUser: AuthUser = {
-            id: data.user.id,
-            email: data.user.email!,
-            role: profile?.role || 'subscriber',
-            user_metadata: data.user.user_metadata
-          };
+          const authUser = mapSupabaseUser(data.user);
+          if (profile?.role) {
+            authUser.role = profile.role;
+          }
 
           const authSession: AuthSession = {
             user: authUser,
@@ -54,13 +52,12 @@ export const useAuthStore = create<AuthStore>()(
           toast.success('Successfully signed in');
         } catch (error) {
           console.error('Sign in error:', error);
-          const handledError = handleAuthError(error);
           set({ 
-            error: handledError,
+            error: error as Error,
             isLoading: false,
             hasAccess: false
           });
-          toast.error(handledError.message);
+          toast.error('Failed to sign in');
         }
       },
 
@@ -80,12 +77,11 @@ export const useAuthStore = create<AuthStore>()(
           toast.success('Successfully signed out');
         } catch (error) {
           console.error('Sign out error:', error);
-          const handledError = handleAuthError(error);
           set({ 
-            error: handledError,
+            error: error as Error,
             isLoading: false
           });
-          toast.error(handledError.message);
+          toast.error('Failed to sign out');
         }
       },
 

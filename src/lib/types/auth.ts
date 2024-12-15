@@ -1,4 +1,6 @@
-import { UserRole } from './base';
+import type { User } from '@supabase/supabase-js';
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
@@ -35,10 +37,23 @@ export interface AuthStore extends AuthState {
   reset: () => void;
 }
 
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+}
+
 export interface AuthErrorCode {
   code: string;
   message: string;
   details?: Record<string, any>;
+}
+
+export interface AuthError extends Error {
+  code?: string;
+  statusCode?: number;
+  details?: string;
 }
 
 export interface AuthErrorBoundaryProps {
@@ -56,3 +71,12 @@ export interface AuthErrorRecoveryState {
   retryCount: number;
   lastError: Error | null;
 }
+
+export const mapSupabaseUser = (user: User): AuthUser => ({
+  id: user.id,
+  email: user.email!,
+  role: (user.user_metadata?.role || 'subscriber') as UserRole,
+  username: user.user_metadata?.username,
+  displayName: user.user_metadata?.display_name,
+  user_metadata: user.user_metadata
+});

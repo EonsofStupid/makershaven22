@@ -1,5 +1,5 @@
 import { BaseEntity } from './base';
-import { Json } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types/base';
 
 export interface WorkflowStage {
   id: string;
@@ -19,6 +19,21 @@ export interface WorkflowStageConfig {
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
   }>;
+  approvers?: string[];
+  deadline?: string;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  notifications?: {
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+    type: string;
+    recipients: string[];
+    template: string;
+  }[];
+  requiredApprovers?: number;
 }
 
 export interface WorkflowTemplate extends BaseEntity {
@@ -29,9 +44,9 @@ export interface WorkflowTemplate extends BaseEntity {
   created_by?: string;
 }
 
-export interface WorkflowInstance extends BaseEntity {
-  template_id: string;
-  current_stage: number;
-  status: 'active' | 'completed' | 'cancelled';
-  metadata?: Json;
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  steps: WorkflowStage[];
+  is_active?: boolean;
 }
