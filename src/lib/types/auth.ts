@@ -32,8 +32,4 @@ export interface Profile extends BaseEntity {
   gamification_enabled?: boolean;
   visual_editor_enabled?: boolean;
   last_login_at?: string;
-  pin_enabled?: boolean;
-  last_password_login?: string;
-  failed_login_attempts?: number;
-  lockout_until?: string;
 }

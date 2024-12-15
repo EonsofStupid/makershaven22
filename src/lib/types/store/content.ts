@@ -1,4 +1,5 @@
-import { BaseEntity, ContentStatus, ContentType, Json } from '../base';
+import { BaseEntity, ContentStatus, ContentType } from '../base';
+import { Json } from '@/integrations/supabase/types';
 
 export interface BaseContent extends BaseEntity {
   title: string;
