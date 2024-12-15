@@ -1,96 +1,65 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { 
-  themeSettingsAtom, 
-  themeModeAtom, 
-  systemThemeAtom, 
-  effectiveThemeAtom,
-  updateThemeAtom 
-} from '@/lib/store/atoms/theme';
-import { Settings } from '@/components/admin/settings/types';
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useThemeStore } from '@/lib/store/theme-store';
+import { themeSettingsAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme';
 import { applyThemeToDocument } from './utils/themeUtils';
-import { DEFAULT_SETTINGS } from '../admin/settings/hooks/useSettingsDefaults';
+import { toast } from "sonner";
+import type { Settings, Theme } from '@/lib/types/settings';
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
+interface ThemeContextType {
+  theme: Theme | null;
+  mode: 'light' | 'dark' | 'system';
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (theme: Settings) => Promise<void>;
 }
 
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [themeSettings, setThemeSettings] = useAtom(themeSettingsAtom);
+const ThemeContext = createContext<ThemeContextType | null>(null);
+
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  // Jotai state
+  const [themeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
-  const [, setSystemTheme] = useAtom(systemThemeAtom);
-  const [effectiveTheme] = useAtom(effectiveThemeAtom);
-  const [, updateTheme] = useAtom(updateThemeAtom);
+  const effectiveTheme = useAtom(effectiveThemeAtom)[0];
 
-  // Initialize theme settings if not present
-  useEffect(() => {
-    if (!themeSettings) {
-      console.log("Initializing theme with default settings");
-      setThemeSettings(DEFAULT_SETTINGS);
-    }
-  }, [themeSettings, setThemeSettings]);
-
-  // Handle system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
-    };
-
-    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [setSystemTheme]);
+  // Zustand state and actions
+  const { 
+    settings: zustandSettings,
+    updateSettings: updateZustandSettings,
+    setError
+  } = useThemeStore();
 
   // Apply theme settings to document
   useEffect(() => {
-    if (themeSettings) {
-      console.log("Applying theme settings:", themeSettings);
+    if (themeSettings?.settings) {
+      console.log("Applying theme settings:", themeSettings.settings);
       applyThemeToDocument(themeSettings);
-      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
+    } else {
+      console.warn("Theme settings are not defined, skipping theme application");
     }
-  }, [themeSettings, effectiveTheme]);
+  }, [themeSettings]);
 
-  const handleThemeUpdate = async (newTheme: Settings) => {
+  // Update theme in both stores
+  const updateTheme = async (newSettings: Settings) => {
     try {
-      const { error } = await supabase.rpc('update_site_settings', {
-        p_site_title: newTheme.site_title,
-        p_primary_color: newTheme.primary_color,
-        p_secondary_color: newTheme.secondary_color,
-        p_accent_color: newTheme.accent_color,
-        p_text_primary_color: newTheme.text_primary_color,
-        p_text_secondary_color: newTheme.text_secondary_color,
-        p_text_link_color: newTheme.text_link_color,
-        p_text_heading_color: newTheme.text_heading_color,
-        p_neon_cyan: newTheme.neon_cyan,
-        p_neon_pink: newTheme.neon_pink,
-        p_neon_purple: newTheme.neon_purple,
-        p_font_family_heading: newTheme.font_family_heading,
-        p_font_family_body: newTheme.font_family_body,
-        p_font_size_base: newTheme.font_size_base,
-        p_font_weight_normal: newTheme.font_weight_normal,
-        p_font_weight_bold: newTheme.font_weight_bold,
-        p_line_height_base: newTheme.line_height_base,
-        p_letter_spacing: newTheme.letter_spacing
-      });
-
-      if (error) throw error;
+      // Update Zustand store
+      updateZustandSettings(newSettings);
       
-      updateTheme(newTheme);
+      // Update document
+      applyThemeToDocument({ settings: newSettings, mode: themeMode });
+      
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
+      setError(error instanceof Error ? error : new Error('Failed to update theme'));
       toast.error("Failed to update theme");
     }
   };
 
   const contextValue = {
     theme: themeSettings,
-    themeMode,
+    mode: themeMode,
     effectiveTheme,
-    updateTheme: handleThemeUpdate
+    updateTheme
   };
 
   return (
@@ -99,18 +68,6 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     </ThemeContext.Provider>
   );
 };
-
-const ThemeContext = createContext<{
-  theme: Settings | null;
-  themeMode: 'light' | 'dark' | 'system';
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (theme: Settings) => void;
-}>({
-  theme: null,
-  themeMode: 'system',
-  effectiveTheme: 'dark',
-  updateTheme: () => {},
-});
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);

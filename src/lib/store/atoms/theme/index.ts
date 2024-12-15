@@ -1,27 +1,32 @@
 import { atom } from 'jotai';
-import type { Settings } from '@/lib/types/settings';
+import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 import { useThemeStore } from '../../theme-store';
 
-// Read-only atom that syncs with Zustand theme store
-export const themeSettingsAtom = atom<Settings | null>(
-  (get) => useThemeStore.getState().settings
-);
+// Base theme atom with storage
+export const themeSettingsAtom = atom<Theme | null>(null);
 
-// Writable atom for theme mode
-export const themeModeAtom = atom<'light' | 'dark' | 'system'>(
-  (get) => useThemeStore.getState().mode,
-  (get, set, newMode: 'light' | 'dark' | 'system') => {
-    useThemeStore.getState().setMode(newMode);
+// Mode management
+export const themeModeAtom = atom<ThemeMode>('system');
+
+// System theme detection
+export const systemThemeAtom = atom<'light' | 'dark'>('dark');
+
+// Computed effective theme
+export const effectiveThemeAtom = atom(
+  (get) => {
+    const mode = get(themeModeAtom);
+    const systemTheme = get(systemThemeAtom);
+    return mode === 'system' ? systemTheme : mode;
   }
 );
 
-// Computed atom for effective theme based on system preference
-export const effectiveThemeAtom = atom((get) => {
-  const mode = get(themeModeAtom);
-  if (mode === 'system') {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+// Sync with Zustand store
+export const syncWithZustandAtom = atom(
+  null,
+  (get, set) => {
+    const theme = get(themeSettingsAtom);
+    if (theme) {
+      useThemeStore.getState().updateSettings(theme.settings);
+    }
   }
-  return mode;
-});
+);

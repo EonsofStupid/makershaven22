@@ -1,35 +1,29 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Settings, Theme, ThemeMode, ThemeState } from '@/lib/types/settings';
+import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
 
-export const useThemeStore = create<ThemeState>()(
-  persist(
-    (set) => ({
-      settings: null,
-      mode: 'system',
-      isLoading: false,
-      error: null,
-      setMode: (mode: ThemeMode) => set({ mode }),
-      updateSettings: (newSettings: Partial<Settings>) => 
-        set((state) => ({
-          settings: state.settings ? { ...state.settings, ...newSettings } : null,
-          error: null
-        })),
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
-      setError: (error: Error | null) => set({ error }),
-      resetToDefaults: () => set({ 
-        settings: null,
-        mode: 'system',
-        isLoading: false,
-        error: null
-      }),
-    }),
-    {
-      name: 'theme-storage',
-      partialize: (state) => ({ 
-        settings: state.settings,
-        mode: state.mode
-      }),
-    }
-  )
-);
+interface ThemeState {
+  settings: Settings | null;
+  mode: ThemeMode;
+  isLoading: boolean;
+  error: Error | null;
+  updateSettings: (settings: Settings) => void;
+  setMode: (mode: ThemeMode) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
+}
+
+export const useThemeStore = create<ThemeState>((set) => ({
+  settings: null,
+  mode: 'system',
+  isLoading: false,
+  error: null,
+  updateSettings: (settings) => set({ settings, error: null }),
+  setMode: (mode) => set({ mode }),
+  setError: (error) => set({ error }),
+  reset: () => set({ 
+    settings: null, 
+    mode: 'system', 
+    isLoading: false, 
+    error: null 
+  })
+}));
