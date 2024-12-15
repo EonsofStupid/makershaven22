@@ -1,4 +1,4 @@
-import type { Json } from '@/integrations/supabase/types/base';
+import { Json } from '@/integrations/supabase/types';
 
 export enum WorkflowStageType {
   APPROVAL = 'approval',
@@ -10,34 +10,15 @@ export enum WorkflowStageType {
 
 export interface WorkflowStage {
   id: string;
-  name: string;
   type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
+  title: string;
   description?: string;
-}
-
-export interface WorkflowStageConfig {
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  timeLimit?: number;
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
+  config: Record<string, any>;
+  order: number;
 }
 
 export interface WorkflowTemplate {
-  id: string;
+  id?: string;
   name: string;
   description?: string;
   stages: WorkflowStage[];
@@ -56,4 +37,10 @@ export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowSta
 export interface StageConfigUpdateProps {
   stage: WorkflowStage;
   onUpdate: (updates: Partial<WorkflowStage>) => void;
+}
+
+export interface WorkflowStageConfig {
+  title: string;
+  description?: string;
+  config: Record<string, any>;
 }

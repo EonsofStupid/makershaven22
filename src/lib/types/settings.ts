@@ -53,6 +53,17 @@ export interface DatabaseSettingsRow extends Settings {
   security_settings?: Record<string, any>;
 }
 
+export interface SettingsFormData extends Settings {
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  box_shadow?: 'none' | 'sm' | 'md' | 'lg';
+  backdrop_blur?: string;
+}
+
+export interface SettingsResponse {
+  data: Settings;
+  error: Error | null;
+}
+
 export interface SettingsUpdateParams {
   p_site_title: string;
   p_tagline: string;
