@@ -20,15 +20,12 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
-  history?: WorkflowHistory[];
 }
 
 export interface WorkflowStageConfig {
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
+  assignees?: string[];
+  dueDate?: string;
+  priority?: 'low' | 'medium' | 'high';
   notifications?: {
     email?: boolean;
     inApp?: boolean;
@@ -53,24 +50,20 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export interface WorkflowHistory {
-  type: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
-}
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
-export interface WorkflowState {
-  templates: WorkflowTemplate[];
-  currentTemplate: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  setTemplates: (templates: WorkflowTemplate[]) => void;
-  setCurrentTemplate: (template: WorkflowTemplate | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  fetchTemplates: () => Promise<void>;
-  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
-  addToHistory: (id: string, entry: { type: string; timestamp: string }) => void;
+export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>) => ({
+  stageId,
+  updates
+});
+
+export const isValidStageUpdate = (update: any): update is { stageId: string; updates: Partial<WorkflowStage> } => {
+  return update && typeof update.stageId === 'string' && typeof update.updates === 'object';
+};
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
 
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
@@ -108,10 +101,6 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   };
 };
 
-export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages as unknown as Json;
-};
-
 export const parseStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
@@ -123,4 +112,11 @@ export const parseStages = (data: Json): WorkflowStage[] => {
     config: stage.config || {},
     description: stage.description
   }));
+};
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => ({
+    ...stage,
+    config: stage.config || {}
+  })) as Json;
 };
