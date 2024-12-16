@@ -743,6 +743,226 @@ export type Database = {
           },
         ]
       }
+      mi3dp_attributes: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          value_type: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          value_type: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          value_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mi3dp_attributes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "mi3dp_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mi3dp_builds: {
+        Row: {
+          build_volume: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          images: Json | null
+          name: string
+          parts: Json | null
+          user_id: string
+        }
+        Insert: {
+          build_volume?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: Json | null
+          name: string
+          parts?: Json | null
+          user_id: string
+        }
+        Update: {
+          build_volume?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          images?: Json | null
+          name?: string
+          parts?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mi3dp_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_category: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_category?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_category?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mi3dp_categories_parent_category_fkey"
+            columns: ["parent_category"]
+            isOneToOne: false
+            referencedRelation: "mi3dp_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mi3dp_part_taxonomy: {
+        Row: {
+          id: string
+          part_id: string | null
+          taxonomy_id: string | null
+        }
+        Insert: {
+          id?: string
+          part_id?: string | null
+          taxonomy_id?: string | null
+        }
+        Update: {
+          id?: string
+          part_id?: string | null
+          taxonomy_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mi3dp_part_taxonomy_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "mi3dp_parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mi3dp_part_taxonomy_taxonomy_id_fkey"
+            columns: ["taxonomy_id"]
+            isOneToOne: false
+            referencedRelation: "mi3dp_taxonomies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mi3dp_parts: {
+        Row: {
+          attributes: Json | null
+          category: string
+          compatibility: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          manufacturer: string | null
+          name: string
+          price: number | null
+          subcategory: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          attributes?: Json | null
+          category: string
+          compatibility?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          manufacturer?: string | null
+          name: string
+          price?: number | null
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          attributes?: Json | null
+          category?: string
+          compatibility?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          manufacturer?: string | null
+          name?: string
+          price?: number | null
+          subcategory?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      mi3dp_taxonomies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      mi3dp_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          role: string
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          role: string
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          role?: string
+          username?: string
+        }
+        Relationships: []
+      }
       navigation_settings: {
         Row: {
           created_at: string | null

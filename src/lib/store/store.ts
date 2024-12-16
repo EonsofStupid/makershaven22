@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GlobalState } from '../types/base';
+import type { GlobalState } from '../types/core';
 
 export const useStore = create<GlobalState>()(
   persist(
