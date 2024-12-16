@@ -1,33 +1,41 @@
-import { type Settings } from "@/components/admin/settings/types";
-import { type Json } from "@/integrations/supabase/types";
+import type { Settings } from "@/components/admin/settings/types";
+import type { Json } from "@/integrations/supabase/types";
+import type { AuthSession, AuthUser } from "./auth-types";
+import type { WorkflowStage, WorkflowTemplate } from "./workflow";
 
-export interface RedisConfig {
-  enabled: boolean;
-  host: string;
-  port: number;
-  password?: string;
-  ttl: number;
-  maxMemory: number;
-  restrictedMode: boolean;
-  features: {
-    sessionManagement: boolean;
-    caching: boolean;
-    realTimeUpdates: boolean;
-    rateLimit: boolean;
+export interface RedisState {
+  config: {
+    enabled: boolean;
+    host: string;
+    port: number;
+    password?: string;
+    ttl: number;
+    maxMemory: number;
+    restrictedMode: boolean;
+    features: {
+      sessionManagement: boolean;
+      caching: boolean;
+      realTimeUpdates: boolean;
+      rateLimit: boolean;
+    };
   };
+  updateConfig: (updates: Partial<RedisState['config']>) => void;
+  toggleFeature: (feature: keyof RedisState['config']['features']) => void;
 }
 
 export interface AuthState {
-  session: any | null;
-  user: any | null;
+  session: AuthSession | null;
+  user: AuthUser | null;
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  setSession: (session: any | null) => void;
-  setUser: (user: any | null) => void;
+  hasAccess: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   setIsTransitioning: (transitioning: boolean) => void;
+  reset: () => void;
   signOut: () => Promise<void>;
 }
 
@@ -40,45 +48,19 @@ export interface WorkflowState {
   setCurrentTemplate: (template: WorkflowTemplate | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
+  fetchTemplates: () => Promise<void>;
+  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
+  addToHistory: (id: string, entry: { type: string; timestamp: string }) => void;
 }
 
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
-}
-
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  dueDate?: string;
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
+export interface ThemeState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: 'light' | 'dark' | 'system';
+  setSettings: (settings: Settings) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+  updateTheme: (settings: Settings) => Promise<void>;
 }

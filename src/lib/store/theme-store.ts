@@ -1,18 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
+import type { ThemeState } from '@/lib/types/store-types';
 import type { Settings } from '@/components/admin/settings/types';
-
-interface ThemeState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: 'light' | 'dark' | 'system';
-  setSettings: (settings: Settings) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  updateTheme: (settings: Settings) => Promise<void>;
-}
 
 export const useThemeStore = create<ThemeState>((set) => ({
   settings: null,
@@ -42,6 +31,11 @@ export const useThemeStore = create<ThemeState>((set) => ({
         p_font_weight_bold: settings.font_weight_bold,
         p_line_height_base: settings.line_height_base,
         p_letter_spacing: settings.letter_spacing,
+        p_border_radius: settings.border_radius,
+        p_spacing_unit: settings.spacing_unit,
+        p_transition_duration: settings.transition_duration,
+        p_shadow_color: settings.shadow_color,
+        p_hover_scale: settings.hover_scale,
         p_neon_cyan: settings.neon_cyan,
         p_neon_pink: settings.neon_pink,
         p_neon_purple: settings.neon_purple

@@ -1,33 +1,34 @@
 import { create } from 'zustand';
-import type { RedisConfig } from '@/lib/types/store-types';
-
-interface RedisState {
-  config: RedisConfig;
-  isLoading: boolean;
-  error: Error | null;
-  setConfig: (config: RedisConfig) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-}
+import type { RedisState } from '@/lib/types/store-types';
 
 export const useRedisStore = create<RedisState>((set) => ({
   config: {
     enabled: false,
     host: 'localhost',
     port: 6379,
+    password: '',
     ttl: 3600,
-    maxMemory: 100,
+    maxMemory: 128,
     restrictedMode: false,
     features: {
-      sessionManagement: true,
-      caching: true,
+      sessionManagement: false,
+      caching: false,
       realTimeUpdates: false,
       rateLimit: false
     }
   },
-  isLoading: false,
-  error: null,
-  setConfig: (config) => set({ config }),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error })
+  updateConfig: (updates) => 
+    set((state) => ({
+      config: { ...state.config, ...updates }
+    })),
+  toggleFeature: (feature) =>
+    set((state) => ({
+      config: {
+        ...state.config,
+        features: {
+          ...state.config.features,
+          [feature]: !state.config.features[feature]
+        }
+      }
+    }))
 }));
