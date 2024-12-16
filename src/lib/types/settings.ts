@@ -1,4 +1,4 @@
-import { Json } from '@supabase/supabase-js';
+import type { Json } from '@supabase/supabase-js';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
