@@ -1,42 +1,53 @@
-import React from "react";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { useState } from "react";
 import { NavigationContainer } from "./core/NavigationContainer";
-import { NavigationLinks } from "./NavigationLinks";
-import { UserMenu } from "./menu/UserMenu";
-import { SearchDialog } from "./SearchDialog";
-import { MobileNav } from "./mobile/MobileNav";
+import { NavigationSection } from "./core/NavigationSection";
 import { Logo } from "./Logo";
+import { NavigationLinks } from "./NavigationLinks";
+import { MegaMenu } from "./MegaMenu";
+import { SearchButton } from "./SearchButton";
+import { SearchDialog } from "./SearchDialog";
+import { UserAvatar } from "../avatar/UserAvatar";
+import { UserMenu } from "./UserMenu";
+import { MobileNav } from "./mobile/MobileNav";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export const Navigation = () => {
-  const { user, isLoading } = useAuthStore();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { user } = useAuthStore();
 
   return (
     <NavigationContainer>
-      <div className="flex items-center gap-6">
+      <NavigationSection>
         <Logo />
-        <NavigationLinks />
-      </div>
+      </NavigationSection>
 
-      <div className="flex items-center gap-4">
-        <SearchDialog />
-        {!isLoading && (
-          <>
-            {user ? (
-              <UserMenu user={user} />
-            ) : (
-              <div className="flex items-center gap-2">
-                <a
-                  href="/login"
-                  className="text-sm font-medium text-white hover:text-neon-cyan transition-colors"
-                >
-                  Sign in
-                </a>
-              </div>
-            )}
-          </>
+      <NavigationSection className="hidden md:flex space-x-6">
+        <NavigationLinks />
+        <MegaMenu />
+      </NavigationSection>
+
+      <NavigationSection className="space-x-4">
+        <SearchButton onClick={() => setSearchOpen(true)} />
+  
+        {user && (
+          <div className="hidden md:block relative z-[60]">
+            <UserAvatar
+              size="lg"
+              className="transform translate-y-2"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            />
+            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
+          </div>
         )}
+  
         <MobileNav />
-      </div>
+      </NavigationSection>
+
+      <SearchDialog 
+        open={searchOpen} 
+        onOpenChange={setSearchOpen}
+      />
     </NavigationContainer>
   );
 };
