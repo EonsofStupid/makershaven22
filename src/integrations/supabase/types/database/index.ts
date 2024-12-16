@@ -1,11 +1,11 @@
-import { AuthTableDefinitions } from './auth';
-import { ContentTableDefinitions } from './content';
-import { SettingsTableDefinitions } from './settings';
-import { Json } from './base';
+import type { AuthTableDefinitions } from './auth';
+import type { ContentTableDefinitions } from './content';
+import type { ThemeTableDefinition } from './theme';
+import type { Json } from '../base';
 
 export interface Database {
   public: {
-    Tables: AuthTableDefinitions & ContentTableDefinitions & SettingsTableDefinitions;
+    Tables: AuthTableDefinitions & ContentTableDefinitions & ThemeTableDefinition;
     Views: Record<string, never>;
     Functions: {
       check_rate_limit: {
@@ -40,9 +40,9 @@ export interface Database {
       };
     };
     Enums: {
-      user_role: UserRole;
-      content_status: ContentStatus;
-      content_type: ContentType;
+      user_role: 'subscriber' | 'maker' | 'admin' | 'super_admin';
+      content_status: 'draft' | 'published' | 'archived';
+      content_type: 'page' | 'component' | 'template' | 'workflow';
     };
   };
 }
@@ -50,5 +50,4 @@ export interface Database {
 export type { Json };
 export * from './auth';
 export * from './content';
-export * from './settings';
-export * from './base';
+export * from './theme';
