@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { useAtom } from 'jotai';
-import { userAtom } from "@/lib/store/atoms/auth";
+import { useAuthStore } from '@/lib/store/auth-store';
 import { FeaturedPost } from "@/components/home/FeaturedPost";
 import { PostCard } from "@/components/home/PostCard";
 
@@ -51,7 +50,7 @@ const posts = [
 ];
 
 const Index = () => {
-  const [user] = useAtom(userAtom);
+  const { user } = useAuthStore();
 
   if (!user) {
     return <Navigate to="/login" replace />;
