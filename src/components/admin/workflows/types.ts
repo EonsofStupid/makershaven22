@@ -1,4 +1,4 @@
-import { Json } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 import type { Profile } from "@/integrations/supabase/types/tables";
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
@@ -7,7 +7,7 @@ export interface WorkflowTemplate {
   id: string;
   name: string;
   description?: string;
-  stages: WorkflowStage[];
+  steps: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
   created_at?: string;
@@ -56,13 +56,6 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
-
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
-
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
@@ -98,6 +91,10 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   };
 };
 
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages as unknown as Json;
+};
+
 export const parseStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
@@ -111,9 +108,9 @@ export const parseStages = (data: Json): WorkflowStage[] => {
   }));
 };
 
-export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages.map(stage => ({
-    ...stage,
-    config: stage.config || {}
-  })) as unknown as Json;
-};
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
+}

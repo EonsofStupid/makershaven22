@@ -53,7 +53,12 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('workflow_templates')
-        .insert([template])
+        .insert([{ 
+          name: template.name,
+          description: template.description,
+          steps: template.steps || [],
+          is_active: template.is_active ?? true
+        }])
         .select()
         .single();
 
