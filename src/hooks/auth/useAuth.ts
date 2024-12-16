@@ -7,7 +7,6 @@ import {
   authErrorAtom,
   isAuthenticatedAtom
 } from '@/lib/store/atoms/auth/auth-atoms';
-import type { AuthUser, AuthSession } from '@/lib/types/auth/base';
 
 export const useAuth = () => {
   const [user] = useAtom(authUserAtom);
@@ -15,7 +14,11 @@ export const useAuth = () => {
   const [isLoading] = useAtom(authLoadingAtom);
   const [error] = useAtom(authErrorAtom);
   const [isAuthenticated] = useAtom(isAuthenticatedAtom);
-  const { setUser, setSession, setLoading, setError, reset } = useAuthStore();
+  const { reset } = useAuthStore();
+
+  const signOut = async () => {
+    reset();
+  };
 
   return {
     user,
@@ -23,18 +26,6 @@ export const useAuth = () => {
     isLoading,
     error,
     isAuthenticated,
-    setUser: (user: AuthUser | null) => {
-      setUser(user);
-    },
-    setSession: (session: AuthSession | null) => {
-      setSession(session);
-    },
-    setLoading: (isLoading: boolean) => {
-      setLoading(isLoading);
-    },
-    setError: (error: Error | null) => {
-      setError(error);
-    },
-    reset,
+    signOut
   };
 };
