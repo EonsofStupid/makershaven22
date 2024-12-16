@@ -1,11 +1,5 @@
-export * from './tables';
+export * from './core';
+export * from './tables/workflow';
+export * from './tables/settings';
 export * from './enums';
-export * from './base';
-
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type { Json } from './base';
