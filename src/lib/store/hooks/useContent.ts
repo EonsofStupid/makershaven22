@@ -1,32 +1,41 @@
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
-import { activeContentAtom, contentHistoryAtom } from '../atoms/content';
+import { 
+  activeContentAtom, 
+  contentHistoryAtom, 
+  contentLoadingAtom, 
+  contentErrorAtom,
+  setActiveContentAtom,
+  addToContentHistoryAtom,
+  clearContentHistoryAtom
+} from '../atoms/content';
 import type { BaseContent } from '@/lib/types/content';
 
 export const useContent = () => {
-  const [activeContent, setActiveContent] = useAtom(activeContentAtom);
-  const [contentHistory, setContentHistory] = useAtom(contentHistoryAtom);
+  const [activeContent] = useAtom(activeContentAtom);
+  const [contentHistory] = useAtom(contentHistoryAtom);
+  const [isLoading] = useAtom(contentLoadingAtom);
+  const [error] = useAtom(contentErrorAtom);
+  const [, setActiveContent] = useAtom(setActiveContentAtom);
+  const [, addToHistory] = useAtom(addToContentHistoryAtom);
+  const [, clearHistory] = useAtom(clearContentHistoryAtom);
 
-  const addToHistory = useCallback((contentId: string, content: BaseContent) => {
-    setContentHistory((prev) => ({
-      ...prev,
-      [contentId]: [...(prev[contentId] || []), content],
-    }));
-  }, [setContentHistory]);
+  const addContentToHistory = useCallback((contentId: string, content: BaseContent) => {
+    addToHistory({ contentId, content });
+  }, [addToHistory]);
 
-  const clearHistory = useCallback((contentId: string) => {
-    setContentHistory((prev) => {
-      const { [contentId]: _, ...rest } = prev;
-      return rest;
-    });
-  }, [setContentHistory]);
+  const clearContentHistory = useCallback((contentId: string) => {
+    clearHistory(contentId);
+  }, [clearHistory]);
 
   return {
     activeContent,
     setActiveContent,
     contentHistory,
-    addToHistory,
-    clearHistory,
+    addToHistory: addContentToHistory,
+    clearHistory: clearContentHistory,
+    isLoading,
+    error,
     hasHistory: (contentId: string) => Boolean(contentHistory[contentId]?.length),
     getHistoryForContent: (contentId: string) => contentHistory[contentId] || [],
   };
