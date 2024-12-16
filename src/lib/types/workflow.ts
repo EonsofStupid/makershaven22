@@ -1,4 +1,4 @@
-import { Json } from '@/integrations/supabase/types';
+import type { Json } from '@supabase/supabase-js';
 
 export interface WorkflowTemplate {
   id: string;
@@ -76,5 +76,5 @@ export const serializeWorkflowSteps = (stages: WorkflowStage[]): Json => {
     description,
     config,
     order
-  }));
+  })) as Json;
 };

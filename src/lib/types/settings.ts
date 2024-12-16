@@ -38,6 +38,17 @@ export interface Settings {
   menu_animation_type?: string;
   updated_at?: string;
   updated_by?: string;
+  security_settings?: SecuritySettings;
+}
+
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
 }
 
 export interface Theme {

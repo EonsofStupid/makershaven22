@@ -42,3 +42,9 @@ export interface AuthErrorRecoveryState {
   lastAttempt: Date | null;
   nextAttemptDelay: number;
 }
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  fallbackPath?: string;
+}
