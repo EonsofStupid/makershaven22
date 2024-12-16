@@ -1,4 +1,5 @@
-import { Settings, ThemeMode } from '../types/settings';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
+import type { AuthUser, AuthSession } from '@/lib/types/auth/base';
 
 export interface GlobalState {
   // Core state
@@ -7,7 +8,7 @@ export interface GlobalState {
   error: Error | null;
   
   // Theme state
-  theme: Settings | null;
+  theme: Theme | null;
   settings: Settings | null;
   mode: ThemeMode;
   isThemeLoading: boolean;
@@ -19,4 +20,9 @@ export interface GlobalState {
   setMode: (mode: ThemeMode) => void;
   setError: (error: Error | null) => void;
   reset: () => void;
+}
+
+export interface Theme {
+  settings: Settings | null;
+  mode: ThemeMode;
 }

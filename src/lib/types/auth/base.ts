@@ -28,11 +28,6 @@ export interface AuthState {
   hasAccess: boolean;
 }
 
-export interface AuthError extends Error {
-  code: string;
-  details?: string;
-}
-
 export interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;

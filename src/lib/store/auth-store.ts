@@ -8,6 +8,8 @@ interface AuthStore extends AuthState {
   setError: (error: Error | null) => void;
   setTransitioning: (isTransitioning: boolean) => void;
   setHasAccess: (hasAccess: boolean) => void;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
   reset: () => void;
 }
 
@@ -25,6 +27,19 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setError: (error) => set({ error }),
   setTransitioning: (isTransitioning) => set({ isTransitioning }),
   setHasAccess: (hasAccess) => set({ hasAccess }),
+  signIn: async (email, password) => {
+    // Implement actual sign in logic
+    set({ isLoading: true });
+    try {
+      // Sign in implementation
+      set({ isLoading: false });
+    } catch (error) {
+      set({ error: error as Error, isLoading: false });
+    }
+  },
+  signOut: async () => {
+    set({ user: null, session: null });
+  },
   reset: () => set({
     user: null,
     session: null,

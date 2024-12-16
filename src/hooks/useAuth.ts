@@ -1,44 +1,28 @@
-import { useEffect } from 'react';
-import { useAuthStore } from '@/lib/store/auth/auth-store';
 import { useAtom } from 'jotai';
-import { authUserAtom, authSessionAtom } from '@/lib/store/atoms/auth';
-import type { AuthUser, AuthSession } from '@/lib/types/auth';
+import { useAuthStore } from '@/lib/store/auth-store';
+import {
+  authUserAtom,
+  authSessionAtom,
+  authLoadingAtom,
+  authErrorAtom,
+  isAuthenticatedAtom
+} from '@/lib/store/atoms/auth/auth-atoms';
 
 export const useAuth = () => {
-  const authStore = useAuthStore();
-  const [user, setUser] = useAtom(authUserAtom);
-  const [session, setSession] = useAtom(authSessionAtom);
-
-  // Sync Zustand state with Jotai atoms
-  useEffect(() => {
-    if (authStore.user !== user) {
-      setUser(authStore.user);
-    }
-    if (authStore.session !== session) {
-      setSession(authStore.session);
-    }
-  }, [authStore.user, authStore.session, user, session, setUser, setSession]);
-
-  const signOut = async () => {
-    authStore.reset();
-    setUser(null);
-    setSession(null);
-  };
+  const [user] = useAtom(authUserAtom);
+  const [session] = useAtom(authSessionAtom);
+  const [isLoading] = useAtom(authLoadingAtom);
+  const [error] = useAtom(authErrorAtom);
+  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+  const { signIn, signOut } = useAuthStore();
 
   return {
-    user: authStore.user,
-    session: authStore.session,
-    isLoading: authStore.isLoading,
-    error: authStore.error,
-    isAuthenticated: !!authStore.session,
-    signOut,
-    setUser: (user: AuthUser | null) => {
-      authStore.setUser(user);
-      setUser(user);
-    },
-    setSession: (session: AuthSession | null) => {
-      authStore.setSession(session);
-      setSession(session);
-    }
+    user,
+    session,
+    isLoading,
+    error,
+    isAuthenticated,
+    signIn,
+    signOut
   };
 };
