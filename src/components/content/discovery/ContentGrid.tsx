@@ -42,12 +42,20 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex flex-col items-center gap-8 p-6 w-full"
+        transition={{ duration: 0.3 }}
+        className="flex flex-col items-center gap-8 p-6 w-full bg-black/40 backdrop-blur-xl"
       >
         {items.map((post) => (
-          <div key={post.id} className="w-[81%]">
+          <motion.div 
+            key={post.id} 
+            className="w-[81%] hover:scale-[var(--hover-scale)] transition-transform duration-[var(--transition-duration)]"
+            whileHover={{ 
+              boxShadow: '0 0 20px var(--neon-cyan)',
+              transition: { duration: 0.2 }
+            }}
+          >
             <BlogPostCard post={post} />
-          </div>
+          </motion.div>
         ))}
       </motion.div>
     );
@@ -57,7 +65,8 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6"
+      transition={{ duration: 0.3 }}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-unit)] p-[var(--spacing-unit)] bg-black/40 backdrop-blur-xl border border-[var(--neon-cyan)]/10 rounded-[var(--border-radius)]"
     >
       {children}
     </motion.div>
