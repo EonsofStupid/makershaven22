@@ -16,7 +16,6 @@ export const useSyncedStore = () => {
   return {
     state: globalState,
     setState: syncState,
-    // Provide direct access to both stores if needed
     jotaiStore: globalState,
     zustandStore
   };
