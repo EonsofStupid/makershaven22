@@ -1,27 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
-
-interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: string | string[];
-  fallbackPath?: string;
-}
+import type { AuthGuardProps } from "@/lib/types/auth/base";
 
 export const AuthGuard = ({
   children,
   requireAuth = true,
   requiredRole,
   fallbackPath = "/login",
+  loadingComponent,
+  unauthorizedComponent,
+  onError
 }: AuthGuardProps) => {
-  const { user, session, isAuthLoading } = useSyncedAuth();
+  const { user, session, isLoading } = useAuth();
   const location = useLocation();
 
-  if (isAuthLoading) {
-    return (
+  useEffect(() => {
+    if (!isLoading && requireAuth && !session) {
+      toast.error("Please sign in to access this page");
+    }
+  }, [isLoading, requireAuth, session]);
+
+  if (isLoading) {
+    return loadingComponent || (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
       </div>
@@ -30,7 +33,6 @@ export const AuthGuard = ({
 
   // Not authenticated but authentication required
   if (requireAuth && !session) {
-    toast.error("Please sign in to access this page");
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
@@ -42,9 +44,12 @@ export const AuthGuard = ({
   // Role check if required
   if (requireAuth && requiredRole && user) {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    if (!roles.includes(user.role)) {
+    if (!roles.includes(user.role!)) {
+      if (onError) {
+        onError(new Error("Insufficient permissions"));
+      }
       toast.error("You don't have permission to access this page");
-      return <Navigate to="/" replace />;
+      return unauthorizedComponent || <Navigate to="/" replace />;
     }
   }
 
