@@ -1,15 +1,8 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
-
-export interface BaseTableDefinitions {
-  [key: string]: {
-    Row: Record<string, any>;
-    Insert: Record<string, any>;
-    Update: Record<string, any>;
-  };
+export interface TableDefinition<T = any> {
+  Row: T;
+  Insert: Partial<T>;
+  Update: Partial<T>;
+  Relationships: any[];
 }
+
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];

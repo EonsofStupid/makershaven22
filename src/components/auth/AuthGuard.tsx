@@ -1,41 +1,28 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { AuthGuardProps } from '@/lib/types/auth/base';
-import type { UserRole } from '@/lib/types/base';
+import type { AuthGuardProps } from '@/lib/auth/types/auth';
+import { Navigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
+import { userAtom, loadingStateAtom } from '@/lib/store/atoms/auth';
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({
-  children,
-  requireAuth = false,
-  requiredRole,
-  fallbackPath = '/auth/login',
-  loadingComponent = <LoadingSpinner />,
-  unauthorizedComponent = <Navigate to={fallbackPath} replace />,
-  onError
+export const AuthGuard: React.FC<AuthGuardProps> = ({ 
+  children, 
+  requireAuth = true, 
+  requiredRole, 
+  fallbackPath 
 }) => {
-  const { user, isAuthLoading, error } = useSyncedAuth();
-  const location = useLocation();
+  const [user] = useAtom(userAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
 
-  React.useEffect(() => {
-    if (error && onError) {
-      onError(error);
-    }
-  }, [error, onError]);
-
-  if (isAuthLoading) {
-    return <>{loadingComponent}</>;
+  if (loadingState.isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (requireAuth && !user) {
-    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
+    return <Navigate to={fallbackPath || '/login'} replace />;
   }
 
-  if (requiredRole && user) {
-    const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    if (!roles.includes(user.role as UserRole)) {
-      return <>{unauthorizedComponent}</>;
-    }
+  if (requiredRole && user && !user.role) {
+    return <Navigate to={fallbackPath || '/unauthorized'} replace />;
   }
 
   return <>{children}</>;

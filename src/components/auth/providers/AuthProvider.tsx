@@ -1,74 +1,133 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAtom } from 'jotai';
+import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { 
+  sessionAtom,
+  userAtom,
+  loadingStateAtom,
+  authErrorAtom,
+  setSessionAtom,
+  setUserAtom,
+  setLoadingStateAtom,
+  setAuthErrorAtom,
+  isTransitioningAtom,
+  setIsTransitioningAtom
+} from '@/lib/store/atoms/auth';
+import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
+import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setAuthState } = useAuth();
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
+  const [loadingState] = useAtom(loadingStateAtom);
+  const [, setLoadingState] = useAtom(setLoadingStateAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
+  const [isTransitioning] = useAtom(isTransitioningAtom);
+  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event);
+    console.log('AuthProvider mounted - Starting initialization');
+    
+    setLoadingState({ isLoading: true, message: 'Initializing auth...' });
+    
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        setAuthState({ isLoading: true, error: null });
-        
-        if (session) {
-          try {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", session.user.id)
-              .single();
-
-            const user = {
-              ...session.user,
-              email: session.user.email!,
-              role: profile?.role || "subscriber",
-              ...profile
-            };
-
-            setAuthState({
-              user,
-              session: {
-                user,
-                access_token: session.access_token,
-                refresh_token: session.refresh_token ?? undefined,
-                expires_in: session.expires_in ?? 3600
-              },
-              isLoading: false,
-              error: null
-            });
-            
-            if (event === "SIGNED_IN") {
-              toast.success("Successfully signed in");
-            }
-          } catch (error) {
-            console.error("Error fetching profile:", error);
-            setAuthState({
-              error: error as Error,
-              isLoading: false
-            });
-          }
-        } else {
-          setAuthState({
-            user: null,
-            session: null,
-            isLoading: false,
-            error: null
-          });
-          
-          if (event === "SIGNED_OUT") {
-            toast.success("Successfully signed out");
-          }
+        if (sessionError) {
+          throw sessionError;
         }
+
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
+
+          setSession(session);
+          setUser({ ...session.user, role: profile?.role || 'subscriber' });
+          console.log('Auth initialized with session:', session.user.id);
+        } else {
+          setSession(null);
+          setUser(null);
+          console.log('Auth initialized with no session');
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setError(error instanceof Error ? error : new Error('Failed to initialize auth'));
+        toast.error('Failed to initialize authentication');
+      } finally {
+        setLoadingState({ isLoading: false });
       }
-    );
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      setIsTransitioning(true);
+      
+      try {
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
+
+          setSession(session);
+          setUser({ ...session.user, role: profile?.role || 'subscriber' });
+        } else {
+          setSession(null);
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth state change error:', error);
+        setError(error instanceof Error ? error : new Error('Auth state change failed'));
+        toast.error('Authentication error occurred');
+      } finally {
+        setIsTransitioning(false);
+      }
+    });
+
+    initializeAuth();
 
     return () => {
+      console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
+      setLoadingState({ isLoading: false });
     };
-  }, [setAuthState]);
+  }, [setSession, setUser, setLoadingState, setError, setIsTransitioning]);
 
-  return <>{children}</>;
+  return (
+    <AuthErrorBoundary>
+      <LoadingOverlay 
+        isVisible={loadingState.isLoading} 
+        message={loadingState.message}
+      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
+    </AuthErrorBoundary>
+  );
 };

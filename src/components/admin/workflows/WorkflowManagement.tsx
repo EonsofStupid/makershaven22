@@ -9,7 +9,16 @@ import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import type { WorkflowTemplate } from './types';
+
+interface Workflow {
+  id: string;
+  name: string;
+  description: string;
+  steps: any[];
+  triggers: any[];
+  created_by: string;
+  updated_at: string;
+}
 
 export const WorkflowManagement = () => {
   const [workflowState] = useAtom(workflowStateAtom);
@@ -21,7 +30,7 @@ export const WorkflowManagement = () => {
     queryFn: async () => {
       console.log('Fetching workflows...');
       const { data, error } = await supabase
-        .from('workflow_templates')
+        .from('cms_workflows')
         .select('*')
         .order('updated_at', { ascending: false });
 
@@ -31,11 +40,11 @@ export const WorkflowManagement = () => {
         throw error;
       }
 
-      return data as WorkflowTemplate[];
+      return data as Workflow[];
     }
   });
 
-  const handleActivateWorkflow = async (workflow: WorkflowTemplate) => {
+  const handleActivateWorkflow = async (workflow: Workflow) => {
     try {
       console.log('Activating workflow:', workflow.id);
       setActiveWorkflow({ id: workflow.id, data: workflow });

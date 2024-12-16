@@ -138,7 +138,7 @@ export type Database = {
       }
       blog_posts: {
         Row: {
-          author_id: string
+          author_id: string | null
           category: Database["public"]["Enums"]["post_category"] | null
           content: string
           excerpt: string | null
@@ -155,7 +155,7 @@ export type Database = {
           views_count: number | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           category?: Database["public"]["Enums"]["post_category"] | null
           content: string
           excerpt?: string | null
@@ -172,7 +172,7 @@ export type Database = {
           views_count?: number | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           category?: Database["public"]["Enums"]["post_category"] | null
           content?: string
           excerpt?: string | null
@@ -243,7 +243,7 @@ export type Database = {
         Row: {
           content: Json | null
           created_at: string | null
-          created_by: string
+          created_by: string | null
           id: string
           metadata: Json | null
           slug: string | null
@@ -257,7 +257,7 @@ export type Database = {
         Insert: {
           content?: Json | null
           created_at?: string | null
-          created_by: string
+          created_by?: string | null
           id?: string
           metadata?: Json | null
           slug?: string | null
@@ -271,7 +271,7 @@ export type Database = {
         Update: {
           content?: Json | null
           created_at?: string | null
-          created_by?: string
+          created_by?: string | null
           id?: string
           metadata?: Json | null
           slug?: string | null
@@ -465,84 +465,29 @@ export type Database = {
           },
         ]
       }
-      forum_flags: {
-        Row: {
-          created_at: string | null
-          id: string
-          reason: string
-          reporter_id: string | null
-          resolved_at: string | null
-          resolved_by: string | null
-          status: string | null
-          thread_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          reason: string
-          reporter_id?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          status?: string | null
-          thread_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          reason?: string
-          reporter_id?: string | null
-          resolved_at?: string | null
-          resolved_by?: string | null
-          status?: string | null
-          thread_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "forum_flags_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "forum_flags_resolved_by_fkey"
-            columns: ["resolved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "forum_flags_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "forum_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       forum_replies: {
         Row: {
-          author_id: string
+          author_id: string | null
           content: string
           created_at: string | null
           id: string
-          thread_id: string
+          thread_id: string | null
           updated_at: string | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           content: string
           created_at?: string | null
           id?: string
-          thread_id: string
+          thread_id?: string | null
           updated_at?: string | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           content?: string
           created_at?: string | null
           id?: string
-          thread_id?: string
+          thread_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -564,7 +509,7 @@ export type Database = {
       }
       forum_threads: {
         Row: {
-          author_id: string
+          author_id: string | null
           content: string
           created_at: string | null
           id: string
@@ -572,7 +517,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           content: string
           created_at?: string | null
           id?: string
@@ -580,7 +525,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           content?: string
           created_at?: string | null
           id?: string
@@ -743,226 +688,6 @@ export type Database = {
           },
         ]
       }
-      mi3dp_attributes: {
-        Row: {
-          category_id: string | null
-          created_at: string | null
-          id: string
-          name: string
-          value_type: string
-        }
-        Insert: {
-          category_id?: string | null
-          created_at?: string | null
-          id?: string
-          name: string
-          value_type: string
-        }
-        Update: {
-          category_id?: string | null
-          created_at?: string | null
-          id?: string
-          name?: string
-          value_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mi3dp_attributes_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "mi3dp_categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      mi3dp_builds: {
-        Row: {
-          build_volume: Json | null
-          created_at: string | null
-          description: string | null
-          id: string
-          images: Json | null
-          name: string
-          parts: Json | null
-          user_id: string
-        }
-        Insert: {
-          build_volume?: Json | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          images?: Json | null
-          name: string
-          parts?: Json | null
-          user_id: string
-        }
-        Update: {
-          build_volume?: Json | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          images?: Json | null
-          name?: string
-          parts?: Json | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      mi3dp_categories: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          name: string
-          parent_category: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name: string
-          parent_category?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-          parent_category?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mi3dp_categories_parent_category_fkey"
-            columns: ["parent_category"]
-            isOneToOne: false
-            referencedRelation: "mi3dp_categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      mi3dp_part_taxonomy: {
-        Row: {
-          id: string
-          part_id: string | null
-          taxonomy_id: string | null
-        }
-        Insert: {
-          id?: string
-          part_id?: string | null
-          taxonomy_id?: string | null
-        }
-        Update: {
-          id?: string
-          part_id?: string | null
-          taxonomy_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mi3dp_part_taxonomy_part_id_fkey"
-            columns: ["part_id"]
-            isOneToOne: false
-            referencedRelation: "mi3dp_parts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mi3dp_part_taxonomy_taxonomy_id_fkey"
-            columns: ["taxonomy_id"]
-            isOneToOne: false
-            referencedRelation: "mi3dp_taxonomies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      mi3dp_parts: {
-        Row: {
-          attributes: Json | null
-          category: string
-          compatibility: Json | null
-          created_at: string | null
-          description: string | null
-          id: string
-          image_url: string | null
-          manufacturer: string | null
-          name: string
-          price: number | null
-          subcategory: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          attributes?: Json | null
-          category: string
-          compatibility?: Json | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          manufacturer?: string | null
-          name: string
-          price?: number | null
-          subcategory?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          attributes?: Json | null
-          category?: string
-          compatibility?: Json | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          manufacturer?: string | null
-          name?: string
-          price?: number | null
-          subcategory?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      mi3dp_taxonomies: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      mi3dp_users: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          role: string
-          username: string
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          role: string
-          username: string
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          role?: string
-          username?: string
-        }
-        Relationships: []
-      }
       navigation_settings: {
         Row: {
           created_at: string | null
@@ -1122,20 +847,6 @@ export type Database = {
           status?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_publishing_queue_content"
-            columns: ["content_id"]
-            isOneToOne: false
-            referencedRelation: "cms_content"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_publishing_queue_revision"
-            columns: ["revision_id"]
-            isOneToOne: false
-            referencedRelation: "cms_content_revisions"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "publishing_queue_content_id_fkey"
             columns: ["content_id"]
@@ -1369,7 +1080,6 @@ export type Database = {
           font_weight_normal: string
           hover_scale: string | null
           id: string
-          last_sync: string | null
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
@@ -1382,12 +1092,12 @@ export type Database = {
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
-          state_version: number | null
           tagline: string | null
           text_heading_color: string | null
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -1406,7 +1116,6 @@ export type Database = {
           font_weight_normal: string
           hover_scale?: string | null
           id?: string
-          last_sync?: string | null
           letter_spacing: string
           line_height_base: string
           logo_url?: string | null
@@ -1419,12 +1128,12 @@ export type Database = {
           shadow_color?: string | null
           site_title: string
           spacing_unit?: string | null
-          state_version?: number | null
           tagline?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -1443,7 +1152,6 @@ export type Database = {
           font_weight_normal?: string
           hover_scale?: string | null
           id?: string
-          last_sync?: string | null
           letter_spacing?: string
           line_height_base?: string
           logo_url?: string | null
@@ -1456,12 +1164,12 @@ export type Database = {
           shadow_color?: string | null
           site_title?: string
           spacing_unit?: string | null
-          state_version?: number | null
           tagline?: string | null
           text_heading_color?: string | null
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -1522,8 +1230,6 @@ export type Database = {
           details: string | null
           id: string
           metadata: Json | null
-          state_data: Json | null
-          sync_status: string | null
           user_id: string
         }
         Insert: {
@@ -1532,8 +1238,6 @@ export type Database = {
           details?: string | null
           id?: string
           metadata?: Json | null
-          state_data?: Json | null
-          sync_status?: string | null
           user_id: string
         }
         Update: {
@@ -1542,8 +1246,6 @@ export type Database = {
           details?: string | null
           id?: string
           metadata?: Json | null
-          state_data?: Json | null
-          sync_status?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1754,7 +1456,6 @@ export type Database = {
           font_weight_normal: string
           hover_scale: string | null
           id: string
-          last_sync: string | null
           letter_spacing: string
           line_height_base: string
           logo_url: string | null
@@ -1767,12 +1468,12 @@ export type Database = {
           shadow_color: string | null
           site_title: string
           spacing_unit: string | null
-          state_version: number | null
           tagline: string | null
           text_heading_color: string | null
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -1816,14 +1517,7 @@ export type Database = {
         | "3D Printer"
         | "3D Printer Hardware"
       theme_mode: "light" | "dark" | "system"
-      transition_type: "fade" | "slide" | "scale" | "blur"
       user_role: "subscriber" | "maker" | "admin" | "super_admin"
-      workflow_stage_type:
-        | "APPROVAL"
-        | "REVIEW"
-        | "TASK"
-        | "NOTIFICATION"
-        | "CONDITIONAL"
     }
     CompositeTypes: {
       [_ in never]: never

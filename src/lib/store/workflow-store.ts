@@ -1,28 +1,43 @@
-import { create } from 'zustand';
-import type { WorkflowTemplate } from '@/lib/types/workflow';
+import { atom } from 'jotai';
 
-interface WorkflowStore {
-  activeWorkflows: Record<string, WorkflowTemplate>;
-  workflowHistory: Record<string, Array<{ action: string; timestamp: string }>>;
-  setActiveWorkflow: (update: { id: string; data: WorkflowTemplate }) => void;
-  addToHistory: (update: { id: string; data: { action: string; timestamp: string } }) => void;
+interface WorkflowState {
+  activeWorkflowId: string | null;
+  workflows: Record<string, any>;
+  history: Record<string, { type: string; timestamp: string }[]>;
 }
 
-export const useWorkflowStore = create<WorkflowStore>((set) => ({
-  activeWorkflows: {},
-  workflowHistory: {},
-  setActiveWorkflow: ({ id, data }) =>
-    set((state) => ({
-      activeWorkflows: {
-        ...state.activeWorkflows,
+const initialState: WorkflowState = {
+  activeWorkflowId: null,
+  workflows: {},
+  history: {}
+};
+
+export const workflowStateAtom = atom<WorkflowState>(initialState);
+
+export const useWorkflowStore = () => {
+  const setActiveWorkflow = (id: string, data: any) => {
+    workflowStateAtom.write((prev) => ({
+      ...prev,
+      activeWorkflowId: id,
+      workflows: {
+        ...prev.workflows,
         [id]: data
       }
-    })),
-  addToHistory: ({ id, data }) =>
-    set((state) => ({
-      workflowHistory: {
-        ...state.workflowHistory,
-        [id]: [...(state.workflowHistory[id] || []), data]
+    }));
+  };
+
+  const addToHistory = (workflowId: string, entry: { type: string; timestamp: string }) => {
+    workflowStateAtom.write((prev) => ({
+      ...prev,
+      history: {
+        ...prev.history,
+        [workflowId]: [...(prev.history[workflowId] || []), entry]
       }
-    }))
-}));
+    }));
+  };
+
+  return {
+    setActiveWorkflow,
+    addToHistory
+  };
+};

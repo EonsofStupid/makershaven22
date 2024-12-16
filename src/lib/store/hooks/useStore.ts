@@ -1,16 +1,28 @@
-import { useStore as useZustandStore } from '../store';
-import type { GlobalState } from '../../types/base';
+import { useAtom } from 'jotai';
+import { appReadyAtom, appErrorAtom, globalLoadingAtom, globalErrorAtom, userPreferencesAtom } from '../atoms/core';
 
 export const useStore = () => {
-  const store = useZustandStore();
+  const [appReady, setAppReady] = useAtom(appReadyAtom);
+  const [appError, setAppError] = useAtom(appErrorAtom);
+  const [globalLoading, setGlobalLoading] = useAtom(globalLoadingAtom);
+  const [globalError, setGlobalError] = useAtom(globalErrorAtom);
+  const [userPreferences, setUserPreferences] = useAtom(userPreferencesAtom);
 
   return {
-    ...store,
-    // Add any computed values or additional functionality here
-    isAuthenticated: !!store.session && !!store.user,
-    isAdmin: store.user?.role === 'admin' || store.user?.role === 'super_admin',
-    isMaker: store.user?.role === 'maker' || store.user?.role === 'admin' || store.user?.role === 'super_admin'
+    // App State
+    appReady,
+    setAppReady,
+    appError,
+    setAppError,
+
+    // Global UI State
+    globalLoading,
+    setGlobalLoading,
+    globalError,
+    setGlobalError,
+
+    // User Preferences
+    userPreferences,
+    setUserPreferences,
   };
 };
-
-export type Store = ReturnType<typeof useStore>;

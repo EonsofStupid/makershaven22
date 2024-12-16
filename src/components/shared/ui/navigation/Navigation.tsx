@@ -1,32 +1,46 @@
-import React from 'react';
-import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
-import { MainNav } from './MainNav';
-import { UserNav } from './UserNav';
-import { Logo } from './Logo';
+import { useState } from "react";
+import { NavigationContainer } from "./core/NavigationContainer";
+import { NavigationSection } from "./core/NavigationSection";
+import { Logo } from "./Logo";
+import { NavigationLinks } from "./NavigationLinks";
+import { MegaMenu } from "./MegaMenu";
+import { SearchButton } from "./SearchButton";
+import { SearchDialog } from "./SearchDialog";
+import { UserAvatar } from "../avatar/UserAvatar";
+import { UserMenu } from "./UserMenu";
+import { MobileNav } from "./mobile/MobileNav";
 
 export const Navigation = () => {
-  const { user, session } = useSyncedAuth();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <div className="border-b border-white/10 bg-black/40 backdrop-blur-xl">
-      <div className="flex h-16 items-center px-4">
+    <NavigationContainer>
+      <NavigationSection>
         <Logo />
-        <MainNav className="mx-6" />
-        <div className="ml-auto flex items-center space-x-4">
-          {session ? (
-            <UserNav user={user} />
-          ) : (
-            <div className="flex items-center space-x-4">
-              <a href="/login" className="text-sm font-medium text-white hover:text-white/80">
-                Login
-              </a>
-              <a href="/register" className="text-sm font-medium text-white hover:text-white/80">
-                Register
-              </a>
-            </div>
-          )}
+      </NavigationSection>
+
+      <NavigationSection className="hidden md:flex space-x-6">
+        <NavigationLinks />
+        <MegaMenu />
+      </NavigationSection>
+
+      <NavigationSection className="space-x-4">
+        <SearchButton onClick={() => setSearchOpen(true)} />
+  
+        <div className="hidden md:block relative z-[60]">
+          <UserAvatar
+            size="lg"
+            className="transform translate-y-2"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+          />
+          {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
         </div>
-      </div>
-    </div>
+  
+        <MobileNav />
+      </NavigationSection>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+    </NavigationContainer>
   );
 };

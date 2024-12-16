@@ -1,53 +1,81 @@
-import { create } from 'zustand';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/auth/base';
+import { atom, useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-interface AuthStore extends AuthState {
-  setUser: (user: AuthUser | null) => void;
-  setSession: (session: AuthSession | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setTransitioning: (isTransitioning: boolean) => void;
-  setHasAccess: (hasAccess: boolean) => void;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  reset: () => void;
+// Types
+interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  session: null,
-  isLoading: false,
-  error: null,
-  isTransitioning: false,
-  hasAccess: false,
+interface AuthState {
+  session: Session | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
+}
 
-  setUser: (user) => set({ user }),
-  setSession: (session) => set({ session }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  setTransitioning: (isTransitioning) => set({ isTransitioning }),
-  setHasAccess: (hasAccess) => set({ hasAccess }),
+// Atoms
+export const sessionAtom = atomWithStorage<Session | null>('auth_session', null);
+export const userAtom = atomWithStorage<AuthUser | null>('auth_user', null);
+export const loadingAtom = atom<boolean>(true);
+export const errorAtom = atom<Error | null>(null);
+export const isTransitioningAtom = atom<boolean>(false);
 
-  signIn: async (email, password) => {
-    set({ isLoading: true, error: null });
+// Custom hook for auth store
+export const useAuthStore = () => {
+  const [session, setSession] = useAtom(sessionAtom);
+  const [user, setUser] = useAtom(userAtom);
+  const [isLoading, setLoading] = useAtom(loadingAtom);
+  const [error, setError] = useAtom(errorAtom);
+  const [isTransitioning, setIsTransitioning] = useAtom(isTransitioningAtom);
+
+  const signOut = async () => {
     try {
-      // Implement actual sign in logic with Supabase
-      set({ isLoading: false });
-    } catch (error) {
-      set({ error: error as Error, isLoading: false });
+      setIsTransitioning(true);
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+      
+      setSession(null);
+      setUser(null);
+      toast.success("Successfully signed out");
+    } catch (err) {
+      console.error("Sign out error:", err);
+      setError(err instanceof Error ? err : new Error('Failed to sign out'));
+      toast.error("Failed to sign out");
+    } finally {
+      setIsTransitioning(false);
     }
-  },
+  };
 
-  signOut: async () => {
-    set({ user: null, session: null });
-  },
+  const reset = () => {
+    setSession(null);
+    setUser(null);
+    setError(null);
+    setLoading(false);
+    setIsTransitioning(false);
+  };
 
-  reset: () => set({
-    user: null,
-    session: null,
-    isLoading: false,
-    error: null,
-    isTransitioning: false,
-    hasAccess: false
-  })
-}));
+  return {
+    session,
+    user,
+    isLoading,
+    error,
+    isTransitioning,
+    setSession,
+    setUser,
+    setLoading,
+    setError,
+    setIsTransitioning,
+    signOut,
+    reset
+  };
+};

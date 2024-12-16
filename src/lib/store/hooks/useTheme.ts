@@ -4,25 +4,18 @@ import {
   themeModeAtom, 
   systemThemeAtom, 
   effectiveThemeAtom,
-  themeAtom,
+  themeStateAtom,
+  cssVariablesAtom,
   updateThemeAtom
 } from '../atoms/theme/theme-atoms';
-import { useThemeStore } from '../theme-store';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
   const [, setSystemTheme] = useAtom(systemThemeAtom);
   const effectiveTheme = useAtomValue(effectiveThemeAtom);
-  const [theme] = useAtom(themeAtom);
+  const cssVariables = useAtomValue(cssVariablesAtom);
+  const [themeState] = useAtom(themeStateAtom);
   const [, updateTheme] = useAtom(updateThemeAtom);
-  
-  const { 
-    isLoading, 
-    error,
-    setMode: setStoreMode,
-    updateSettings: updateStoreSettings
-  } = useThemeStore();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -35,23 +28,25 @@ export const useTheme = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setSystemTheme]);
 
-  const setMode = (mode: ThemeMode) => {
-    setThemeMode(mode);
-    setStoreMode(mode);
-  };
-
-  const updateSettings = async (updates: Settings) => {
-    await updateTheme(updates);
-    updateStoreSettings(updates);
-  };
+  useEffect(() => {
+    // Apply CSS variables to document root
+    const root = document.documentElement;
+    Object.entries(cssVariables).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+    
+    // Apply theme class
+    root.classList.remove('light', 'dark');
+    root.classList.add(effectiveTheme);
+  }, [cssVariables, effectiveTheme]);
 
   return {
     mode: themeMode,
-    setMode,
+    setMode: setThemeMode,
     effectiveTheme,
-    settings: theme?.settings || null,
-    isLoading,
-    error,
-    updateSettings
+    settings: themeState.settings,
+    isLoading: themeState.isLoading,
+    error: themeState.error,
+    updateTheme
   };
 };
