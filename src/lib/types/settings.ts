@@ -35,9 +35,19 @@ export interface Settings {
   backdrop_blur?: string;
   transition_type?: TransitionType;
   theme_mode?: ThemeMode;
-  security_settings: Json;
+  security_settings: SecuritySettings;
   updated_at?: string;
   updated_by?: string;
+}
+
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
 }
 
 export interface Theme {
@@ -55,3 +65,10 @@ export interface ThemeContextType {
 export type SettingsUpdateParams = {
   [K in keyof Settings as `p_${string & K}`]: Settings[K];
 };
+
+export interface SettingsFormData extends Omit<Settings, 'id' | 'updated_at' | 'updated_by'> {}
+
+export interface SettingsResponse {
+  data: Settings;
+  error: Error | null;
+}

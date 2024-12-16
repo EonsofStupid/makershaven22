@@ -4,13 +4,15 @@ import { ColorPicker } from "./ColorPicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "@/components/theme/hooks/useTheme";
 import { toast } from "sonner";
+import type { Settings } from "@/lib/types/settings";
 
 export const FontColorSettingsSection = () => {
   const { settings, updateSettings } = useTheme();
 
-  const handleColorChange = async (key: string, value: string) => {
+  const handleColorChange = async (key: keyof Settings, value: string) => {
     try {
-      await updateSettings({ [key]: value });
+      if (!settings) return;
+      await updateSettings({ ...settings, [key]: value });
       toast.success("Color updated successfully");
     } catch (error) {
       console.error("Error updating color:", error);
@@ -64,19 +66,19 @@ export const FontColorSettingsSection = () => {
             <ColorPicker
               label="Neon Cyan"
               cssVar="--neon-cyan"
-              value={settings.neon_cyan}
+              value={settings.neon_cyan || '#41f0db'}
               onChange={(color) => handleColorChange("neon_cyan", color)}
             />
             <ColorPicker
               label="Neon Pink"
               cssVar="--neon-pink"
-              value={settings.neon_pink}
+              value={settings.neon_pink || '#ff0abe'}
               onChange={(color) => handleColorChange("neon_pink", color)}
             />
             <ColorPicker
               label="Neon Purple"
               cssVar="--neon-purple"
-              value={settings.neon_purple}
+              value={settings.neon_purple || '#8000ff'}
               onChange={(color) => handleColorChange("neon_purple", color)}
             />
           </TabsContent>
