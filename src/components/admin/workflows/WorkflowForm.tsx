@@ -1,7 +1,8 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { WorkflowFormData } from "@/components/content/types/workflow";
+import { StagesManager } from "./components/StagesManager";
+import type { WorkflowFormData } from "./types";
 
 interface WorkflowFormProps {
   formData: WorkflowFormData;
@@ -34,8 +35,10 @@ export const WorkflowForm = ({ formData, onChange, onSubmit }: WorkflowFormProps
       </div>
 
       <div className="border border-white/10 rounded-lg p-6 mt-8">
-        <h2 className="text-xl font-semibold text-white mb-4">Workflow Steps</h2>
-        <p className="text-white/60">Step configuration will be available in the next update.</p>
+        <StagesManager
+          stages={formData.steps}
+          onChange={(stages) => onChange({ steps: stages })}
+        />
       </div>
     </form>
   );

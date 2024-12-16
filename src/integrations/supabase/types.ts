@@ -40,7 +40,15 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "active_2fa_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_settings: {
         Row: {
@@ -91,7 +99,15 @@ export type Database = {
           position?: number | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_toolbar_shortcuts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       auth_error_logs: {
         Row: {
@@ -172,7 +188,15 @@ export type Database = {
           updated_at?: string | null
           views_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cms_categories: {
         Row: {
@@ -258,7 +282,22 @@ export type Database = {
           updated_by?: string | null
           version?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cms_content_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_content_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cms_content_relationships: {
         Row: {
@@ -344,6 +383,13 @@ export type Database = {
             referencedRelation: "cms_content"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "cms_content_revisions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cms_workflows: {
@@ -374,7 +420,15 @@ export type Database = {
           triggers?: Json | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cms_workflows_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       erd_visualizations: {
         Row: {
@@ -401,7 +455,15 @@ export type Database = {
           name?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "erd_visualizations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       forum_flags: {
         Row: {
@@ -435,6 +497,20 @@ export type Database = {
           thread_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "forum_flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_flags_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "forum_flags_thread_id_fkey"
             columns: ["thread_id"]
@@ -471,6 +547,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "forum_replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "forum_replies_thread_id_fkey"
             columns: ["thread_id"]
             isOneToOne: false
@@ -504,7 +587,15 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "forum_threads_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       import_sessions: {
         Row: {
@@ -546,7 +637,15 @@ export type Database = {
           type?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "import_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       maker_projects: {
         Row: {
@@ -633,6 +732,13 @@ export type Database = {
             columns: ["blog_post_id"]
             isOneToOne: false
             referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -882,7 +988,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "navigation_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -894,7 +1008,6 @@ export type Database = {
           created_at: string | null
           display_name: string | null
           failed_login_attempts: number | null
-          failed_pin_attempts: number | null
           gamification_enabled: boolean | null
           id: string
           is_banned: boolean | null
@@ -905,7 +1018,6 @@ export type Database = {
           lockout_until: string | null
           onboarding_completed: boolean | null
           pin_enabled: boolean | null
-          pin_hash: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
@@ -923,7 +1035,6 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           failed_login_attempts?: number | null
-          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id: string
           is_banned?: boolean | null
@@ -934,7 +1045,6 @@ export type Database = {
           lockout_until?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
-          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -952,7 +1062,6 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           failed_login_attempts?: number | null
-          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id?: string
           is_banned?: boolean | null
@@ -963,7 +1072,6 @@ export type Database = {
           lockout_until?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
-          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -972,7 +1080,15 @@ export type Database = {
           visual_editor_enabled?: boolean | null
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_banned_by_fkey"
+            columns: ["banned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       publishing_queue: {
         Row: {
@@ -1028,6 +1144,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "publishing_queue_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "publishing_queue_revision_id_fkey"
             columns: ["revision_id"]
             isOneToOne: false
@@ -1067,7 +1190,15 @@ export type Database = {
           used_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "recovery_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       revision_history: {
         Row: {
@@ -1097,7 +1228,15 @@ export type Database = {
           id?: string
           revision_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "revision_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_audit_logs: {
         Row: {
@@ -1127,7 +1266,15 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "security_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_events: {
         Row: {
@@ -1157,7 +1304,15 @@ export type Database = {
           severity?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "security_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_logs: {
         Row: {
@@ -1190,7 +1345,15 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "security_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
@@ -1304,7 +1467,15 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "site_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trusted_devices: {
         Row: {
@@ -1334,7 +1505,15 @@ export type Database = {
           last_used?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trusted_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_activity: {
         Row: {
@@ -1367,7 +1546,15 @@ export type Database = {
           sync_status?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_activity_cms: {
         Row: {
@@ -1400,6 +1587,13 @@ export type Database = {
             columns: ["content_id"]
             isOneToOne: false
             referencedRelation: "cms_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activity_cms_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1435,7 +1629,15 @@ export type Database = {
           steps?: Json
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

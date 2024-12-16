@@ -1,57 +1,58 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import type { WorkflowTemplate, WorkflowStage } from '@/lib/types/workflow';
 
 interface WorkflowState {
-  activeWorkflows: Record<string, any>;
-  workflowHistory: Record<string, any[]>;
+  activeWorkflows: Record<string, WorkflowTemplate>;
+  workflowHistory: Record<string, Array<{ action: string; timestamp: string }>>;
+  stages: WorkflowStage[];
 }
 
-const initialWorkflowState: WorkflowState = {
+const initialState: WorkflowState = {
   activeWorkflows: {},
   workflowHistory: {},
+  stages: []
 };
 
-export const workflowStateAtom = atom<WorkflowState>(initialWorkflowState);
+export const workflowStateAtom = atomWithStorage<WorkflowState>('workflow-state', initialState);
 
 export const setActiveWorkflowAtom = atom(
   null,
-  (get, set, { id, data }: { id: string; data: any }) => {
-    const currentState = get(workflowStateAtom);
+  (get, set, update: { id: string; data: WorkflowTemplate }) => {
+    const current = get(workflowStateAtom);
     set(workflowStateAtom, {
-      ...currentState,
-      activeWorkflows: { ...currentState.activeWorkflows, [id]: data },
+      ...current,
+      activeWorkflows: {
+        ...current.activeWorkflows,
+        [update.id]: update.data
+      }
     });
   }
 );
 
 export const addToWorkflowHistoryAtom = atom(
   null,
-  (get, set, { id, data }: { id: string; data: any }) => {
-    const currentState = get(workflowStateAtom);
+  (get, set, update: { id: string; data: { action: string; timestamp: string } }) => {
+    const current = get(workflowStateAtom);
+    const existingHistory = current.workflowHistory[update.id] || [];
+    
     set(workflowStateAtom, {
-      ...currentState,
+      ...current,
       workflowHistory: {
-        ...currentState.workflowHistory,
-        [id]: [...(currentState.workflowHistory[id] || []), data],
-      },
+        ...current.workflowHistory,
+        [update.id]: [...existingHistory, update.data]
+      }
     });
   }
 );
 
-export const clearWorkflowHistoryAtom = atom(
+export const setWorkflowStagesAtom = atom(
   null,
-  (get, set, id: string) => {
-    const currentState = get(workflowStateAtom);
-    const { [id]: _, ...restHistory } = currentState.workflowHistory;
+  (get, set, stages: WorkflowStage[]) => {
+    const current = get(workflowStateAtom);
     set(workflowStateAtom, {
-      ...currentState,
-      workflowHistory: restHistory,
+      ...current,
+      stages
     });
-  }
-);
-
-export const resetWorkflowAtom = atom(
-  null,
-  (_get, set) => {
-    set(workflowStateAtom, initialWorkflowState);
   }
 );

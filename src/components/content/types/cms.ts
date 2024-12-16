@@ -1,38 +1,31 @@
-import { Json } from "@/integrations/supabase/types";
+import { BaseEntity, ContentStatus, ContentType } from '@/lib/types/base';
 
-export interface BaseContent {
-  id: string;
+export interface BaseContent extends BaseEntity {
   title: string;
-  content: Json;
-  type: 'page' | 'component' | 'template' | 'workflow';
-  status: 'draft' | 'published' | 'archived';
-  created_by: { display_name: string };
-  created_at: string;
-  updated_at?: string;
-  metadata?: Json;
+  type: ContentType;
+  content?: Record<string, any>;
+  metadata?: Record<string, any>;
+  slug?: string;
+  status?: ContentStatus;
   version?: number;
+  created_by: string;
+  updated_by?: string;
 }
 
-export interface ContentWithAuthor extends BaseContent {
-  created_by: { display_name: string };
-}
-
-export interface ContentRevision {
-  id: string;
+export interface ContentRevision extends BaseEntity {
   content_id: string;
-  content: Json;
-  metadata?: Json;
-  version_number: number;
-  created_by: string;
-  created_at: string;
-  profiles: { display_name: string };
+  content: Record<string, any>;
+  metadata?: Record<string, any>;
+  created_by?: string;
+  version_number?: number;
+  change_summary?: string;
+  rollback_metadata?: Record<string, any>;
+  publish_status?: string;
 }
 
-export interface Revision {
-  id: string;
-  content: Json;
-  metadata?: Json;
-  created_by: string;
-  created_at: string;
-  profiles: { display_name: string };
+export interface ContentRelationship extends BaseEntity {
+  parent_id?: string;
+  child_id?: string;
+  relationship_type: string;
+  order_index?: number;
 }

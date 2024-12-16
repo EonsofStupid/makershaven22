@@ -1,83 +1,95 @@
-import { useNavigate } from "react-router-dom";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { useAuthStore } from '@/lib/store/auth-store';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/lib/store/auth/auth-store';
 
 export const Register = () => {
   const navigate = useNavigate();
-  const { session } = useAuthStore();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { setUser, setSession } = useAuthStore();
 
-  if (session) {
-    navigate('/');
-    return null;
-  }
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user && data.session) {
+        setUser(data.user);
+        setSession(data.session);
+        toast.success('Registration successful!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Failed to register');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1A1F2C] px-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="text-white hover:text-[#41f0db]"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0F1114] to-[#1A1F2C]"
+    >
+      <div className="w-full max-w-md space-y-8 p-8 bg-black/20 backdrop-blur-xl rounded-xl border border-white/10">
+        <div>
+          <h2 className="text-3xl font-bold text-center text-white">Register</h2>
+        </div>
+        <form onSubmit={handleRegister} className="space-y-6">
+          <div>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-white/5 border-white/10"
+              required
+            />
+          </div>
+          <div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-white/5 border-white/10"
+              required
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-neon-cyan/20 text-white border border-neon-cyan/50 hover:bg-neon-cyan/30"
           >
-            <ArrowLeft className="h-5 w-5" />
+            {isLoading ? 'Registering...' : 'Register'}
+          </Button>
+        </form>
+        <div className="text-center">
+          <Button
+            variant="link"
+            onClick={() => navigate('/auth/login')}
+            className="text-neon-cyan hover:text-neon-cyan/80"
+          >
+            Already have an account? Login
           </Button>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card className="p-6 bg-black/30 backdrop-blur-xl border border-white/10">
-            <Auth
-              supabaseClient={supabase}
-              appearance={{
-                theme: ThemeSupa,
-                extend: true,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: '#41f0db',
-                      brandAccent: '#ff0abe',
-                      brandButtonText: 'white',
-                      defaultButtonBackground: 'rgba(65, 240, 219, 0.1)',
-                      defaultButtonBackgroundHover: 'rgba(65, 240, 219, 0.2)',
-                      defaultButtonBorder: '#41f0db',
-                      defaultButtonText: '#41f0db',
-                      inputBackground: 'rgba(0, 0, 0, 0.3)',
-                      inputBorder: 'rgba(65, 240, 219, 0.2)',
-                      inputBorderHover: 'rgba(65, 240, 219, 0.4)',
-                      inputBorderFocus: '#41f0db',
-                      inputText: 'white',
-                      inputPlaceholder: 'rgba(255, 255, 255, 0.4)',
-                    },
-                  },
-                },
-                className: {
-                  container: 'space-y-4',
-                  button: 'w-full h-12 rounded-lg transition-all duration-300',
-                  label: 'text-sm font-medium text-[#41f0db]',
-                  input: 'h-12 w-full rounded-lg px-4',
-                  message: 'text-red-400 text-sm',
-                  anchor: 'text-[#41f0db] hover:text-[#ff0abe] transition-colors',
-                },
-              }}
-              theme="dark"
-              providers={['github', 'google']}
-              redirectTo={`${window.location.origin}/`}
-            />
-          </Card>
-        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

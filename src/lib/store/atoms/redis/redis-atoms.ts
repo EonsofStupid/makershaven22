@@ -1,45 +1,29 @@
 import { atom } from 'jotai';
+import type { RedisConfig } from '@/components/admin/cache/types';
 
-export interface RedisConfig {
-  enabled: boolean;
-  host?: string;
-  port?: number;
-  password?: string;
-  features: {
-    sessionManagement: boolean;
-    caching: boolean;
-    rateLimit: boolean;
-  };
-}
-
-export interface RedisStatus {
-  isConnected: boolean;
-  lastChecked: Date | null;
-  error: string | null;
-}
-
-const defaultConfig: RedisConfig = {
+const initialRedisConfig: RedisConfig = {
   enabled: false,
+  host: '',
+  port: '',
+  password: '',
+  ttl: 3600,
+  maxMemory: 128,
+  restrictedMode: false,
   features: {
     sessionManagement: false,
     caching: false,
-    rateLimit: false
+    realTimeUpdates: false
   }
 };
 
-export const redisConfigAtom = atom<RedisConfig>(defaultConfig);
-export const redisStatusAtom = atom<RedisStatus>({
+export const redisConfigAtom = atom<RedisConfig>(initialRedisConfig);
+
+export const redisStatusAtom = atom({
   isConnected: false,
-  lastChecked: null,
-  error: null
+  lastChecked: null as Date | null,
+  error: null as string | null
 });
 
-// Derived atoms
-export const isRedisEnabledAtom = atom(
-  (get) => get(redisConfigAtom).enabled
-);
-
-// Action atoms
 export const updateRedisConfigAtom = atom(
   null,
   (get, set, update: Partial<RedisConfig>) => {
@@ -50,8 +34,12 @@ export const updateRedisConfigAtom = atom(
 
 export const updateRedisStatusAtom = atom(
   null,
-  (get, set, update: Partial<RedisStatus>) => {
-    const current = get(redisStatusAtom);
-    set(redisStatusAtom, { ...current, ...update });
+  (get, set, status: { isConnected: boolean; lastChecked?: Date; error?: string | null }) => {
+    set(redisStatusAtom, {
+      ...get(redisStatusAtom),
+      isConnected: status.isConnected,
+      lastChecked: status.lastChecked || new Date(),
+      error: status.error || null
+    });
   }
 );

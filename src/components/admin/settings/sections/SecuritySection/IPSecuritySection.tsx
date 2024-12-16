@@ -6,13 +6,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Plus, X } from 'lucide-react';
-import { SecuritySettings } from '../../types/security';
+import type { SecuritySettings } from '@/lib/types/settings';
 
 export const IPSecuritySection = () => {
   const [newIP, setNewIP] = React.useState('');
   const queryClient = useQueryClient();
 
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings = {} as SecuritySettings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -20,7 +20,15 @@ export const IPSecuritySection = () => {
         .select('security_settings')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          title: "Error fetching settings",
+          description: error.message,
+          variant: "destructive"
+        });
+        throw error;
+      }
+
       return data.security_settings as SecuritySettings;
     }
   });
@@ -46,7 +54,7 @@ export const IPSecuritySection = () => {
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       toast.success('Security settings updated successfully');
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Error updating security settings:', error);
       toast.error('Failed to update security settings');
     }

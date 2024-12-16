@@ -1,36 +1,41 @@
-import { Json } from "@/integrations/supabase/types";
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: Record<string, any>;
-  description?: string;
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { BaseEntity } from '@/lib/types/base';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface WorkflowFormData {
   name: string;
+  description: string;
+  steps: WorkflowStage[];
+  is_active?: boolean;
+}
+
+export interface WorkflowTemplate extends BaseEntity {
+  name: string;
   description?: string;
+  steps: Json;
   stages: WorkflowStage[];
   is_active: boolean;
 }
 
+export interface WorkflowStage {
+  id: string;
+  type: WorkflowStageType;
+  name: string;
+  description?: string;
+  config: WorkflowStageConfig;
+  order: number;
+}
+
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+
 export interface WorkflowStageConfig {
   timeLimit?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+  }>;
+  approvers?: string[];
+  deadline?: string;
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
@@ -39,12 +44,11 @@ export interface WorkflowStageConfig {
     onStart?: boolean;
     onComplete?: boolean;
     reminderInterval?: number;
-  };
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-  }>;
+    type: string;
+    recipients: string[];
+    template: string;
+  }[];
+  requiredApprovers?: number;
 }
 
 export interface StageConfigUpdateProps {
@@ -54,40 +58,39 @@ export interface StageConfigUpdateProps {
 
 export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
-export const validateStage = (stage: WorkflowStage) => {
+export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors?: string[] } => {
   const errors: string[] = [];
-  if (!stage.name.trim()) {
+  
+  if (!stage.name?.trim()) {
     errors.push('Stage name is required');
   }
+  
   if (!stage.type) {
     errors.push('Stage type is required');
   }
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors: errors.length > 0 ? errors : undefined
   };
 };
 
 export const isValidStageUpdate = (update: Partial<WorkflowStage>): boolean => {
-  return true; // Add validation logic as needed
+  if (update.name !== undefined && !update.name.trim()) {
+    return false;
+  }
+  return true;
 };
 
 export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>) => {
-  return updates;
+  return { id: stageId, ...updates };
+};
+
+export const parseStages = (steps: Json): WorkflowStage[] => {
+  if (!steps || !Array.isArray(steps)) return [];
+  return steps as WorkflowStage[];
 };
 
 export const serializeStages = (stages: WorkflowStage[]): Json => {
   return stages as unknown as Json;
-};
-
-export const parseStages = (data: Json): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  return data.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: stage.type || 'TASK',
-    order: stage.order || 0,
-    config: stage.config || {},
-    description: stage.description
-  }));
 };

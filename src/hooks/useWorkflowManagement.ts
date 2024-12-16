@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkflowStore } from '@/lib/store/workflow-store';
 import { toast } from 'sonner';
+import { parseWorkflowSteps, serializeWorkflowSteps } from '@/lib/types/workflow';
+import type { WorkflowTemplate } from '@/lib/types/workflow';
 
 export const useWorkflowManagement = () => {
   const queryClient = useQueryClient();
@@ -10,9 +12,8 @@ export const useWorkflowManagement = () => {
   const { data: workflows, isLoading, error } = useQuery({
     queryKey: ['workflows'],
     queryFn: async () => {
-      console.log('Fetching workflows...');
       const { data, error } = await supabase
-        .from('cms_workflows')
+        .from('workflow_templates')
         .select(`
           *,
           created_by (
@@ -22,45 +23,38 @@ export const useWorkflowManagement = () => {
         `)
         .order('updated_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching workflows:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      return data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+      return data.map(workflow => ({
+        ...workflow,
+        stages: parseWorkflowSteps(workflow.steps)
+      })) as WorkflowTemplate[];
+    }
   });
 
   const createWorkflow = useMutation({
-    mutationFn: async ({ name, description, steps, triggers }: {
-      name: string;
-      description?: string;
-      steps: any[];
-      triggers?: any[];
-    }) => {
-      console.log('Creating workflow:', { name, description, steps, triggers });
-      const { data, error } = await supabase
-        .from('cms_workflows')
+    mutationFn: async (data: Partial<WorkflowTemplate>) => {
+      const { data: newWorkflow, error } = await supabase
+        .from('workflow_templates')
         .insert({
-          name,
-          description,
-          steps,
-          triggers: triggers || [],
+          name: data.name,
+          description: data.description,
+          steps: serializeWorkflowSteps(data.stages || []),
+          is_active: data.is_active ?? true,
           created_by: (await supabase.auth.getUser()).data.user?.id
         })
         .select()
         .single();
 
       if (error) throw error;
-      return data;
+      return newWorkflow;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['workflows'] });
-      setActiveWorkflow(data.id, data);
-      addToHistory(data.id, { 
-        type: 'created', 
-        timestamp: new Date().toISOString() 
+      setActiveWorkflow({ id: data.id, data });
+      addToHistory({ 
+        id: data.id, 
+        data: { action: 'created', timestamp: new Date().toISOString() }
       });
       toast.success('Workflow created successfully');
     },
@@ -71,17 +65,13 @@ export const useWorkflowManagement = () => {
   });
 
   const updateWorkflow = useMutation({
-    mutationFn: async ({ id, ...updates }: { 
-      id: string; 
-      name?: string;
-      description?: string;
-      steps?: any[];
-      triggers?: any[];
-    }) => {
-      console.log('Updating workflow:', { id, ...updates });
+    mutationFn: async ({ id, ...updates }: Partial<WorkflowTemplate> & { id: string }) => {
       const { data, error } = await supabase
-        .from('cms_workflows')
-        .update(updates)
+        .from('workflow_templates')
+        .update({
+          ...updates,
+          steps: updates.stages ? serializeWorkflowSteps(updates.stages) : undefined
+        })
         .eq('id', id)
         .select()
         .single();
@@ -91,10 +81,10 @@ export const useWorkflowManagement = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['workflows'] });
-      setActiveWorkflow(data.id, data);
-      addToHistory(data.id, { 
-        type: 'updated', 
-        timestamp: new Date().toISOString() 
+      setActiveWorkflow({ id: data.id, data });
+      addToHistory({ 
+        id: data.id, 
+        data: { action: 'updated', timestamp: new Date().toISOString() }
       });
       toast.success('Workflow updated successfully');
     },
@@ -106,19 +96,19 @@ export const useWorkflowManagement = () => {
 
   const deleteWorkflow = useMutation({
     mutationFn: async (id: string) => {
-      console.log('Deleting workflow:', id);
       const { error } = await supabase
-        .from('cms_workflows')
+        .from('workflow_templates')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      return id;
     },
-    onSuccess: (_, id) => {
+    onSuccess: (id) => {
       queryClient.invalidateQueries({ queryKey: ['workflows'] });
-      addToHistory(id, { 
-        type: 'deleted', 
-        timestamp: new Date().toISOString() 
+      addToHistory({ 
+        id, 
+        data: { action: 'deleted', timestamp: new Date().toISOString() }
       });
       toast.success('Workflow deleted successfully');
     },

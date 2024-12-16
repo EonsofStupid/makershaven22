@@ -1,43 +1,40 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import type { AuthGuardProps } from '@/lib/types/auth/base';
+import type { UserRole } from '@/lib/types/base';
 
-interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: string | string[];
-  fallbackPath?: string;
-}
+export const AuthGuard: React.FC<AuthGuardProps> = ({
+  children,
+  requireAuth = false,
+  requiredRole,
+  fallbackPath = '/auth/login',
+  loadingComponent = <LoadingSpinner />,
+  unauthorizedComponent = <Navigate to={fallbackPath} replace />,
+  onError
+}) => {
+  const { user, isAuthLoading, error } = useSyncedAuth();
+  const location = useLocation();
 
-export const AuthGuard = ({ 
-  children, 
-  requireAuth = true, 
-  requiredRole, 
-  fallbackPath = '/login'
-}: AuthGuardProps) => {
-  const { user, isLoading } = useAuthStore();
+  React.useEffect(() => {
+    if (error && onError) {
+      onError(error);
+    }
+  }, [error, onError]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
+  if (isAuthLoading) {
+    return <>{loadingComponent}</>;
   }
 
   if (requireAuth && !user) {
-    return <Navigate to={fallbackPath} replace />;
+    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
-  if (requiredRole && user && !user.role) {
-    return <Navigate to={fallbackPath || '/unauthorized'} replace />;
-  }
-
-  if (requiredRole && user?.role) {
+  if (requiredRole && user) {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-    if (!roles.includes(user.role)) {
-      return <Navigate to={fallbackPath || '/unauthorized'} replace />;
+    if (!roles.includes(user.role as UserRole)) {
+      return <>{unauthorizedComponent}</>;
     }
   }
 

@@ -9,10 +9,32 @@ import { CreateUserForm } from "@/components/admin/users/CreateUserForm";
 import { UserBulkActions } from "@/components/admin/users/UserBulkActions";
 import { UserMetrics } from "@/components/admin/users/UserMetrics";
 import { useUserMetrics } from "@/hooks/useUserMetrics";
+import { useStore } from '@/lib/store';
 
 const UserManagement = () => {
+  const { isReady, error } = useStore();
   const { data: metrics, isLoading: isLoadingMetrics } = useUserMetrics();
   const [searchQuery, setSearchQuery] = React.useState("");
+
+  if (!isReady) {
+    return (
+      <div className="min-h-screen bg-gray-900 pt-20 p-8">
+        <div className="flex justify-center items-center h-64">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 pt-20 p-8">
+        <div className="flex justify-center items-center h-64">
+          Error: {error.message}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 pt-20 p-8">

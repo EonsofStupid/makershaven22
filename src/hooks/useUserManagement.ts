@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkflowStore } from '@/lib/store/workflow-store';
 import { toast } from 'sonner';
-import { UserRole } from '@/components/auth/types';
+import { UserRole } from '@/lib/types/auth';
+import { UserProfile, UserActivity } from '@/components/admin/users/types';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();
@@ -17,7 +18,7 @@ export const useUserManagement = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as UserProfile[];
     }
   });
 
@@ -43,11 +44,35 @@ export const useUserManagement = () => {
     }
   });
 
+  const getUserActivity = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_activity')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as UserActivity[];
+  };
+
+  const getUserCMSActivity = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_activity_cms')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  };
+
   return {
     users,
     isLoading,
     error,
     refetch,
-    updateRole
+    updateRole,
+    getUserActivity,
+    getUserCMSActivity
   };
 };

@@ -1,92 +1,78 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Hammer, 
-  Wrench, 
-  BookOpen, 
-  Globe,
-  ChevronDown 
-} from 'lucide-react';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { BuildsMenu } from './menu-items/BuildsMenu';
-import { PartsMenu } from './menu-items/PartsMenu';
-import { GuidesMenu } from './menu-items/GuidesMenu';
-import { SiteMenu } from './menu-items/SiteMenu';
+import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
-export function MegaMenu() {
+export const MegaMenu = () => {
+  const { user } = useSyncedAuth();
+
+  const ListItem = React.forwardRef<
+    React.ElementRef<"a">,
+    React.ComponentPropsWithoutRef<"a">
+  >(({ className, title, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <a
+            ref={ref}
+            className={cn(
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              className
+            )}
+            {...props}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+              {children}
+            </p>
+          </a>
+        </NavigationMenuLink>
+      </li>
+    );
+  });
+  ListItem.displayName = "ListItem";
+
   return (
     <NavigationMenu>
-      <NavigationMenuList className="flex items-center gap-1">
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className="h-9 px-4 py-2 group/nav-trigger bg-transparent text-white data-[state=open]:bg-white/5 hover:bg-gradient-to-r hover:from-[#41f0db]/20 hover:to-[#8000ff]/20 hover:text-[#41f0db] transition-all duration-300"
-          >
-            <Hammer className="w-4 h-4 mr-2" />
-            <span className="relative">
-              Builds
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#41f0db] to-[#8000ff] transition-all duration-300 group-hover/nav-trigger:w-full" />
-            </span>
-            <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-300 group-data-[state=open]/nav-trigger:rotate-180" />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <BuildsMenu />
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className="h-9 px-4 py-2 group/nav-trigger bg-transparent text-white data-[state=open]:bg-white/5 hover:bg-gradient-to-r hover:from-[#41f0db]/20 hover:to-[#8000ff]/20 hover:text-[#41f0db] transition-all duration-300"
-          >
-            <Wrench className="w-4 h-4 mr-2" />
-            <span className="relative">
-              Parts
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#41f0db] to-[#8000ff] transition-all duration-300 group-hover/nav-trigger:w-full" />
-            </span>
-            <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-300 group-data-[state=open]/nav-trigger:rotate-180" />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <PartsMenu />
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className="h-9 px-4 py-2 group/nav-trigger bg-transparent text-white data-[state=open]:bg-white/5 hover:bg-gradient-to-r hover:from-[#41f0db]/20 hover:to-[#8000ff]/20 hover:text-[#41f0db] transition-all duration-300"
-          >
-            <BookOpen className="w-4 h-4 mr-2" />
-            <span className="relative">
-              Guides
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#41f0db] to-[#8000ff] transition-all duration-300 group-hover/nav-trigger:w-full" />
-            </span>
-            <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-300 group-data-[state=open]/nav-trigger:rotate-180" />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <GuidesMenu />
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className="h-9 px-4 py-2 group/nav-trigger bg-transparent text-white data-[state=open]:bg-white/5 hover:bg-gradient-to-r hover:from-[#41f0db]/20 hover:to-[#8000ff]/20 hover:text-[#41f0db] transition-all duration-300"
-          >
-            <Globe className="w-4 h-4 mr-2" />
-            <span className="relative">
-              Site
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#41f0db] to-[#8000ff] transition-all duration-300 group-hover/nav-trigger:w-full" />
-            </span>
-            <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-300 group-data-[state=open]/nav-trigger:rotate-180" />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <SiteMenu />
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+      <NavigationMenuList>
+        {user && (
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                {menuItems.map((item) => (
+                  <ListItem key={item.title} title={item.title} href={item.href}>
+                    {item.description}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        )}
       </NavigationMenuList>
     </NavigationMenu>
   );
-}
+};
+
+const menuItems = [
+  {
+    title: "Profile",
+    href: "/profile",
+    description: "Manage your account settings"
+  },
+  {
+    title: "My Builds",
+    href: "/builds",
+    description: "View your saved builds"
+  },
+  {
+    title: "Messages",
+    href: "/messages",
+    description: "Check your inbox"
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    description: "Customize your experience"
+  }
+];
