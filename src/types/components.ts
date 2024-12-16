@@ -1,20 +1,17 @@
-export interface ComponentConfig {
+export interface ComponentType {
   id: string;
   name: string;
+  description?: string;
+  props: Record<string, any>;
+}
+
+export interface ComponentConfig {
   type: string;
   props: Record<string, any>;
   children?: ComponentConfig[];
-  styles?: Record<string, string>;
-  validation?: {
-    required?: boolean;
-    pattern?: RegExp;
-    minLength?: number;
-    maxLength?: number;
-  };
 }
 
 export interface ComponentProps {
   config: ComponentConfig;
-  onChange?: (value: any) => void;
-  value?: any;
+  onUpdate?: (config: ComponentConfig) => void;
 }

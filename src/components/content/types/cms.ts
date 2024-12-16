@@ -1,6 +1,6 @@
 import { Json } from "@/integrations/supabase/types";
 
-export interface ContentWithAuthor {
+export interface BaseContent {
   id: string;
   title: string;
   content: Json;
@@ -11,6 +11,10 @@ export interface ContentWithAuthor {
   updated_at?: string;
   metadata?: Json;
   version?: number;
+}
+
+export interface ContentWithAuthor extends BaseContent {
+  created_by: { display_name: string };
 }
 
 export interface ContentRevision {
@@ -30,5 +34,5 @@ export interface Revision {
   metadata?: Json;
   created_by: string;
   created_at: string;
-  profiles: Profile;
+  profiles: { display_name: string };
 }
