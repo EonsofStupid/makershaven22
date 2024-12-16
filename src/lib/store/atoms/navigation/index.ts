@@ -1,50 +1,28 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+import type { NavigationSettings } from '@/lib/types/navigation';
 
-export interface NavigationState {
-  isOpen: boolean;
-  activeTab: string;
-  shortcuts: string[];
-  expanded: boolean;
-}
+// Persistent storage atoms for navigation state
+export const navigationSettingsAtom = atomWithStorage<NavigationSettings | null>('navigation-settings', null);
 
-const initialState: NavigationState = {
-  isOpen: false,
-  activeTab: 'home',
-  shortcuts: [],
-  expanded: true
-};
+// Volatile state atoms
+export const navigationLoadingAtom = atom<boolean>(false);
+export const navigationErrorAtom = atom<Error | null>(null);
 
-export const navigationAtom = atomWithStorage<NavigationState>('navigation-state', initialState);
-
-export const sidebarAtom = atom(
-  (get) => get(navigationAtom).isOpen,
-  (get, set, isOpen: boolean) => {
-    const current = get(navigationAtom);
-    set(navigationAtom, { ...current, isOpen });
+// Action atoms
+export const setNavigationSettingsAtom = atom(
+  null,
+  (get, set, settings: NavigationSettings | null) => {
+    set(navigationSettingsAtom, settings);
   }
 );
 
-export const sidebarExpandedAtom = atom(
-  (get) => get(navigationAtom).expanded,
-  (get, set, expanded: boolean) => {
-    const current = get(navigationAtom);
-    set(navigationAtom, { ...current, expanded });
-  }
-);
-
-export const sidebarActiveTabAtom = atom(
-  (get) => get(navigationAtom).activeTab,
-  (get, set, activeTab: string) => {
-    const current = get(navigationAtom);
-    set(navigationAtom, { ...current, activeTab });
-  }
-);
-
-export const sidebarShortcutsAtom = atom(
-  (get) => get(navigationAtom).shortcuts,
-  (get, set, shortcuts: string[]) => {
-    const current = get(navigationAtom);
-    set(navigationAtom, { ...current, shortcuts });
+export const updateNavigationSettingsAtom = atom(
+  null,
+  (get, set, updates: Partial<NavigationSettings>) => {
+    const current = get(navigationSettingsAtom);
+    if (current) {
+      set(navigationSettingsAtom, { ...current, ...updates });
+    }
   }
 );

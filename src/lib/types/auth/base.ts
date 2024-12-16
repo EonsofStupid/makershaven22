@@ -37,3 +37,8 @@ export interface AuthGuardProps {
   unauthorizedComponent?: React.ReactNode;
   onError?: (error: Error | { message: string }) => void;
 }
+
+export interface AuthError extends Error {
+  code: string;
+  details?: string;
+}
