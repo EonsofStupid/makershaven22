@@ -13,7 +13,7 @@ interface TwoFactorVerificationProps {
 export const TwoFactorVerification: React.FC<TwoFactorVerificationProps> = ({ 
   email 
 }) => {
-  const { authError } = useSyncedAuth();
+  const { error: authError } = useSyncedAuth();
   const {
     verifyCode,
     isLoading,

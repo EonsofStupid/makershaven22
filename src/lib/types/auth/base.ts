@@ -1,4 +1,4 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+import type { UserRole } from '../base';
 
 export interface AuthUser {
   id: string;
@@ -35,6 +35,7 @@ export interface AuthError extends Error {
 
 export interface AuthErrorBoundaryState {
   error: AuthError | null;
+  hasError: boolean;
 }
 
 export interface AuthErrorRecoveryState {

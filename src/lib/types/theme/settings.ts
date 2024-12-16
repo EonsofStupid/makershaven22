@@ -1,10 +1,11 @@
-import type { ThemeBase, ThemeColors, ThemeEffects, ThemeTypography, ThemeMode } from './base';
+import type { ThemeBase, ThemeColors, ThemeEffects, ThemeTypography, ThemeMode, SecuritySettings } from './base';
 
 export interface ThemeSettings extends ThemeBase, ThemeColors, ThemeEffects, ThemeTypography {
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: ThemeMode;
   menu_animation_type?: string;
+  security_settings: SecuritySettings;
 }
 
 export interface Theme {
