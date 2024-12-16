@@ -1,36 +1,24 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthSession, AuthUser } from '@/lib/auth/types';
-
-interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
-}
+import type { AuthState } from '@/lib/types/store-types';
 
 export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   user: null,
   isLoading: true,
   error: null,
-  isOffline: false,
+  isTransitioning: false,
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
-  setOffline: (isOffline) => set({ isOffline }),
+  setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
   signOut: async () => {
-    await supabase.auth.signOut();
-    set({ session: null, user: null });
-  },
-  reset: () => set({ session: null, user: null, isLoading: false, error: null, isOffline: false })
+    try {
+      await supabase.auth.signOut();
+      set({ session: null, user: null });
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }
 }));
