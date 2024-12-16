@@ -13,13 +13,18 @@ interface ThemeState {
   setError: (error: Error | null) => void;
   setMode: (mode: 'light' | 'dark' | 'system') => void;
   updateTheme: (settings: Partial<Settings>) => Promise<void>;
+  reset: () => void;
 }
 
-export const useThemeStore = create<ThemeState>((set) => ({
+const initialState = {
   settings: null,
   isLoading: true,
   error: null,
-  mode: 'system',
+  mode: 'system' as const
+};
+
+export const useThemeStore = create<ThemeState>((set) => ({
+  ...initialState,
   setSettings: (settings) => set({ settings }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
@@ -30,7 +35,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
       if (error) throw error;
       
       set((state) => ({
-        settings: { ...state.settings, ...settings }
+        settings: state.settings ? { ...state.settings, ...settings } : null
       }));
       
       toast.success("Theme updated successfully");
@@ -39,5 +44,6 @@ export const useThemeStore = create<ThemeState>((set) => ({
       set({ error: error instanceof Error ? error : new Error('Failed to update theme') });
       toast.error("Failed to update theme");
     }
-  }
+  },
+  reset: () => set(initialState)
 }));

@@ -1,64 +1,54 @@
 import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-interface AuthUser {
-  id: string;
-  email?: string | null;
-  role?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
+import type { AuthSession, AuthUser } from '@/lib/auth/types';
 
 interface AuthState {
-  session: any | null;
+  session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
   error: Error | null;
+  isOffline: boolean;
   isTransitioning: boolean;
-  setSession: (session: any | null) => void;
+}
+
+interface AuthStore extends AuthState {
+  setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
-  setIsTransitioning: (isTransitioning: boolean) => void;
+  setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+const initialState: AuthState = {
   session: null,
   user: null,
   isLoading: true,
   error: null,
-  isTransitioning: false,
+  isOffline: false,
+  isTransitioning: false
+};
+
+export const useAuthStore = create<AuthStore>((set) => ({
+  ...initialState,
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
-  setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
+  setOffline: (isOffline) => set({ isOffline }),
   signOut: async () => {
     try {
-      set({ isTransitioning: true });
-      const { error: signOutError } = await supabase.auth.signOut();
-      if (signOutError) throw signOutError;
-      
-      set({ session: null, user: null });
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      set(initialState);
       toast.success("Successfully signed out");
-    } catch (err) {
-      console.error("Sign out error:", err);
-      set({ error: err instanceof Error ? err : new Error('Failed to sign out') });
+    } catch (error) {
+      console.error("Error signing out:", error);
       toast.error("Failed to sign out");
-    } finally {
-      set({ isTransitioning: false });
+      set({ error: error instanceof Error ? error : new Error('Failed to sign out') });
     }
   },
-  reset: () => set({
-    session: null,
-    user: null,
-    error: null,
-    isLoading: false,
-    isTransitioning: false
-  })
+  reset: () => set(initialState)
 }));
