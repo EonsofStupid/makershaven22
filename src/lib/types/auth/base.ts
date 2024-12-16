@@ -1,4 +1,4 @@
-import type { UserRole } from '../base';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
@@ -25,30 +25,15 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  hasAccess: boolean;
+}
+
+export interface ErrorState {
+  code?: string;
+  message: string;
+  details?: Record<string, any>;
 }
 
 export interface AuthError extends Error {
   code: string;
-  details?: string;
-}
-
-export interface AuthErrorBoundaryState {
-  error: AuthError | null;
-}
-
-export interface AuthErrorRecoveryState {
-  attemptCount: number;
-  lastAttempt: Date | null;
-  nextAttemptDelay: number;
-}
-
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
-  onError?: (error: Error) => void;
+  details?: Record<string, any>;
 }
