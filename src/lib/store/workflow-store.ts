@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import type { WorkflowTemplate } from '@/components/admin/workflows/types';
+import { serializeStages } from '@/components/admin/workflows/types';
 import { toast } from 'sonner';
 
 interface WorkflowState {
@@ -56,7 +57,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         .insert([{ 
           name: template.name,
           description: template.description,
-          steps: template.steps || [],
+          steps: serializeStages(template.steps || []),
           is_active: template.is_active ?? true
         }])
         .select()
@@ -77,6 +78,10 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   updateTemplate: async (id, updates) => {
     set({ isLoading: true });
     try {
+      if (updates.steps) {
+        updates.steps = serializeStages(updates.steps);
+      }
+      
       const { data, error } = await supabase
         .from('workflow_templates')
         .update(updates)
