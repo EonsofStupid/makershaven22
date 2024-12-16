@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -17,6 +17,7 @@ export const AuthGuard = ({
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const { user, isLoading } = useAuthStore();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -27,7 +28,7 @@ export const AuthGuard = ({
   }
 
   if (requireAuth && !user) {
-    return <Navigate to={fallbackPath} replace />;
+    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
   if (requiredRole && user && !user.role) {
@@ -43,5 +44,3 @@ export const AuthGuard = ({
 
   return <>{children}</>;
 };
-
-export default AuthGuard;

@@ -1,4 +1,4 @@
-import { Json } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 
 export type ContentType = 'page' | 'component' | 'template' | 'workflow';
 export type ContentStatus = 'draft' | 'published' | 'archived';

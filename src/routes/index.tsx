@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -13,7 +13,7 @@ import Index from "@/pages/Index";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 
-export const AppRoutes = () => {
+export const Routes = () => {
   const { session, user, isLoading } = useAuthStore();
   
   if (isLoading) {
@@ -27,7 +27,7 @@ export const AppRoutes = () => {
   return (
     <PageTransition>
       <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
+        <RouterRoutes>
           {/* Landing page for non-authenticated users */}
           <Route 
             path="/" 
@@ -102,7 +102,7 @@ export const AppRoutes = () => {
 
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        </RouterRoutes>
       </Suspense>
     </PageTransition>
   );

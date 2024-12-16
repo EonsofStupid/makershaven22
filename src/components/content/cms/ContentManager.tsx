@@ -15,20 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface ContentWithAuthor {
-  id: string;
-  title: string;
-  status: string;
-  type: string;
-  updated_at: string;
-  created_by: {
-    display_name: string | null;
-  } | null;
-  updated_by: {
-    display_name: string | null;
-  } | null;
-}
+import type { ContentWithAuthor } from '@/lib/types/content';
 
 export const ContentManager = () => {
   const navigate = useNavigate();
@@ -38,13 +25,11 @@ export const ContentManager = () => {
   const { data: content, isLoading } = useQuery({
     queryKey: ['cms-content', search, typeFilter],
     queryFn: async () => {
-      console.log('Fetching CMS content...');
       let query = supabase
         .from('cms_content')
         .select(`
           *,
-          created_by:profiles!cms_content_created_by_fkey(display_name),
-          updated_by:profiles!cms_content_updated_by_fkey(display_name)
+          created_by:profiles(display_name)
         `)
         .order('updated_at', { ascending: false });
 
@@ -64,8 +49,7 @@ export const ContentManager = () => {
         throw error;
       }
 
-      console.log('Fetched content:', data);
-      return data as ContentWithAuthor[];
+      return data as unknown as ContentWithAuthor[];
     }
   });
 
@@ -153,8 +137,8 @@ export const ContentManager = () => {
                     </h3>
                     <div className="flex items-center gap-2 mt-2">
                       <span className="text-sm text-white/60">
-                        Last updated by {item.updated_by?.display_name} on{' '}
-                        {new Date(item.updated_at).toLocaleDateString()}
+                        Last updated by {item.created_by.display_name} on{' '}
+                        {new Date(item.updated_at || '').toLocaleDateString()}
                       </span>
                       <span className="text-sm text-white/60">•</span>
                       <span className="text-sm text-white/60 capitalize">
@@ -179,5 +163,3 @@ export const ContentManager = () => {
     </div>
   );
 };
-
-export default ContentManager;

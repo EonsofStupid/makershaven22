@@ -5,8 +5,26 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: Record<string, any>;
+  config: WorkflowStageConfig;
   description?: string;
+}
+
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  dueDate?: string;
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: any;
+    }>;
+  };
 }
 
 export interface WorkflowTemplate {
@@ -18,4 +36,12 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface WorkflowState {
+  templates: WorkflowTemplate[];
+  activeTemplate: WorkflowTemplate | null;
+  history: WorkflowStage[];
+  isLoading: boolean;
+  error: Error | null;
 }
