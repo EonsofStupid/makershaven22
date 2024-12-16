@@ -6,12 +6,11 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { useAtom } from 'jotai';
-import { sessionAtom } from '@/lib/store/atoms/auth';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 export const Register = () => {
   const navigate = useNavigate();
-  const [session] = useAtom(sessionAtom);
+  const { session } = useAuthStore();
 
   if (session) {
     navigate('/');
