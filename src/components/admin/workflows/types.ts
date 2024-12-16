@@ -3,15 +3,6 @@ import type { Profile } from "@/integrations/supabase/types/tables";
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
-}
-
 export interface WorkflowTemplate {
   id: string;
   name: string;
@@ -22,6 +13,15 @@ export interface WorkflowTemplate {
   created_at?: string;
   updated_at?: string;
   profile?: Profile;
+}
+
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  description?: string;
 }
 
 export interface WorkflowStageConfig {
