@@ -33,6 +33,11 @@ export interface AuthError extends Error {
   details?: string;
 }
 
+export interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error: AuthError; reset: () => void }>;
+}
+
 export interface AuthErrorBoundaryState {
   error: AuthError | null;
   hasError: boolean;

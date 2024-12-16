@@ -1,7 +1,17 @@
-import { Json } from '@/integrations/supabase/types/database/base';
+import type { Json } from '@supabase/supabase-js';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+
+export interface SecuritySettings {
+  ip_whitelist: string[];
+  ip_blacklist: string[];
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  max_login_attempts: number;
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
+}
 
 export interface Settings {
   id: string;
@@ -40,16 +50,6 @@ export interface Settings {
   updated_by?: string;
 }
 
-export interface SecuritySettings {
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
-  max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
-}
-
 export interface Theme {
   settings: Settings | null;
   mode: ThemeMode;
@@ -61,10 +61,6 @@ export interface ThemeContextType {
   effectiveTheme: 'light' | 'dark';
   updateTheme: (settings: Settings) => Promise<void>;
 }
-
-export type SettingsUpdateParams = {
-  [K in keyof Settings as `p_${string & K}`]: Settings[K];
-};
 
 export interface SettingsFormData extends Omit<Settings, 'id' | 'updated_at' | 'updated_by'> {}
 
