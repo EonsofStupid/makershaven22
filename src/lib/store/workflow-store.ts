@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import type { WorkflowTemplate } from '@/components/admin/workflows/types';
-import { serializeStages } from '@/components/admin/workflows/types';
+import { serializeStages, parseStages } from '@/components/admin/workflows/types';
 import { toast } from 'sonner';
 
 interface WorkflowState {
@@ -11,7 +11,7 @@ interface WorkflowState {
   error: Error | null;
   setTemplates: (templates: WorkflowTemplate[]) => void;
   setCurrentTemplate: (template: WorkflowTemplate | null) => void;
-  setLoading: (isLoading: boolean) => void;
+  setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   fetchTemplates: () => Promise<void>;
   createTemplate: (template: Partial<WorkflowTemplate>) => Promise<void>;
@@ -35,15 +35,29 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('workflow_templates')
-        .select('*, profile:profiles(id, username, display_name, avatar_url)')
+        .select(`
+          *,
+          profile:created_by (
+            id,
+            username,
+            display_name,
+            avatar_url
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      set({ templates: data as WorkflowTemplate[], error: null });
+
+      const templates = data.map(template => ({
+        ...template,
+        steps: parseStages(template.steps)
+      }));
+
+      set({ templates, error: null });
     } catch (error) {
-      console.error('Error fetching templates:', error);
-      set({ error: error as Error });
-      toast.error('Failed to load workflow templates');
+      console.error('Error fetching workflows:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to fetch workflows') });
+      toast.error('Failed to load workflows');
     } finally {
       set({ isLoading: false });
     }
@@ -54,7 +68,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('workflow_templates')
-        .insert([{ 
+        .insert([{
           name: template.name,
           description: template.description,
           steps: serializeStages(template.steps || []),
@@ -64,12 +78,14 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         .single();
 
       if (error) throw error;
-      const templates = get().templates;
-      set({ templates: [...templates, data as WorkflowTemplate] });
-      toast.success('Template created successfully');
+
+      const templates = [...get().templates, { ...data, steps: parseStages(data.steps) }];
+      set({ templates });
+      toast.success('Workflow template created');
     } catch (error) {
-      console.error('Error creating template:', error);
-      toast.error('Failed to create template');
+      console.error('Error creating workflow:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to create workflow') });
+      toast.error('Failed to create workflow');
     } finally {
       set({ isLoading: false });
     }
@@ -81,7 +97,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       if (updates.steps) {
         updates.steps = serializeStages(updates.steps);
       }
-      
+
       const { data, error } = await supabase
         .from('workflow_templates')
         .update(updates)
@@ -90,14 +106,16 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         .single();
 
       if (error) throw error;
+
       const templates = get().templates.map(t => 
-        t.id === id ? { ...t, ...data } : t
+        t.id === id ? { ...data, steps: parseStages(data.steps) } : t
       );
       set({ templates });
-      toast.success('Template updated successfully');
+      toast.success('Workflow template updated');
     } catch (error) {
-      console.error('Error updating template:', error);
-      toast.error('Failed to update template');
+      console.error('Error updating workflow:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to update workflow') });
+      toast.error('Failed to update workflow');
     } finally {
       set({ isLoading: false });
     }
@@ -112,12 +130,14 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         .eq('id', id);
 
       if (error) throw error;
+
       const templates = get().templates.filter(t => t.id !== id);
       set({ templates });
-      toast.success('Template deleted successfully');
+      toast.success('Workflow template deleted');
     } catch (error) {
-      console.error('Error deleting template:', error);
-      toast.error('Failed to delete template');
+      console.error('Error deleting workflow:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to delete workflow') });
+      toast.error('Failed to delete workflow');
     } finally {
       set({ isLoading: false });
     }
