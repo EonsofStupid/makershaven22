@@ -887,30 +887,90 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          ban_reason: string | null
+          banned_at: string | null
+          banned_by: string | null
+          bio: string | null
           created_at: string | null
           display_name: string | null
+          failed_login_attempts: number | null
+          failed_pin_attempts: number | null
+          gamification_enabled: boolean | null
           id: string
+          is_banned: boolean | null
+          last_login_at: string | null
+          last_password_login: string | null
+          last_seen: string | null
+          location: string | null
+          lockout_until: string | null
+          onboarding_completed: boolean | null
+          pin_enabled: boolean | null
+          pin_hash: string | null
           role: Database["public"]["Enums"]["user_role"] | null
+          two_factor_enabled: boolean | null
+          two_factor_secret: string | null
           updated_at: string | null
           username: string | null
+          visual_editor_enabled: boolean | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
+          banned_by?: string | null
+          bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
+          failed_pin_attempts?: number | null
+          gamification_enabled?: boolean | null
           id: string
+          is_banned?: boolean | null
+          last_login_at?: string | null
+          last_password_login?: string | null
+          last_seen?: string | null
+          location?: string | null
+          lockout_until?: string | null
+          onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
+          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string | null
           username?: string | null
+          visual_editor_enabled?: boolean | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          ban_reason?: string | null
+          banned_at?: string | null
+          banned_by?: string | null
+          bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
+          failed_pin_attempts?: number | null
+          gamification_enabled?: boolean | null
           id?: string
+          is_banned?: boolean | null
+          last_login_at?: string | null
+          last_password_login?: string | null
+          last_seen?: string | null
+          location?: string | null
+          lockout_until?: string | null
+          onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
+          pin_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string | null
           username?: string | null
+          visual_editor_enabled?: boolean | null
+          website?: string | null
         }
         Relationships: []
       }
