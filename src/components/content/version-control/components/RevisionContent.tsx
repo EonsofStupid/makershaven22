@@ -1,6 +1,5 @@
 import React from 'react';
-import { useAtom } from 'jotai';
-import { selectedRevisionsAtom } from '../atoms/revision-atoms';
+import { useRevisionStore, getSelectedRevisions } from '../atoms/revision-atoms';
 import { RevisionMetadata } from './RevisionMetadata';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,7 +9,7 @@ interface RevisionContentProps {
 }
 
 export const RevisionContent: React.FC<RevisionContentProps> = ({ side }) => {
-  const [selectedRevisions] = useAtom(selectedRevisionsAtom);
+  const selectedRevisions = useRevisionStore(getSelectedRevisions);
   const revision = selectedRevisions[side];
 
   if (!revision) return null;
