@@ -12,7 +12,7 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
-  profile?: Profile; // Add relation to profiles
+  profile?: Profile;
 }
 
 export interface WorkflowTemplatesTable {
@@ -32,7 +32,11 @@ export interface WorkflowStage {
 
 export interface WorkflowStageConfig {
   assignees?: string[];
-  dueDate?: string;
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
   priority?: 'low' | 'medium' | 'high';
   notifications?: {
     email?: boolean;

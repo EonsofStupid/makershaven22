@@ -1,4 +1,5 @@
 import { Json } from "@/integrations/supabase/types";
+import type { Profile } from "@/integrations/supabase/types/tables";
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
@@ -20,11 +21,16 @@ export interface WorkflowTemplate {
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+  profile?: Profile;
 }
 
 export interface WorkflowStageConfig {
   assignees?: string[];
-  dueDate?: string;
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
   priority?: 'low' | 'medium' | 'high';
   notifications?: {
     email?: boolean;
@@ -51,15 +57,6 @@ export interface WorkflowStageConfig {
 }
 
 export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
-
-export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>) => ({
-  stageId,
-  updates
-});
-
-export const isValidStageUpdate = (update: any): update is { stageId: string; updates: Partial<WorkflowStage> } => {
-  return update && typeof update.stageId === 'string' && typeof update.updates === 'object';
-};
 
 export interface StageConfigUpdateProps {
   stage: WorkflowStage;
@@ -107,7 +104,7 @@ export const parseStages = (data: Json): WorkflowStage[] => {
   return data.map(stage => ({
     id: stage.id || crypto.randomUUID(),
     name: stage.name || '',
-    type: (stage.type as WorkflowStageType) || 'TASK',
+    type: stage.type || 'TASK',
     order: stage.order || 0,
     config: stage.config || {},
     description: stage.description
@@ -118,5 +115,5 @@ export const serializeStages = (stages: WorkflowStage[]): Json => {
   return stages.map(stage => ({
     ...stage,
     config: stage.config || {}
-  })) as Json;
+  })) as unknown as Json;
 };
