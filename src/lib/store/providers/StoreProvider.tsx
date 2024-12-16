@@ -1,9 +1,5 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
-interface StoreProviderProps {
-  children: ReactNode;
-}
-
-export const StoreProvider = ({ children }: StoreProviderProps) => {
+export const StoreProvider = ({ children }: { children: ReactNode }) => {
   return children;
 };
