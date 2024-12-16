@@ -7,7 +7,7 @@ import { RevisionSelector } from './components/RevisionSelector';
 import { RevisionContent } from './components/RevisionContent';
 import { RollbackConfirmation } from './components/RollbackConfirmation';
 import { revisionsAtom, rollbackVersionAtom, showRollbackConfirmAtom } from './atoms/revision-atoms';
-import type { ContentRevision } from '@/integrations/supabase/types/content';
+import type { ContentRevision } from '@/lib/types/content';
 
 interface RevisionCompareProps {
   contentId: string;
@@ -25,8 +25,6 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
   const { isLoading } = useQuery({
     queryKey: ['content-revisions', contentId],
     queryFn: async () => {
-      console.log('Fetching revisions for comparison:', contentId);
-      
       try {
         const { data, error } = await supabase
           .from('cms_content_revisions')
@@ -40,7 +38,7 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
             version_number,
             change_summary,
             rollback_metadata,
-            profiles (
+            profiles:created_by (
               display_name
             )
           `)
@@ -48,8 +46,14 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
           .order('version_number', { ascending: false });
 
         if (error) throw error;
-        setRevisions(data as ContentRevision[]);
-        return data as ContentRevision[];
+
+        const revisions = data.map(rev => ({
+          ...rev,
+          profiles: rev.profiles as { display_name: string }
+        }));
+
+        setRevisions(revisions as ContentRevision[]);
+        return revisions;
       } catch (error) {
         console.error('Failed to fetch revisions:', error);
         toast.error('Failed to load revisions');

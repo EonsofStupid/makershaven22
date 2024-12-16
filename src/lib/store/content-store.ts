@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { BaseContent, ContentType } from '@/components/content/types/contentTypes';
+import type { BaseContent, ContentType } from '@/lib/types/content';
 import { toast } from 'sonner';
 
 interface ContentState {
@@ -10,7 +10,7 @@ interface ContentState {
   error: Error | null;
   fetchContent: () => Promise<void>;
   setCurrentContent: (content: BaseContent | null) => void;
-  createContent: (content: Partial<BaseContent>) => Promise<void>;
+  createContent: (content: Omit<BaseContent, 'id' | 'created_at'>) => Promise<void>;
   updateContent: (id: string, updates: Partial<BaseContent>) => Promise<void>;
   deleteContent: (id: string) => Promise<void>;
 }
@@ -28,7 +28,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
         .from('cms_content')
         .select(`
           *,
-          created_by:profiles(display_name)
+          profiles:created_by (
+            display_name
+          )
         `)
         .order('created_at', { ascending: false });
 
@@ -48,9 +50,15 @@ export const useContentStore = create<ContentState>((set, get) => ({
   createContent: async (content) => {
     set({ isLoading: true });
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('cms_content')
-        .insert([content])
+        .insert([{
+          ...content,
+          created_by: user.id
+        }])
         .select()
         .single();
 
@@ -72,9 +80,16 @@ export const useContentStore = create<ContentState>((set, get) => ({
   updateContent: async (id, updates) => {
     set({ isLoading: true });
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { data, error } = await supabase
         .from('cms_content')
-        .update(updates)
+        .update({
+          ...updates,
+          updated_by: user.id,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', id)
         .select()
         .single();

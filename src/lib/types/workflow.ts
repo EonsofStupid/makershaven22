@@ -9,6 +9,17 @@ export interface WorkflowStage {
   description?: string;
 }
 
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface WorkflowStageConfig {
   assignees?: string[];
   dueDate?: string;
@@ -25,23 +36,24 @@ export interface WorkflowStageConfig {
       value: any;
     }>;
   };
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
+  requiredApprovers?: number;
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
 }
 
 export interface WorkflowState {
   templates: WorkflowTemplate[];
-  activeTemplate: WorkflowTemplate | null;
-  history: WorkflowStage[];
+  currentTemplate: WorkflowTemplate | null;
   isLoading: boolean;
   error: Error | null;
+  setTemplates: (templates: WorkflowTemplate[]) => void;
+  setCurrentTemplate: (template: WorkflowTemplate | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  fetchTemplates: () => Promise<void>;
+  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
+  addToHistory: (id: string, entry: { type: string; timestamp: string }) => void;
 }
