@@ -1,10 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Settings, ThemeMode, GlobalState } from '@/lib/types/base';
+import type { GlobalState } from './types';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export const useStore = create<GlobalState>()(
   persist(
     (set) => ({
+      // Core state
+      isReady: false,
+      isMaintenanceMode: false,
+      error: null,
+      isLoading: false,
+
       // Theme state
       theme: null,
       settings: null,
@@ -12,10 +19,13 @@ export const useStore = create<GlobalState>()(
       isThemeLoading: false,
       themeError: null,
 
-      // Core state
-      isReady: false,
-      isMaintenanceMode: false,
-      error: null,
+      // Auth state
+      user: null,
+      session: null,
+      isAuthLoading: false,
+      authError: null,
+      isTransitioning: false,
+      hasAccess: false,
 
       // Actions
       setState: (state) => set(state),
@@ -30,7 +40,14 @@ export const useStore = create<GlobalState>()(
         themeError: null,
         isReady: false,
         isMaintenanceMode: false,
-        error: null
+        error: null,
+        isLoading: false,
+        user: null,
+        session: null,
+        isAuthLoading: false,
+        authError: null,
+        isTransitioning: false,
+        hasAccess: false
       })
     }),
     {
@@ -38,7 +55,9 @@ export const useStore = create<GlobalState>()(
       partialize: (state) => ({
         theme: state.theme,
         settings: state.settings,
-        mode: state.mode
+        mode: state.mode,
+        user: state.user,
+        session: state.session
       })
     }
   )
