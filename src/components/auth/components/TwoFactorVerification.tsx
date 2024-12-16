@@ -10,16 +10,15 @@ interface TwoFactorVerificationProps {
   password: string;
 }
 
-export const TwoFactorVerification = ({ email, password }: TwoFactorVerificationProps) => {
+export const TwoFactorVerification: React.FC<TwoFactorVerificationProps> = ({ 
+  email 
+}) => {
   const { authError } = useSyncedAuth();
   const {
-    code,
-    setCode,
+    verifyCode,
     isLoading,
-    error,
-    handleVerification,
-    handleResendCode
-  } = useTwoFactorVerification(email, password);
+    error
+  } = useTwoFactorVerification();
 
   return (
     <motion.div
@@ -30,12 +29,9 @@ export const TwoFactorVerification = ({ email, password }: TwoFactorVerification
     >
       <TwoFactorHeader email={email} />
       <TwoFactorForm
-        code={code}
+        onSubmit={verifyCode}
         isLoading={isLoading}
         error={error || authError}
-        onChange={setCode}
-        onSubmit={handleVerification}
-        onResend={handleResendCode}
       />
     </motion.div>
   );

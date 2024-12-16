@@ -1,37 +1,55 @@
-import { UserRole } from '../base';
+import type { UserRole } from '../base';
+
+export interface AuthUser {
+  id: string;
+  email?: string;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
+}
+
+export interface AuthSession {
+  user: AuthUser;
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
+}
+
+export interface AuthState {
+  user: AuthUser | null;
+  session: AuthSession | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
+  hasAccess: boolean;
+}
 
 export interface AuthError extends Error {
   code: string;
   details?: string;
 }
 
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requiredRole?: UserRole;
-  fallback?: React.ReactNode;
-}
-
-export interface AuthErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}
-
 export interface AuthErrorBoundaryState {
-  error: Error | null;
+  error: AuthError | null;
+  hasError: boolean;
 }
 
 export interface AuthErrorRecoveryState {
-  retryCount: number;
-  lastError: AuthError | null;
+  attemptCount: number;
+  lastAttempt: Date | null;
+  nextAttemptDelay: number;
 }
 
-export interface PinVerificationResponse {
-  success: boolean;
-  error?: string;
-  lockout_until?: string;
-}
-
-export interface PinSetupResponse {
-  success: boolean;
-  error?: string;
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error) => void;
 }

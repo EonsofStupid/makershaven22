@@ -1,49 +1,28 @@
-import { useState } from "react";
-import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
-import { NavigationContainer } from "./navigation/core/NavigationContainer";
-import { NavigationSection } from "./navigation/core/NavigationSection";
-import { Logo } from "./navigation/Logo";
-import { UnifiedNavigation } from "./navigation/UnifiedNavigation";
-import { SearchButton } from "./navigation/SearchButton";
-import { SearchDialog } from "./navigation/SearchDialog";
+import React from 'react';
+import { UserNav } from "./navigation/UserNav";
+import { MainNav } from "./navigation/MainNav";
 import { UserAvatar } from "./avatar/UserAvatar";
-import { UserMenu } from "./navigation/UserMenu";
-import { MobileNav } from "./navigation/mobile/MobileNav";
+import { useAuth } from "@/lib/store/hooks/useAuth";
+import type { AuthUser } from '@/lib/types/auth';
 
-export const Navigation = () => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const { session, user } = useSyncedAuth();
+interface NavigationProps {
+  user?: AuthUser;
+}
 
+export const Navigation: React.FC<NavigationProps> = ({ user }) => {
   return (
-    <NavigationContainer>
-      <NavigationSection>
-        <Logo />
-      </NavigationSection>
-
-      <NavigationSection className="hidden md:flex">
-        <UnifiedNavigation />
-      </NavigationSection>
-
-      <NavigationSection className="space-x-4">
-        <SearchButton onClick={() => setSearchOpen(true)} />
-  
-        {session && (
-          <div className="hidden md:block relative z-[60]">
-            <UserAvatar
-              user={user}
-              size="lg"
-              className="transform translate-y-2 cursor-pointer"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            />
-            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
+    <div className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 max-w-screen-2xl items-center">
+        <MainNav />
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            {/* Search functionality can be added here */}
           </div>
-        )}
-  
-        <MobileNav />
-      </NavigationSection>
-
-      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
-    </NavigationContainer>
+          <UserNav>
+            <UserAvatar user={user} className="h-8 w-8" />
+          </UserNav>
+        </div>
+      </div>
+    </div>
   );
 };
