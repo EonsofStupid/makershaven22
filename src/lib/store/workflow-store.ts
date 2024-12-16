@@ -1,28 +1,39 @@
 import { create } from 'zustand';
 
 interface WorkflowState {
-  activeWorkflowId: string | null;
-  workflows: Record<string, any>;
-  history: Record<string, { type: string; timestamp: string }[]>;
+  activeWorkflows: Record<string, any>;
+  workflowHistory: Record<string, any[]>;
   setActiveWorkflow: (id: string, data: any) => void;
-  addToHistory: (workflowId: string, entry: { type: string; timestamp: string }) => void;
+  addToHistory: (id: string, data: any) => void;
+  clearHistory: (id: string) => void;
+  reset: () => void;
 }
 
+const initialState = {
+  activeWorkflows: {},
+  workflowHistory: {}
+};
+
 export const useWorkflowStore = create<WorkflowState>((set) => ({
-  activeWorkflowId: null,
-  workflows: {},
-  history: {},
-  setActiveWorkflow: (id, data) => set((state) => ({
-    activeWorkflowId: id,
-    workflows: {
-      ...state.workflows,
-      [id]: data
-    }
-  })),
-  addToHistory: (workflowId, entry) => set((state) => ({
-    history: {
-      ...state.history,
-      [workflowId]: [...(state.history[workflowId] || []), entry]
-    }
-  }))
+  ...initialState,
+  setActiveWorkflow: (id, data) => 
+    set((state) => ({
+      activeWorkflows: { 
+        ...state.activeWorkflows, 
+        [id]: data 
+      }
+    })),
+  addToHistory: (id, data) =>
+    set((state) => ({
+      workflowHistory: {
+        ...state.workflowHistory,
+        [id]: [...(state.workflowHistory[id] || []), data]
+      }
+    })),
+  clearHistory: (id) =>
+    set((state) => {
+      const { [id]: _, ...rest } = state.workflowHistory;
+      return { workflowHistory: rest };
+    }),
+  reset: () => set(initialState)
 }));

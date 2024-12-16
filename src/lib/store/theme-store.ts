@@ -31,7 +31,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
   setMode: (mode) => set({ mode }),
   updateTheme: async (settings) => {
     try {
-      const { error } = await supabase.rpc('update_site_settings', settings);
+      const { data, error } = await supabase.rpc('update_site_settings', settings);
       if (error) throw error;
       
       set((state) => ({
