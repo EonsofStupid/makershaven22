@@ -22,3 +22,12 @@ export const useRevisionStore = create<RevisionState>((set) => ({
   setRollbackVersion: (version) => set({ rollbackVersion: version }),
   setShowRollbackConfirm: (show) => set({ showRollbackConfirm: show }),
 }));
+
+// Helper function to get selected revisions
+export const getSelectedRevisions = (state: RevisionState) => {
+  const { revisions, selectedVersions } = state;
+  return {
+    left: revisions.find(r => r.version_number === selectedVersions.left),
+    right: revisions.find(r => r.version_number === selectedVersions.right)
+  };
+};

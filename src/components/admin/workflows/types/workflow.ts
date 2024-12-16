@@ -56,11 +56,6 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
-
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 

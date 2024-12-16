@@ -51,7 +51,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       const templates = data.map(template => ({
         ...template,
         steps: parseStages(template.steps)
-      }));
+      })) as WorkflowTemplate[];
 
       set({ templates, error: null });
     } catch (error) {

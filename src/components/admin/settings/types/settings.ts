@@ -1,4 +1,4 @@
-import { Json } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface Settings {
   site_title: string;
@@ -32,6 +32,7 @@ export interface Settings {
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
+  security_settings?: Json;
 }
 
 export interface SettingsFormData extends Settings {}
