@@ -46,5 +46,9 @@ export interface AuthErrorRecoveryState {
 export interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
   fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error) => void;
 }

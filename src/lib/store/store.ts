@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GlobalState } from './types';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
+import type { GlobalState } from '../types/base';
 
 export const useStore = create<GlobalState>()(
   persist(
@@ -27,6 +26,18 @@ export const useStore = create<GlobalState>()(
       isTransitioning: false,
       hasAccess: false,
 
+      // Content state
+      activeContent: null,
+      contentHistory: {},
+      isContentLoading: false,
+      contentError: null,
+
+      // Workflow state
+      activeWorkflows: {},
+      workflowHistory: {},
+      isWorkflowLoading: false,
+      workflowError: null,
+
       // Actions
       setState: (state) => set(state),
       updateSettings: (settings) => set({ settings, error: null }),
@@ -47,7 +58,15 @@ export const useStore = create<GlobalState>()(
         isAuthLoading: false,
         authError: null,
         isTransitioning: false,
-        hasAccess: false
+        hasAccess: false,
+        activeContent: null,
+        contentHistory: {},
+        isContentLoading: false,
+        contentError: null,
+        activeWorkflows: {},
+        workflowHistory: {},
+        isWorkflowLoading: false,
+        workflowError: null
       })
     }),
     {
