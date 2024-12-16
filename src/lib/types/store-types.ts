@@ -1,26 +1,14 @@
 import type { Settings } from "@/components/admin/settings/types";
 import type { Json } from "@/integrations/supabase/types";
-import type { AuthSession, AuthUser } from "./auth-types";
 import type { WorkflowStage, WorkflowTemplate } from "./workflow";
+import type { Session, User } from '@supabase/supabase-js';
 
-export interface RedisState {
-  config: {
-    enabled: boolean;
-    host: string;
-    port: number;
-    password?: string;
-    ttl: number;
-    maxMemory: number;
-    restrictedMode: boolean;
-    features: {
-      sessionManagement: boolean;
-      caching: boolean;
-      realTimeUpdates: boolean;
-      rateLimit: boolean;
-    };
-  };
-  updateConfig: (updates: Partial<RedisState['config']>) => void;
-  toggleFeature: (feature: keyof RedisState['config']['features']) => void;
+export interface AuthUser extends User {
+  role?: string;
+}
+
+export interface AuthSession extends Session {
+  user: AuthUser | null;
 }
 
 export interface AuthState {
@@ -29,7 +17,6 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-  hasAccess: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
@@ -49,8 +36,6 @@ export interface WorkflowState {
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   fetchTemplates: () => Promise<void>;
-  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
-  addToHistory: (id: string, entry: { type: string; timestamp: string }) => void;
 }
 
 export interface ThemeState {

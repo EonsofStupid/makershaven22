@@ -1,3 +1,6 @@
+import type { Json } from "@/integrations/supabase/types";
+import type { Profile } from "@/integrations/supabase/types/tables";
+
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowStage {
@@ -13,12 +16,12 @@ export interface WorkflowTemplate {
   id: string;
   name: string;
   description?: string;
-  stages: WorkflowStage[];
+  steps: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
-  history?: WorkflowHistory[];
+  profile?: Profile;
 }
 
 export interface WorkflowStageConfig {
@@ -41,37 +44,12 @@ export interface WorkflowStageConfig {
     }>;
   };
   requiredApprovers?: number;
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
   customFields?: Array<{
     name: string;
     type: 'text' | 'number' | 'date' | 'select';
     required: boolean;
-    options?: string[]; // For select type fields
+    options?: string[];
   }>;
-}
-
-export interface WorkflowHistory {
-  type: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
-}
-
-export interface WorkflowState {
-  templates: WorkflowTemplate[];
-  currentTemplate: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  setTemplates: (templates: WorkflowTemplate[]) => void;
-  setCurrentTemplate: (template: WorkflowTemplate | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  fetchTemplates: () => Promise<void>;
-  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
-  addToHistory: (id: string, entry: { type: string; timestamp: string }) => void;
 }
 
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
@@ -85,7 +63,6 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
     errors.push('Stage type is required');
   }
 
-  // Validate config based on stage type
   switch (stage.type) {
     case 'APPROVAL':
       if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
@@ -110,14 +87,11 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   };
 };
 
-export const serializeStages = (stages: WorkflowStage[]): any => {
-  return stages.map(stage => ({
-    ...stage,
-    config: stage.config || {}
-  }));
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages as unknown as Json;
 };
 
-export const parseStages = (data: any): WorkflowStage[] => {
+export const parseStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({

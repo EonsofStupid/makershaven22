@@ -8,7 +8,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
   error: null,
   isTransitioning: false,
-  hasAccess: false,
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
@@ -19,16 +18,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     user: null, 
     error: null, 
     isLoading: false, 
-    isTransitioning: false,
-    hasAccess: false 
+    isTransitioning: false
   }),
   signOut: async () => {
     try {
       await supabase.auth.signOut();
       set({ 
         session: null, 
-        user: null,
-        hasAccess: false 
+        user: null
       });
     } catch (error) {
       console.error('Error signing out:', error);

@@ -1,21 +1,8 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types/workflow/types';
+import type { WorkflowTemplate } from '@/lib/types/workflow';
+import type { WorkflowState } from '@/lib/types/store-types';
 import { toast } from 'sonner';
-
-interface WorkflowState {
-  templates: WorkflowTemplate[];
-  currentTemplate: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  setTemplates: (templates: WorkflowTemplate[]) => void;
-  setCurrentTemplate: (template: WorkflowTemplate | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  fetchTemplates: () => Promise<void>;
-  updateTemplate: (id: string, updates: Partial<WorkflowTemplate>) => Promise<void>;
-  deleteTemplate: (id: string) => Promise<void>;
-}
 
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   templates: [],
@@ -47,53 +34,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       console.error('Error fetching templates:', error);
       set({ error: error as Error });
       toast.error('Failed to load workflow templates');
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  updateTemplate: async (id, updates) => {
-    set({ isLoading: true });
-    try {
-      const { error } = await supabase
-        .from('workflow_templates')
-        .update(updates)
-        .eq('id', id);
-
-      if (error) throw error;
-
-      const templates = get().templates.map(t =>
-        t.id === id ? { ...t, ...updates } : t
-      );
-
-      set({ templates });
-      toast.success('Template updated successfully');
-    } catch (error) {
-      console.error('Error updating template:', error);
-      set({ error: error as Error });
-      toast.error('Failed to update template');
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  deleteTemplate: async (id) => {
-    set({ isLoading: true });
-    try {
-      const { error } = await supabase
-        .from('workflow_templates')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      const templates = get().templates.filter(t => t.id !== id);
-      set({ templates });
-      toast.success('Template deleted successfully');
-    } catch (error) {
-      console.error('Error deleting template:', error);
-      set({ error: error as Error });
-      toast.error('Failed to delete template');
     } finally {
       set({ isLoading: false });
     }

@@ -1,21 +1,21 @@
-import { type ReactNode } from 'react';
-import { useAuthStore } from '../auth-store';
-import { useThemeStore } from '../theme-store';
-import { useRedisStore } from '../redis-store';
-import { useWorkflowStore } from '../workflow-store';
-import { useContentStore } from '../content-store';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
 
-interface StoreProviderProps {
-  children: ReactNode;
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1
+    }
+  }
+});
 
-export const StoreProvider = ({ children }: StoreProviderProps) => {
-  // Initialize stores
-  useAuthStore.getState();
-  useThemeStore.getState();
-  useRedisStore.getState();
-  useWorkflowStore.getState();
-  useContentStore.getState();
-
-  return children;
+export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Toaster />
+    </QueryClientProvider>
+  );
 };
