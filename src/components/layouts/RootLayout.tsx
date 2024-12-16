@@ -31,10 +31,16 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <motion.div 
       className="min-h-screen bg-background"
+      style={{
+        '--transition-duration': theme?.settings?.transition_duration || '0.3s',
+        '--backdrop-blur': theme?.settings?.backdrop_blur || '0px'
+      } as React.CSSProperties}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ 
+        duration: parseFloat(theme?.settings?.transition_duration || '0.3'),
+      }}
     >
       <Navigation />
       <main className="relative z-10">
@@ -42,7 +48,10 @@ export const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ 
+            duration: parseFloat(theme?.settings?.transition_duration || '0.3'),
+            delay: 0.1 
+          }}
         >
           {children}
         </motion.div>
