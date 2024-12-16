@@ -34,10 +34,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('workflow_templates')
-        .select(`
-          *,
-          profile:profiles(id, username, display_name, avatar_url)
-        `)
+        .select('*, profile:profiles(id, username, display_name, avatar_url)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

@@ -15,7 +15,7 @@ interface SettingsState {
   resetSettings: () => Promise<void>;
 }
 
-export const useSettingsStore = create<SettingsState>((set, get) => ({
+export const useSettingsStore = create<SettingsState>((set) => ({
   settings: null,
   isLoading: false,
   error: null,
@@ -66,7 +66,25 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   resetSettings: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase.rpc('reset_site_settings');
+      const { data, error } = await supabase.rpc('update_site_settings', {
+        p_site_title: 'PopCulture',
+        p_tagline: 'Your daily dose of pop culture',
+        p_primary_color: '#41f0db',
+        p_secondary_color: '#ff0abe',
+        p_accent_color: '#8000ff',
+        p_text_primary_color: '#ffffff',
+        p_text_secondary_color: '#a1a1aa',
+        p_text_link_color: '#41f0db',
+        p_text_heading_color: '#ffffff',
+        p_font_family_heading: 'Inter',
+        p_font_family_body: 'Inter',
+        p_font_size_base: '16px',
+        p_font_weight_normal: '400',
+        p_font_weight_bold: '700',
+        p_line_height_base: '1.5',
+        p_letter_spacing: 'normal'
+      });
+
       if (error) throw error;
       set({ settings: data as Settings });
       toast.success('Settings reset successfully');

@@ -1,11 +1,8 @@
 import { create } from 'zustand';
-import type { ContentRevision } from '@/components/content/types/contentTypes';
+import type { ContentRevision } from '@/integrations/supabase/types/content';
 
 interface RevisionState {
-  selectedVersions: {
-    left: number;
-    right: number;
-  };
+  selectedVersions: { left: number; right: number };
   revisions: ContentRevision[];
   rollbackVersion: number | null;
   showRollbackConfirm: boolean;
@@ -23,13 +20,5 @@ export const useRevisionStore = create<RevisionState>((set) => ({
   setSelectedVersions: (versions) => set({ selectedVersions: versions }),
   setRevisions: (revisions) => set({ revisions }),
   setRollbackVersion: (version) => set({ rollbackVersion: version }),
-  setShowRollbackConfirm: (show) => set({ showRollbackConfirm: show })
+  setShowRollbackConfirm: (show) => set({ showRollbackConfirm: show }),
 }));
-
-export const getSelectedRevisions = (state: RevisionState) => {
-  const { revisions, selectedVersions } = state;
-  return {
-    left: revisions.find(r => r.version_number === selectedVersions.left),
-    right: revisions.find(r => r.version_number === selectedVersions.right)
-  };
-};
