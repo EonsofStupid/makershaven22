@@ -1,15 +1,17 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { WorkflowTemplate } from '@/components/admin/workflows/types';
+import type { WorkflowTemplate, WorkflowStage } from '@/lib/types/workflow';
 
 interface WorkflowState {
   activeWorkflows: Record<string, WorkflowTemplate>;
   workflowHistory: Record<string, Array<{ action: string; timestamp: string }>>;
+  stages: WorkflowStage[];
 }
 
 const initialState: WorkflowState = {
   activeWorkflows: {},
-  workflowHistory: {}
+  workflowHistory: {},
+  stages: []
 };
 
 export const workflowStateAtom = atomWithStorage<WorkflowState>('workflow-state', initialState);
@@ -40,6 +42,17 @@ export const addToWorkflowHistoryAtom = atom(
         ...current.workflowHistory,
         [update.id]: [...existingHistory, update.data]
       }
+    });
+  }
+);
+
+export const setWorkflowStagesAtom = atom(
+  null,
+  (get, set, stages: WorkflowStage[]) => {
+    const current = get(workflowStateAtom);
+    set(workflowStateAtom, {
+      ...current,
+      stages
     });
   }
 );
