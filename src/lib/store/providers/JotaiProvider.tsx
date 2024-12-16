@@ -1,11 +1,10 @@
+import React from 'react';
 import { Provider } from 'jotai';
-import { DevTools } from 'jotai-devtools';
 
-export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Provider>
-      <DevTools />
-      {children}
-    </Provider>
-  );
+interface JotaiProviderProps {
+  children: React.ReactNode;
+}
+
+export const JotaiProvider: React.FC<JotaiProviderProps> = ({ children }) => {
+  return <Provider>{children}</Provider>;
 };
