@@ -18,6 +18,14 @@ export const useStore = create<GlobalState>()(
       isThemeLoading: false,
       themeError: null,
 
+      // Auth state
+      user: null,
+      session: null,
+      isAuthLoading: false,
+      authError: null,
+      isTransitioning: false,
+      hasAccess: false,
+
       // Content state
       activeContent: null,
       contentHistory: {},
@@ -45,6 +53,12 @@ export const useStore = create<GlobalState>()(
         isMaintenanceMode: false,
         error: null,
         isLoading: false,
+        user: null,
+        session: null,
+        isAuthLoading: false,
+        authError: null,
+        isTransitioning: false,
+        hasAccess: false,
         activeContent: null,
         contentHistory: {},
         isContentLoading: false,
@@ -60,7 +74,9 @@ export const useStore = create<GlobalState>()(
       partialize: (state) => ({
         theme: state.theme,
         settings: state.settings,
-        mode: state.mode
+        mode: state.mode,
+        user: state.user,
+        session: state.session
       })
     }
   )

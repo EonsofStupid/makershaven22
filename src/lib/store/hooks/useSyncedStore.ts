@@ -20,3 +20,13 @@ export const useSyncedStore = () => {
     zustandStore
   };
 };
+
+export const useSyncedAuth = () => {
+  const store = useSyncedStore();
+  return {
+    user: store.state.user,
+    session: store.state.session,
+    isAuthLoading: store.state.isAuthLoading,
+    error: store.state.authError
+  };
+};
