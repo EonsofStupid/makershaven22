@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface AuthUser {
