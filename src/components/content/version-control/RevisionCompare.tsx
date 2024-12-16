@@ -18,9 +18,9 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
   contentId,
   currentVersion
 }) => {
-  const [, setRevisions] = useAtom(revisionsAtom);
-  const [showRollbackConfirm, setShowRollbackConfirm] = useAtom(showRollbackConfirmAtom);
-  const [rollbackVersion, setRollbackVersion] = useAtom(rollbackVersionAtom);
+  const [, setRevisions] = useState(revisionsAtom);
+  const [showRollbackConfirm, setShowRollbackConfirm] = useState(showRollbackConfirmAtom);
+  const [rollbackVersion, setRollbackVersion] = useState(rollbackVersionAtom);
 
   const { isLoading } = useQuery({
     queryKey: ['content-revisions', contentId],
