@@ -1,63 +1,57 @@
+import { useAtom } from 'jotai';
 import { useEffect } from 'react';
-import { useThemeStore } from '@/lib/store/theme-store';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import type { ThemeSettings, ThemeMode } from '@/lib/types/theme';
+import { 
+  themeModeAtom, 
+  systemThemeAtom, 
+  effectiveThemeAtom,
+  themeSettingsAtom,
+  updateThemeAtom
+} from '../store/atoms/theme/theme-atoms';
+import { useThemeStore } from '../store/theme-store';
+import type { Settings, ThemeMode } from '@/lib/types/settings';
 
 export const useTheme = () => {
+  const [themeMode, setThemeMode] = useAtom(themeModeAtom);
+  const [, setSystemTheme] = useAtom(systemThemeAtom);
+  const effectiveTheme = useAtom(effectiveThemeAtom)[0];
+  const [settings] = useAtom(themeSettingsAtom);
+  const [, updateTheme] = useAtom(updateThemeAtom);
+  
   const { 
-    theme,
-    mode,
-    settings,
-    isLoading,
+    isLoading, 
     error,
-    setTheme,
-    setMode,
-    updateSettings,
-    setError
+    setMode: setStoreMode,
+    updateSettings: updateStoreSettings
   } = useThemeStore();
 
-  // Handle system theme changes
   useEffect(() => {
-    if (mode === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => {
-        document.documentElement.classList.toggle('dark', e.matches);
-      };
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? 'dark' : 'light');
+    };
 
-      mediaQuery.addEventListener('change', handleChange);
-      document.documentElement.classList.toggle('dark', mediaQuery.matches);
+    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [setSystemTheme]);
 
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-  }, [mode]);
+  const setMode = (mode: ThemeMode) => {
+    setThemeMode(mode);
+    setStoreMode(mode);
+  };
 
-  // Sync with Supabase
-  const saveSettings = async (newSettings: Partial<ThemeSettings>) => {
-    try {
-      const { error } = await supabase
-        .from('site_settings')
-        .update(newSettings)
-        .single();
-
-      if (error) throw error;
-      
-      updateSettings(newSettings);
-      toast.success('Theme settings updated');
-    } catch (err) {
-      console.error('Failed to save theme settings:', err);
-      setError(err as Error);
-      toast.error('Failed to save theme settings');
-    }
+  const updateSettings = async (updates: Settings) => {
+    await updateTheme(updates);
+    updateStoreSettings(updates);
   };
 
   return {
-    theme,
-    mode,
+    mode: themeMode,
+    setMode,
+    effectiveTheme,
     settings,
     isLoading,
     error,
-    setMode,
-    updateSettings: saveSettings
+    updateSettings
   };
 };
