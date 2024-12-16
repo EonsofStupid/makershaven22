@@ -1,7 +1,17 @@
 import React from "react";
-import { AuthError, AuthErrorBoundaryProps, AuthErrorBoundaryState } from "@/lib/auth/types/errors";
+import { AuthError } from "@/lib/auth/types/errors";
 import { ErrorRecoveryHandler } from "./ErrorRecoveryHandler";
 import { useAuthStore } from "@/lib/store/auth-store";
+
+interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error: AuthError; reset: () => void }>;
+}
+
+interface AuthErrorBoundaryState {
+  hasError: boolean;
+  error: AuthError | null;
+}
 
 export class AuthErrorBoundary extends React.Component<AuthErrorBoundaryProps, AuthErrorBoundaryState> {
   public state: AuthErrorBoundaryState = {
@@ -25,8 +35,8 @@ export class AuthErrorBoundary extends React.Component<AuthErrorBoundaryProps, A
   };
 
   private handleRetry = async () => {
-    const { reset } = useAuthStore();
-    await reset();
+    const { initialize } = useAuthStore.getState();
+    await initialize();
     this.handleReset();
   };
 

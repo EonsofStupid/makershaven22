@@ -1,23 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { AuthUser, AuthSession } from '@/lib/types/store-types';
-
-interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setIsTransitioning: (isTransitioning: boolean) => void;
-  signOut: () => Promise<void>;
-  initialize: () => Promise<void>;
-  handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
-}
+import type { AuthUser, AuthSession, AuthState } from '@/lib/types/store-types';
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
@@ -43,13 +27,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         if (profileError) throw profileError;
 
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
+        };
+
         set({
-          session,
-          user: { ...session.user, role: profile?.role || 'subscriber' },
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
           error: null
         });
 
-        // Log security event
         await supabase.from('security_events').insert({
           user_id: session.user.id,
           event_type: 'session_updated',
@@ -96,9 +87,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             
         if (profileError) throw profileError;
 
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
+        };
+
         set({
-          session,
-          user: { ...session.user, role: profile?.role || 'subscriber' },
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
           error: null
         });
       }

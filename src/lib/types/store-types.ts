@@ -4,6 +4,9 @@ export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser extends User {
   role?: UserRole;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
 }
 
 export interface AuthSession extends Session {
