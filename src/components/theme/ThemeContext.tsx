@@ -21,7 +21,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const effectiveTheme = useAtom(effectiveThemeAtom)[0];
   const { state, setState } = useSyncedStore();
 
-  // Apply theme settings when they change
   useEffect(() => {
     if (themeSettings) {
       console.log("Applying theme settings:", themeSettings);
@@ -31,7 +30,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [themeSettings, themeMode]);
 
-  // Update theme settings in Supabase and local state
   const updateTheme = async (newSettings: Settings) => {
     try {
       setState({ settings: newSettings });
