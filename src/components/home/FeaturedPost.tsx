@@ -3,11 +3,10 @@ import { ArrowRight, Calendar, Clock, Star, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { useAtom } from 'jotai';
-import { userAtom } from "@/lib/store/atoms/auth";
+import { useAuthStore } from '@/lib/store/auth-store';
 
 export const FeaturedPost = () => {
-  const [user] = useAtom(userAtom);
+  const { user } = useAuthStore();
 
   const handleReadMore = () => {
     if (!user) {

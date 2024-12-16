@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { 
-  themeSettingsAtom, 
-  themeModeAtom, 
-  systemThemeAtom, 
-  effectiveThemeAtom,
-  updateThemeAtom 
-} from '@/lib/store/atoms/theme';
-import { Settings } from '@/components/admin/settings/types';
+import { useThemeStore } from '@/lib/store/theme-store';
+import type { Settings } from '@/components/admin/settings/types';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { applyThemeToDocument } from './utils/themeUtils';
@@ -17,58 +10,35 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [themeSettings] = useAtom(themeSettingsAtom);
-  const [themeMode] = useAtom(themeModeAtom);
-  const [, setSystemTheme] = useAtom(systemThemeAtom);
-  const [effectiveTheme] = useAtom(effectiveThemeAtom);
-  const [, updateTheme] = useAtom(updateThemeAtom);
+  const { settings, mode, setMode, updateTheme } = useThemeStore();
 
   // Handle system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
+      if (mode === 'system') {
+        setMode(e.matches ? 'dark' : 'light');
+      }
     };
 
-    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    if (mode === 'system') {
+      setMode(mediaQuery.matches ? 'dark' : 'light');
+    }
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [setSystemTheme]);
+  }, [mode, setMode]);
 
   // Apply theme settings to document
   useEffect(() => {
-    if (themeSettings) {
-      applyThemeToDocument(themeSettings);
-      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
+    if (settings) {
+      applyThemeToDocument(settings);
+      document.documentElement.classList.toggle('dark', mode === 'dark');
     }
-  }, [themeSettings, effectiveTheme]);
+  }, [settings, mode]);
 
   const handleThemeUpdate = async (newTheme: Settings) => {
     try {
-      const { error } = await supabase.rpc('update_site_settings', {
-        p_site_title: newTheme.site_title,
-        p_primary_color: newTheme.primary_color,
-        p_secondary_color: newTheme.secondary_color,
-        p_accent_color: newTheme.accent_color,
-        p_text_primary_color: newTheme.text_primary_color,
-        p_text_secondary_color: newTheme.text_secondary_color,
-        p_text_link_color: newTheme.text_link_color,
-        p_text_heading_color: newTheme.text_heading_color,
-        p_neon_cyan: newTheme.neon_cyan,
-        p_neon_pink: newTheme.neon_pink,
-        p_neon_purple: newTheme.neon_purple,
-        p_font_family_heading: newTheme.font_family_heading,
-        p_font_family_body: newTheme.font_family_body,
-        p_font_size_base: newTheme.font_size_base,
-        p_font_weight_normal: newTheme.font_weight_normal,
-        p_font_weight_bold: newTheme.font_weight_bold,
-        p_line_height_base: newTheme.line_height_base,
-        p_letter_spacing: newTheme.letter_spacing
-      });
-
-      if (error) throw error;
-      
-      updateTheme(newTheme);
+      await updateTheme(newTheme);
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
@@ -77,9 +47,9 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   };
 
   const contextValue = {
-    theme: themeSettings,
-    themeMode,
-    effectiveTheme,
+    theme: settings,
+    mode,
+    effectiveTheme: mode,
     updateTheme: handleThemeUpdate
   };
 
@@ -92,12 +62,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
 const ThemeContext = createContext<{
   theme: Settings | null;
-  themeMode: 'light' | 'dark' | 'system';
+  mode: 'light' | 'dark' | 'system';
   effectiveTheme: 'light' | 'dark';
   updateTheme: (theme: Settings) => void;
 }>({
   theme: null,
-  themeMode: 'system',
+  mode: 'system',
   effectiveTheme: 'dark',
   updateTheme: () => {},
 });

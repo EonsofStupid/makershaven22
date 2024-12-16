@@ -1,13 +1,11 @@
 import React from 'react';
-import { useAtom } from 'jotai';
 import { CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { redisConfigAtom, updateRedisConfigAtom } from '@/lib/store/atoms/redis/redis-atoms';
+import { useRedisStore } from '@/lib/store/redis-store';
 
 export const RedisFeatureToggles = () => {
-  const [config] = useAtom(redisConfigAtom);
-  const [, updateConfig] = useAtom(updateRedisConfigAtom);
+  const { config, updateConfig } = useRedisStore();
 
   const handleFeatureToggle = (feature: keyof typeof config.features, enabled: boolean) => {
     updateConfig({

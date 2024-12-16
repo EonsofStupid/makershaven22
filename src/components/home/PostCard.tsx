@@ -3,8 +3,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { useAtom } from 'jotai';
-import { userAtom } from "@/lib/store/atoms/auth";
+import { useAuthStore } from '@/lib/store/auth-store';
 
 interface PostCardProps {
   delay: number;
@@ -16,7 +15,7 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ delay, id, category, title, excerpt, date }: PostCardProps) => {
-  const [user] = useAtom(userAtom);
+  const { user } = useAuthStore();
 
   const handleReadMore = () => {
     if (!user) {
