@@ -1,21 +1,23 @@
-export interface AuthErrorDetails {
+export interface AuthError extends Error {
   code: string;
-  message: string;
-  details?: Record<string, any>;
+  details?: string;
 }
 
-export interface ValidationError {
-  field: string;
-  message: string;
+export interface AuthErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+export interface AuthErrorBoundaryState {
+  error: Error | null;
+}
+
+export interface AuthErrorRecoveryState {
+  retryCount: number;
+  lastError: AuthError | null;
 }
 
 export interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-}
-
-export interface ErrorRecoveryProps {
-  error: Error;
-  resetErrorBoundary: () => void;
 }
