@@ -14,15 +14,6 @@ export interface BaseEntity {
   updated_at?: string;
 }
 
-export interface BaseContent extends BaseEntity {
-  title: string;
-  type: ContentType;
-  status: ContentStatus;
-  created_by: string;
-  content: Record<string, any>;
-  metadata?: Record<string, any>;
-}
-
 export interface GlobalState {
   // Core state
   isReady: boolean;

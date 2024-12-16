@@ -1,5 +1,5 @@
 import { toast } from 'sonner';
-import type { AuthError, ErrorState } from '@/lib/types';
+import type { AuthError, ErrorState } from '@/lib/types/auth/base';
 
 // Rate limiting configuration
 const rateLimits: { [key: string]: { count: number; timestamp: number } } = {};
