@@ -27,19 +27,21 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setError: (error) => set({ error }),
   setTransitioning: (isTransitioning) => set({ isTransitioning }),
   setHasAccess: (hasAccess) => set({ hasAccess }),
+
   signIn: async (email, password) => {
-    // Implement actual sign in logic
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
-      // Sign in implementation
+      // Implement actual sign in logic with Supabase
       set({ isLoading: false });
     } catch (error) {
       set({ error: error as Error, isLoading: false });
     }
   },
+
   signOut: async () => {
     set({ user: null, session: null });
   },
+
   reset: () => set({
     user: null,
     session: null,

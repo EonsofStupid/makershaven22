@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import type { AuthUser, AuthSession, AuthState } from '@/lib/types/auth/base';
+import type { AuthUser, AuthSession } from '@/lib/types/auth/base';
 
 // Persistent storage atoms
 export const authUserAtom = atomWithStorage<AuthUser | null>('auth_user', null);
 export const authSessionAtom = atomWithStorage<AuthSession | null>('auth_session', null);
-export const sessionAtom = authSessionAtom; // For backward compatibility
-export const userAtom = authUserAtom; // For backward compatibility
+export const sessionAtom = authSessionAtom;
+export const userAtom = authUserAtom;
 
 // Volatile state atoms
 export const authLoadingAtom = atom<boolean>(false);
@@ -35,19 +35,5 @@ export const setAuthStateAtom = atom(
     }
     if ('error' in update) set(authErrorAtom, update.error ?? null);
     if ('isTransitioning' in update) set(authTransitioningAtom, update.isTransitioning ?? false);
-  }
-);
-
-export const setUserAtom = atom(
-  null,
-  (get, set, user: AuthUser | null) => {
-    set(authUserAtom, user);
-  }
-);
-
-export const setSessionAtom = atom(
-  null,
-  (get, set, session: AuthSession | null) => {
-    set(authSessionAtom, session);
   }
 );

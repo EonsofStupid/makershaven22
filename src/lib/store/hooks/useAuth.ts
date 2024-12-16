@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useAuthStore } from '../auth/auth-store';
+import { useAuthStore } from '../auth-store';
 import {
   userAtom,
   sessionAtom,
