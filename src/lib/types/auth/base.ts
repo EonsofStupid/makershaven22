@@ -42,18 +42,3 @@ export interface AuthGuardProps {
   unauthorizedComponent?: React.ReactNode;
   onError?: (error: Error | { message: string }) => void;
 }
-
-export interface AuthErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}
-
-export interface AuthErrorBoundaryState {
-  error: AuthError | null;
-  hasError: boolean;
-}
-
-export interface AuthErrorRecoveryState {
-  retryCount: number;
-  lastError: AuthError | null;
-}
