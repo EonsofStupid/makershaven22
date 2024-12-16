@@ -52,3 +52,16 @@ export interface SecuritySettings {
   lockout_duration_minutes: number;
   session_timeout_minutes: number;
 }
+
+export interface Settings extends ThemeBase, ThemeColors, ThemeEffects, ThemeTypography {
+  logo_url?: string;
+  favicon_url?: string;
+  theme_mode?: ThemeMode;
+  menu_animation_type?: string;
+  security_settings: SecuritySettings;
+}
+
+export interface Theme {
+  settings: Settings | null;
+  mode: ThemeMode;
+}

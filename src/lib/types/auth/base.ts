@@ -40,7 +40,6 @@ export interface AuthErrorBoundaryProps {
 
 export interface AuthErrorBoundaryState {
   error: AuthError | null;
-  hasError: boolean;
 }
 
 export interface AuthErrorRecoveryState {
