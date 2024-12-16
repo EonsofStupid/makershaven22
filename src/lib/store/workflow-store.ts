@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { WorkflowTemplate, WorkflowStage, parseStages } from '@/components/admin/workflows/types';
+import type { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types/workflow/types';
+import { toast } from 'sonner';
 
 interface WorkflowState {
   templates: WorkflowTemplate[];
@@ -32,20 +33,20 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('workflow_templates')
-        .select('*')
+        .select(`
+          *,
+          profile:profiles(id, username, display_name, avatar_url)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const templates = data.map(template => ({
-        ...template,
-        stages: parseStages(template.steps)
-      })) as WorkflowTemplate[];
-
+      const templates = data as WorkflowTemplate[];
       set({ templates, error: null });
     } catch (error) {
       console.error('Error fetching templates:', error);
       set({ error: error as Error });
+      toast.error('Failed to load workflow templates');
     } finally {
       set({ isLoading: false });
     }
@@ -66,9 +67,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       );
 
       set({ templates });
+      toast.success('Template updated successfully');
     } catch (error) {
       console.error('Error updating template:', error);
       set({ error: error as Error });
+      toast.error('Failed to update template');
     } finally {
       set({ isLoading: false });
     }
@@ -86,9 +89,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
       const templates = get().templates.filter(t => t.id !== id);
       set({ templates });
+      toast.success('Template deleted successfully');
     } catch (error) {
       console.error('Error deleting template:', error);
       set({ error: error as Error });
+      toast.error('Failed to delete template');
     } finally {
       set({ isLoading: false });
     }
