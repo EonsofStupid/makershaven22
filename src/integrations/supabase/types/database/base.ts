@@ -7,7 +7,9 @@ export type Json =
   | Json[];
 
 export interface BaseTableDefinitions {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
+  [key: string]: {
+    Row: Record<string, any>;
+    Insert: Record<string, any>;
+    Update: Record<string, any>;
+  };
 }
