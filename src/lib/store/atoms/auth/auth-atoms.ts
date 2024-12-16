@@ -29,31 +29,3 @@ export const syncAuthStoreAtom = atom(
     set(authTransitioningAtom, store.isTransitioning);
   }
 );
-
-// Action atoms
-export const setAuthStateAtom = atom(
-  null,
-  (get, set, update: Partial<AuthState>) => {
-    const store = useAuthStore.getState();
-    if ('user' in update) {
-      set(authUserAtom, update.user ?? null);
-      store.setUser(update.user ?? null);
-    }
-    if ('session' in update) {
-      set(authSessionAtom, update.session ?? null);
-      store.setSession(update.session ?? null);
-    }
-    if ('isLoading' in update) {
-      set(authLoadingAtom, update.isLoading ?? false);
-      store.setLoading(update.isLoading ?? false);
-    }
-    if ('error' in update) {
-      set(authErrorAtom, update.error ?? null);
-      store.setError(update.error ?? null);
-    }
-    if ('isTransitioning' in update) {
-      set(authTransitioningAtom, update.isTransitioning ?? false);
-      store.setTransitioning(update.isTransitioning ?? false);
-    }
-  }
-);

@@ -44,8 +44,8 @@ export interface AuthErrorBoundaryState {
 }
 
 export interface AuthErrorRecoveryState {
-  attemptCount: number;
-  lastAttempt: Date | null;
+  retryCount: number;
+  lastError: AuthError | null;
   nextAttemptDelay: number;
 }
 
