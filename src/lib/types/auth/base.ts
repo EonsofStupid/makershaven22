@@ -25,15 +25,30 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
-}
-
-export interface ErrorState {
-  code?: string;
-  message: string;
-  details?: Record<string, any>;
+  hasAccess: boolean;
 }
 
 export interface AuthError extends Error {
   code: string;
-  details?: Record<string, any>;
+  details?: string;
+}
+
+export interface AuthErrorBoundaryState {
+  error: AuthError | null;
+}
+
+export interface AuthErrorRecoveryState {
+  attemptCount: number;
+  lastAttempt: Date | null;
+  nextAttemptDelay: number;
+}
+
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error) => void;
 }

@@ -45,13 +45,8 @@ export interface WorkflowNotification {
   template: string;
 }
 
-export interface WorkflowStage {
-  id: string;
-  type: WorkflowStepType;
-  name: string;
+export interface WorkflowStage extends WorkflowStep {
   description?: string;
-  config: WorkflowStepConfig;
-  order: number;
 }
 
 export const parseWorkflowSteps = (steps: Json): WorkflowStage[] => {
