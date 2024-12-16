@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 import type { Settings, ThemeMode } from '@/lib/types/settings';
-import type { ThemeStore } from '@/lib/types/theme';
+
+interface ThemeStore {
+  theme: Settings | null;
+  mode: ThemeMode;
+  isLoading: boolean;
+  error: Error | null;
+  setTheme: (theme: Settings) => void;
+  setMode: (mode: ThemeMode) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+  setError: (error: Error | null) => void;
+}
 
 export const useThemeStore = create<ThemeStore>((set) => ({
   theme: null,
