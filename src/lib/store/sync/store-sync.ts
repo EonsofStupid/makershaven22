@@ -28,7 +28,8 @@ export const themeStoreAtom = atom<ThemeState>({
 
 // Subscribe to Zustand store changes
 useStore.subscribe((state) => {
-  globalStoreAtom.onMount = (setAtom) => {
-    setAtom(state);
-  };
+  const setGlobalStore = globalStoreAtom.onMount;
+  if (setGlobalStore) {
+    setGlobalStore(state);
+  }
 });

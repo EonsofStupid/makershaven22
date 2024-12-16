@@ -1,7 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import type { AuthUser, AuthSession, AuthState } from '@/lib/types/auth/base';
-import { useAuthStore } from '../../auth/auth-store';
 
 // Persistent storage atoms
 export const authUserAtom = atomWithStorage<AuthUser | null>('auth_user', null);
@@ -20,12 +19,11 @@ export const isAuthenticatedAtom = atom(
 // Sync atoms with Zustand store
 export const syncAuthStoreAtom = atom(
   null,
-  (get, set) => {
-    const store = useAuthStore.getState();
-    set(authUserAtom, store.user);
-    set(authSessionAtom, store.session);
-    set(authLoadingAtom, store.isLoading);
-    set(authErrorAtom, store.error);
-    set(authTransitioningAtom, store.isTransitioning);
+  (get, set, state: AuthState) => {
+    set(authUserAtom, state.user);
+    set(authSessionAtom, state.session);
+    set(authLoadingAtom, state.isLoading);
+    set(authErrorAtom, state.error);
+    set(authTransitioningAtom, state.isTransitioning);
   }
 );
