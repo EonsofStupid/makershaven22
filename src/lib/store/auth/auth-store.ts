@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/auth/base';
+import type { AuthState } from '@/lib/types/auth/base';
 
 interface AuthStore extends AuthState {
   setUser: (user: AuthUser | null) => void;
@@ -18,6 +18,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   error: null,
   isTransitioning: false,
   hasAccess: false,
+
   setUser: (user) => set({ user }),
   setSession: (session) => set({ session }),
   setLoading: (isLoading) => set({ isLoading }),
