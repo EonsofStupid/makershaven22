@@ -56,6 +56,8 @@ export interface WorkflowStageConfig {
   }>;
 }
 
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
@@ -106,4 +108,17 @@ export const parseStages = (data: Json): WorkflowStage[] => {
     config: stage.config || {},
     description: stage.description
   }));
+};
+
+export const isValidStageUpdate = (update: Partial<WorkflowStage>): boolean => {
+  if (update.name !== undefined && !update.name.trim()) return false;
+  if (update.type && !['APPROVAL', 'REVIEW', 'TASK', 'NOTIFICATION', 'CONDITIONAL'].includes(update.type)) return false;
+  return true;
+};
+
+export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
+  return {
+    ...updates,
+    id: stageId
+  };
 };

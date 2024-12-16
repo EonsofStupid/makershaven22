@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { WorkflowTemplate } from '@/components/admin/workflows/types';
-import { serializeStages, parseStages } from '@/components/admin/workflows/types';
+import type { WorkflowTemplate, WorkflowStage } from '@/components/admin/workflows/types';
+import { parseStages, serializeStages } from '@/components/admin/workflows/types';
 import { toast } from 'sonner';
 
 interface WorkflowState {
@@ -94,13 +94,14 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   updateTemplate: async (id, updates) => {
     set({ isLoading: true });
     try {
-      if (updates.steps) {
-        updates.steps = serializeStages(updates.steps);
-      }
+      const serializedUpdates = {
+        ...updates,
+        steps: updates.steps ? serializeStages(updates.steps) : undefined
+      };
 
       const { data, error } = await supabase
         .from('workflow_templates')
-        .update(updates)
+        .update(serializedUpdates)
         .eq('id', id)
         .select()
         .single();

@@ -7,9 +7,11 @@ interface SettingsState {
   settings: Settings | null;
   isLoading: boolean;
   error: Error | null;
+  mode: 'light' | 'dark' | 'system';
   setSettings: (settings: Settings) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
   fetchSettings: () => Promise<void>;
   updateSettings: (updates: Partial<Settings>) => Promise<void>;
   resetSettings: () => Promise<void>;
@@ -19,10 +21,12 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   settings: null,
   isLoading: false,
   error: null,
+  mode: 'system',
 
   setSettings: (settings) => set({ settings }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
+  setMode: (mode) => set({ mode }),
 
   fetchSettings: async () => {
     set({ isLoading: true });
@@ -67,7 +71,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     set({ isLoading: true });
     try {
       const { data, error } = await supabase.rpc('update_site_settings', {
-        p_site_title: 'PopCulture',
+        p_site_title: 'MakersImpulse',
         p_tagline: 'Your daily dose of pop culture',
         p_primary_color: '#41f0db',
         p_secondary_color: '#ff0abe',
@@ -82,7 +86,15 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         p_font_weight_normal: '400',
         p_font_weight_bold: '700',
         p_line_height_base: '1.5',
-        p_letter_spacing: 'normal'
+        p_letter_spacing: 'normal',
+        p_border_radius: '0.5rem',
+        p_spacing_unit: '1rem',
+        p_transition_duration: '0.3s',
+        p_shadow_color: 'rgba(0,0,0,0.1)',
+        p_hover_scale: '1.05',
+        p_neon_cyan: '#41f0db',
+        p_neon_pink: '#ff0abe',
+        p_neon_purple: '#8000ff'
       });
 
       if (error) throw error;
