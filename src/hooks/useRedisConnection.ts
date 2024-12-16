@@ -1,13 +1,16 @@
-import { useAtom } from 'jotai';
+// Refactored `useRedisConnection` hook to use Zustand and align with `auth-store.ts`
+
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { redisConfigAtom, redisStatusAtom, updateRedisStatusAtom } from '@/lib/store/atoms/redis/redis-atoms';
+import { useRedisStore } from '@/zustand/stores/redisStore';
 
 export const useRedisConnection = () => {
-  const [config] = useState(redisConfigAtom);
-  const [status] = useState(redisStatusAtom);
-  const [, updateStatus] = useState(updateRedisStatusAtom);
+  const {
+    config,
+    status,
+    updateStatus
+  } = useRedisStore();
 
   const testConnection = useCallback(async () => {
     if (!config.enabled) {
