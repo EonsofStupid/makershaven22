@@ -21,9 +21,9 @@ export interface Profile {
 }
 
 export const useProfiles = () => {
-  return useQuery({
+  return useQuery<Profile[]>({
     queryKey: ['admin-profiles'],
-    queryFn: async (): Promise<Profile[]> => {
+    queryFn: async () => {
       console.log('Fetching profiles...');
       const { data, error } = await supabase
         .from('profiles')
@@ -32,12 +32,15 @@ export const useProfiles = () => {
       
       if (error) {
         console.error('Error fetching profiles:', error);
-        toast.error('Failed to load profiles');
         throw error;
       }
 
       console.log('Profiles fetched:', data);
       return data;
+    },
+    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
+    onError: (error) => {
+      toast.error('Failed to load profiles');
     },
   });
 };
