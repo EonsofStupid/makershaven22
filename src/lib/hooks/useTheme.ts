@@ -8,7 +8,7 @@ import {
   updateThemeAtom
 } from '../store/atoms/theme/theme-atoms';
 import { useThemeStore } from '../store/theme-store';
-import type { Settings, ThemeMode } from '@/lib/types/settings';
+import type { Settings, ThemeMode } from '@/lib/types/base';
 
 export const useTheme = () => {
   const [themeMode, setThemeMode] = useAtom(themeModeAtom);
@@ -40,7 +40,7 @@ export const useTheme = () => {
     setStoreMode(mode);
   };
 
-  const updateSettings = async (updates: Settings) => {
+  const updateSettings = async (updates: Partial<Settings>) => {
     await updateTheme(updates);
     updateStoreSettings(updates);
   };
