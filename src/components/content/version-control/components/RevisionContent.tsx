@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRevisionStore, getSelectedRevisions } from '../atoms/revision-atoms';
+import { useRevisionStore, getSelectedRevisions } from '@/lib/store/revision-store';
 import { RevisionMetadata } from './RevisionMetadata';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';

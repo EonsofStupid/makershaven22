@@ -1,11 +1,10 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { useSettingsForm } from "./hooks/useSettingsForm";
+import { useSettingsStore } from '@/lib/store/settings-store';
 import { SettingsFormContainer } from "./components/SettingsFormContainer";
-import type { Settings } from '@/lib/store/atoms/theme/settings-atoms';
 
 export const SettingsForm = () => {
-  const { isLoading } = useSettingsForm();
+  const isLoading = useSettingsStore((state) => state.isLoading);
 
   if (isLoading) {
     return (
