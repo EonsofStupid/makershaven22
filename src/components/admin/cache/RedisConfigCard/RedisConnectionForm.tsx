@@ -1,20 +1,15 @@
 import React from 'react';
-import { useAtom } from 'jotai';
-import { redisConfigAtom } from '@/lib/store/atoms/redis/redis-atoms';
-import type { RedisConfig } from '@/lib/store/atoms/redis/redis-atoms';
+import { useRedisStore } from '@/lib/store/redis-store';
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const RedisConnectionForm = () => {
-  const [config, setConfig] = useAtom(redisConfigAtom);
+  const { config, updateConfig } = useRedisStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setConfig(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    updateConfig({ [name]: value });
   };
 
   return (

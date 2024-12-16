@@ -1,58 +1,99 @@
 import { create } from 'zustand';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-interface RedisConfig {
-  enabled: boolean;
+export interface RedisConfig {
   host: string;
-  port: number;
+  port: string | number;
   password?: string;
-  features: {
+  status?: 'connected' | 'disconnected' | 'error';
+  features?: {
     sessionManagement: boolean;
     caching: boolean;
-    rateLimit: boolean;
+    realTimeUpdates: boolean;
   };
-}
-
-interface RedisStatus {
-  isConnected: boolean;
-  error: string | null;
-  lastChecked: Date | null;
 }
 
 interface RedisState {
   config: RedisConfig;
-  status: RedisStatus;
-  updateConfig: (config: Partial<RedisConfig>) => void;
-  updateStatus: (status: Partial<RedisStatus>) => void;
-  reset: () => void;
+  isLoading: boolean;
+  error: Error | null;
+  updateConfig: (config: Partial<RedisConfig>) => Promise<void>;
+  testConnection: () => Promise<void>;
+  toggleFeature: (feature: keyof RedisConfig['features']) => void;
 }
 
-const initialConfig: RedisConfig = {
-  enabled: false,
-  host: 'localhost',
-  port: 6379,
-  features: {
-    sessionManagement: false,
-    caching: false,
-    rateLimit: false
-  }
-};
-
-const initialStatus: RedisStatus = {
-  isConnected: false,
+export const useRedisStore = create<RedisState>((set, get) => ({
+  config: {
+    host: 'localhost',
+    port: 6379,
+    features: {
+      sessionManagement: false,
+      caching: false,
+      realTimeUpdates: false
+    }
+  },
+  isLoading: false,
   error: null,
-  lastChecked: null
-};
 
-export const useRedisStore = create<RedisState>((set) => ({
-  config: initialConfig,
-  status: initialStatus,
-  updateConfig: (newConfig) => 
-    set((state) => ({ 
-      config: { ...state.config, ...newConfig }
-    })),
-  updateStatus: (newStatus) =>
-    set((state) => ({
-      status: { ...state.status, ...newStatus }
-    })),
-  reset: () => set({ config: initialConfig, status: initialStatus })
+  updateConfig: async (newConfig) => {
+    set({ isLoading: true });
+    try {
+      const { error } = await supabase.functions.invoke('test-redis-connection', {
+        body: { ...get().config, ...newConfig }
+      });
+
+      if (error) throw error;
+
+      set(state => ({
+        config: { ...state.config, ...newConfig },
+        error: null
+      }));
+      toast.success('Redis configuration updated');
+    } catch (error) {
+      console.error('Error updating Redis config:', error);
+      set({ error: error as Error });
+      toast.error('Failed to update Redis configuration');
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  testConnection: async () => {
+    set({ isLoading: true });
+    try {
+      const { error } = await supabase.functions.invoke('test-redis-connection', {
+        body: get().config
+      });
+
+      if (error) throw error;
+
+      set(state => ({
+        config: { ...state.config, status: 'connected' },
+        error: null
+      }));
+      toast.success('Redis connection successful');
+    } catch (error) {
+      console.error('Error testing Redis connection:', error);
+      set(state => ({
+        config: { ...state.config, status: 'error' },
+        error: error as Error
+      }));
+      toast.error('Redis connection failed');
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  toggleFeature: (feature) => {
+    set(state => ({
+      config: {
+        ...state.config,
+        features: {
+          ...state.config.features,
+          [feature]: !state.config.features?.[feature]
+        }
+      }
+    }));
+  }
 }));
