@@ -6,24 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PinDisplay } from "./PinDisplay";
 import { NumberPad } from "./NumberPad";
-import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
+import type { PinVerificationResponse } from "../../types/pin-auth";
 
 interface PinLoginFormProps {
   email: string;
   onSwitchToPassword: () => void;
 }
 
-interface PinVerificationResponse {
-  success: boolean;
-  message?: string;
-  locked_until?: string;
-}
-
 export const PinLoginForm = ({ email, onSwitchToPassword }: PinLoginFormProps) => {
   const navigate = useNavigate();
   const [pin, setPin] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setAuthError } = useSyncedAuth();
 
   const handlePinSubmit = async (pin: string) => {
     try {
@@ -47,16 +40,13 @@ export const PinLoginForm = ({ email, onSwitchToPassword }: PinLoginFormProps) =
       } else {
         if (response.locked_until) {
           toast.error(`Account locked until ${new Date(response.locked_until).toLocaleTimeString()}`);
-          setAuthError(new Error(response.message || "Account locked"));
         } else {
           toast.error(response.message || "Invalid PIN");
-          setAuthError(new Error(response.message || "Invalid PIN"));
         }
       }
     } catch (error) {
       console.error("PIN verification error:", error);
       toast.error("Failed to verify PIN");
-      setAuthError(error instanceof Error ? error : new Error("Failed to verify PIN"));
     } finally {
       setIsSubmitting(false);
     }

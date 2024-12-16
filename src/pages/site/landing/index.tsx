@@ -4,12 +4,12 @@ import { Database, Box, Users, TrendingUp, BookOpen } from "lucide-react";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturePanel } from "./components/FeaturePanel";
 import { TableView } from "./components/DatabaseVisual/TableView";
-import { useSyncedAuth } from "@/lib/store/hooks/useSyncedStore";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
-  const { user } = useSyncedAuth();
+  const { user } = useAuthStore();
   
   const backgroundY = useTransform(scrollY, [0, 1000], ["0%", "50%"]);
   const textY = useTransform(scrollY, [0, 500], ["0%", "100%"]);

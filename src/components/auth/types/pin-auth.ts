@@ -1,19 +1,11 @@
-export interface PinLoginProps {
-  onSuccess: () => void;
-  onError: (error: Error) => void;
-}
-
-export interface PinSetupProps {
-  onComplete: () => void;
-}
-
-export interface PinVerificationResponse {
+export type PinVerificationResponse = {
   success: boolean;
-  error?: string;
-  lockout_until?: string;
-}
+  message?: string;
+  locked_until?: string | null;
+};
 
-export interface PinSetupResponse {
+export type PinSetupResponse = {
   success: boolean;
-  error?: string;
-}
+  message: string;
+  locked_until?: string | null;
+};

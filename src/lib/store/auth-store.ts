@@ -1,53 +1,64 @@
 import { create } from 'zustand';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/auth/base';
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-interface AuthStore extends AuthState {
+interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
+}
+
+interface AuthState {
+  session: any | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
+  setSession: (session: any | null) => void;
   setUser: (user: AuthUser | null) => void;
-  setSession: (session: AuthSession | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
-  setTransitioning: (isTransitioning: boolean) => void;
-  setHasAccess: (hasAccess: boolean) => void;
-  signIn: (email: string, password: string) => Promise<void>;
+  setIsTransitioning: (isTransitioning: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
+export const useAuthStore = create<AuthState>((set) => ({
   session: null,
-  isLoading: false,
+  user: null,
+  isLoading: true,
   error: null,
   isTransitioning: false,
-  hasAccess: false,
-
-  setUser: (user) => set({ user }),
   setSession: (session) => set({ session }),
+  setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
-  setTransitioning: (isTransitioning) => set({ isTransitioning }),
-  setHasAccess: (hasAccess) => set({ hasAccess }),
-
-  signIn: async (email, password) => {
-    set({ isLoading: true, error: null });
+  setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
+  signOut: async () => {
     try {
-      // Implement actual sign in logic with Supabase
-      set({ isLoading: false });
-    } catch (error) {
-      set({ error: error as Error, isLoading: false });
+      set({ isTransitioning: true });
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+      
+      set({ session: null, user: null });
+      toast.success("Successfully signed out");
+    } catch (err) {
+      console.error("Sign out error:", err);
+      set({ error: err instanceof Error ? err : new Error('Failed to sign out') });
+      toast.error("Failed to sign out");
+    } finally {
+      set({ isTransitioning: false });
     }
   },
-
-  signOut: async () => {
-    set({ user: null, session: null });
-  },
-
   reset: () => set({
-    user: null,
     session: null,
-    isLoading: false,
+    user: null,
     error: null,
-    isTransitioning: false,
-    hasAccess: false
+    isLoading: false,
+    isTransitioning: false
   })
 }));

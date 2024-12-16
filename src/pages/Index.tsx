@@ -1,99 +1,77 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Hammer, Wrench, BookOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { useSyncedAuth } from '@/lib/store/hooks/useSyncedStore';
+import { Navigate } from "react-router-dom";
+import Layout from "../components/Layout";
+import { useAuthStore } from '@/lib/store/auth-store';
+import { FeaturedPost } from "@/components/home/FeaturedPost";
+import { PostCard } from "@/components/home/PostCard";
+
+const posts = [
+  {
+    id: 2,
+    category: "Technology",
+    title: "The Future of AI in Content Creation",
+    excerpt: "Explore how artificial intelligence is revolutionizing the way we create and consume content.",
+    date: "Mar 14, 2024"
+  },
+  {
+    id: 3,
+    category: "Design",
+    title: "Mastering Modern UI/UX Principles",
+    excerpt: "Learn the essential principles of modern user interface and experience design.",
+    date: "Mar 13, 2024"
+  },
+  {
+    id: 4,
+    category: "Development",
+    title: "Building Scalable Web Applications",
+    excerpt: "Best practices and patterns for creating maintainable and scalable web applications.",
+    date: "Mar 12, 2024"
+  },
+  {
+    id: 5,
+    category: "Career",
+    title: "Navigating the Tech Industry in 2024",
+    excerpt: "Essential insights for tech professionals looking to advance their careers.",
+    date: "Mar 11, 2024"
+  },
+  {
+    id: 6,
+    category: "Tools",
+    title: "Essential Developer Tools for 2024",
+    excerpt: "A comprehensive guide to the most important tools for modern development.",
+    date: "Mar 10, 2024"
+  },
+  {
+    id: 7,
+    category: "Community",
+    title: "Building a Strong Developer Network",
+    excerpt: "Tips and strategies for connecting with other developers and growing your network.",
+    date: "Mar 9, 2024"
+  }
+];
 
 const Index = () => {
-  const navigate = useNavigate();
-  const { user } = useSyncedAuth();
+  const { user } = useAuthStore();
 
-  const handleNavigation = (path: string) => {
-    if (!user) {
-      toast.error("Please sign in to access this feature");
-      navigate("/login");
-      return;
-    }
-    navigate(path);
-  };
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#41f0db] to-[#8000ff] text-transparent bg-clip-text">
-            Welcome to MakersImpulse
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Your hub for 3D printing innovation. Discover builds, parts, and join our community of makers.
-          </p>
-        </motion.div>
-
-        {/* Featured Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="glass p-6 rounded-xl cursor-pointer"
-            onClick={() => handleNavigation('/maker-space/builds')}
-          >
-            <Hammer className="w-8 h-8 text-[#41f0db] mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Latest Builds</h2>
-            <p className="text-white/70">Explore the newest community printer builds and modifications.</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="glass p-6 rounded-xl cursor-pointer"
-            onClick={() => handleNavigation('/maker-space/parts')}
-          >
-            <Wrench className="w-8 h-8 text-[#ff0abe] mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Parts Catalog</h2>
-            <p className="text-white/70">Find compatible parts and upgrades for your printer.</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass p-6 rounded-xl cursor-pointer"
-            onClick={() => handleNavigation('/maker-space/guides')}
-          >
-            <BookOpen className="w-8 h-8 text-[#8000ff] mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Guides</h2>
-            <p className="text-white/70">Learn from our comprehensive collection of 3D printing guides.</p>
-          </motion.div>
+    <Layout>
+      <div className="container mx-auto px-6 py-12">
+        <FeaturedPost />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map((post, i) => (
+            <PostCard
+              key={post.id}
+              delay={i}
+              {...post}
+            />
+          ))}
         </div>
-
-        {/* CTA Section */}
-        {!user && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center"
-          >
-            <Button
-              onClick={() => navigate('/login')}
-              className="bg-gradient-to-r from-[#41f0db] to-[#8000ff] text-white px-8 py-3 rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Join Our Community
-            </Button>
-          </motion.div>
-        )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

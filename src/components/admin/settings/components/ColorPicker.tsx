@@ -10,7 +10,6 @@ interface ColorPickerProps {
   cssVar?: string;
   onChange: (color: string) => void;
   className?: string;
-  description?: string;
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({ 
@@ -18,8 +17,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   value, 
   cssVar,
   onChange,
-  className,
-  description 
+  className 
 }) => {
   const handleColorChange = (newColor: string) => {
     onChange(newColor);
@@ -28,8 +26,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       document.documentElement.style.setProperty(cssVar, newColor);
     }
     // Show visual feedback
-    toast.success(`${label} updated`, {
-      description: cssVar ? `Updated ${cssVar} to ${newColor}` : undefined,
+    toast.success(`${label} updated to ${newColor}`, {
+      description: `CSS Variable: ${cssVar || 'none'}`,
     });
   };
   
@@ -64,9 +62,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           className="w-12 h-12 p-1 rounded-lg cursor-pointer bg-gray-700/50 border-gray-600 transition-all hover:scale-110"
         />
       </div>
-      {description && (
-        <p className="text-xs text-gray-400">{description}</p>
-      )}
       <div 
         className="h-6 w-full rounded transition-all"
         style={{ 

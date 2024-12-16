@@ -7,14 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { FileText, GitBranch, History } from "lucide-react";
-import { useStore } from '@/lib/store';
-import { useAtom } from 'jotai';
-import { workflowStateAtom } from '@/lib/store/atoms/workflow/workflow-atoms';
 
 const AdminDashboard = () => {
   const [mousePosition, setMousePosition] = React.useState({ x: 50, y: 50 });
-  const [workflowState] = useAtom(workflowStateAtom);
-  const { isReady, error } = useStore();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -22,14 +17,6 @@ const AdminDashboard = () => {
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setMousePosition({ x, y });
   };
-
-  if (!isReady) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
 
   return (
     <div 

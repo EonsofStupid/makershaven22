@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { useContent } from '@/lib/store/hooks/useContent';
 import {
   Select,
   SelectContent,
@@ -17,11 +16,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface ContentWithAuthor {
+  id: string;
+  title: string;
+  status: string;
+  type: string;
+  updated_at: string;
+  created_by: {
+    display_name: string | null;
+  } | null;
+  updated_by: {
+    display_name: string | null;
+  } | null;
+}
+
 export const ContentManager = () => {
   const navigate = useNavigate();
   const [search, setSearch] = React.useState('');
   const [typeFilter, setTypeFilter] = React.useState<string>('all');
-  const { setActiveContent } = useContent();
   
   const { data: content, isLoading } = useQuery({
     queryKey: ['cms-content', search, typeFilter],
@@ -52,18 +64,13 @@ export const ContentManager = () => {
         throw error;
       }
 
-      return data;
+      console.log('Fetched content:', data);
+      return data as ContentWithAuthor[];
     }
   });
 
   const handleCreateContent = () => {
-    setActiveContent(null); // Reset active content when creating new
     navigate('/admin/content-management/editor');
-  };
-
-  const handleEditContent = (content: any) => {
-    setActiveContent(content);
-    navigate(`/admin/content-management/editor/${content.id}`);
   };
 
   const getStatusColor = (status: string) => {
@@ -134,10 +141,10 @@ export const ContentManager = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="group"
-              onClick={() => handleEditContent(item)}
             >
               <Card 
                 className="p-6 bg-black/40 border-white/10 hover:border-[#26c766]/50 transition-all duration-300 cursor-pointer"
+                onClick={() => navigate(`/admin/content-management/editor/${item.id}`)}
               >
                 <div className="flex justify-between items-start">
                   <div>

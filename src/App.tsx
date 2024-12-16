@@ -2,26 +2,22 @@ import { BrowserRouter } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RootLayout } from "@/components/layouts/RootLayout";
 import { AppRoutes } from "@/routes";
-import { GlobalErrorBoundary } from "@/components/shared/error-handling/GlobalErrorBoundary";
+import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
 import { ThemeProvider } from "@/components/theme/ThemeContext";
 import { AdminSidebarProvider } from "@/components/admin/dashboard/sidebar/AdminSidebarContext";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/auth/providers/QueryProvider";
-import { StoreProvider } from '@/lib/store/providers/StoreProvider';
-import { setupGlobalErrorHandlers } from "@/utils/errorHandling";
-
-// Setup global error handlers
-setupGlobalErrorHandlers();
+import { AuthProvider } from "@/components/auth/providers/AuthProvider";
 
 const App = () => {
   return (
-    <GlobalErrorBoundary>
-      <StoreProvider>
-        <QueryProvider>
-          <BrowserRouter>
-            <AdminSidebarProvider>
-              <ThemeProvider>
-                <TooltipProvider>
+    <ErrorBoundary>
+      <QueryProvider>
+        <BrowserRouter>
+          <AdminSidebarProvider>
+            <ThemeProvider>
+              <TooltipProvider>
+                <AuthProvider>
                   <RootLayout>
                     <AppRoutes />
                   </RootLayout>
@@ -42,13 +38,13 @@ const App = () => {
                       },
                     }}
                   />
-                </TooltipProvider>
-              </ThemeProvider>
-            </AdminSidebarProvider>
-          </BrowserRouter>
-        </QueryProvider>
-      </StoreProvider>
-    </GlobalErrorBoundary>
+                </AuthProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </AdminSidebarProvider>
+        </BrowserRouter>
+      </QueryProvider>
+    </ErrorBoundary>
   );
 };
 

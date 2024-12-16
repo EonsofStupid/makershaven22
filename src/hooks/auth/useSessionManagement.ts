@@ -25,31 +25,20 @@ export const useSessionManagement = () => {
         storeSessionLocally(session);
         await registerUserSession(session.user.id);
 
-        // First, check if profile exists
-        let { data: profile, error: profileError } = await supabase
+        const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
           
-        if (profileError || !profile) {
-          // If profile doesn't exist, create it
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert([{ 
-              id: session.user.id,
-              role: 'subscriber'
-            }])
-            .select()
-            .single();
-            
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            throw createError;
-          }
-          
-          profile = newProfile;
-          toast.success('Profile created successfully');
+        if (error) {
+          console.error('Error fetching profile:', error);
+          throw error;
+        }
+        
+        if (!profile) {
+          console.error('No profile found');
+          throw new Error('No profile found');
         }
         
         setSession(session);

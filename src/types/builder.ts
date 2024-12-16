@@ -1,19 +1,18 @@
 export interface BuilderElement {
   id: string;
   type: string;
-  props?: Record<string, any>;
-  styles?: Record<string, any>;
+  props: Record<string, any>;
   children?: BuilderElement[];
+  content?: string;
 }
 
 export interface BuilderState {
   elements: BuilderElement[];
   selectedElement: string | null;
-  history: BuilderElement[][];
-  historyIndex: number;
 }
 
-export interface BuilderAction {
-  type: string;
-  payload?: any;
-}
+export type BuilderAction =
+  | { type: 'ADD_ELEMENT'; element: BuilderElement }
+  | { type: 'UPDATE_ELEMENT'; id: string; updates: Partial<BuilderElement> }
+  | { type: 'DELETE_ELEMENT'; id: string }
+  | { type: 'SELECT_ELEMENT'; id: string | null };

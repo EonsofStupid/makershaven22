@@ -1,52 +1,86 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { themeSettingsAtom, themeModeAtom, effectiveThemeAtom } from '@/lib/store/atoms/theme';
-import { applyThemeToDocument } from './utils/themeUtils';
+import { 
+  themeSettingsAtom, 
+  themeModeAtom, 
+  systemThemeAtom, 
+  effectiveThemeAtom,
+  updateThemeAtom 
+} from '@/lib/store/atoms/theme';
+import { Settings } from '@/components/admin/settings/types';
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Settings, Theme, ThemeMode } from '@/lib/types/settings';
-import { useSyncedStore } from '@/lib/store/hooks/useSyncedStore';
+import { applyThemeToDocument } from './utils/themeUtils';
 
-interface ThemeContextType {
-  theme: Theme | null;
-  mode: ThemeMode;
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (settings: Settings) => Promise<void>;
+interface ThemeProviderProps {
+  children: React.ReactNode;
 }
 
-const ThemeContext = createContext<ThemeContextType | null>(null);
-
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [themeSettings] = useAtom(themeSettingsAtom);
   const [themeMode] = useAtom(themeModeAtom);
-  const effectiveTheme = useAtom(effectiveThemeAtom)[0];
-  const { state, setState } = useSyncedStore();
+  const [, setSystemTheme] = useAtom(systemThemeAtom);
+  const [effectiveTheme] = useAtom(effectiveThemeAtom);
+  const [, updateTheme] = useAtom(updateThemeAtom);
 
+  // Handle system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? 'dark' : 'light');
+    };
+
+    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [setSystemTheme]);
+
+  // Apply theme settings to document
   useEffect(() => {
     if (themeSettings) {
-      console.log("Applying theme settings:", themeSettings);
       applyThemeToDocument(themeSettings);
-    } else {
-      console.warn("Theme settings are not defined, using defaults");
+      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
     }
-  }, [themeSettings, themeMode]);
+  }, [themeSettings, effectiveTheme]);
 
-  const updateTheme = async (newSettings: Settings) => {
+  const handleThemeUpdate = async (newTheme: Settings) => {
     try {
-      setState({ settings: newSettings });
-      applyThemeToDocument(newSettings);
+      const { error } = await supabase.rpc('update_site_settings', {
+        p_site_title: newTheme.site_title,
+        p_primary_color: newTheme.primary_color,
+        p_secondary_color: newTheme.secondary_color,
+        p_accent_color: newTheme.accent_color,
+        p_text_primary_color: newTheme.text_primary_color,
+        p_text_secondary_color: newTheme.text_secondary_color,
+        p_text_link_color: newTheme.text_link_color,
+        p_text_heading_color: newTheme.text_heading_color,
+        p_neon_cyan: newTheme.neon_cyan,
+        p_neon_pink: newTheme.neon_pink,
+        p_neon_purple: newTheme.neon_purple,
+        p_font_family_heading: newTheme.font_family_heading,
+        p_font_family_body: newTheme.font_family_body,
+        p_font_size_base: newTheme.font_size_base,
+        p_font_weight_normal: newTheme.font_weight_normal,
+        p_font_weight_bold: newTheme.font_weight_bold,
+        p_line_height_base: newTheme.line_height_base,
+        p_letter_spacing: newTheme.letter_spacing
+      });
+
+      if (error) throw error;
+      
+      updateTheme(newTheme);
       toast.success("Theme updated successfully");
     } catch (error) {
       console.error("Error updating theme:", error);
       toast.error("Failed to update theme");
-      throw error;
     }
   };
 
-  const contextValue: ThemeContextType = {
-    theme: themeSettings ? { settings: themeSettings, mode: themeMode } : null,
-    mode: themeMode,
+  const contextValue = {
+    theme: themeSettings,
+    themeMode,
     effectiveTheme,
-    updateTheme
+    updateTheme: handleThemeUpdate
   };
 
   return (
@@ -55,6 +89,18 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     </ThemeContext.Provider>
   );
 };
+
+const ThemeContext = createContext<{
+  theme: Settings | null;
+  themeMode: 'light' | 'dark' | 'system';
+  effectiveTheme: 'light' | 'dark';
+  updateTheme: (theme: Settings) => void;
+}>({
+  theme: null,
+  themeMode: 'system',
+  effectiveTheme: 'dark',
+  updateTheme: () => {},
+});
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
