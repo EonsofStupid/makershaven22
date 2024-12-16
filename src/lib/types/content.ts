@@ -1,4 +1,5 @@
-import type { Json } from '@/integrations/supabase/types';
+import type { Json } from '@supabase/supabase-js';
+import type { ContentType, ContentStatus } from './base';
 
 export interface BaseContent {
   id: string;
@@ -14,9 +15,6 @@ export interface BaseContent {
   created_at?: string;
   updated_at?: string;
 }
-
-export type ContentType = 'page' | 'component' | 'template' | 'workflow';
-export type ContentStatus = 'draft' | 'published' | 'archived';
 
 export interface ContentData {
   body?: string;

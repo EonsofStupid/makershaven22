@@ -20,7 +20,7 @@ export interface GlobalState {
   isMaintenanceMode: boolean;
   error: Error | null;
   isLoading: boolean;
-
+  
   // Theme state
   theme: Theme | null;
   settings: Settings | null;

@@ -1,15 +1,13 @@
 import type { Json } from '@supabase/supabase-js';
+import type { BaseEntity } from './base';
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends BaseEntity {
   name: string;
   description?: string;
   steps: WorkflowStep[];
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface WorkflowStep {
