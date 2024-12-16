@@ -20,19 +20,19 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
-  box_shadow: string;
-  backdrop_blur: string;
-  transition_type: string;
+  border_radius?: string;
+  spacing_unit?: string;
+  transition_duration?: string;
+  shadow_color?: string;
+  hover_scale?: string;
+  box_shadow?: string;
+  backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
   security_settings?: Json;
+  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
 }
 
 export interface SettingsFormData extends Settings {}

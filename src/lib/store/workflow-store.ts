@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { WorkflowTemplate, WorkflowStage } from '@/components/admin/workflows/types';
-import { parseStages, serializeStages } from '@/components/admin/workflows/types';
+import type { WorkflowTemplate, WorkflowStage } from '@/components/admin/workflows/types/workflow';
+import { parseStages, serializeStages } from '@/components/admin/workflows/types/workflow';
 import { toast } from 'sonner';
 
 interface WorkflowState {
