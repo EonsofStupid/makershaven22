@@ -1,34 +1,25 @@
-import type { Json } from '../base/json';
+import { UserRole } from '../enums';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
-export interface AuthUser {
+export interface Profile {
   id: string;
-  email?: string | null;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  lastSeen?: Date;
-  isBanned?: boolean;
-  banReason?: string;
-  bannedAt?: Date;
-  bannedBy?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
-}
-
-export interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  loading: boolean;
-  error: Error | null;
+  username: string;
+  display_name: string;
+  avatar_url: string;
+  role: UserRole;
+  bio: string;
+  website: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
+  last_seen: string;
+  is_banned: boolean;
+  ban_reason?: string;
+  banned_at?: string;
+  banned_by?: string;
+  two_factor_enabled: boolean;
+  two_factor_secret?: string;
+  onboarding_completed: boolean;
+  gamification_enabled: boolean;
+  visual_editor_enabled: boolean;
+  last_login_at: string;
 }
