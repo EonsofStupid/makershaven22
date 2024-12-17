@@ -9,7 +9,7 @@ export type {
   Settings,
   SettingsUpdateParams,
   SettingsResponse
-} from './settings';
+} from './core/settings';
 
 export type {
   WorkflowTemplate,
@@ -26,3 +26,17 @@ export type {
   TransitionType,
   PostCategory
 } from './core/enums';
+
+// Content types
+export type {
+  BaseContent,
+  ContentRevision,
+  ContentRelationship
+} from './core/content';
+
+// Database types
+export type {
+  Json,
+  JsonObject,
+  JsonArray
+} from './core/json';

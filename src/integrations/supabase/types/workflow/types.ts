@@ -1,6 +1,13 @@
-import { Json } from '../base';
+import { Json } from '../core/json';
 import { WorkflowStageType } from '../core/enums';
-import { BaseEntity, UserOwnedEntity } from '../base';
+import { BaseEntity, UserOwnedEntity } from '../core/base';
+
+export interface WorkflowTemplate extends UserOwnedEntity {
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  is_active?: boolean;
+}
 
 export interface WorkflowStage {
   id: string;
@@ -9,13 +16,6 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
-}
-
-export interface WorkflowTemplate extends UserOwnedEntity {
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  is_active: boolean;
 }
 
 export interface WorkflowStageConfig {
@@ -50,17 +50,29 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: Json[]): WorkflowStage[] => {
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
-  return data.map(stage => ({
-    id: typeof stage === 'object' && stage !== null ? String(stage.id || crypto.randomUUID()) : crypto.randomUUID(),
-    name: typeof stage === 'object' && stage !== null ? String(stage.name || '') : '',
-    type: typeof stage === 'object' && stage !== null ? (stage.type as WorkflowStageType || 'TASK') : 'TASK',
-    order: typeof stage === 'object' && stage !== null ? Number(stage.order || 0) : 0,
-    config: typeof stage === 'object' && stage !== null ? (stage.config as WorkflowStageConfig || {}) : {},
-    description: typeof stage === 'object' && stage !== null ? String(stage.description || '') : undefined
-  }));
+  return data.map(stage => {
+    if (typeof stage !== 'object' || stage === null) {
+      return {
+        id: crypto.randomUUID(),
+        name: '',
+        type: 'TASK' as WorkflowStageType,
+        order: 0,
+        config: {},
+      };
+    }
+
+    return {
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'TASK',
+      order: Number(stage.order || 0),
+      config: stage.config as WorkflowStageConfig || {},
+      description: stage.description ? String(stage.description) : undefined
+    };
+  });
 };
 
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
