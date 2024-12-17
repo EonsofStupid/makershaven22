@@ -1,4 +1,10 @@
-import type { Json } from './json';
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export interface BaseEntity {
   id: string;
@@ -6,11 +12,7 @@ export interface BaseEntity {
   updated_at?: string;
 }
 
-export interface AuditableEntity extends BaseEntity {
+export interface UserOwnedEntity extends BaseEntity {
   created_by: string;
   updated_by?: string;
-}
-
-export interface MetadataEntity extends BaseEntity {
-  metadata?: Json;
 }
