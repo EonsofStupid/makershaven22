@@ -50,7 +50,7 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+export const parseWorkflowStages = (data: any[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => {

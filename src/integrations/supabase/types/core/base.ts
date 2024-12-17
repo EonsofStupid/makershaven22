@@ -8,3 +8,7 @@ export interface UserOwnedEntity extends BaseEntity {
   created_by: string;
   updated_by?: string;
 }
+
+export interface MetadataEntity {
+  metadata?: Record<string, any>;
+}
