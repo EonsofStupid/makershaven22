@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileSpreadsheet, Database, Settings } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
+import { toast } from "@/lib/hooks/toast";
 
 const ImportData = () => {
   const { toast } = useToast();

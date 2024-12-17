@@ -1,5 +1,5 @@
 import { isContentPage, isContentComponent } from "@/utils/validators";
-import { toast } from "sonner";
+import { toast } from "@/lib/hooks/toast";
 import type { Json } from "@/integrations/supabase/types";
 
 const handleSubmit = (content: Json) => {
