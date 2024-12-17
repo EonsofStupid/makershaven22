@@ -16,9 +16,11 @@ export const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 h-16">
-      <div className="absolute inset-0 bg-[#151A24]/80 backdrop-blur-xl border-b border-[#41f0db]/20"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#41f0db]/5 via-transparent to-[#ff0abe]/5"></div>
+      {/* Glass background with gradient */}
+      <div className="absolute inset-0 bg-[#151A24]/80 backdrop-blur-xl border-b border-[#41f0db]/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#41f0db]/5 via-transparent to-[#ff0abe]/5" />
       
+      {/* Navigation content */}
       <div className="container relative z-10 h-full mx-auto px-4">
         <div className="flex items-center justify-between h-full">
           <NavigationSection>

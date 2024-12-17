@@ -1,88 +1,91 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Database, Box, Users, TrendingUp, BookOpen } from "lucide-react";
-import { HeroSection } from "./components/HeroSection";
-import { FeaturePanel } from "./components/FeaturePanel";
-import { TableView } from "./components/DatabaseVisual/TableView";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 const LandingPage = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
   const { user } = useAuthStore();
   
-  const backgroundY = useTransform(scrollY, [0, 1000], ["0%", "50%"]);
-  const textY = useTransform(scrollY, [0, 500], ["0%", "100%"]);
-  const parallaxY = useTransform(scrollY, [0, 1000], ["0%", "25%"]);
-
   return (
-    <div ref={containerRef} className="min-h-screen relative overflow-hidden bg-[#1a1a1a]">
-      <motion.div 
-        style={{ y: backgroundY }}
-        className="absolute inset-0 z-0"
-      >
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-purple via-brand-magenta to-brand-lime opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#41f0db]/10 via-[#ff0abe]/10 to-[#8000ff]/10" />
-      </motion.div>
+    <div className="min-h-screen relative overflow-hidden bg-[#151A24]">
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#41f0db]/10 via-[#ff0abe]/10 to-[#8000ff]/10" />
+        </div>
+        
+        {/* Hero Content */}
+        <div className="container mx-auto px-6 pt-24 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              <span className="neon-text-cyan">Build</span>{" "}
+              <span className="neon-text-pink">Your Vision</span>
+            </h1>
+            <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+              Join our community of makers and bring your ideas to life
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-      <motion.div 
-        style={{ y: parallaxY }}
-        className="relative z-10"
-      >
-        <HeroSection />
-
-        <div className="container mx-auto px-6 py-20">
-          <TableView />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mt-20">
-            <FeaturePanel
+      {/* Feature Grid */}
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <FeatureCard
               icon={Database}
               title="Latest Builds"
-              description="Explore our comprehensive database of 3D printer builds with detailed specifications and user reviews."
-              gradient="bg-gradient-to-r from-[#41f0db]/20 to-[#8000ff]/20"
+              description="Explore our comprehensive database of 3D printer builds."
               link={user ? "/maker-space/builds" : "/auth/login"}
+              gradient="from-[#41f0db]/20 to-[#8000ff]/20"
             />
-            <FeaturePanel
+            <FeatureCard
               icon={Box}
               title="Parts Catalog"
-              description="Find compatible parts and upgrades for your 3D printer with our interactive catalog system."
-              gradient="bg-gradient-to-r from-[#ff0abe]/20 to-[#41f0db]/20"
+              description="Find compatible parts and upgrades for your 3D printer."
               link={user ? "/maker-space/parts" : "/auth/login"}
+              gradient="from-[#ff0abe]/20 to-[#41f0db]/20"
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-12">
-            <FeaturePanel
+            <FeatureCard
               icon={BookOpen}
               title="Community Guides"
-              description="Learn from expert makers with our comprehensive guide collection."
-              gradient="bg-gradient-to-r from-[#41f0db]/20 to-[#ff0abe]/20"
+              description="Learn from expert makers with our comprehensive guides."
               link={user ? "/maker-space/guides" : "/auth/login"}
-            />
-            <FeaturePanel
-              icon={Users}
-              title="User Reviews"
-              description="Real experiences from our community of makers."
-              gradient="bg-gradient-to-r from-[#ff0abe]/20 to-[#8000ff]/20"
-              link={user ? "/maker-space/reviews" : "/auth/login"}
-            />
-            <FeaturePanel
-              icon={TrendingUp}
-              title="Trending Projects"
-              description="Stay updated with the latest and most popular builds."
-              gradient="bg-gradient-to-r from-[#8000ff]/20 to-[#41f0db]/20"
-              link={user ? "/maker-space/builds/trending" : "/auth/login"}
+              gradient="from-[#8000ff]/20 to-[#41f0db]/20"
             />
           </div>
         </div>
-      </motion.div>
-
-      <motion.div
-        style={{ y: textY }}
-        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#1a1a1a] to-transparent z-20"
-      />
+      </section>
     </div>
+  );
+};
+
+const FeatureCard = ({ icon: Icon, title, description, link, gradient }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ scale: 1.02 }}
+      className={`relative overflow-hidden rounded-xl bg-gradient-to-r ${gradient} p-1`}
+    >
+      <a 
+        href={link}
+        className="block h-full"
+      >
+        <div className="glass p-6 h-full rounded-lg backdrop-blur-xl border border-white/10 hover:border-neon-cyan/30 transition-all duration-300">
+          <Icon className="w-12 h-12 mb-4 text-[#41f0db]" />
+          <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
+          <p className="text-white/80">{description}</p>
+        </div>
+      </a>
+    </motion.div>
   );
 };
 
