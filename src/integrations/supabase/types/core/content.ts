@@ -4,31 +4,31 @@ import { BaseEntity, UserOwnedEntity } from './base';
 
 export interface BaseContent extends UserOwnedEntity {
   title: string;
-  content: Json;
   type: ContentType;
-  status: ContentStatus;
+  content?: Json;
   metadata?: Json;
-  version?: number;
   slug?: string;
+  status?: ContentStatus;
+  version?: number;
 }
 
-export interface ContentRevision {
-  id: string;
+export interface ContentRevision extends BaseEntity {
   content_id: string;
   content: Json;
   metadata?: Json;
+  created_by?: string;
   version_number: number;
-  created_by: string;
-  created_at: string;
-  profiles: { display_name: string };
   change_summary?: string;
+  publish_status?: string;
+  scheduled_publish_at?: string;
+  rollback_from?: string;
   rollback_metadata?: Json;
 }
 
 export interface ContentRelationship {
   id: string;
-  parent_id?: string;
-  child_id?: string;
+  parent_id: string;
+  child_id: string;
   relationship_type: string;
   order_index?: number;
 }
