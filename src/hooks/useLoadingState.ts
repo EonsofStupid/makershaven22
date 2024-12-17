@@ -1,38 +1,34 @@
-import { useState, useCallback } from 'react';
-import { LoadingState, initialLoadingState } from '@/lib/store/atoms/loading';
+// Refactored `useLoadingState` hook to use Zustand and align with `auth-store.ts`
 
-export const useLoadingState = (initialState?: Partial<LoadingState>) => {
-  const [loadingState, setLoadingState] = useState<LoadingState>({
-    ...initialLoadingState,
-    ...initialState
-  });
+import { useCallback } from 'react';
+import { useLoadingStore } from '@/zustand/stores/loadingStore';
+
+export const useLoadingState = () => {
+  const { loadingState, setLoading, setError, resetLoading } = useLoadingStore();
 
   const startLoading = useCallback((message?: string) => {
-    setLoadingState({
+    setLoading({
       isLoading: true,
       error: null,
-      message
+      message,
     });
-  }, []);
+  }, [setLoading]);
 
   const stopLoading = useCallback(() => {
-    setLoadingState({
-      isLoading: false,
-      error: null
-    });
-  }, []);
+    resetLoading();
+  }, [resetLoading]);
 
-  const setError = useCallback((error: Error) => {
-    setLoadingState({
+  const setErrorState = useCallback((error: Error) => {
+    setError({
       isLoading: false,
-      error
+      error: error.message,
     });
-  }, []);
+  }, [setError]);
 
   return {
     ...loadingState,
     startLoading,
     stopLoading,
-    setError
+    setError: setErrorState,
   };
 };
