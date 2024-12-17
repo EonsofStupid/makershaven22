@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { AuthState, AuthUser, AuthSession } from '@/lib/auth/types';
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   user: null,
   isLoading: true,
   error: null,
   isTransitioning: false,
+  hasAccess: false,
 
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
@@ -38,7 +39,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({
           session: { ...session, user: authUser } as AuthSession,
           user: authUser,
-          error: null
+          error: null,
+          hasAccess: true
         });
 
         await supabase.from('security_events').insert({
@@ -49,11 +51,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
 
       } else {
-        set({ session: null, user: null });
+        set({ 
+          session: null, 
+          user: null,
+          hasAccess: false 
+        });
       }
     } catch (error) {
       console.error('Session update error:', error);
-      set({ error: error instanceof Error ? error : new Error('Session update failed') });
+      set({ 
+        error: error instanceof Error ? error : new Error('Session update failed'),
+        hasAccess: false
+      });
       toast.error('Session update failed');
     }
   },
@@ -63,7 +72,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      set({ session: null, user: null });
+      set({ 
+        session: null, 
+        user: null,
+        hasAccess: false
+      });
       toast.success('Signed out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -98,12 +111,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({
           session: { ...session, user: authUser } as AuthSession,
           user: authUser,
-          error: null
+          error: null,
+          hasAccess: true
         });
       }
     } catch (error) {
       console.error('Auth initialization error:', error);
-      set({ error: error instanceof Error ? error : new Error('Failed to initialize auth') });
+      set({ 
+        error: error instanceof Error ? error : new Error('Failed to initialize auth'),
+        hasAccess: false
+      });
       toast.error('Authentication error occurred');
     } finally {
       set({ isLoading: false });
