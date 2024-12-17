@@ -10,7 +10,7 @@ export interface AuthUser extends User {
 }
 
 export interface AuthSession extends Session {
-  user: AuthUser | null;
+  user: AuthUser;
 }
 
 export interface AuthState {
@@ -19,6 +19,7 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
+  hasAccess: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
