@@ -38,10 +38,3 @@ export interface AuthState {
   initialize: () => Promise<void>;
   handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
 }
-
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-}

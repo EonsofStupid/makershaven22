@@ -37,10 +37,17 @@ export const useAuthStore = create<AuthState>((set) => ({
         };
 
         set({
-          session: { ...session, user: authUser },
+          session: { ...session, user: authUser } as AuthSession,
           user: authUser,
           error: null,
           hasAccess: true
+        });
+
+        await supabase.from('security_events').insert({
+          user_id: session.user.id,
+          event_type: 'session_updated',
+          severity: 'low',
+          details: { timestamp: new Date().toISOString() }
         });
 
       } else {
@@ -102,7 +109,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         };
 
         set({
-          session: { ...session, user: authUser },
+          session: { ...session, user: authUser } as AuthSession,
           user: authUser,
           error: null,
           hasAccess: true
