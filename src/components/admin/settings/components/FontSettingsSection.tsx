@@ -2,10 +2,10 @@ import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CSSEffectsControl } from "./CSSEffectsControl";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../types";
+import { Settings } from "@/integrations/supabase/types";
 
 interface FontSettingsSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<Settings>;
 }
 
 export const FontSettingsSection: React.FC<FontSettingsSectionProps> = ({ form }) => {

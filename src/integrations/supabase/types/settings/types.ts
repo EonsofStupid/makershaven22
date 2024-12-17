@@ -40,6 +40,10 @@ export interface Settings {
   last_sync?: string;
 }
 
+export interface SettingsFormData extends Settings {
+  // Additional form-specific fields can be added here
+}
+
 export interface SettingsUpdateParams {
   p_site_title: string;
   p_tagline: string;

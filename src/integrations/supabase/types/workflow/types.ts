@@ -23,11 +23,6 @@ export interface WorkflowTemplate {
   profile?: Profile;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
-
 export interface WorkflowStageConfig {
   assignees?: string[];
   timeLimit?: number;
@@ -59,24 +54,3 @@ export interface WorkflowStageConfig {
     options?: string[];
   }>;
 }
-
-export const parseWorkflowStage = (data: Json): WorkflowStage => {
-  if (typeof data !== 'object' || !data) {
-    throw new Error('Invalid workflow stage data');
-  }
-
-  const stage = data as Record<string, Json>;
-  
-  return {
-    id: String(stage.id || ''),
-    name: String(stage.name || ''),
-    type: (stage.type as WorkflowStageType) || 'TASK',
-    order: Number(stage.order || 0),
-    config: stage.config as WorkflowStageConfig || {},
-    description: stage.description ? String(stage.description) : undefined
-  };
-};
-
-export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return stage as unknown as Json;
-};

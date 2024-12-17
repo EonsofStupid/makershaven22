@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../types";
+import { Settings } from "@/integrations/supabase/types";
 
 interface CSSEffectsControlProps {
   label: string;
@@ -19,8 +19,8 @@ interface CSSEffectsControlProps {
   className?: string;
   previewClass?: string;
   description?: string;
-  form?: UseFormReturn<SettingsFormData>;
-  name?: keyof SettingsFormData;
+  form?: UseFormReturn<Settings>;
+  name?: keyof Settings;
 }
 
 export const CSSEffectsControl: React.FC<CSSEffectsControlProps> = ({
