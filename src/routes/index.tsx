@@ -2,7 +2,7 @@ import { Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { AuthGuard } from "@/lib/store/auth/AuthGuard";
+import { AuthGuard } from "@/lib/store/auth";
 import { useAuthStore } from '@/lib/store/auth';
 import { toast } from "sonner";
 import { publicRoutes } from "./public-routes";
