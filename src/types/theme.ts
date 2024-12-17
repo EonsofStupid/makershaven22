@@ -1,14 +1,16 @@
-import { ThemeMode, TransitionType } from './enums';
+import { Json } from './json';
 
-export interface ThemeState {
-  mode: ThemeMode;
-  transition: TransitionType;
-  systemTheme: ThemeMode;
-  effectiveTheme: ThemeMode;
-  cssVariables: Record<string, string>;
-  settings: ThemeSettings;
-  isLoading: boolean;
-  error: Error | null;
+export enum ThemeMode {
+  LIGHT = 'light',
+  DARK = 'dark',
+  SYSTEM = 'system'
+}
+
+export enum TransitionType {
+  FADE = 'fade',
+  SLIDE = 'slide',
+  SCALE = 'scale',
+  BLUR = 'blur'
 }
 
 export interface ThemeSettings {
@@ -40,4 +42,24 @@ export interface ThemeSettings {
   backdrop_blur?: string;
   theme_mode?: ThemeMode;
   transition_type?: TransitionType;
+  security_settings?: Json;
+}
+
+export interface ThemeState {
+  settings: ThemeSettings | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: ThemeMode;
+  themeMode: ThemeMode;
+  systemTheme: ThemeMode;
+  effectiveTheme: ThemeMode;
+  cssVariables: Record<string, string>;
+  setThemeMode: (mode: ThemeMode) => void;
+  setSystemTheme: (theme: ThemeMode) => void;
+  setSettings: (settings: ThemeSettings) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error) => void;
+  setMode: (mode: ThemeMode) => void;
+  updateSettings: (settings: ThemeSettings) => Promise<void>;
+  updateTheme: (settings: ThemeSettings) => Promise<void>;
 }

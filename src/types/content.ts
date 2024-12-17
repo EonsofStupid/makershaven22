@@ -1,11 +1,23 @@
-import { ComponentType, ContentStatus } from './enums';
-import type { Json } from '@supabase/supabase-js';
+import { Json } from './json';
+
+export enum ContentStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
+  SCHEDULED = 'scheduled'
+}
+
+export enum ContentType {
+  PAGE = 'page',
+  POST = 'post',
+  COMPONENT = 'component'
+}
 
 export interface BaseContent {
   id: string;
   title: string;
-  type: ComponentType;
-  content: string | Json;
+  type: ContentType;
+  content: Json;
   metadata?: Json;
   slug?: string;
   status: ContentStatus;
@@ -42,13 +54,9 @@ export interface SecurityLog {
   user_id?: string;
   event_type: string;
   severity: string;
-  details: Json;
-  metadata: Json;
+  details?: Json;
+  metadata?: Json;
   ip_address?: string;
   user_agent?: string;
   created_at: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-  };
 }

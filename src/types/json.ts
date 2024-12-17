@@ -1,18 +1,16 @@
-import type { Json as SupabaseJson } from '@supabase/supabase-js';
-
-export type Json = SupabaseJson;
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type JsonObject = { [key: string]: Json };
 
-export function isJsonObject(value: Json): value is JsonObject {
+export const isJsonObject = (value: unknown): value is JsonObject => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+};
 
-export function parseJsonField<T>(json: Json | null): T | null {
-  if (!json) return null;
-  try {
-    return typeof json === 'string' ? JSON.parse(json) : json as T;
-  } catch {
-    return null;
-  }
-}
+export const isJsonArray = (value: unknown): value is Json[] => {
+  return Array.isArray(value);
+};
+
+export const isJsonPrimitive = (value: unknown): value is string | number | boolean | null => {
+  const type = typeof value;
+  return value === null || type === 'string' || type === 'number' || type === 'boolean';
+};
