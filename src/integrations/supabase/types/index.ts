@@ -1,15 +1,10 @@
 // Core types
-export * from './core/json';
-export * from './core/enums';
+export * from './core';
 
-// Settings and theme
-export * from './settings/theme';
+// Database types
+export * from './database/tables';
 
-// Workflow
-export * from './workflow/stage';
-export * from './workflow/template';
-
-// Re-export common types
+// Re-export commonly used types
 export type {
   Json,
   JsonObject,
@@ -23,5 +18,6 @@ export type {
   WorkflowStageType,
   ThemeMode,
   TransitionType,
-  MenuAnimationType
+  MenuAnimationType,
+  PostCategory
 } from './core/enums';
