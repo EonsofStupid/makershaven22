@@ -1,13 +1,10 @@
-import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { redisConfigAtom, redisStatusAtom, updateRedisStatusAtom } from '@/lib/store/atoms/redis/redis-atoms';
+import { useRedisStore } from '@/lib/store/redis-store';
 
 export const useRedisConnection = () => {
-  const [config] = useAtom(redisConfigAtom);
-  const [status] = useAtom(redisStatusAtom);
-  const [, updateStatus] = useAtom(updateRedisStatusAtom);
+  const { config, status, updateStatus } = useRedisStore();
 
   const testConnection = useCallback(async () => {
     if (!config.enabled) {
