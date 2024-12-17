@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
-import { Layout } from "@/components/Layout";
+import Layout from "@/components/Layout"; // Fixed import
 import LandingPage from "@/pages/site/landing";
 import Index from "@/pages/Index";
 import Login from "@/pages/auth/login";
