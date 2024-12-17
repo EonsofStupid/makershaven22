@@ -1,21 +1,34 @@
-import type { UserRole } from '../enums';
+import type { Json } from '../base/json';
 
-export interface Profile {
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
+export interface AuthUser {
   id: string;
-  username?: string | null;
-  display_name?: string | null;
-  avatar_url?: string | null;
+  email?: string | null;
   role?: UserRole;
-  bio?: string | null;
-  website?: string | null;
-  location?: string | null;
-  created_at?: string;
-  updated_at?: string;
-  last_seen?: string | null;
+  username?: string;
+  displayName?: string;
+  lastSeen?: Date;
+  isBanned?: boolean;
+  banReason?: string;
+  bannedAt?: Date;
+  bannedBy?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
 }
 
-export interface ProfilesTable {
-  Row: Profile;
-  Insert: Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
-  Update: Partial<Omit<Profile, 'id'>>;
+export interface AuthSession {
+  user: AuthUser;
+  expires_at?: number;
+  access_token?: string;
+  refresh_token?: string;
+}
+
+export interface AuthState {
+  session: AuthSession | null;
+  user: AuthUser | null;
+  loading: boolean;
+  error: Error | null;
 }

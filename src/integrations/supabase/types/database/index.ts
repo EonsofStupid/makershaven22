@@ -1,5 +1,5 @@
-export * from './core';
-export * from './tables/workflow';
-export * from './tables/settings';
+export * from './tables';
 export * from './enums';
-export type { Json } from './base';
+export * from './base';
+
+export type { Json } from '../base/json';

@@ -391,6 +391,69 @@ export type Database = {
         }
         Relationships: []
       }
+      enhanced_audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          error_code: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          new_state: Json | null
+          previous_state: Json | null
+          request_id: string | null
+          resource_id: string | null
+          resource_type: string
+          session_id: string | null
+          severity: string
+          stack_trace: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          new_state?: Json | null
+          previous_state?: Json | null
+          request_id?: string | null
+          resource_id?: string | null
+          resource_type: string
+          session_id?: string | null
+          severity: string
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          new_state?: Json | null
+          previous_state?: Json | null
+          request_id?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          session_id?: string | null
+          severity?: string
+          stack_trace?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       erd_visualizations: {
         Row: {
           created_at: string | null
@@ -1525,6 +1588,23 @@ export type Database = {
           user_id: string
         }
         Returns: undefined
+      }
+      log_security_event: {
+        Args: {
+          p_event_type: string
+          p_severity: string
+          p_user_id: string
+          p_resource_type: string
+          p_resource_id: string
+          p_action: string
+          p_previous_state?: Json
+          p_new_state?: Json
+          p_metadata?: Json
+          p_error_code?: string
+          p_error_message?: string
+          p_stack_trace?: string
+        }
+        Returns: string
       }
       record_user_activity: {
         Args: {
