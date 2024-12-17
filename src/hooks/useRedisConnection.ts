@@ -1,53 +1,58 @@
-import { useAtom } from 'jotai';
-import { useCallback } from 'react';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { redisConfigAtom, redisStatusAtom, updateRedisStatusAtom } from '@/lib/store/atoms/redis/redis-atoms';
+import { toast } from 'sonner';
+import { UserRole } from '@/components/auth/types';
 
-export const useRedisConnection = () => {
-  const [config] = useState(redisConfigAtom);
-  const [status] = useState(redisStatusAtom);
-  const [, updateStatus] = useState(updateRedisStatusAtom);
+export const useUserManagement = () => {
+  const queryClient = useQueryClient();
+  const [isUpdating, setIsUpdating] = useState(false); // Local loading spinner state
 
-  const testConnection = useCallback(async () => {
-    if (!config.enabled) {
-      updateStatus({
-        isConnected: false,
-        error: null,
-        lastChecked: new Date()
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.functions.invoke('test-redis-connection', {
-        body: { config }
-      });
+  const { data: users, isLoading, error, refetch } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      updateStatus({
-        isConnected: data.connected,
-        error: null,
-        lastChecked: new Date()
-      });
-
-      toast.success('Redis connection successful');
-    } catch (error) {
-      console.error('Redis connection error:', error);
-      updateStatus({
-        isConnected: false,
-        error: error instanceof Error ? error.message : 'Failed to connect to Redis',
-        lastChecked: new Date()
-      });
-      toast.error('Redis connection failed', {
-        description: error instanceof Error ? error.message : 'Failed to connect to Redis'
-      });
+      return data;
     }
-  }, [config, updateStatus]);
+  });
+
+  const updateRole = useMutation({
+    mutationFn: async ({ userId, newRole }: { userId: string; newRole: UserRole }) => {
+      setIsUpdating(true); // Start loading spinner
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('User role updated successfully');
+    },
+    onError: (error) => {
+      console.error('Error updating role:', error);
+      toast.error('Failed to update user role');
+    },
+    onSettled: () => {
+      setIsUpdating(false); // Stop loading spinner
+    }
+  });
 
   return {
-    status,
-    testConnection
+    users,
+    isLoading,
+    error,
+    isUpdating, // Expose the spinner state
+    refetch,
+    updateRole
   };
 };

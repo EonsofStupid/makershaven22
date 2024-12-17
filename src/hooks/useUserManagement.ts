@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useWorkflowStore } from '@/lib/store/workflow-store';
 import { toast } from 'sonner';
 import { UserRole } from '@/components/auth/types';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();
-  const { setActiveWorkflow, addToHistory } = useWorkflowStore();
 
   const { data: users, isLoading, error, refetch } = useQuery({
     queryKey: ['users'],
