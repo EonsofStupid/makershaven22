@@ -1,17 +1,12 @@
 // Core types
-export * from './core/json';
-export * from './core/enums';
-export * from './core/base-types';
-
-// Database types
-export * from './database';
+export * from './core';
 
 // Feature-specific types
-export * from './auth/types';
-export * from './content/types';
-export * from './workflow/types';
-export * from './settings/types';
-export * from './theme/types';
+export * from './settings';
+export * from './workflow';
+export * from './content';
 
-// Utility types
-export * from './utils';
+// Re-export common types for backwards compatibility
+export type { Settings, SettingsUpdateParams, SettingsResponse } from './settings';
+export type { WorkflowTemplate, WorkflowStage, WorkflowStageConfig } from './workflow';
+export type { BaseContent, ContentRevision, ContentRelationship } from './content';

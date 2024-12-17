@@ -2,7 +2,7 @@ export * from './json';
 export * from './enums';
 export * from './base-types';
 
-// Re-export common types for backwards compatibility
+// Re-export common types
 export type { Json, JsonObject, JsonArray } from './json';
 export type { 
   UserRole, 
@@ -10,6 +10,5 @@ export type {
   ContentType, 
   WorkflowStageType,
   ThemeMode,
-  TransitionType,
-  PostCategory
+  TransitionType 
 } from './enums';

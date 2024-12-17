@@ -1,5 +1,5 @@
-import { Json } from '../base/json';
-import { ThemeMode } from '../enums';
+import { Json } from '../core';
+import { ThemeMode } from '../core';
 
 export interface Settings {
   id: string;
@@ -63,4 +63,9 @@ export interface SettingsUpdateParams {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
+}
+
+export interface SettingsResponse {
+  data: Settings;
+  error: null | Error;
 }
