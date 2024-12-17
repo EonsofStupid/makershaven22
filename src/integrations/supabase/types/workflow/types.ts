@@ -1,6 +1,6 @@
-import { Json } from '../core/json';
+import { Json } from '../base';
 import { WorkflowStageType } from '../core/enums';
-import type { Profile } from '../auth/types';
+import { BaseEntity, UserOwnedEntity } from '../base';
 
 export interface WorkflowStage {
   id: string;
@@ -11,16 +11,11 @@ export interface WorkflowStage {
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends UserOwnedEntity {
   name: string;
   description?: string;
   steps: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  profile?: Profile;
 }
 
 export interface WorkflowStageConfig {
@@ -55,7 +50,7 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: any[]): WorkflowStage[] => {
+export const parseStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
@@ -63,7 +58,7 @@ export const parseStages = (data: any[]): WorkflowStage[] => {
     name: stage.name?.toString() || '',
     type: (stage.type as WorkflowStageType) || 'TASK',
     order: Number(stage.order) || 0,
-    config: stage.config || {},
+    config: stage.config as WorkflowStageConfig || {},
     description: stage.description?.toString()
   }));
 };

@@ -1,20 +1,17 @@
-import { Json } from '../core';
-import { ThemeMode } from '../core';
+import { Json } from '../base';
+import { ThemeMode, TransitionType } from '../core/enums';
 
 export interface Settings {
   id: string;
   site_title: string;
   tagline?: string;
-  primary_color: string;
-  secondary_color: string;
-  accent_color: string;
-  text_primary_color: string;
-  text_secondary_color: string;
-  text_link_color: string;
-  text_heading_color: string;
-  neon_cyan: string;
-  neon_pink: string;
-  neon_purple: string;
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color?: string;
+  text_primary_color?: string;
+  text_secondary_color?: string;
+  text_link_color?: string;
+  text_heading_color?: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -27,15 +24,20 @@ export interface Settings {
   transition_duration?: string;
   shadow_color?: string;
   hover_scale?: string;
+  neon_cyan?: string;
+  neon_pink?: string;
+  neon_purple?: string;
   box_shadow?: string;
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
-  theme_mode?: ThemeMode;
   security_settings?: Json;
-  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
+  transition_type?: TransitionType;
+  theme_mode?: ThemeMode;
+  state_version?: number;
+  last_sync?: string;
 }
 
 export interface SettingsUpdateParams {
