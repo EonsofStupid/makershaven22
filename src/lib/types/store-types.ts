@@ -1,4 +1,5 @@
 import type { Session, User } from '@supabase/supabase-js';
+import type { Settings } from '@/components/admin/settings/types';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
@@ -27,4 +28,16 @@ export interface AuthState {
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
+}
+
+export interface ThemeState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: 'light' | 'dark' | 'system';
+  setSettings: (settings: Settings) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+  updateSettings: (settings: Settings) => Promise<void>;
 }

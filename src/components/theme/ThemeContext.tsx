@@ -1,49 +1,33 @@
-import React, { useEffect } from 'react';
-import { useThemeStore } from '@/lib/store/theme-store';
-import type { Settings } from '@/components/admin/settings/types';
-import { toast } from 'sonner';
-import { applyThemeToDocument } from './utils/themeUtils';
+import React, { createContext, useContext } from "react";
+import { useSettingsStore } from "@/lib/store/settings-store";
+import type { Settings } from "@/components/admin/settings/types";
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
+interface ThemeContextType {
+  theme: Settings | null;
+  updateTheme: (theme: Settings) => Promise<void>;
 }
 
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const { settings, mode, setMode, updateTheme } = useThemeStore();
+const ThemeContext = createContext<ThemeContextType | null>(null);
 
-  // Handle system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (mode === 'system') {
-        setMode(e.matches ? 'dark' : 'light');
-      }
-    };
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const { settings, updateSettings } = useSettingsStore();
 
-    if (mode === 'system') {
-      setMode(mediaQuery.matches ? 'dark' : 'light');
-    }
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [mode, setMode]);
-
-  // Apply theme settings to document
-  useEffect(() => {
-    if (settings) {
-      applyThemeToDocument(settings);
-      document.documentElement.classList.toggle('dark', mode === 'dark');
-    }
-  }, [settings, mode]);
-
-  const handleThemeUpdate = async (newTheme: Settings) => {
-    try {
-      await updateTheme(newTheme);
-      toast.success('Theme updated successfully');
-    } catch (error) {
-      console.error('Error updating theme:', error);
-      toast.error('Failed to update theme');
-    }
+  const value = {
+    theme: settings,
+    updateTheme: updateSettings
   };
 
-  return <>{children}</>;
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
 };
