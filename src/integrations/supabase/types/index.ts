@@ -2,7 +2,7 @@
 export * from './core/json';
 export * from './core/enums';
 export * from './core/settings';
-export * from './core/workflow';
+export * from './workflow/types';
 export * from './core/content';
 export * from './core/base';
 
@@ -11,7 +11,6 @@ export * from './auth';
 export * from './activity';
 export * from './media';
 export * from './theme';
-export * from './workflow';
 export * from './settings';
 export * from './content';
 
@@ -26,7 +25,7 @@ export type {
   WorkflowTemplate,
   WorkflowStage,
   WorkflowStageConfig
-} from './core/workflow';
+} from './workflow/types';
 
 export type {
   BaseContent,
