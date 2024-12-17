@@ -21,14 +21,14 @@ export interface PostWithAuthor extends Post {
 
 export const usePostsQuery = () => {
   return useQuery({
-    queryKey: ['admin-posts'],
+    queryKey: ["admin-posts"],
     queryFn: async () => {
-      console.log('Starting posts fetch operation...');
+      console.log("Starting posts fetch operation...");
       
       try {
-        console.log('Executing Supabase query with profiles join...');
+        console.log("Executing Supabase query with profiles join...");
         const { data: rawData, error: rawError } = await supabase
-          .from('blog_posts')
+          .from("blog_posts")
           .select(`
             *,
             profiles (
@@ -36,44 +36,44 @@ export const usePostsQuery = () => {
               username
             )
           `)
-          .order('updated_at', { ascending: false });
+          .order("updated_at", { ascending: false });
 
-        console.log('Raw Supabase Response:', { data: rawData, error: rawError });
+        console.log("Raw Supabase Response:", { data: rawData, error: rawError });
 
         if (rawError) {
-          console.error('Error in Supabase query:', rawError);
-          toast.error('Failed to load posts');
+          console.error("Error in Supabase query:", rawError);
+          toast.error("Failed to load posts");
           throw rawError;
         }
 
         if (!rawData) {
-          console.warn('No data returned from Supabase');
+          console.warn("No data returned from Supabase");
           return [];
         }
 
         // Transform the data
-        console.log('Transforming posts data...');
-        const transformedData: PostWithAuthor[] = rawData.map(post => {
+        console.log("Transforming posts data...");
+        const transformedData: PostWithAuthor[] = rawData.map((post) => {
           // Log each post's profile data for debugging
-          console.log('Post profile data:', {
+          console.log("Post profile data:", {
             postId: post.id,
             profiles: post.profiles,
-            authorId: post.author_id
+            authorId: post.author_id,
           });
 
           return {
             ...post,
             profiles: post.profiles || {
               display_name: null,
-              username: null
-            }
+              username: null,
+            },
           };
         });
 
-        console.log('Successfully transformed posts:', transformedData);
+        console.log("Successfully transformed posts:", transformedData);
         return transformedData;
       } catch (error) {
-        console.error('Unexpected error in posts query:', error);
+        console.error("Unexpected error in posts query:", error);
         throw error;
       }
     },
