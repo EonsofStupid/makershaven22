@@ -8,8 +8,7 @@ import { toast } from 'sonner';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { WorkflowTemplateCard } from './components/WorkflowTemplateCard';
 import { useNavigate } from 'react-router-dom';
-import { parseStages } from './types';
-import type { WorkflowTemplate } from './types';
+import type { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types';
 
 export const WorkflowTemplateList = () => {
   const navigate = useNavigate();
