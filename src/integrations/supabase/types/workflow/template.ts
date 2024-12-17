@@ -1,44 +1,49 @@
-import { Json } from '../base/json';
-import { WorkflowStage, parseStage, serializeStage } from './stage';
-import type { Profile } from '../auth/types';
+import { Json } from '../core/json';
+import { WorkflowStage, parseWorkflowStage } from './stage';
 
 export interface WorkflowTemplate {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   steps: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  profile?: Profile;
+  is_active?: boolean | null;
+  created_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  profile?: {
+    id: string;
+    username: string;
+    display_name: string;
+    avatar_url: string;
+  };
 }
 
-export const parseTemplate = (data: Json): WorkflowTemplate => {
+export const parseWorkflowTemplate = (data: Json): WorkflowTemplate => {
   if (typeof data !== 'object' || !data) {
-    throw new Error('Invalid template data');
+    throw new Error('Invalid workflow template data');
   }
 
-  const steps = Array.isArray(data.steps) 
-    ? data.steps.map(step => parseStage(step))
+  const template = data as Record<string, Json>;
+  const steps = Array.isArray(template.steps) 
+    ? template.steps.map(step => parseWorkflowStage(step))
     : [];
 
   return {
-    id: data.id as string,
-    name: data.name as string,
-    description: data.description as string,
+    id: String(template.id || ''),
+    name: String(template.name || ''),
+    description: template.description ? String(template.description) : null,
     steps,
-    is_active: data.is_active as boolean,
-    created_by: data.created_by as string,
-    created_at: data.created_at as string,
-    updated_at: data.updated_at as string,
-    profile: data.profile as Profile
+    is_active: Boolean(template.is_active),
+    created_by: template.created_by ? String(template.created_by) : null,
+    created_at: template.created_at ? String(template.created_at) : null,
+    updated_at: template.updated_at ? String(template.updated_at) : null,
+    profile: template.profile as WorkflowTemplate['profile']
   };
 };
 
-export const serializeTemplate = (template: WorkflowTemplate): Json => {
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,
-    steps: template.steps.map(serializeStage)
+    steps: template.steps.map(step => serializeWorkflowStage(step))
   } as unknown as Json;
 };

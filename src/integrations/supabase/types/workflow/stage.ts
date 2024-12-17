@@ -1,5 +1,5 @@
-import { Json } from '../base/json';
-import { WorkflowStageType } from '../enums';
+import { Json } from '../core/json';
+import { WorkflowStageType } from '../core/enums';
 
 export interface WorkflowStage {
   id: string;
@@ -42,21 +42,23 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStage = (data: Json): WorkflowStage => {
+export const parseWorkflowStage = (data: Json): WorkflowStage => {
   if (typeof data !== 'object' || !data) {
-    throw new Error('Invalid stage data');
+    throw new Error('Invalid workflow stage data');
   }
 
+  const stage = data as Record<string, Json>;
+  
   return {
-    id: data.id as string || crypto.randomUUID(),
-    name: data.name as string || '',
-    type: (data.type as WorkflowStageType) || 'TASK',
-    order: (data.order as number) || 0,
-    config: (data.config as WorkflowStageConfig) || {},
-    description: data.description as string
+    id: String(stage.id || ''),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'TASK',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
   };
 };
 
-export const serializeStage = (stage: WorkflowStage): Json => {
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
   return stage as unknown as Json;
 };
