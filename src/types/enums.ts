@@ -14,6 +14,7 @@ export type PostCategory =
   | '3D Printer'
   | '3D Printer Hardware';
 
+// Type guards
 export const isUserRole = (value: unknown): value is UserRole => {
   return typeof value === 'string' && ['subscriber', 'maker', 'admin', 'super_admin'].includes(value);
 };

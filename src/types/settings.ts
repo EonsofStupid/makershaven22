@@ -1,5 +1,7 @@
-import { ThemeMode, TransitionType } from './enums';
-import type { Json } from './json';
+import { Json } from "./json";
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface Settings {
   site_title: string;
@@ -26,15 +28,15 @@ export interface Settings {
   transition_duration: string;
   shadow_color: string;
   hover_scale: string;
-  box_shadow?: string;
-  backdrop_blur?: string;
+  box_shadow: string;
+  backdrop_blur: string;
   logo_url?: string;
   favicon_url?: string;
-  theme_mode?: ThemeMode;
-  transition_type?: TransitionType;
-  security_settings?: Json;
   updated_at?: string;
   updated_by?: string;
+  theme_mode?: ThemeMode;
+  security_settings?: Json;
+  transition_type?: TransitionType;
 }
 
 export interface ThemeState {
@@ -50,8 +52,35 @@ export interface ThemeState {
   setSystemTheme: (theme: ThemeMode) => void;
   setSettings: (settings: Settings) => void;
   setLoading: (isLoading: boolean) => void;
-  setError: (error: Error) => void;
+  setError: (error: Error | null) => void;
   setMode: (mode: ThemeMode) => void;
   updateSettings: (settings: Settings) => Promise<void>;
   updateTheme: (settings: Settings) => Promise<void>;
+}
+
+export interface SettingsUpdateParams {
+  p_site_title: string;
+  p_tagline: string;
+  p_primary_color: string;
+  p_secondary_color: string;
+  p_accent_color: string;
+  p_text_primary_color: string;
+  p_text_secondary_color: string;
+  p_text_link_color: string;
+  p_text_heading_color: string;
+  p_neon_cyan: string;
+  p_neon_pink: string;
+  p_neon_purple: string;
+  p_border_radius: string;
+  p_spacing_unit: string;
+  p_transition_duration: string;
+  p_shadow_color: string;
+  p_hover_scale: string;
+  p_font_family_heading: string;
+  p_font_family_body: string;
+  p_font_size_base: string;
+  p_font_weight_normal: string;
+  p_font_weight_bold: string;
+  p_line_height_base: string;
+  p_letter_spacing: string;
 }
