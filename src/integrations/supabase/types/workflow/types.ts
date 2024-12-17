@@ -3,24 +3,6 @@ import type { Profile } from '../auth/types';
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  steps: Json;
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  profile?: Profile;
-}
-
-export interface WorkflowTemplatesTable {
-  Row: WorkflowTemplate;
-  Insert: Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'>;
-  Update: Partial<Omit<WorkflowTemplate, 'id'>>;
-}
-
 export interface WorkflowStage {
   id: string;
   name: string;
@@ -28,6 +10,18 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+  profile?: Profile;
 }
 
 export interface WorkflowStageConfig {
@@ -61,3 +55,25 @@ export interface WorkflowStageConfig {
     options?: string[];
   }>;
 }
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
+}
+
+export const parseStages = (data: Json): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(stage => ({
+    id: typeof stage === 'object' && stage ? (stage.id as string || crypto.randomUUID()) : crypto.randomUUID(),
+    name: typeof stage === 'object' && stage ? (stage.name as string || '') : '',
+    type: typeof stage === 'object' && stage ? ((stage.type as WorkflowStageType) || 'TASK') : 'TASK',
+    order: typeof stage === 'object' && stage ? (stage.order as number || 0) : 0,
+    config: typeof stage === 'object' && stage ? (stage.config as WorkflowStageConfig || {}) : {},
+    description: typeof stage === 'object' && stage ? (stage.description as string) : undefined
+  }));
+};
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages as unknown as Json;
+};

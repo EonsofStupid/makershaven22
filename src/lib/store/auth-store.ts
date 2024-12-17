@@ -1,20 +1,21 @@
 import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { AuthUser, AuthSession, AuthState } from '@/lib/types/store-types';
+import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store-types';
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   user: null,
   isLoading: true,
   error: null,
+  isOffline: false,
   isTransitioning: false,
 
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
-  setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
+  setOffline: (isOffline) => set({ isOffline }),
 
   handleSessionUpdate: async (session) => {
     try {
@@ -108,5 +109,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  reset: () => {
+    set({
+      session: null,
+      user: null,
+      isLoading: false,
+      error: null,
+      isOffline: false,
+      isTransitioning: false
+    });
   }
 }));
