@@ -1,4 +1,5 @@
 @layer utilities {
+  /* Animation states using CUBE CSS utilities */
   .is-loading {
     @apply animate-pulse;
   }
@@ -9,5 +10,13 @@
 
   .is-disabled {
     @apply opacity-50 pointer-events-none;
+  }
+
+  .is-hidden {
+    @apply hidden;
+  }
+
+  .is-visible {
+    @apply block;
   }
 }
