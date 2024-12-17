@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
+import { toast } from "@/lib/hooks/toast";
 import { useAuthStore } from '@/lib/store/auth-store';
 
 interface PostCardProps {

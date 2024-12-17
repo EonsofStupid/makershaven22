@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { toast } from "@/lib/hooks/toast";
 import type { AuthState, AuthUser, AuthSession } from '@/lib/auth/types';
 
 export const useAuthStore = create<AuthState>((set) => ({
