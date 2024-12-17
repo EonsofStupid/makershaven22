@@ -1,5 +1,6 @@
 import { Json } from '../core/json';
 import { WorkflowStageType } from '../core/enums';
+import type { Profile } from '../auth/types';
 
 export interface WorkflowStage {
   id: string;
@@ -20,6 +21,11 @@ export interface WorkflowTemplate {
   created_at?: string;
   updated_at?: string;
   profile?: Profile;
+}
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
 
 export interface WorkflowStageConfig {

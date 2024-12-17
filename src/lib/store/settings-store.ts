@@ -1,22 +1,20 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { ThemeSettings, ThemeState } from '@/integrations/supabase/types';
+import type { Settings, SettingsUpdateParams } from '@/integrations/supabase/types';
 
-interface SettingsStore extends ThemeState {
+interface SettingsState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
   fetchSettings: () => Promise<void>;
-  updateSettings: (settings: ThemeSettings) => Promise<void>;
+  updateSettings: (settings: SettingsUpdateParams) => Promise<void>;
   resetSettings: () => Promise<void>;
 }
 
-export const useSettingsStore = create<SettingsStore>((set) => ({
+export const useSettingsStore = create<SettingsState>((set) => ({
   settings: null,
   isLoading: true,
   error: null,
-  mode: 'light',
-  themeMode: 'light',
-  systemTheme: 'light',
-  effectiveTheme: 'light',
-  cssVariables: {},
   
   fetchSettings: async () => {
     set({ isLoading: true });
@@ -27,7 +25,6 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
         .single();
 
       if (error) throw error;
-
       set({ settings: data, isLoading: false });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -41,8 +38,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
       const { error } = await supabase.rpc('update_site_settings', settings);
 
       if (error) throw error;
-
-      set({ settings, isLoading: false });
+      set({ settings: settings as unknown as Settings, isLoading: false });
     } catch (error) {
       console.error('Error updating settings:', error);
       set({ error: error as Error, isLoading: false });
@@ -55,18 +51,10 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
       const { error } = await supabase.rpc('reset_site_settings');
 
       if (error) throw error;
-
       set({ settings: null, isLoading: false });
     } catch (error) {
       console.error('Error resetting settings:', error);
       set({ error: error as Error, isLoading: false });
     }
-  },
-
-  setThemeMode: (mode) => set({ mode }),
-  setSystemTheme: (theme) => set({ systemTheme: theme }),
-  setSettings: (settings) => set({ settings }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  setMode: (mode) => set({ mode }),
+  }
 }));

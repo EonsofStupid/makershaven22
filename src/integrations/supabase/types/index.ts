@@ -3,17 +3,17 @@ export * from './core/base';
 export * from './core/enums';
 export * from './core/json';
 
+// Database types
+export * from './database/tables';
+export * from './database/base';
+
 // Feature-specific types
 export * from './workflow/types';
 export * from './theme/types';
-export * from './content/types';
 export * from './auth/types';
 export * from './settings/types';
 
-// Database types
-export * from './database/tables';
-
-// Re-export common types for convenience
+// Re-export common types
 export type {
   Json,
   JsonArray,
@@ -35,13 +35,15 @@ export type {
 export type {
   WorkflowStage,
   WorkflowTemplate,
-  WorkflowStageConfig
+  WorkflowStageConfig,
+  StageConfigUpdateProps
 } from './workflow/types';
 
 // Export theme types
 export type {
   ThemeSettings,
-  ThemeState
+  ThemeState,
+  ThemeMode as ThemeModeType
 } from './theme/types';
 
 // Export content types

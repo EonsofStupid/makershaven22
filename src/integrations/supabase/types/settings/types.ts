@@ -1,19 +1,17 @@
-import { Json } from '../base/json';
-import { ThemeMode, TransitionType } from '../enums';
+import { Json } from '../core/json';
+import { ThemeMode, TransitionType } from '../core/enums';
 
 export interface Settings {
+  id: string;
   site_title: string;
   tagline?: string;
-  primary_color: string;
-  secondary_color: string;
-  accent_color: string;
-  text_primary_color: string;
-  text_secondary_color: string;
-  text_link_color: string;
-  text_heading_color: string;
-  neon_cyan: string;
-  neon_pink: string;
-  neon_purple: string;
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color?: string;
+  text_primary_color?: string;
+  text_secondary_color?: string;
+  text_link_color?: string;
+  text_heading_color?: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -21,21 +19,28 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
-  box_shadow: string;
-  backdrop_blur: string;
+  border_radius?: string;
+  spacing_unit?: string;
+  transition_duration?: string;
+  shadow_color?: string;
+  hover_scale?: string;
+  neon_cyan?: string;
+  neon_pink?: string;
+  neon_purple?: string;
+  box_shadow?: string;
+  backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
-  theme_mode?: ThemeMode;
   security_settings?: Json;
   transition_type?: TransitionType;
+  theme_mode?: ThemeMode;
+  state_version?: number;
+  last_sync?: string;
 }
+
+export type SettingsFormData = Settings;
 
 export interface SettingsUpdateParams {
   p_site_title: string;
@@ -62,6 +67,9 @@ export interface SettingsUpdateParams {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
-  p_logo_url?: string;
-  p_favicon_url?: string;
+}
+
+export interface SettingsResponse {
+  data: Settings;
+  error: null | Error;
 }
