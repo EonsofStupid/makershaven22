@@ -1,53 +1,108 @@
 import { useState } from "react";
-import { NavigationContainer } from "./core/NavigationContainer";
-import { NavigationSection } from "./core/NavigationSection";
-import { Logo } from "./Logo";
-import { NavigationLinks } from "./NavigationLinks";
-import { MegaMenu } from "./MegaMenu";
-import { SearchButton } from "./SearchButton";
-import { SearchDialog } from "./SearchDialog";
-import { UserAvatar } from "../avatar/UserAvatar";
-import { UserMenu } from "./UserMenu";
-import { MobileNav } from "./mobile/MobileNav";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { Menu, Search, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { UserAvatar } from "../avatar/UserAvatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navigation = () => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user } = useAuthStore();
+  const { user, signOut } = useAuthStore();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
+  };
 
   return (
-    <NavigationContainer>
-      <NavigationSection>
-        <Logo />
-      </NavigationSection>
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b bg-background/80 backdrop-blur-xl">
+      <div className="container flex h-full items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="text-xl font-bold bg-gradient-to-r from-[#41f0db] to-[#8000ff] bg-clip-text text-transparent">
+            MakersImpulse
+          </span>
+        </Link>
 
-      <NavigationSection className="hidden md:flex space-x-6">
-        <NavigationLinks />
-        <MegaMenu />
-      </NavigationSection>
+        {/* Center Navigation */}
+        <div className="hidden md:flex items-center space-x-6">
+          <Link 
+            to="/maker-space"
+            className="text-white hover:text-[#41f0db] transition-all duration-300"
+          >
+            Maker Space
+          </Link>
+          <Link 
+            to="/blog"
+            className="text-white hover:text-[#41f0db] transition-all duration-300"
+          >
+            Blog
+          </Link>
+          {user?.role === 'admin' && (
+            <Link 
+              to="/admin/dashboard"
+              className="text-white hover:text-[#41f0db] transition-all duration-300"
+            >
+              Admin
+            </Link>
+          )}
+        </div>
 
-      <NavigationSection className="space-x-4">
-        <SearchButton onClick={() => setSearchOpen(true)} />
-  
-        {user && (
-          <div className="hidden md:block relative z-[60]">
-            <UserAvatar
-              size="lg"
-              className="transform translate-y-2"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            />
-            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
-          </div>
-        )}
-  
-        <MobileNav />
-      </NavigationSection>
+        {/* Right Section */}
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSearchOpen(true)}
+            className="hover:bg-white/10"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
 
-      <SearchDialog 
-        open={searchOpen} 
-        onOpenChange={setSearchOpen}
-      />
-    </NavigationContainer>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="relative h-10 w-10 rounded-full"
+                >
+                  <UserAvatar size="lg" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button variant="ghost">Sign In</Button>
+            </Link>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+    </nav>
   );
 };

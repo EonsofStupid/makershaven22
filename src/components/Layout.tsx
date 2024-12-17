@@ -1,8 +1,3 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, User, LogOut } from "lucide-react";
-import { useState } from "react";
-import { useAuthStore } from '@/lib/store/auth-store';
-import { toast } from "sonner";
 import { Navigation } from "./shared/ui/navigation/Navigation";
 
 interface LayoutProps {
