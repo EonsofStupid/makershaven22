@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store-types';
+import { supabase } from '@/integrations/supabase/client';
+import type { AuthState, AuthUser, AuthSession } from '../types/store-types';
+import { toast } from 'sonner';
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
@@ -11,103 +11,128 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isOffline: false,
   isTransitioning: false,
 
-  setSession: (session) => set({ session }),
-  setUser: (user) => set({ user }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  setOffline: (isOffline) => set({ isOffline }),
+  initialize: async () => {
+    try {
+      console.log("Initializing auth...");
+      set({ isLoading: true });
 
-  handleSessionUpdate: async (session) => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw sessionError;
+      }
+
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          // Don't throw here, just log the error
+          toast.error("Failed to load user profile");
+        }
+
+        // Merge auth user with profile data
+        const enrichedUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url,
+        };
+
+        const enrichedSession: AuthSession = {
+          ...session,
+          user: enrichedUser,
+        };
+
+        set({ 
+          session: enrichedSession,
+          user: enrichedUser,
+          isLoading: false 
+        });
+      } else {
+        set({ 
+          session: null,
+          user: null,
+          isLoading: false 
+        });
+      }
+    } catch (error) {
+      console.error("Auth initialization error:", error);
+      set({ 
+        error: error as Error,
+        isLoading: false 
+      });
+      toast.error("Failed to initialize authentication");
+    }
+  },
+
+  handleSessionUpdate: async (session: AuthSession | null) => {
     try {
       if (session?.user) {
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          toast.error("Failed to load user profile");
+          return;
+        }
 
-        const authUser: AuthUser = {
+        const enrichedUser: AuthUser = {
           ...session.user,
           role: profile?.role || 'subscriber',
           username: profile?.username,
           displayName: profile?.display_name,
-          avatarUrl: profile?.avatar_url
+          avatarUrl: profile?.avatar_url,
         };
 
-        set({
-          session: { ...session, user: authUser } as AuthSession,
-          user: authUser,
-          error: null
-        });
+        const enrichedSession: AuthSession = {
+          ...session,
+          user: enrichedUser,
+        };
 
-        await supabase.from('security_events').insert({
-          user_id: session.user.id,
-          event_type: 'session_updated',
-          severity: 'low',
-          details: { timestamp: new Date().toISOString() }
-        });
-
+        set({ session: enrichedSession, user: enrichedUser });
       } else {
         set({ session: null, user: null });
       }
     } catch (error) {
-      console.error('Session update error:', error);
-      set({ error: error instanceof Error ? error : new Error('Session update failed') });
-      toast.error('Session update failed');
+      console.error("Session update error:", error);
+      toast.error("Failed to update session");
     }
   },
+
+  setSession: (session: AuthSession | null) => set({ session }),
+  setUser: (user: AuthUser | null) => set({ user }),
+  setLoading: (isLoading: boolean) => set({ isLoading }),
+  setError: (error: Error | null) => set({ error }),
+  setOffline: (isOffline: boolean) => set({ isOffline }),
 
   signOut: async () => {
     try {
+      set({ isTransitioning: true });
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      set({ session: null, user: null });
-      toast.success('Signed out successfully');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast.error('Failed to sign out');
-    }
-  },
-
-  initialize: async () => {
-    set({ isLoading: true });
-    try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      set({ 
+        session: null,
+        user: null,
+        isTransitioning: false 
+      });
       
-      if (sessionError) throw sessionError;
-
-      if (session?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-            
-        if (profileError) throw profileError;
-
-        const authUser: AuthUser = {
-          ...session.user,
-          role: profile?.role || 'subscriber',
-          username: profile?.username,
-          displayName: profile?.display_name,
-          avatarUrl: profile?.avatar_url
-        };
-
-        set({
-          session: { ...session, user: authUser } as AuthSession,
-          user: authUser,
-          error: null
-        });
-      }
+      toast.success("Signed out successfully");
     } catch (error) {
-      console.error('Auth initialization error:', error);
-      set({ error: error instanceof Error ? error : new Error('Failed to initialize auth') });
-      toast.error('Authentication error occurred');
-    } finally {
-      set({ isLoading: false });
+      console.error("Sign out error:", error);
+      set({ isTransitioning: false });
+      toast.error("Failed to sign out");
     }
   },
 
@@ -118,7 +143,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       isLoading: false,
       error: null,
       isOffline: false,
-      isTransitioning: false
+      isTransitioning: false,
     });
-  }
+  },
 }));
