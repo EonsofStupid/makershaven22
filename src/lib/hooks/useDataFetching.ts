@@ -7,6 +7,7 @@ interface UseDataFetchingOptions {
   staleTime?: number;
   cacheTime?: number;
   enabled?: boolean;
+  forceRefresh?: boolean;
 }
 
 export const useDataFetching = ({
@@ -14,7 +15,8 @@ export const useDataFetching = ({
   fn,
   staleTime = 5 * 60 * 1000, // 5 minutes
   cacheTime = 30 * 60 * 1000, // 30 minutes
-  enabled = true
+  enabled = true,
+  forceRefresh = false
 }: UseDataFetchingOptions) => {
   const { getCache, setCache } = useCacheStore();
   const cacheKey = key.join('-');
@@ -22,17 +24,30 @@ export const useDataFetching = ({
   return useQuery({
     queryKey: key,
     queryFn: async () => {
-      const cachedData = getCache(cacheKey);
-      if (cachedData) {
-        return cachedData;
+      console.log(`Fetching data for ${cacheKey}`);
+      
+      if (!forceRefresh) {
+        const cachedData = getCache(cacheKey);
+        if (cachedData) {
+          console.log(`Returning cached data for ${cacheKey}`);
+          return cachedData;
+        }
       }
 
       const data = await fn();
-      setCache(cacheKey, data);
+      console.log(`Caching fresh data for ${cacheKey}`);
+      setCache(cacheKey, data, staleTime);
       return data;
     },
     staleTime,
     gcTime: cacheTime,
-    enabled
+    enabled,
+    retry: (failureCount, error) => {
+      console.log(`Retry attempt ${failureCount} for ${cacheKey}:`, error);
+      return failureCount < 3;
+    },
+    meta: {
+      errorMessage: `Failed to fetch data for ${key.join('/')}`,
+    }
   });
 };
