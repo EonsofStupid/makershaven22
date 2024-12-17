@@ -1,7 +1,6 @@
 import type { Json } from '../base/json';
 import type { Profile } from '../auth/types';
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+import { WorkflowStageType } from '../enums';
 
 export interface WorkflowStage {
   id: string;

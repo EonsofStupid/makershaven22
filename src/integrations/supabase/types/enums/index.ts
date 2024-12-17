@@ -6,7 +6,7 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 export type PostCategory = 
   | 'Guides'
-  | 'Reviews'
+  | 'Reviews' 
   | 'Blog'
   | 'Site Updates'
   | 'Critical'
