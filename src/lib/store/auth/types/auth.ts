@@ -1,4 +1,4 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+import type { UserRole } from '@/integrations/supabase/types/auth/roles';
 
 export interface AuthUser {
   id: string;

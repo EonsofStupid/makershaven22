@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth-store';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { UserRole } from '../types/auth';
+import type { UserRole } from '@/integrations/supabase/types/auth/roles';
 
 interface AuthGuardProps {
   children: React.ReactNode;
