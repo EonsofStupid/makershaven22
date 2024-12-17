@@ -21,6 +21,7 @@ export const useSettingsFetch = () => {
       }
 
       const settings: Settings = {
+        id: data.id,
         site_title: data.site_title,
         tagline: data.tagline,
         primary_color: data.primary_color,
@@ -28,7 +29,6 @@ export const useSettingsFetch = () => {
         accent_color: data.accent_color,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        theme_mode: data.theme_mode,
         text_primary_color: data.text_primary_color,
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,
@@ -52,7 +52,10 @@ export const useSettingsFetch = () => {
         box_shadow: data.box_shadow || 'none',
         backdrop_blur: data.backdrop_blur || '0',
         updated_at: data.updated_at,
-        updated_by: data.updated_by
+        updated_by: data.updated_by,
+        security_settings: data.security_settings,
+        state_version: data.state_version,
+        last_sync: data.last_sync
       };
 
       console.log("Settings fetched successfully:", settings);
