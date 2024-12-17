@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import { useAuthStore } from '@/lib/store/auth-store';
 import { FeaturedPost } from "@/components/home/FeaturedPost";
 import { PostCard } from "@/components/home/PostCard";
+import { motion } from "framer-motion";
 
 const posts = [
   {
@@ -25,27 +26,6 @@ const posts = [
     title: "Building Scalable Web Applications",
     excerpt: "Best practices and patterns for creating maintainable and scalable web applications.",
     date: "Mar 12, 2024"
-  },
-  {
-    id: 5,
-    category: "Career",
-    title: "Navigating the Tech Industry in 2024",
-    excerpt: "Essential insights for tech professionals looking to advance their careers.",
-    date: "Mar 11, 2024"
-  },
-  {
-    id: 6,
-    category: "Tools",
-    title: "Essential Developer Tools for 2024",
-    excerpt: "A comprehensive guide to the most important tools for modern development.",
-    date: "Mar 10, 2024"
-  },
-  {
-    id: 7,
-    category: "Community",
-    title: "Building a Strong Developer Network",
-    excerpt: "Tips and strategies for connecting with other developers and growing your network.",
-    date: "Mar 9, 2024"
   }
 ];
 
@@ -58,17 +38,38 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-6 py-12">
-        <FeaturedPost />
+      <div className="min-h-screen bg-[#151A24] relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#41f0db]/10 via-[#ff0abe]/10 to-[#8000ff]/10" />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post, i) => (
-            <PostCard
-              key={post.id}
-              delay={i}
-              {...post}
-            />
-          ))}
+        {/* Content */}
+        <div className="container relative z-10 mx-auto px-6 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <FeaturedPost />
+          </motion.div>
+          
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {posts.map((post, i) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
+              >
+                <PostCard {...post} />
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </Layout>

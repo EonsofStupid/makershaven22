@@ -1,4 +1,5 @@
 import { Navigation } from "./shared/ui/navigation/Navigation";
+import { motion } from "framer-motion";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -6,14 +7,17 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen">
+    <motion.div 
+      className="min-h-screen bg-[#151A24]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <Navigation />
       <main className="pt-16 min-h-screen">
-        <div className="container mx-auto px-4 py-8">
-          {children}
-        </div>
+        {children}
       </main>
-    </div>
+    </motion.div>
   );
 };
 
