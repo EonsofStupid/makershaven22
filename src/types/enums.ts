@@ -6,8 +6,8 @@ export enum ThemeMode {
 
 export enum TransitionType {
   FADE = 'fade',
-  SCALE = 'scale',
   SLIDE = 'slide',
+  SCALE = 'scale',
   BLUR = 'blur'
 }
 
@@ -15,13 +15,11 @@ export enum PostCategory {
   BUILD = 'build',
   GUIDE = 'guide',
   NEWS = 'news',
-  REVIEW = 'review',
-  TUTORIAL = 'tutorial'
+  REVIEW = 'review'
 }
 
 export enum UserRole {
-  SUBSCRIBER = 'subscriber',
-  MAKER = 'maker',
+  USER = 'user',
   ADMIN = 'admin',
   SUPER_ADMIN = 'super_admin'
 }
@@ -33,16 +31,15 @@ export enum WorkflowStageType {
   REVIEW = 'REVIEW'
 }
 
+export enum ComponentType {
+  TEXT = 'text',
+  IMAGE = 'image',
+  CONTAINER = 'container',
+  BUTTON = 'button'
+}
+
 export enum ContentStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
-  ARCHIVED = 'archived',
-  SCHEDULED = 'scheduled'
-}
-
-export enum ComponentType {
-  PAGE = 'page',
-  SECTION = 'section',
-  BLOCK = 'block',
-  ELEMENT = 'element'
+  ARCHIVED = 'archived'
 }
