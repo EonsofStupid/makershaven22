@@ -14,15 +14,3 @@ export interface AuditableEntity extends BaseEntity {
 export interface MetadataEntity extends BaseEntity {
   metadata?: Json;
 }
-
-export type TableDefinition<RowType extends { id: string }> = {
-  Row: Readonly<RowType>;
-  Insert: Partial<RowType> & Required<Pick<RowType, "id">>;
-  Update: Partial<RowType>;
-  Relationships: Array<{
-    foreignKeyName: string;
-    columns: Array<keyof RowType>;
-    referencedRelation: string;
-    referencedColumns: Array<keyof RowType>;
-  }>;
-};

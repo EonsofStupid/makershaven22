@@ -36,6 +36,8 @@ export interface Settings {
   theme_mode?: ThemeMode;
   security_settings?: Json;
   transition_type?: TransitionType;
+  state_version?: number;
+  last_sync?: string;
 }
 
 export interface SettingsUpdateParams {

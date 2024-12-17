@@ -1,7 +1,5 @@
 import { Json } from './json';
-
-export type ContentStatus = 'draft' | 'published' | 'archived';
-export type ContentType = 'page' | 'component' | 'template' | 'workflow';
+import { ContentStatus, ContentType } from './enums';
 
 export interface BaseContent {
   id: string;

@@ -1,13 +1,15 @@
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = Json[];
-export type JsonObject = { [key: string]: Json | undefined };
+export type JsonObject = { [key: string]: Json };
 export type Json = JsonPrimitive | JsonObject | JsonArray;
 
 export const isJsonPrimitive = (value: unknown): value is JsonPrimitive => {
-  return value === null || 
-    typeof value === "string" || 
-    typeof value === "number" || 
-    typeof value === "boolean";
+  return (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null
+  );
 };
 
 export const isJsonArray = (value: unknown): value is JsonArray => {
@@ -15,12 +17,18 @@ export const isJsonArray = (value: unknown): value is JsonArray => {
 };
 
 export const isJsonObject = (value: unknown): value is JsonObject => {
-  return typeof value === "object" && 
-    value !== null && 
-    !Array.isArray(value) && 
-    Object.values(value).every(item => item === undefined || isJson(item));
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.values(value).every(item => isJson(item))
+  );
 };
 
 export const isJson = (value: unknown): value is Json => {
-  return isJsonPrimitive(value) || isJsonArray(value) || isJsonObject(value);
+  return (
+    isJsonPrimitive(value) ||
+    isJsonArray(value) ||
+    isJsonObject(value)
+  );
 };
