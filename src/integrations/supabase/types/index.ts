@@ -1,8 +1,10 @@
 // Core types
-export * from './base';
+export * from './core/base';
 export * from './core/enums';
-export * from './settings';
-export * from './workflow/types';
+export * from './core/settings';
+export * from './core/workflow';
+export * from './core/content';
+export * from './core/json';
 
 // Re-export commonly used types
 export type {
@@ -15,7 +17,7 @@ export type {
   WorkflowTemplate,
   WorkflowStage,
   WorkflowStageConfig
-} from './workflow/types';
+} from './core/workflow';
 
 export type {
   UserRole,
@@ -31,7 +33,8 @@ export type {
 export type {
   BaseContent,
   ContentRevision,
-  ContentRelationship
+  ContentRelationship,
+  SecurityLog
 } from './core/content';
 
 // Database types

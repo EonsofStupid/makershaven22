@@ -1,6 +1,13 @@
 import { Json } from './json';
 import { WorkflowStageType } from './enums';
-import { UserOwnedEntity, MetadataEntity } from './base';
+import { BaseEntity, UserOwnedEntity } from './base';
+
+export interface WorkflowTemplate extends UserOwnedEntity {
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  is_active?: boolean;
+}
 
 export interface WorkflowStage {
   id: string;
@@ -9,13 +16,6 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
-}
-
-export interface WorkflowTemplate extends UserOwnedEntity {
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  is_active: boolean;
 }
 
 export interface WorkflowStageConfig {
@@ -50,19 +50,40 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: Json[]): WorkflowStage[] => {
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
-  return data.map(stage => ({
-    id: stage.id?.toString() || crypto.randomUUID(),
-    name: stage.name?.toString() || '',
-    type: (stage.type as WorkflowStageType) || 'TASK',
-    order: Number(stage.order) || 0,
-    config: stage.config as WorkflowStageConfig || {},
-    description: stage.description?.toString()
-  }));
+  return data.map(stage => {
+    if (typeof stage !== 'object' || stage === null) {
+      return {
+        id: crypto.randomUUID(),
+        name: '',
+        type: 'TASK' as WorkflowStageType,
+        order: 0,
+        config: {},
+      };
+    }
+
+    return {
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'TASK',
+      order: Number(stage.order || 0),
+      config: stage.config as WorkflowStageConfig || {},
+      description: stage.description ? String(stage.description) : undefined
+    };
+  });
 };
 
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return template as unknown as Json;
+  return {
+    ...template,
+    steps: template.steps.map(step => ({
+      ...step,
+      id: step.id.toString(),
+      type: step.type.toString(),
+      order: Number(step.order),
+      config: step.config || {}
+    }))
+  } as unknown as Json;
 };
