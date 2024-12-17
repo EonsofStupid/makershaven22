@@ -4,7 +4,7 @@ export * from './core/enums';
 export * from './core/settings';
 export * from './core/workflow';
 export * from './core/content';
-export * from './core/base-types';
+export * from './core/base';
 
 // Feature-specific types
 export * from './auth';

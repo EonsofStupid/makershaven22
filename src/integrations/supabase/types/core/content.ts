@@ -1,36 +1,28 @@
 import { Json } from './json';
 import { ContentStatus, ContentType } from './enums';
+import { UserOwnedEntity, MetadataEntity } from './base';
 
-export interface BaseContent {
-  id: string;
+export interface BaseContent extends UserOwnedEntity, MetadataEntity {
   title: string;
   content: Json;
   type: ContentType;
   status: ContentStatus;
-  created_by: string;
-  created_at: string;
-  updated_at?: string;
-  metadata?: Json;
   version?: number;
   slug?: string;
-  updated_by?: string;
 }
 
-export interface ContentRevision {
-  id: string;
+export interface ContentRevision extends UserOwnedEntity {
   content_id: string;
   content: Json;
-  metadata?: Json;
   version_number: number;
-  created_by: string;
-  created_at: string;
-  profiles: { display_name: string };
   change_summary?: string;
   rollback_metadata?: Json;
+  profiles?: {
+    display_name: string;
+  };
 }
 
-export interface ContentRelationship {
-  id: string;
+export interface ContentRelationship extends BaseEntity {
   parent_id: string;
   child_id: string;
   relationship_type: string;

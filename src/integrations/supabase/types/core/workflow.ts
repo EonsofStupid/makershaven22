@@ -1,5 +1,6 @@
 import { Json } from './json';
 import { WorkflowStageType } from './enums';
+import { UserOwnedEntity, MetadataEntity } from './base';
 
 export interface WorkflowStage {
   id: string;
@@ -10,15 +11,11 @@ export interface WorkflowStage {
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends UserOwnedEntity {
   name: string;
   description?: string;
   steps: WorkflowStage[];
   is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface WorkflowStageConfig {
