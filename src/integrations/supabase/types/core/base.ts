@@ -1,3 +1,5 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
 export interface BaseEntity {
   id: string;
   created_at?: string;
@@ -9,6 +11,7 @@ export interface UserOwnedEntity extends BaseEntity {
   updated_by?: string;
 }
 
-export interface MetadataEntity {
-  metadata?: Record<string, any>;
+export interface AuditableEntity extends BaseEntity {
+  version?: number;
+  last_sync?: string;
 }
