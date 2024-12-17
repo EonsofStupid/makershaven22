@@ -3,7 +3,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ActiveSession {

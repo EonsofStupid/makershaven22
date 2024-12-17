@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast";
 import { motion } from "framer-motion";
 import VisualEditorControls from "./VisualEditorControls";
 import VisualEditorPresets from "./VisualEditorPresets";

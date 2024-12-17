@@ -3,7 +3,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { TwoFactorSetup } from "./TwoFactorSetup";
 
