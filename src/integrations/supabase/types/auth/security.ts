@@ -1,7 +1,7 @@
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventSeverity = 'low' | 'medium' | 'high';
 export type SecurityEventCategory = 'auth' | 'session' | 'security' | 'pin' | 'audit';
 
-export interface SecurityEvent {
+export interface SecurityLog {
   id: string;
   userId: string;
   eventType: string;
@@ -11,17 +11,18 @@ export interface SecurityEvent {
   userAgent?: string;
   metadata?: Record<string, any>;
   createdAt: Date;
-  resourceType: string;
-  resourceId?: string;
-  action: string;
-  previousState?: any;
-  newState?: any;
-  errorCode?: string;
-  errorMessage?: string;
-  stackTrace?: string;
 }
 
-export interface AuditLog extends SecurityEvent {
-  sessionId?: string;
-  requestId: string;
+export interface SessionConfig {
+  refreshInterval: number;
+  sessionTimeout: number;
+  storageKey: string;
+  onSessionExpired?: () => void;
+  onRefreshError?: (error: Error) => void;
+}
+
+export interface SessionState {
+  isAuthenticated: boolean;
+  lastActivity: Date;
+  token?: string;
 }

@@ -15,6 +15,7 @@ export const validateContent = async (type: ContentType, data: unknown) => {
 };
 
 export const validateContentRelationship = (parentType: ContentType, childType: ContentType) => {
+  // Define allowed relationships between content types
   const allowedRelationships: Record<ContentType, ContentType[]> = {
     page: ["component", "template"],
     component: ["component"],

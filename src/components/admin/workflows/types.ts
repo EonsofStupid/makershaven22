@@ -1,62 +1,78 @@
-import type { Json } from "@/integrations/supabase/types";
-import type { Profile } from "@/integrations/supabase/types/tables";
+import { Json } from "@/integrations/supabase/types";
 
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  profile?: Profile;
+export interface StageValidationRule {
+  field: string;
+  type: 'required' | 'min' | 'max' | 'pattern' | 'custom';
+  value?: any;
+  message?: string;
 }
 
 export interface WorkflowStageConfig {
-  assignees?: string[];
   timeLimit?: number;
+  requiredApprovers?: number;
+  customFields?: {
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    options?: string[];
+    required?: boolean;
+  }[];
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
   };
-  priority?: 'low' | 'medium' | 'high';
   notifications?: {
-    email?: boolean;
-    inApp?: boolean;
     onStart?: boolean;
     onComplete?: boolean;
     reminderInterval?: number;
   };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
 }
 
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  description?: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  validationRules?: StageValidationRule[];
+}
+
+export interface WorkflowTemplate {
+  id?: string;
+  name: string;
+  description: string | null;
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_at?: string;
+  created_by?: string;
+  updated_at?: string;
+}
+
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+}
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return JSON.parse(JSON.stringify(stages)) as Json;
+};
+
+export const parseStages = (stages: Json): WorkflowStage[] => {
+  if (!Array.isArray(stages)) return [];
+  return stages.map((stage: any) => ({
+    id: stage.id || crypto.randomUUID(),
+    name: stage.name || '',
+    description: stage.description || '',
+    type: stage.type || 'task',
+    order: stage.order || 0,
+    config: stage.config || {},
+    validationRules: stage.validationRules || []
+  }));
+};
 
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
@@ -65,27 +81,29 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
     errors.push('Stage name is required');
   }
 
-  if (!stage.type) {
-    errors.push('Stage type is required');
+  switch (stage.type) {
+    case 'approval':
+      if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
+        errors.push('At least one approver is required');
+      }
+      break;
+    case 'review':
+      if (!stage.config.autoAssignment?.value) {
+        errors.push('Reviewer assignment is required');
+      }
+      break;
+    case 'task':
+      if (stage.config.customFields?.some(field => field.required && !field.name)) {
+        errors.push('Required custom fields must have a name');
+      }
+      break;
   }
 
-  switch (stage.type) {
-    case 'APPROVAL':
-      if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
-        errors.push('At least one approver is required for approval stages');
-      }
-      break;
-    case 'TASK':
-      if (stage.config.customFields?.some(field => !field.name)) {
-        errors.push('All custom fields must have a name');
-      }
-      break;
-    case 'CONDITIONAL':
-      if (!stage.config.conditions?.rules?.length) {
-        errors.push('Conditional stages must have at least one rule');
-      }
-      break;
-  }
+  stage.validationRules?.forEach(rule => {
+    if (rule.type === 'required' && !stage.config[rule.field]) {
+      errors.push(rule.message || `${rule.field} is required`);
+    }
+  });
 
   return {
     isValid: errors.length === 0,
@@ -93,32 +111,24 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   };
 };
 
-export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages as unknown as Json;
-};
+// Enterprise-level type definitions for stage updates
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
-export const parseStages = (data: Json): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: stage.type || 'TASK',
-    order: stage.order || 0,
-    config: stage.config || {},
-    description: stage.description
-  }));
-};
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
+}
 
+// Type guard to ensure stage updates are valid
 export const isValidStageUpdate = (update: Partial<WorkflowStage>): boolean => {
-  if (update.name !== undefined && !update.name.trim()) return false;
-  if (update.type && !['APPROVAL', 'REVIEW', 'TASK', 'NOTIFICATION', 'CONDITIONAL'].includes(update.type)) return false;
-  return true;
+  const requiredKeys: (keyof WorkflowStage)[] = ['id', 'type'];
+  return !requiredKeys.some(key => key in update && !update[key]);
 };
 
-export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
+// Utility function to safely update stage configuration
+export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>): { id: string } & Partial<WorkflowStage> => {
   return {
-    ...updates,
-    id: stageId
+    id: stageId,
+    ...updates
   };
 };

@@ -4,12 +4,10 @@ import { Database, Box, Users, TrendingUp, BookOpen } from "lucide-react";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturePanel } from "./components/FeaturePanel";
 import { TableView } from "./components/DatabaseVisual/TableView";
-import { useAuthStore } from "@/lib/store/auth-store";
 
 const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
-  const { user } = useAuthStore();
   
   const backgroundY = useTransform(scrollY, [0, 1000], ["0%", "50%"]);
   const textY = useTransform(scrollY, [0, 500], ["0%", "100%"]);
@@ -41,14 +39,14 @@ const LandingPage = () => {
               title="Latest Builds"
               description="Explore our comprehensive database of 3D printer builds with detailed specifications and user reviews."
               gradient="bg-gradient-to-r from-[#41f0db]/20 to-[#8000ff]/20"
-              link={user ? "/maker-space/builds" : "/auth/login"}
+              link="/maker-space/builds"
             />
             <FeaturePanel
               icon={Box}
               title="Parts Catalog"
               description="Find compatible parts and upgrades for your 3D printer with our interactive catalog system."
               gradient="bg-gradient-to-r from-[#ff0abe]/20 to-[#41f0db]/20"
-              link={user ? "/maker-space/parts" : "/auth/login"}
+              link="/maker-space/parts"
             />
           </div>
 
@@ -58,21 +56,21 @@ const LandingPage = () => {
               title="Community Guides"
               description="Learn from expert makers with our comprehensive guide collection."
               gradient="bg-gradient-to-r from-[#41f0db]/20 to-[#ff0abe]/20"
-              link={user ? "/maker-space/guides" : "/auth/login"}
+              link="/maker-space/guides"
             />
             <FeaturePanel
               icon={Users}
               title="User Reviews"
               description="Real experiences from our community of makers."
               gradient="bg-gradient-to-r from-[#ff0abe]/20 to-[#8000ff]/20"
-              link={user ? "/maker-space/reviews" : "/auth/login"}
+              link="/maker-space/reviews"
             />
             <FeaturePanel
               icon={TrendingUp}
               title="Trending Projects"
               description="Stay updated with the latest and most popular builds."
               gradient="bg-gradient-to-r from-[#8000ff]/20 to-[#41f0db]/20"
-              link={user ? "/maker-space/builds/trending" : "/auth/login"}
+              link="/maker-space/builds/trending"
             />
           </div>
         </div>
