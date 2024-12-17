@@ -31,8 +31,8 @@ export interface ContentRevision {
 
 export interface ContentRelationship {
   id: string;
-  parentId: string;
-  childId: string;
-  relationshipType: string;
-  orderIndex?: number;
+  parent_id: string;
+  child_id: string;
+  relationship_type: string;
+  order_index?: number;
 }
