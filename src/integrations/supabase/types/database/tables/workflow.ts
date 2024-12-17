@@ -1,17 +1,13 @@
-import type { Json } from '../base';
-import type { Profile } from '../auth/types';
+import type { AuditableEntity } from '../core/base-types';
+import type { Json } from '../core/json';
+import type { WorkflowStageType } from '../core/enums';
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends AuditableEntity {
   name: string;
   description?: string;
-  steps: Json; // Raw database storage
-  stages?: WorkflowStage[]; // Runtime transformed data
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  profile?: Profile;
+  steps: Json;
+  triggers?: Json;
+  is_active?: boolean;
 }
 
 export interface WorkflowStage {
@@ -22,8 +18,6 @@ export interface WorkflowStage {
   config: WorkflowStageConfig;
   description?: string;
 }
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowStageConfig {
   assignees?: string[];
@@ -56,27 +50,3 @@ export interface WorkflowStageConfig {
     options?: string[];
   }>;
 }
-
-// Type guard for workflow stage
-export const isWorkflowStage = (value: unknown): value is WorkflowStage => {
-  if (!value || typeof value !== 'object') return false;
-  const stage = value as WorkflowStage;
-  return (
-    typeof stage.id === 'string' &&
-    typeof stage.name === 'string' &&
-    typeof stage.type === 'string' &&
-    typeof stage.order === 'number' &&
-    typeof stage.config === 'object'
-  );
-};
-
-// Type guard for workflow template
-export const isWorkflowTemplate = (value: unknown): value is WorkflowTemplate => {
-  if (!value || typeof value !== 'object') return false;
-  const template = value as WorkflowTemplate;
-  return (
-    typeof template.id === 'string' &&
-    typeof template.name === 'string' &&
-    typeof template.is_active === 'boolean'
-  );
-};

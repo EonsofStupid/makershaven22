@@ -406,6 +406,7 @@ export type Database = {
           request_id: string | null
           resource_id: string | null
           resource_type: string
+          role: Database["public"]["Enums"]["user_role"] | null
           session_id: string | null
           severity: string
           stack_trace: string | null
@@ -426,6 +427,7 @@ export type Database = {
           request_id?: string | null
           resource_id?: string | null
           resource_type: string
+          role?: Database["public"]["Enums"]["user_role"] | null
           session_id?: string | null
           severity: string
           stack_trace?: string | null
@@ -446,6 +448,7 @@ export type Database = {
           request_id?: string | null
           resource_id?: string | null
           resource_type?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
           session_id?: string | null
           severity?: string
           stack_trace?: string | null
