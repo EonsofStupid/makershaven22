@@ -1,5 +1,20 @@
 import type { Json } from './json';
 
+export interface BaseEntity {
+  id: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AuditableEntity extends BaseEntity {
+  created_by: string;
+  updated_by?: string;
+}
+
+export interface MetadataEntity extends BaseEntity {
+  metadata?: Json;
+}
+
 export type TableDefinition<RowType extends { id: string }> = {
   Row: Readonly<RowType>;
   Insert: Partial<RowType> & Required<Pick<RowType, "id">>;
@@ -11,18 +26,3 @@ export type TableDefinition<RowType extends { id: string }> = {
     referencedColumns: Array<keyof RowType>;
   }>;
 };
-
-export interface BaseEntity {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface AuditableEntity extends BaseEntity {
-  created_by?: string;
-  updated_by?: string;
-}
-
-export interface MetadataEntity extends BaseEntity {
-  metadata?: Json;
-}
