@@ -10,11 +10,7 @@ import { UserMenuHeader } from "./UserMenuHeader";
 import { UserMenuItem } from "./UserMenuItem";
 import { motion } from "framer-motion";
 
-interface UserMenuProps {
-  onClose: () => void;
-}
-
-export const UserMenu = ({ onClose }: UserMenuProps) => {
+export const UserMenu = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
 
