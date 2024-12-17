@@ -1,9 +1,8 @@
 // Core types
 export * from './core/base';
+export * from './core/enums';
 export * from './core/settings';
 export * from './core/workflow';
-export * from './core/content';
-export * from './core/enums';
 
 // Re-export commonly used types
 export type {
@@ -22,13 +21,14 @@ export type {
   WorkflowTemplate,
   WorkflowStage,
   WorkflowStageConfig,
-  WorkflowStageType
 } from './core/workflow';
 
 export type {
-  ContentType,
+  UserRole,
   ContentStatus,
-  BaseContent,
-  ContentRevision,
-  ContentRelationship
-} from './core/content';
+  ContentType,
+  WorkflowStageType,
+  ThemeMode,
+  TransitionType,
+  PostCategory
+} from './core/enums';

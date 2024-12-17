@@ -39,12 +39,12 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
-    id: stage.id?.toString() || crypto.randomUUID(),
-    name: stage.name?.toString() || '',
-    type: (stage.type as WorkflowStageType) || 'TASK',
-    order: Number(stage.order) || 0,
-    config: stage.config || {},
-    description: stage.description?.toString()
+    id: typeof stage === 'object' && stage !== null ? String(stage.id || crypto.randomUUID()) : crypto.randomUUID(),
+    name: typeof stage === 'object' && stage !== null ? String(stage.name || '') : '',
+    type: typeof stage === 'object' && stage !== null ? (stage.type as WorkflowStageType || 'TASK') : 'TASK',
+    order: typeof stage === 'object' && stage !== null ? Number(stage.order || 0) : 0,
+    config: typeof stage === 'object' && stage !== null ? (stage.config as Record<string, any> || {}) : {},
+    description: typeof stage === 'object' && stage !== null ? String(stage.description || '') : undefined
   }));
 };
 
