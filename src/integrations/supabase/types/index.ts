@@ -1,28 +1,29 @@
 // Core types
-export * from './core/base-types';
-export * from './core/settings-types';
-export * from './core/workflow-types';
-export * from './core/content-types';
+export * from './core/base';
+export * from './core/settings';
+export * from './core/workflow';
+export * from './core/content';
+export * from './core/enums';
 
 // Re-export commonly used types
 export type {
   Json,
   BaseEntity,
   UserOwnedEntity
-} from './core/base-types';
+} from './core/base';
 
 export type {
   Settings,
   SettingsUpdateParams,
   SettingsResponse
-} from './core/settings-types';
+} from './core/settings';
 
 export type {
   WorkflowTemplate,
   WorkflowStage,
   WorkflowStageConfig,
   WorkflowStageType
-} from './core/workflow-types';
+} from './core/workflow';
 
 export type {
   ContentType,
@@ -30,4 +31,4 @@ export type {
   BaseContent,
   ContentRevision,
   ContentRelationship
-} from './core/content-types';
+} from './core/content';

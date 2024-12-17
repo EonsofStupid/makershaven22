@@ -1,8 +1,8 @@
-import { Json } from './json';
+import { Json } from './base';
 import { ContentStatus, ContentType } from './enums';
-import { BaseEntity, UserOwnedEntity } from './base';
+import { BaseEntity } from './base';
 
-export interface BaseContent extends UserOwnedEntity {
+export interface BaseContent extends BaseEntity {
   title: string;
   type: ContentType;
   content?: Json;
@@ -10,19 +10,19 @@ export interface BaseContent extends UserOwnedEntity {
   slug?: string;
   status?: ContentStatus;
   version?: number;
+  created_by: string;
+  updated_by?: string;
 }
 
-export interface ContentRevision extends BaseEntity {
+export interface ContentRevision {
+  id: string;
   content_id: string;
   content: Json;
   metadata?: Json;
-  created_by?: string;
   version_number: number;
+  created_by: string;
+  created_at: string;
   change_summary?: string;
-  publish_status?: string;
-  scheduled_publish_at?: string;
-  rollback_from?: string;
-  rollback_metadata?: Json;
 }
 
 export interface ContentRelationship {
@@ -31,20 +31,4 @@ export interface ContentRelationship {
   child_id: string;
   relationship_type: string;
   order_index?: number;
-}
-
-export interface SecurityLog {
-  id: string;
-  user_id: string;
-  event_type: string;
-  severity: string;
-  details: Json;
-  metadata: Json;
-  ip_address: string;
-  user_agent: string;
-  created_at: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-  };
 }

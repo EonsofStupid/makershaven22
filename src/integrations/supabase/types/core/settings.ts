@@ -1,6 +1,5 @@
-import { Json } from './json';
+import { Json } from './base';
 import { ThemeMode, TransitionType } from './enums';
-import { BaseEntity } from './base';
 
 export interface Settings extends BaseEntity {
   site_title: string;

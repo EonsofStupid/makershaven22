@@ -1,4 +1,4 @@
-import { Json } from './json';
+import { Json } from './base';
 import { WorkflowStageType } from './enums';
 import { BaseEntity, UserOwnedEntity } from './base';
 
@@ -35,16 +35,16 @@ export interface WorkflowStageConfig {
   }[];
 }
 
-export const parseWorkflowStages = (data: any[]): WorkflowStage[] => {
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: stage.type || 'TASK',
-    order: stage.order || 0,
+    id: stage.id?.toString() || crypto.randomUUID(),
+    name: stage.name?.toString() || '',
+    type: (stage.type as WorkflowStageType) || 'TASK',
+    order: Number(stage.order) || 0,
     config: stage.config || {},
-    description: stage.description
+    description: stage.description?.toString()
   }));
 };
 
