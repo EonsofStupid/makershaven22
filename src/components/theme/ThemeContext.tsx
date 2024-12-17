@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useThemeStore } from '@/lib/store/theme-store';
 import type { Settings } from '@/components/admin/settings/types';
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { toast } from 'sonner';
 import { applyThemeToDocument } from './utils/themeUtils';
 
 interface ThemeProviderProps {
@@ -39,43 +38,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const handleThemeUpdate = async (newTheme: Settings) => {
     try {
       await updateTheme(newTheme);
-      toast.success("Theme updated successfully");
+      toast.success('Theme updated successfully');
     } catch (error) {
-      console.error("Error updating theme:", error);
-      toast.error("Failed to update theme");
+      console.error('Error updating theme:', error);
+      toast.error('Failed to update theme');
     }
   };
 
-  const contextValue = {
-    theme: settings,
-    mode,
-    effectiveTheme: mode,
-    updateTheme: handleThemeUpdate
-  };
-
-  return (
-    <ThemeContext.Provider value={contextValue}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-const ThemeContext = createContext<{
-  theme: Settings | null;
-  mode: 'light' | 'dark' | 'system';
-  effectiveTheme: 'light' | 'dark';
-  updateTheme: (theme: Settings) => void;
-}>({
-  theme: null,
-  mode: 'system',
-  effectiveTheme: 'dark',
-  updateTheme: () => {},
-});
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
+  return <>{children}</>;
 };
