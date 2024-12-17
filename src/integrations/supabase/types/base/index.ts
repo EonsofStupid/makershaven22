@@ -7,11 +7,11 @@ export interface BaseEntity {
 }
 
 export interface UserOwnedEntity extends BaseEntity {
-  created_by: string;
+  created_by?: string;
   updated_by?: string;
 }
 
-export interface MetadataEntity {
+export interface MetadataEntity extends BaseEntity {
   metadata?: Json;
 }
 
