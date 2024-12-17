@@ -16,10 +16,10 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 
 export const useAuthSetup = () => {
-  const [, setLoading] = useState(setLoadingStateAtom);
-  const [, setError] = useState(setAuthErrorAtom);
-  const [, setSession] = useState(setSessionAtom);
-  const [, setUser] = useState(setUserAtom);
+  const [, setLoading] = useAtom(setLoadingStateAtom);
+  const [, setError] = useAtom(setAuthErrorAtom);
+  const [, setSession] = useAtom(setSessionAtom);
+  const [, setUser] = useAtom(setUserAtom);
   const initialSetupDone = useRef(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout>();
   const retryAttempts = useRef(0);
