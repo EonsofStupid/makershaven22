@@ -35,15 +35,13 @@ export type {
 export type {
   WorkflowStage,
   WorkflowTemplate,
-  WorkflowStageConfig,
-  StageConfigUpdateProps
+  WorkflowStageConfig
 } from './workflow/types';
 
 // Export theme types
 export type {
   ThemeSettings,
-  ThemeState,
-  ThemeMode as ThemeModeType
+  ThemeState
 } from './theme/types';
 
 // Export content types

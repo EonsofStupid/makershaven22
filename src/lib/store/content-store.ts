@@ -55,12 +55,12 @@ export const useContentStore = create<ContentState>((set) => ({
 
       const { data, error } = await supabase
         .from('cms_content')
-        .insert([{
+        .insert({
           ...content,
           created_by: user.id,
           status: content.status || 'draft' as ContentStatus,
           type: content.type as ContentType
-        }])
+        })
         .select()
         .single();
 

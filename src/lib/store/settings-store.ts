@@ -38,10 +38,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
   updateSettings: async (settings) => {
     set({ isLoading: true });
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .update(settings)
-        .eq('id', settings.id);
+      const { error } = await supabase.rpc('update_site_settings', settings);
 
       if (error) throw error;
 
