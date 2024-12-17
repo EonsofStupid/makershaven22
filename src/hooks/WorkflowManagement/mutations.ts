@@ -37,3 +37,54 @@ export const useCreateWorkflow = () => {
     },
   });
 };
+
+export const useUpdateWorkflow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: {
+      id: string;
+      name?: string;
+      description?: string;
+      steps?: any[];
+      triggers?: any[];
+    }) => {
+      const { data, error } = await supabase
+        .from('cms_workflows')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(WORKFLOWS_QUERY_KEY);
+      toast.success('Workflow updated successfully');
+    },
+    onError: () => {
+      toast.error('Failed to update workflow');
+    },
+  });
+};
+
+export const useDeleteWorkflow = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('cms_workflows')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(WORKFLOWS_QUERY_KEY);
+      toast.success('Workflow deleted successfully');
+    },
+    onError: () => {
+      toast.error('Failed to delete workflow');
+    },
+  });
+};
