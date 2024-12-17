@@ -10,12 +10,12 @@ import {
 } from '../atoms/theme/theme-atoms';
 
 export const useTheme = () => {
-  const [themeMode, setThemeMode] = useAtom(themeModeAtom);
-  const [, setSystemTheme] = useAtom(systemThemeAtom);
+  const [themeMode, setThemeMode] = useState(themeModeAtom);
+  const [, setSystemTheme] = useState(systemThemeAtom);
   const effectiveTheme = useAtomValue(effectiveThemeAtom);
   const cssVariables = useAtomValue(cssVariablesAtom);
-  const [themeState] = useAtom(themeStateAtom);
-  const [, updateTheme] = useAtom(updateThemeAtom);
+  const [themeState] = useState(themeStateAtom);
+  const [, updateTheme] = useState(updateThemeAtom);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

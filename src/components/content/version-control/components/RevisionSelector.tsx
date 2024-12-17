@@ -8,8 +8,8 @@ interface RevisionSelectorProps {
 }
 
 export const RevisionSelector: React.FC<RevisionSelectorProps> = ({ side }) => {
-  const [selectedVersions, setSelectedVersions] = useAtom(selectedVersionsAtom);
-  const [revisions] = useAtom(revisionsAtom);
+  const [selectedVersions, setSelectedVersions] = useState(selectedVersionsAtom);
+  const [revisions] = useState(revisionsAtom);
 
   const handleVersionChange = (increment: boolean) => {
     const currentVersion = selectedVersions[side];

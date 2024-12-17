@@ -8,10 +8,10 @@ import {
 import type { Settings } from '@/components/admin/settings/types/settings';
 
 export const useSettings = () => {
-  const [settings] = useAtom(settingsAtom);
+  const [settings] = useState(settingsAtom);
   const isLoading = useAtomValue(settingsLoadingAtom);
   const error = useAtomValue(settingsErrorAtom);
-  const [, updateSettings] = useAtom(updateSettingsAtom);
+  const [, updateSettings] = useState(updateSettingsAtom);
 
   return {
     settings,

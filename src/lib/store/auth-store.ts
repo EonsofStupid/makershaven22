@@ -1,24 +1,9 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { AuthUser, AuthSession } from '@/lib/types/store-types';
+import type { AuthUser, AuthSession, AuthState } from '@/lib/types/store-types';
 
-interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setIsTransitioning: (isTransitioning: boolean) => void;
-  signOut: () => Promise<void>;
-  initialize: () => Promise<void>;
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   user: null,
   isLoading: true,
@@ -31,9 +16,53 @@ export const useAuthStore = create<AuthState>((set) => ({
   setError: (error) => set({ error }),
   setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
 
+  handleSessionUpdate: async (session) => {
+    try {
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
+        };
+
+        set({
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
+          error: null
+        });
+
+        await supabase.from('security_events').insert({
+          user_id: session.user.id,
+          event_type: 'session_updated',
+          severity: 'low',
+          details: { timestamp: new Date().toISOString() }
+        });
+
+      } else {
+        set({ session: null, user: null });
+      }
+    } catch (error) {
+      console.error('Session update error:', error);
+      set({ error: error instanceof Error ? error : new Error('Session update failed') });
+      toast.error('Session update failed');
+    }
+  },
+
   signOut: async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       set({ session: null, user: null });
       toast.success('Signed out successfully');
     } catch (error) {
@@ -58,9 +87,17 @@ export const useAuthStore = create<AuthState>((set) => ({
             
         if (profileError) throw profileError;
 
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
+        };
+
         set({
-          session,
-          user: { ...session.user, role: profile?.role || 'subscriber' },
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
           error: null
         });
       }
