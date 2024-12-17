@@ -2,10 +2,11 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useRevisionStore } from '@/lib/store/revision-store';
+import { useAtom } from 'jotai';
 import { RevisionSelector } from './components/RevisionSelector';
 import { RevisionContent } from './components/RevisionContent';
 import { RollbackConfirmation } from './components/RollbackConfirmation';
+import { revisionsAtom, rollbackVersionAtom, showRollbackConfirmAtom } from './atoms/revision-atoms';
 import type { ContentRevision } from '@/lib/types/content';
 
 interface RevisionCompareProps {
@@ -15,15 +16,11 @@ interface RevisionCompareProps {
 
 export const RevisionCompare: React.FC<RevisionCompareProps> = ({
   contentId,
-  currentVersion,
+  currentVersion
 }) => {
-  const {
-    setRevisions,
-    showRollbackConfirm,
-    setShowRollbackConfirm,
-    rollbackVersion,
-    setRollbackVersion,
-  } = useRevisionStore();
+  const [, setRevisions] = useState(revisionsAtom);
+  const [showRollbackConfirm, setShowRollbackConfirm] = useState(showRollbackConfirmAtom);
+  const [rollbackVersion, setRollbackVersion] = useState(rollbackVersionAtom);
 
   const { isLoading } = useQuery({
     queryKey: ['content-revisions', contentId],
@@ -52,7 +49,7 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
 
         const revisions = data.map(rev => ({
           ...rev,
-          profiles: rev.profiles as { display_name: string },
+          profiles: rev.profiles as { display_name: string }
         }));
 
         setRevisions(revisions as ContentRevision[]);
@@ -74,11 +71,11 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
         p_content_id: contentId,
         p_target_version_number: version,
         p_current_content: null, // Will be handled by the database function
-        p_user_id: (await supabase.auth.getUser()).data.user?.id,
+        p_user_id: (await supabase.auth.getUser()).data.user?.id
       });
 
       if (error) throw error;
-
+      
       toast.success('Successfully rolled back to version ' + version);
       setShowRollbackConfirm(false);
     } catch (error) {

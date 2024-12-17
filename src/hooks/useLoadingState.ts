@@ -1,26 +1,38 @@
-import { create } from 'zustand';
+import { useState, useCallback } from 'react';
+import { LoadingState, initialLoadingState } from '@/lib/store/atoms/loading';
 
-interface LoadingState {
-  isLoading: boolean;
-  error: Error | null;
-  message?: string;
-  startLoading: (message?: string) => void;
-  stopLoading: () => void;
-  setError: (error: Error) => void;
-}
+export const useLoadingState = (initialState?: Partial<LoadingState>) => {
+  const [loadingState, setLoadingState] = useState<LoadingState>({
+    ...initialLoadingState,
+    ...initialState
+  });
 
-export const useLoadingStore = create<LoadingState>((set) => ({
-  isLoading: false,
-  error: null,
-  message: undefined,
+  const startLoading = useCallback((message?: string) => {
+    setLoadingState({
+      isLoading: true,
+      error: null,
+      message
+    });
+  }, []);
 
-  startLoading: (message) => set({ isLoading: true, error: null, message }),
-  stopLoading: () => set({ isLoading: false, error: null }),
-  setError: (error) => set({ isLoading: false, error }),
-}));
+  const stopLoading = useCallback(() => {
+    setLoadingState({
+      isLoading: false,
+      error: null
+    });
+  }, []);
 
-// Updated Hook
-export const useLoadingState = () => {
-  const { isLoading, error, message, startLoading, stopLoading, setError } = useLoadingStore();
-  return { isLoading, error, message, startLoading, stopLoading, setError };
+  const setError = useCallback((error: Error) => {
+    setLoadingState({
+      isLoading: false,
+      error
+    });
+  }, []);
+
+  return {
+    ...loadingState,
+    startLoading,
+    stopLoading,
+    setError
+  };
 };
