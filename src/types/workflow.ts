@@ -1,4 +1,4 @@
-import { Json, JsonObject, isJsonObject, assertJsonObject } from "./json";
+import { Json, JsonObject, assertJsonObject } from "./json";
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
@@ -22,7 +22,7 @@ export interface WorkflowTemplate {
   updated_at?: string;
 }
 
-export interface WorkflowStageConfig {
+export interface WorkflowStageConfig extends JsonObject {
   assignees?: string[];
   timeLimit?: number;
   autoAssignment?: {
@@ -54,41 +54,65 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseWorkflowStage = (data: Json): WorkflowStage => {
-  const obj = assertJsonObject(data);
-  return {
-    id: String(obj.id || crypto.randomUUID()),
-    name: String(obj.name || ''),
-    type: (obj.type as WorkflowStageType) || 'TASK',
-    order: Number(obj.order || 0),
-    config: parseWorkflowConfig(obj.config),
-    description: obj.description ? String(obj.description) : undefined
-  };
-};
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
+}
 
-export const parseWorkflowConfig = (data: Json | undefined): WorkflowStageConfig => {
-  if (!data || !isJsonObject(data)) {
-    return {};
+export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+
+  if (!stage.name.trim()) {
+    errors.push('Stage name is required');
   }
-  return data as WorkflowStageConfig;
-};
 
-export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  return data.map(parseWorkflowStage);
-};
+  if (!stage.type) {
+    errors.push('Stage type is required');
+  }
 
-export const serializeWorkflowStage = (stage: WorkflowStage): JsonObject => {
+  switch (stage.type) {
+    case 'APPROVAL':
+      if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
+        errors.push('At least one approver is required for approval stages');
+      }
+      break;
+    case 'TASK':
+      if (stage.config.customFields?.some(field => !field.name)) {
+        errors.push('All custom fields must have a name');
+      }
+      break;
+    case 'CONDITIONAL':
+      if (!stage.config.conditions?.rules?.length) {
+        errors.push('Conditional stages must have at least one rule');
+      }
+      break;
+  }
+
   return {
-    id: stage.id,
-    name: stage.name,
-    type: stage.type,
-    order: stage.order,
-    config: stage.config,
-    description: stage.description
+    isValid: errors.length === 0,
+    errors
   };
 };
 
-export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
-  return stages.map(serializeWorkflowStage);
+export const parseStages = (data: Json): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(item => {
+    const obj = assertJsonObject(item);
+    return {
+      id: String(obj.id || crypto.randomUUID()),
+      name: String(obj.name || ''),
+      type: (obj.type as WorkflowStageType) || 'TASK',
+      order: Number(obj.order || 0),
+      config: obj.config as WorkflowStageConfig || {},
+      description: obj.description ? String(obj.description) : undefined
+    };
+  });
+};
+
+export const serializeStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => ({
+    ...stage,
+    config: { ...stage.config }
+  })) as unknown as Json;
 };
