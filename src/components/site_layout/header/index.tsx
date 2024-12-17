@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationLinks } from '../../shared/ui/navigation/NavigationLinks';
 import { UserAvatar } from '../../shared/ui/avatar/UserAvatar';
-import { useAuthStore } from '@/lib/store/auth/store/auth-store';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 export const Header = () => {
   const { user } = useAuthStore();

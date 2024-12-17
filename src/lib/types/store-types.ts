@@ -28,3 +28,14 @@ export interface AuthState {
   initialize: () => Promise<void>;
   handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
 }
+
+export interface ThemeState {
+  settings: any | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: 'light' | 'dark' | 'system';
+  setSettings: (settings: any) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+}
