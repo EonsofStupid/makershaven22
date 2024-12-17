@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { Settings, SettingsUpdateParams } from '@/integrations/supabase/types';
+import { Settings, SettingsUpdateParams } from '@/integrations/supabase/types';
 
 interface SettingsState {
   settings: Settings | null;

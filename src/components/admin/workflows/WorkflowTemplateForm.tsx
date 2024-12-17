@@ -7,8 +7,8 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { WorkflowFormHeader } from './components/form/WorkflowFormHeader';
 import { WorkflowBasicInfo } from './components/form/WorkflowBasicInfo';
 import { VisualWorkflowBuilder } from './components/VisualWorkflowBuilder';
-import type { WorkflowTemplate } from './types';
-import { serializeStages } from './types';
+import { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types';
+import { parseStages } from '@/integrations/supabase/types/workflow';
 
 export const WorkflowTemplateForm = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ export const WorkflowTemplateForm = () => {
     id: '',
     name: '',
     description: '',
-    stages: [],
+    steps: [],
     is_active: true,
     created_by: '',
     created_at: '',
@@ -62,7 +62,7 @@ export const WorkflowTemplateForm = () => {
       const templateData = {
         name: data.name,
         description: data.description,
-        steps: serializeStages(data.stages),
+        steps: parseStages(data.steps),
         is_active: data.is_active
       };
 
@@ -131,8 +131,8 @@ export const WorkflowTemplateForm = () => {
 
         <div className="border-t border-white/10 pt-6">
           <VisualWorkflowBuilder
-            stages={formData.stages}
-            onChange={(stages) => handleFieldChange('stages', stages)}
+            stages={formData.steps}
+            onChange={(stages) => handleFieldChange('steps', stages)}
           />
         </div>
       </div>
