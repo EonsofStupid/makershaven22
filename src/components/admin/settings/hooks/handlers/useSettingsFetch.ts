@@ -20,7 +20,6 @@ export const useSettingsFetch = () => {
         throw error;
       }
 
-      // Transform the data to match Settings type
       const settings: Settings = {
         site_title: data.site_title,
         tagline: data.tagline,
@@ -37,11 +36,11 @@ export const useSettingsFetch = () => {
         neon_cyan: data.neon_cyan || '#41f0db',
         neon_pink: data.neon_pink || '#ff0abe',
         neon_purple: data.neon_purple || '#8000ff',
-        border_radius: data.border_radius,
-        spacing_unit: data.spacing_unit,
-        transition_duration: data.transition_duration,
-        shadow_color: data.shadow_color,
-        hover_scale: data.hover_scale,
+        border_radius: data.border_radius || '0.5rem',
+        spacing_unit: data.spacing_unit || '1rem',
+        transition_duration: data.transition_duration || '0.3s',
+        shadow_color: data.shadow_color || 'rgba(0,0,0,0.1)',
+        hover_scale: data.hover_scale || '1.05',
         font_family_heading: data.font_family_heading,
         font_family_body: data.font_family_body,
         font_size_base: data.font_size_base,
@@ -49,9 +48,9 @@ export const useSettingsFetch = () => {
         font_weight_bold: data.font_weight_bold,
         line_height_base: data.line_height_base,
         letter_spacing: data.letter_spacing,
-        transition_type: (data.transition_type as 'fade' | 'slide' | 'scale') || 'fade',
-        box_shadow: data.box_shadow,
-        backdrop_blur: data.backdrop_blur,
+        transition_type: data.transition_type || 'fade',
+        box_shadow: data.box_shadow || 'none',
+        backdrop_blur: data.backdrop_blur || '0',
         updated_at: data.updated_at,
         updated_by: data.updated_by
       };

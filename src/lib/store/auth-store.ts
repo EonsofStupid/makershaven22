@@ -1,135 +1,124 @@
-import { useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { 
-  sessionAtom, 
-  userAtom, 
-  authLoadingAtom, 
-  authErrorAtom, 
-  isOfflineAtom,
-  setSessionAtom,
-  setUserAtom,
-  setAuthLoadingAtom,
-  setAuthErrorAtom,
-  setOfflineAtom,
-  isTransitioningAtom,
-  setIsTransitioningAtom
-} from './atoms/auth';
+import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
-import { sessionManager } from '@/lib/auth/SessionManager';
-import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthSession, AuthUser, UserRole } from '@/lib/auth/types/auth';
-import { toast } from 'sonner';
-import { authLogger } from '@/lib/auth/AuthLogger';
+import { toast } from "sonner";
+import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store-types';
 
-export const useAuthStore = () => {
-  // Read-only atoms
-  const [session] = useAtom(sessionAtom);
-  const [user] = useAtom(userAtom);
-  const [isLoading] = useAtom(authLoadingAtom);
-  const [error] = useAtom(authErrorAtom);
-  const [isOffline] = useAtom(isOfflineAtom);
-  const [isTransitioning] = useAtom(isTransitioningAtom);
-  
-  // Writable atoms
-  const [, setSession] = useAtom(setSessionAtom);
-  const [, setUser] = useAtom(setUserAtom);
-  const [, setLoading] = useAtom(setAuthLoadingAtom);
-  const [, setError] = useAtom(setAuthErrorAtom);
-  const [, setOffline] = useAtom(setOfflineAtom);
-  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
+export const useAuthStore = create<AuthState>((set, get) => ({
+  session: null,
+  user: null,
+  isLoading: true,
+  error: null,
+  isOffline: false,
+  isTransitioning: false,
 
-  const handleAuthError = (error: Error) => {
-    authLogger.error('Auth error:', error);
-    setError(error);
-    toast.error('Authentication error', {
-      description: error.message
-    });
-  };
+  setSession: (session) => set({ session }),
+  setUser: (user) => set({ user }),
+  setLoading: (isLoading) => set({ isLoading }),
+  setError: (error) => set({ error }),
+  setOffline: (isOffline) => set({ isOffline }),
 
-  const signOut = async () => {
+  handleSessionUpdate: async (session) => {
     try {
-      authLogger.info('Signing out user:', user?.id);
-      setLoading(true);
-      setError(null);
-      
-      await sessionManager.handleSignOut();
-      securityManager.clearSecurityData();
-      
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
+        };
+
+        set({
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
+          error: null
+        });
+
+        await supabase.from('security_events').insert({
+          user_id: session.user.id,
+          event_type: 'session_updated',
+          severity: 'low',
+          details: { timestamp: new Date().toISOString() }
+        });
+
+      } else {
+        set({ session: null, user: null });
+      }
+    } catch (error) {
+      console.error('Session update error:', error);
+      set({ error: error instanceof Error ? error : new Error('Session update failed') });
+      toast.error('Session update failed');
+    }
+  },
+
+  signOut: async () => {
+    try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      setSession(null);
-      setUser(null);
-      
-      authLogger.info('Sign out successful');
+      set({ session: null, user: null });
       toast.success('Signed out successfully');
     } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Sign out failed');
-      handleAuthError(authError);
-      throw error;
-    } finally {
-      setLoading(false);
+      console.error('Error signing out:', error);
+      toast.error('Failed to sign out');
     }
-  };
+  },
 
-  const refreshSession = async () => {
+  initialize: async () => {
+    set({ isLoading: true });
     try {
-      setLoading(true);
-      authLogger.info('Refreshing session');
-      const { data: { session }, error } = await supabase.auth.refreshSession();
-      if (error) throw error;
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (session) {
-        const authSession: AuthSession = {
-          user: {
-            ...session.user,
-            role: session.user.role as UserRole
-          },
-          expires_at: session.expires_at,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
+      if (sessionError) throw sessionError;
+
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+            
+        if (profileError) throw profileError;
+
+        const authUser: AuthUser = {
+          ...session.user,
+          role: profile?.role || 'subscriber',
+          username: profile?.username,
+          displayName: profile?.display_name,
+          avatarUrl: profile?.avatar_url
         };
-        
-        setSession(authSession);
-        setUser(authSession.user);
-        authLogger.info('Session refreshed successfully');
+
+        set({
+          session: { ...session, user: authUser } as AuthSession,
+          user: authUser,
+          error: null
+        });
       }
     } catch (error) {
-      handleAuthError(error instanceof Error ? error : new Error('Session refresh failed'));
+      console.error('Auth initialization error:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to initialize auth') });
+      toast.error('Authentication error occurred');
     } finally {
-      setLoading(false);
+      set({ isLoading: false });
     }
-  };
+  },
 
-  const reset = () => {
-    authLogger.info('Resetting auth store');
-    setSession(null);
-    setUser(null);
-    setLoading(false);
-    setError(null);
-    setOffline(false);
-  };
-
-  return {
-    // State
-    session,
-    user,
-    isLoading,
-    error,
-    isOffline,
-    isTransitioning,
-    
-    // Setters
-    setSession,
-    setUser,
-    setLoading,
-    setError,
-    setOffline,
-    setIsTransitioning,
-    
-    // Actions
-    signOut,
-    refreshSession,
-    reset,
-  };
-};
+  reset: () => {
+    set({
+      session: null,
+      user: null,
+      isLoading: false,
+      error: null,
+      isOffline: false,
+      isTransitioning: false
+    });
+  }
+}));

@@ -9,15 +9,15 @@ interface StageTypeSelectorProps {
 
 export const StageTypeSelector = ({ value, onChange }: StageTypeSelectorProps) => {
   const stageTypes: { value: WorkflowStageType; label: string }[] = [
-    { value: 'approval', label: 'Approval' },
-    { value: 'review', label: 'Review' },
-    { value: 'task', label: 'Task' },
-    { value: 'notification', label: 'Notification' },
-    { value: 'conditional', label: 'Conditional' },
+    { value: 'APPROVAL', label: 'Approval' },
+    { value: 'REVIEW', label: 'Review' },
+    { value: 'TASK', label: 'Task' },
+    { value: 'NOTIFICATION', label: 'Notification' },
+    { value: 'CONDITIONAL', label: 'Conditional' },
   ];
 
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value} onValueChange={onChange as (value: string) => void}>
       <SelectTrigger className="w-full bg-white/5 border-white/10 text-white">
         <SelectValue placeholder="Select stage type" />
       </SelectTrigger>

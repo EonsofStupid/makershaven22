@@ -1,23 +1,35 @@
 import React from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRevisionStore, getSelectedRevisions } from '@/lib/store/revision-store';
 import { RevisionMetadata } from './RevisionMetadata';
-import type { ContentRevision } from '@/integrations/supabase/types/content';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface RevisionContentProps {
-  revision: ContentRevision | null;
+  side: 'left' | 'right';
 }
 
-export const RevisionContent: React.FC<RevisionContentProps> = ({ revision }) => {
+export const RevisionContent: React.FC<RevisionContentProps> = ({ side }) => {
+  const selectedRevisions = useRevisionStore(getSelectedRevisions);
+  const revision = selectedRevisions[side];
+
   if (!revision) return null;
 
   return (
-    <ScrollArea className="h-[600px]">
-      <div className="space-y-4">
-        <RevisionMetadata revision={revision} />
-        <pre className="bg-background/50 p-4 rounded-lg overflow-x-auto text-sm">
-          {JSON.stringify(revision.content, null, 2)}
-        </pre>
-      </div>
-    </ScrollArea>
+    <Card className="relative">
+      <ScrollArea className="h-[400px]">
+        <div className="p-4">
+          <RevisionMetadata
+            revision={revision}
+            showRollbackButton
+            onRollbackClick={() => {
+              // Rollback logic will be handled in the parent
+            }}
+          />
+          <pre className="mt-4 p-4 bg-background/50 rounded-lg overflow-x-auto text-sm">
+            {JSON.stringify(revision.content, null, 2)}
+          </pre>
+        </div>
+      </ScrollArea>
+    </Card>
   );
 };

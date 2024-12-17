@@ -1,12 +1,9 @@
 export interface BuilderElement {
   id: string;
-  type: 'heading' | 'text' | 'image' | 'button';
-  content: {
-    text?: string;
-    url?: string;
-    alt?: string;
-    [key: string]: any;
-  };
+  type: string;
+  props: Record<string, any>;
+  children?: BuilderElement[];
+  content?: string;
 }
 
 export interface BuilderState {
@@ -14,7 +11,8 @@ export interface BuilderState {
   selectedElement: string | null;
 }
 
-export interface BuilderAction {
-  type: 'ADD_ELEMENT' | 'UPDATE_ELEMENT' | 'DELETE_ELEMENT' | 'SELECT_ELEMENT';
-  payload: any;
-}
+export type BuilderAction =
+  | { type: 'ADD_ELEMENT'; element: BuilderElement }
+  | { type: 'UPDATE_ELEMENT'; id: string; updates: Partial<BuilderElement> }
+  | { type: 'DELETE_ELEMENT'; id: string }
+  | { type: 'SELECT_ELEMENT'; id: string | null };
