@@ -31,7 +31,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
       set({ settings: data, isLoading: false });
     } catch (error) {
       console.error('Error fetching settings:', error);
-      set({ error, isLoading: false });
+      set({ error: error as Error, isLoading: false });
     }
   },
 
@@ -48,24 +48,21 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
       set({ settings, isLoading: false });
     } catch (error) {
       console.error('Error updating settings:', error);
-      set({ error, isLoading: false });
+      set({ error: error as Error, isLoading: false });
     }
   },
 
   resetSettings: async () => {
     set({ isLoading: true });
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .update({ /* default settings */ })
-        .eq('id', 'default-id'); // Replace with actual default ID
+      const { error } = await supabase.rpc('reset_site_settings');
 
       if (error) throw error;
 
       set({ settings: null, isLoading: false });
     } catch (error) {
       console.error('Error resetting settings:', error);
-      set({ error, isLoading: false });
+      set({ error: error as Error, isLoading: false });
     }
   },
 

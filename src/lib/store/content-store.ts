@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import type { BaseContent, ContentType } from '@/lib/types/content';
+import type { BaseContent, ContentStatus, ContentType } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
 interface ContentState {
@@ -15,7 +15,7 @@ interface ContentState {
   deleteContent: (id: string) => Promise<void>;
 }
 
-export const useContentStore = create<ContentState>((set, get) => ({
+export const useContentStore = create<ContentState>((set) => ({
   content: [],
   currentContent: null,
   isLoading: false,
@@ -57,7 +57,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
         .from('cms_content')
         .insert([{
           ...content,
-          created_by: user.id
+          created_by: user.id,
+          status: content.status || 'draft' as ContentStatus,
+          type: content.type as ContentType
         }])
         .select()
         .single();
