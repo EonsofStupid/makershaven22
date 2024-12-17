@@ -10,7 +10,7 @@ export const Logo = () => {
   return (
     <Link 
       to="/"
-      className="flex items-center space-x-2 cursor-pointer group -ml-6 scale-[1.3] z-50"
+      className="flex items-center space-x-2 cursor-pointer group -ml-6 scale-125"
       onClick={() => handleNavigation('/')}
     >
       <span className="text-3xl font-bold flex items-center space-x-1 relative">

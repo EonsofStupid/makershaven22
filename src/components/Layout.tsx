@@ -14,9 +14,9 @@ const Layout = ({ children }: LayoutProps) => {
       exit={{ opacity: 0 }}
     >
       <Navigation />
-      <div className="min-h-screen">
+      <main className="pt-16 min-h-screen">
         {children}
-      </div>
+      </main>
     </motion.div>
   );
 };
