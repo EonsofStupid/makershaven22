@@ -1,5 +1,7 @@
 import { Json } from '../core/json';
-import { ThemeMode, TransitionType } from '../core/enums';
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface ThemeSettings {
   id: string;

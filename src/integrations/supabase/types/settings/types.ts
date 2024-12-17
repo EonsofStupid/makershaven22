@@ -1,5 +1,5 @@
 import { Json } from '../core/json';
-import { ThemeMode, TransitionType } from '../core/enums';
+import { ThemeMode, TransitionType } from '../theme/types';
 
 export interface Settings {
   id: string;
@@ -39,8 +39,6 @@ export interface Settings {
   state_version?: number;
   last_sync?: string;
 }
-
-export type SettingsFormData = Settings;
 
 export interface SettingsUpdateParams {
   p_site_title: string;
