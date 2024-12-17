@@ -24,7 +24,7 @@ const Index = () => {
             backgroundPosition: 'center'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-[#151A24]/80 via-[#151A24]/50 to-[#151A24]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#151A24]/80 via-[#151A24]/50 to-[#151A24]" />
         </div>
 
         {/* Hero Content */}
@@ -44,7 +44,7 @@ const Index = () => {
         </motion.div>
 
         {/* Animated Grid Overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </section>
 
       {/* Feature Cards Section */}
