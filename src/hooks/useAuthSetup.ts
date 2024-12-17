@@ -1,12 +1,6 @@
 import { useCallback, useRef } from 'react';
-import { useAtom } from 'jotai';
-import { 
-  setSessionAtom,
-  setUserAtom,
-  setLoadingStateAtom,
-  setAuthErrorAtom
-} from '@/lib/store/atoms/auth';
 import { toast } from "sonner";
+import { useAuthStore } from '@/zustand/stores/authStore';
 import { useSessionManagement } from './auth/useSessionManagement';
 import { useAuthValidation } from './auth/useAuthValidation';
 import { handleSecurityEvent, handleSessionTimeout } from '@/utils/auth/securityHandlers';
@@ -16,10 +10,7 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 
 export const useAuthSetup = () => {
-  const [, setLoading] = useState(setLoadingStateAtom);
-  const [, setError] = useState(setAuthErrorAtom);
-  const [, setSession] = useState(setSessionAtom);
-  const [, setUser] = useState(setUserAtom);
+  const { setLoading, setError, setSession, setUser } = useAuthStore();
   const initialSetupDone = useRef(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout>();
   const retryAttempts = useRef(0);
@@ -30,7 +21,7 @@ export const useAuthSetup = () => {
   
   const handleAuthChange = useCallback(async (session) => {
     console.log('Handling auth change:', session?.user?.id);
-    setLoading({ isLoading: true });
+    setLoading(true);
     setError(null);
     
     try {
@@ -111,7 +102,7 @@ export const useAuthSetup = () => {
         description: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
     } finally {
-      setLoading({ isLoading: false });
+      setLoading(false);
     }
   }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt, setSession, setUser]);
 
