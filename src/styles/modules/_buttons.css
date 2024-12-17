@@ -1,15 +1,6 @@
 @layer components {
-  /* BEM naming convention for button component */
   .button {
     @apply px-4 py-2 rounded-lg transition-all duration-300 relative overflow-hidden;
-  }
-
-  .button--primary {
-    @apply bg-primary text-white hover:bg-primary/90;
-  }
-
-  .button--secondary {
-    @apply bg-secondary text-white hover:bg-secondary/90;
   }
 
   .button--glass {

@@ -20,3 +20,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Core Variables */
+:root {
+  --primary: #41f0db;
+  --secondary: #ff0abe;
+  --accent: #8000ff;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --text-link: #3B82F6;
+  --text-heading: #FFFFFF;
+  --neon-cyan: #41f0db;
+  --neon-pink: #ff0abe;
+  --neon-purple: #8000ff;
+}
+
+/* Essential Utilities */
+@layer utilities {
+  .glass {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+  }
+
+  .neon-text-cyan {
+    color: var(--neon-cyan);
+    text-shadow: 
+      0 0 7px var(--neon-cyan),
+      0 0 10px var(--neon-cyan),
+      0 0 21px var(--neon-cyan),
+      0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .neon-text-pink {
+    color: var(--neon-pink);
+    text-shadow: 
+      0 0 7px var(--neon-pink),
+      0 0 10px var(--neon-pink),
+      0 0 21px var(--neon-pink),
+      0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Core Animations */
+@keyframes glow {
+  0%, 100% { filter: brightness(100%); }
+  50% { filter: brightness(120%); }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
