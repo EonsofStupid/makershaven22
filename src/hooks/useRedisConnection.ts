@@ -5,9 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { redisConfigAtom, redisStatusAtom, updateRedisStatusAtom } from '@/lib/store/atoms/redis/redis-atoms';
 
 export const useRedisConnection = () => {
-  const [config] = useState(redisConfigAtom);
-  const [status] = useState(redisStatusAtom);
-  const [, updateStatus] = useState(updateRedisStatusAtom);
+  const [config] = useAtom(redisConfigAtom);
+  const [status] = useAtom(redisStatusAtom);
+  const [, updateStatus] = useAtom(updateRedisStatusAtom);
 
   const testConnection = useCallback(async () => {
     if (!config.enabled) {
