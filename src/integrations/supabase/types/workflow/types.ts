@@ -80,3 +80,13 @@ export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
     }))
   } as unknown as Json;
 };
+
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
+  return {
+    ...stage,
+    id: stage.id.toString(),
+    type: stage.type.toString(),
+    order: Number(stage.order),
+    config: stage.config || {}
+  } as unknown as Json;
+};
