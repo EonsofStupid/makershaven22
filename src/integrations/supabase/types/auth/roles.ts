@@ -1,12 +1,7 @@
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
-export interface RoleHierarchy {
-  [key: string]: number;
-}
+export const USER_ROLES: UserRole[] = ['subscriber', 'maker', 'admin', 'super_admin'];
 
-export const ROLE_HIERARCHY: RoleHierarchy = {
-  subscriber: 0,
-  maker: 1,
-  admin: 2,
-  super_admin: 3
+export const isValidRole = (role: string): role is UserRole => {
+  return USER_ROLES.includes(role as UserRole);
 };

@@ -10,7 +10,7 @@ export interface AuthUser extends User {
 }
 
 export interface AuthSession extends Session {
-  user: AuthUser | null;
+  user: AuthUser;
 }
 
 export interface AuthState {
@@ -19,6 +19,7 @@ export interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isTransitioning: boolean;
+  hasAccess: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
@@ -27,4 +28,15 @@ export interface AuthState {
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
+}
+
+export interface ThemeState {
+  settings: any | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: 'light' | 'dark' | 'system';
+  setSettings: (settings: any) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
 }

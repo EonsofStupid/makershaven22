@@ -1,15 +1,15 @@
 import React from "react";
-import { useAuthStore } from '@/lib/store/auth';
+import { useAuthStore } from '@/lib/store/auth-store';
 import { Outlet } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { Header } from "@/components/site_layout/header";
+import { Footer } from "@/components/site_layout/footer";
 
 const Layout: React.FC = () => {
   const { isLoading, user } = useAuthStore();
 
   return (
     <div className="layout">
-      <Header user={user} />
+      <Header />
       <main>
         {isLoading ? <div>Loading...</div> : <Outlet />}
       </main>

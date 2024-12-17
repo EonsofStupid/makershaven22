@@ -4,7 +4,7 @@ import { AdminNav } from "@/components/admin/dashboard/AdminNav";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/hooks/toast";
 import { PostsTable } from "@/components/admin/posts/PostsTable";
 import { usePostsQuery } from "@/hooks/posts/usePostsQuery";
 import { deletePost } from "@/services/blog-posts/deletePost";

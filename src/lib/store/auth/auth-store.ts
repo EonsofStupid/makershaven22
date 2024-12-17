@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/hooks/toast";
-import type { AuthState, AuthUser, AuthSession } from './types';
+import { toast } from "sonner";
+import type { AuthState, AuthUser, AuthSession } from './types/store';
 
 export const useAuthStore = create<AuthState>((set) => ({
   session: null,
@@ -41,13 +41,6 @@ export const useAuthStore = create<AuthState>((set) => ({
           user: authUser,
           error: null,
           hasAccess: true
-        });
-
-        await supabase.from('security_events').insert({
-          user_id: session.user.id,
-          event_type: 'session_updated',
-          severity: 'low',
-          details: { timestamp: new Date().toISOString() }
         });
 
       } else {
