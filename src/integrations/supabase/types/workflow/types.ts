@@ -55,7 +55,7 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: Json[]): WorkflowStage[] => {
+export const parseStages = (data: any[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
@@ -63,7 +63,7 @@ export const parseStages = (data: Json[]): WorkflowStage[] => {
     name: stage.name?.toString() || '',
     type: (stage.type as WorkflowStageType) || 'TASK',
     order: Number(stage.order) || 0,
-    config: stage.config as WorkflowStageConfig || {},
+    config: stage.config || {},
     description: stage.description?.toString()
   }));
 };
