@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import DatabaseSettingsCard from "@/components/admin/data-maestro/settings/DatabaseSettingsCard";
 import ImportSettingsCard from "@/components/admin/data-maestro/settings/ImportSettingsCard";

@@ -33,7 +33,7 @@ interface RedisStore {
 export const useRedisStore = create<RedisStore>((set) => ({
   status: {
     isConnected: false,
-    error: null,
+    error: null
   },
   config: {
     enabled: false,
@@ -46,25 +46,22 @@ export const useRedisStore = create<RedisStore>((set) => ({
       sessionManagement: true,
       caching: true,
       realTimeUpdates: true,
-      rateLimit: true,
-    },
+      rateLimit: true
+    }
   },
-  updateStatus: (status) =>
-    set((state) => ({
-      status: { ...state.status, ...status },
-    })),
-  updateConfig: (config) =>
-    set((state) => ({
-      config: { ...state.config, ...config },
-    })),
-  toggleFeature: (feature) =>
-    set((state) => ({
-      config: {
-        ...state.config,
-        features: {
-          ...state.config.features,
-          [feature]: !state.config.features[feature],
-        },
-      },
-    })),
+  updateStatus: (status) => set((state) => ({
+    status: { ...state.status, ...status }
+  })),
+  updateConfig: (config) => set((state) => ({
+    config: { ...state.config, ...config }
+  })),
+  toggleFeature: (feature) => set((state) => ({
+    config: {
+      ...state.config,
+      features: {
+        ...state.config.features,
+        [feature]: !state.config.features[feature]
+      }
+    }
+  }))
 }));

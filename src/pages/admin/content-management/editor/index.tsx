@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageUploadZone } from "@/components/uploads";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/hooks/toast";
+import { toast } from "sonner";
 import RichTextEditor from "@/components/content/blog/components/RichTextEditor";
 import { Database } from "@/integrations/supabase/types";
 import { PreviewDialog } from "@/components/content/blog/components/preview/PreviewDialog";

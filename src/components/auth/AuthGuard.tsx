@@ -1,12 +1,12 @@
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/lib/store/auth';
+import { useAuthStore } from '@/lib/store/auth-store';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { UserRole } from '@/integrations/supabase/types/auth/roles';
 
 interface AuthGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
+  requiredRole?: string | string[];
   fallbackPath?: string;
 }
 
@@ -32,13 +32,13 @@ export const AuthGuard = ({
   }
 
   if (requiredRole && user && !user.role) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={fallbackPath || '/unauthorized'} replace />;
   }
 
   if (requiredRole && user?.role) {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     if (!roles.includes(user.role)) {
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to={fallbackPath || '/unauthorized'} replace />;
     }
   }
 

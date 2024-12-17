@@ -1,41 +1,21 @@
-import type { UserRole } from './roles';
+import type { UserRole } from '../enums';
 
-export interface AuthUser {
+export interface Profile {
   id: string;
-  email?: string | null;
+  username?: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
   role?: UserRole;
-  username?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  lastSeen?: Date;
-  isBanned?: boolean;
-  banReason?: string;
-  bannedAt?: Date;
-  bannedBy?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  bio?: string | null;
+  website?: string | null;
+  location?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  last_seen?: string | null;
 }
 
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
+export interface ProfilesTable {
+  Row: Profile;
+  Insert: Omit<Profile, 'id' | 'created_at' | 'updated_at'>;
+  Update: Partial<Omit<Profile, 'id'>>;
 }
-
-export interface SecurityLog {
-  id: string;
-  userId: string;
-  eventType: string;
-  severity: SecurityEventSeverity;
-  category: SecurityEventCategory;
-  ipAddress?: string;
-  userAgent?: string;
-  metadata?: Record<string, any>;
-  createdAt: Date;
-}
-
-export type SecurityEventSeverity = 'low' | 'medium' | 'high';
-export type SecurityEventCategory = 'auth' | 'session' | 'security' | 'pin' | 'audit';

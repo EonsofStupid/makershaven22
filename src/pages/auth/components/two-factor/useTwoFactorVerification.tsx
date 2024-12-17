@@ -1,19 +1,13 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useTwoFactorStore } from '@/zustand/stores/twoFactorStore';
 
 export const useTwoFactorVerification = (email: string, password: string) => {
   const navigate = useNavigate();
-  const {
-    code,
-    setCode,
-    isLoading,
-    setIsLoading,
-    error,
-    setError,
-  } = useTwoFactorStore();
+  const [code, setCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleVerification = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +17,13 @@ export const useTwoFactorVerification = (email: string, password: string) => {
     try {
       const { data, error: verifyError } = await supabase.rpc('verify_2fa_code', {
         p_code: code,
-        p_email: email,
+        p_email: email
       });
 
       if (verifyError) throw verifyError;
 
       const result = data as { verified: boolean };
-
+      
       if (result.verified) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -50,12 +44,12 @@ export const useTwoFactorVerification = (email: string, password: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [code, email, password, navigate, setError, setIsLoading]);
+  }, [code, email, password, navigate]);
 
   const handleResendCode = useCallback(async () => {
     try {
       const { error } = await supabase.rpc('resend_2fa_code', {
-        p_email: email,
+        p_email: email
       });
 
       if (error) throw error;
@@ -73,6 +67,6 @@ export const useTwoFactorVerification = (email: string, password: string) => {
     isLoading,
     error,
     handleVerification,
-    handleResendCode,
+    handleResendCode
   };
 };

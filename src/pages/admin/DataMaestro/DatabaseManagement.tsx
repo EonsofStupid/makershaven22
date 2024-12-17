@@ -6,7 +6,7 @@ import { Database, Table, ArrowRight, ServerCog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ERDVisualizer from "@/components/admin/schema/ERDVisualizer";
 import SchemaManager from "@/components/admin/schema/SchemaManager";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const DatabaseManagement = () => {
   const { toast } = useToast();

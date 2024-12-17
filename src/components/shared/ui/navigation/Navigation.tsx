@@ -9,12 +9,10 @@ import { SearchDialog } from "./SearchDialog";
 import { UserAvatar } from "../avatar/UserAvatar";
 import { UserMenu } from "./UserMenu";
 import { MobileNav } from "./mobile/MobileNav";
-import { useAuthStore } from "@/lib/store/auth-store";
 
 export const Navigation = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user } = useAuthStore();
 
   return (
     <NavigationContainer>
@@ -30,24 +28,19 @@ export const Navigation = () => {
       <NavigationSection className="space-x-4">
         <SearchButton onClick={() => setSearchOpen(true)} />
   
-        {user && (
-          <div className="hidden md:block relative z-[60]">
-            <UserAvatar
-              size="lg"
-              className="transform translate-y-2"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            />
-            {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
-          </div>
-        )}
+        <div className="hidden md:block relative z-[60]">
+          <UserAvatar
+            size="lg"
+            className="transform translate-y-2"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+          />
+          {showUserMenu && <UserMenu onClose={() => setShowUserMenu(false)} />}
+        </div>
   
         <MobileNav />
       </NavigationSection>
 
-      <SearchDialog 
-        open={searchOpen} 
-        onOpenChange={setSearchOpen}
-      />
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </NavigationContainer>
   );
 };

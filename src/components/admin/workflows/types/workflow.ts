@@ -1,5 +1,5 @@
-import type { Json } from "@/integrations/supabase/types";
-import type { Profile } from "@/integrations/supabase/types/tables";
+import { Json } from "@/integrations/supabase/types";
+import { Profile } from "@/integrations/supabase/types/tables";
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
@@ -56,11 +56,6 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
-
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
@@ -106,7 +101,7 @@ export const parseStages = (data: Json): WorkflowStage[] => {
     order: stage.order || 0,
     config: stage.config || {},
     description: stage.description
-  })) as WorkflowStage[];
+  }));
 };
 
 export const serializeStages = (stages: WorkflowStage[]): Json => {

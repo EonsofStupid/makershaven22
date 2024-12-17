@@ -5,7 +5,7 @@ import { SettingsFormData } from "../../types";
 import { CSSEffectsControl } from "../../components/CSSEffectsControl";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { toast } from "@/lib/hooks/toast";
+import { toast } from "sonner";
 
 interface TransitionConfigSectionProps {
   form: UseFormReturn<SettingsFormData>;

@@ -1,17 +1,21 @@
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useThemeStore } from '@/lib/store/theme-store';
+import { 
+  themeModeAtom, 
+  systemThemeAtom, 
+  effectiveThemeAtom,
+  themeStateAtom,
+  cssVariablesAtom,
+  updateThemeAtom
+} from '../atoms/theme/theme-atoms';
 
 export const useTheme = () => {
-  const {
-    themeMode,
-    setThemeMode,
-    systemTheme,
-    setSystemTheme,
-    effectiveTheme,
-    cssVariables,
-    themeState,
-    updateTheme,
-  } = useThemeStore();
+  const [themeMode, setThemeMode] = useAtom(themeModeAtom);
+  const [, setSystemTheme] = useAtom(systemThemeAtom);
+  const effectiveTheme = useAtomValue(effectiveThemeAtom);
+  const cssVariables = useAtomValue(cssVariablesAtom);
+  const [themeState] = useAtom(themeStateAtom);
+  const [, updateTheme] = useAtom(updateThemeAtom);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -30,7 +34,7 @@ export const useTheme = () => {
     Object.entries(cssVariables).forEach(([key, value]) => {
       root.style.setProperty(key, value);
     });
-
+    
     // Apply theme class
     root.classList.remove('light', 'dark');
     root.classList.add(effectiveTheme);
@@ -43,6 +47,6 @@ export const useTheme = () => {
     settings: themeState.settings,
     isLoading: themeState.isLoading,
     error: themeState.error,
-    updateTheme,
+    updateTheme
   };
 };

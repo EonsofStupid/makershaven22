@@ -1,4 +1,4 @@
-import { toast } from "@/lib/hooks/toast";
+import { toast } from "sonner";
 import type { ContentType } from "../types/contentTypes";
 import { getSchemaByType } from "../types/contentTypes";
 

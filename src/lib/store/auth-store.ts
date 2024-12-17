@@ -1,7 +1,22 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import type { AuthState, AuthUser, AuthSession } from '@/lib/types/store-types';
+import { toast } from "sonner";
+import type { AuthUser, AuthSession } from '@/lib/types/store-types';
+
+interface AuthState {
+  session: AuthSession | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  isTransitioning: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setIsTransitioning: (isTransitioning: boolean) => void;
+  signOut: () => Promise<void>;
+  initialize: () => Promise<void>;
+}
 
 export const useAuthStore = create<AuthState>((set) => ({
   session: null,
@@ -12,61 +27,49 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setSession: (session) => set({ session }),
   setUser: (user) => set({ user }),
-  setLoading: (loading) => set({ isLoading: loading }),
+  setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
-  setIsTransitioning: (transitioning) => set({ isTransitioning: transitioning }),
+  setIsTransitioning: (isTransitioning) => set({ isTransitioning }),
 
   signOut: async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await supabase.auth.signOut();
       set({ session: null, user: null });
       toast.success('Signed out successfully');
     } catch (error) {
       console.error('Error signing out:', error);
-      toast.error('Error signing out');
+      toast.error('Failed to sign out');
     }
   },
 
   initialize: async () => {
+    set({ isLoading: true });
     try {
-      set({ isLoading: true });
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
-      if (error) throw error;
-      
-      if (session) {
-        const { user } = session;
-        set({ 
+      if (sessionError) throw sessionError;
+
+      if (session?.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+            
+        if (profileError) throw profileError;
+
+        set({
           session,
-          user: user as AuthUser,
+          user: { ...session.user, role: profile?.role || 'subscriber' },
+          error: null
         });
       }
     } catch (error) {
-      console.error('Error initializing auth:', error);
-      set({ error: error as Error });
+      console.error('Auth initialization error:', error);
+      set({ error: error instanceof Error ? error : new Error('Failed to initialize auth') });
+      toast.error('Authentication error occurred');
     } finally {
       set({ isLoading: false });
-    }
-  },
-
-  handleSessionUpdate: async (session) => {
-    set({ isTransitioning: true });
-    try {
-      if (session) {
-        const { user } = session;
-        set({ 
-          session,
-          user: user as AuthUser,
-        });
-      } else {
-        set({ session: null, user: null });
-      }
-    } catch (error) {
-      console.error('Error handling session update:', error);
-      set({ error: error as Error });
-    } finally {
-      set({ isTransitioning: false });
     }
   }
 }));

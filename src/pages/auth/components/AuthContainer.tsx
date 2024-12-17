@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AuthForm } from "./AuthForm";
 import { TwoFactorVerification } from "./TwoFactorVerification";

@@ -1,4 +1,4 @@
-import type { UserRole } from '../../auth/roles';
+import type { UserRole } from '../../auth';
 import type { Json } from '../base';
 
 export interface Profile {
@@ -10,8 +10,8 @@ export interface Profile {
   bio?: string | null;
   website?: string | null;
   location?: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   last_seen?: string | null;
   is_banned?: boolean;
   ban_reason?: string | null;
@@ -40,5 +40,5 @@ export interface SecurityLog {
   ip_address?: string;
   user_agent?: string;
   metadata?: Json;
-  created_at: string;
+  created_at?: string;
 }

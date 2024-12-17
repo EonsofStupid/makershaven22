@@ -2,10 +2,11 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useRevisionStore } from '@/zustand/stores/revisionStore';
+import { useAtom } from 'jotai';
 import { RevisionSelector } from './components/RevisionSelector';
 import { RevisionContent } from './components/RevisionContent';
 import { RollbackConfirmation } from './components/RollbackConfirmation';
+import { revisionsAtom, rollbackVersionAtom, showRollbackConfirmAtom } from './atoms/revision-atoms';
 import type { ContentRevision } from '@/lib/types/content';
 
 interface RevisionCompareProps {
@@ -17,14 +18,9 @@ export const RevisionCompare: React.FC<RevisionCompareProps> = ({
   contentId,
   currentVersion
 }) => {
-  const {
-    revisions,
-    setRevisions,
-    showRollbackConfirm,
-    setShowRollbackConfirm,
-    rollbackVersion,
-    setRollbackVersion
-  } = useRevisionStore();
+  const [, setRevisions] = useAtom(revisionsAtom);
+  const [showRollbackConfirm, setShowRollbackConfirm] = useAtom(showRollbackConfirmAtom);
+  const [rollbackVersion, setRollbackVersion] = useAtom(rollbackVersionAtom);
 
   const { isLoading } = useQuery({
     queryKey: ['content-revisions', contentId],
