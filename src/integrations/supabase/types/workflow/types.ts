@@ -1,6 +1,5 @@
-import type { Json } from '../base/json';
-import type { Profile } from '../auth/types';
-import { WorkflowStageType } from '../enums';
+import { Json } from '../core/json';
+import { WorkflowStageType } from '../core/enums';
 
 export interface WorkflowStage {
   id: string;
@@ -55,24 +54,23 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
-}
+export const parseWorkflowStage = (data: Json): WorkflowStage => {
+  if (typeof data !== 'object' || !data) {
+    throw new Error('Invalid workflow stage data');
+  }
 
-export const parseStages = (data: Json): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
+  const stage = data as Record<string, Json>;
   
-  return data.map(stage => ({
-    id: typeof stage === 'object' && stage ? (stage.id as string || crypto.randomUUID()) : crypto.randomUUID(),
-    name: typeof stage === 'object' && stage ? (stage.name as string || '') : '',
-    type: typeof stage === 'object' && stage ? ((stage.type as WorkflowStageType) || 'TASK') : 'TASK',
-    order: typeof stage === 'object' && stage ? (stage.order as number || 0) : 0,
-    config: typeof stage === 'object' && stage ? (stage.config as WorkflowStageConfig || {}) : {},
-    description: typeof stage === 'object' && stage ? (stage.description as string) : undefined
-  }));
+  return {
+    id: String(stage.id || ''),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'TASK',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
+  };
 };
 
-export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages as unknown as Json;
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
+  return stage as unknown as Json;
 };
