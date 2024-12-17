@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
+import { Layout } from "@/components/Layout";
 import LandingPage from "@/pages/site/landing";
 import Index from "@/pages/Index";
 import Login from "@/pages/auth/login";
@@ -35,7 +36,9 @@ export const Routes = () => {
               !session ? (
                 <LandingPage />
               ) : (
-                <Index />
+                <Layout>
+                  <Index />
+                </Layout>
               )
             } 
           />
@@ -55,11 +58,10 @@ export const Routes = () => {
               key={route.path}
               path={route.path}
               element={
-                <AuthGuard 
-                  requireAuth={true}
-                  fallbackPath="/login"
-                >
-                  {route.element}
+                <AuthGuard requireAuth={true} fallbackPath="/login">
+                  <Layout>
+                    {route.element}
+                  </Layout>
                 </AuthGuard>
               }
             />
@@ -76,7 +78,9 @@ export const Routes = () => {
                   requiredRole={["admin", "super_admin"]}
                   fallbackPath="/"
                 >
-                  {route.element}
+                  <Layout>
+                    {route.element}
+                  </Layout>
                 </AuthGuard>
               }
             />
