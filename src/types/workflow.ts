@@ -1,18 +1,13 @@
-import { Json, JsonObject } from './json';
+import { Json, JsonObject, isJsonObject, assertJsonObject } from "./json";
 
-export enum WorkflowStageType {
-  TASK = 'TASK',
-  APPROVAL = 'APPROVAL',
-  NOTIFICATION = 'NOTIFICATION',
-  REVIEW = 'REVIEW'
-}
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowStage {
   id: string;
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: JsonObject;
+  config: WorkflowStageConfig;
   description?: string;
 }
 
@@ -27,53 +22,73 @@ export interface WorkflowTemplate {
   updated_at?: string;
 }
 
-export interface WorkflowState {
-  templates: WorkflowTemplate[];
-  activeWorkflow: WorkflowTemplate | null;
-  history: WorkflowTemplate[];
-  isLoading: boolean;
-  error: Error | null;
-  setTemplates: (templates: WorkflowTemplate[]) => void;
-  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
-  addToHistory: (workflow: WorkflowTemplate) => void;
-  clearHistory: () => void;
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: any;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
 }
 
-export const isWorkflowStage = (value: unknown): value is WorkflowStage => {
-  if (!isJsonObject(value)) return false;
-  
-  return (
-    typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
-    typeof value.type === 'string' &&
-    typeof value.order === 'number' &&
-    isJsonObject(value.config)
-  );
+export const parseWorkflowStage = (data: Json): WorkflowStage => {
+  const obj = assertJsonObject(data);
+  return {
+    id: String(obj.id || crypto.randomUUID()),
+    name: String(obj.name || ''),
+    type: (obj.type as WorkflowStageType) || 'TASK',
+    order: Number(obj.order || 0),
+    config: parseWorkflowConfig(obj.config),
+    description: obj.description ? String(obj.description) : undefined
+  };
 };
 
-export const isWorkflowTemplate = (value: unknown): value is WorkflowTemplate => {
-  if (!isJsonObject(value)) return false;
-  
-  return (
-    typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
-    Array.isArray(value.steps) &&
-    value.steps.every(isWorkflowStage) &&
-    typeof value.is_active === 'boolean'
-  );
-};
-
-export const parseWorkflowJson = (json: Json): WorkflowStage[] => {
-  if (!Array.isArray(json)) {
-    throw new Error('Invalid workflow JSON format');
+export const parseWorkflowConfig = (data: Json | undefined): WorkflowStageConfig => {
+  if (!data || !isJsonObject(data)) {
+    return {};
   }
-  
-  return json.map((stage): WorkflowStage => ({
-    id: stage.id as string,
-    name: stage.name as string,
-    type: stage.type as WorkflowStageType,
-    order: stage.order as number,
-    config: stage.config as JsonObject,
-    description: stage.description as string | undefined
-  }));
+  return data as WorkflowStageConfig;
+};
+
+export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  return data.map(parseWorkflowStage);
+};
+
+export const serializeWorkflowStage = (stage: WorkflowStage): JsonObject => {
+  return {
+    id: stage.id,
+    name: stage.name,
+    type: stage.type,
+    order: stage.order,
+    config: stage.config,
+    description: stage.description
+  };
+};
+
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(serializeWorkflowStage);
 };

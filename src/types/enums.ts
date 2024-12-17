@@ -1,45 +1,50 @@
-export enum ThemeMode {
-  LIGHT = 'light',
-  DARK = 'dark',
-  SYSTEM = 'system'
-}
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type ContentStatus = 'draft' | 'published' | 'archived';
+export type ContentType = 'page' | 'component' | 'template' | 'workflow';
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+export type PostCategory = 
+  | 'Guides'
+  | 'Reviews' 
+  | 'Blog'
+  | 'Site Updates'
+  | 'Critical'
+  | '3D Printer'
+  | '3D Printer Hardware';
 
-export enum TransitionType {
-  FADE = 'fade',
-  SLIDE = 'slide',
-  SCALE = 'scale',
-  BLUR = 'blur'
-}
+export const isUserRole = (value: unknown): value is UserRole => {
+  return typeof value === 'string' && ['subscriber', 'maker', 'admin', 'super_admin'].includes(value);
+};
 
-export enum PostCategory {
-  BUILD = 'build',
-  GUIDE = 'guide',
-  NEWS = 'news',
-  REVIEW = 'review'
-}
+export const isContentStatus = (value: unknown): value is ContentStatus => {
+  return typeof value === 'string' && ['draft', 'published', 'archived'].includes(value);
+};
 
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-  SUPER_ADMIN = 'super_admin'
-}
+export const isContentType = (value: unknown): value is ContentType => {
+  return typeof value === 'string' && ['page', 'component', 'template', 'workflow'].includes(value);
+};
 
-export enum WorkflowStageType {
-  TASK = 'TASK',
-  APPROVAL = 'APPROVAL',
-  NOTIFICATION = 'NOTIFICATION',
-  REVIEW = 'REVIEW'
-}
+export const isWorkflowStageType = (value: unknown): value is WorkflowStageType => {
+  return typeof value === 'string' && ['APPROVAL', 'REVIEW', 'TASK', 'NOTIFICATION', 'CONDITIONAL'].includes(value);
+};
 
-export enum ComponentType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  CONTAINER = 'container',
-  BUTTON = 'button'
-}
+export const isThemeMode = (value: unknown): value is ThemeMode => {
+  return typeof value === 'string' && ['light', 'dark', 'system'].includes(value);
+};
 
-export enum ContentStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  ARCHIVED = 'archived'
-}
+export const isTransitionType = (value: unknown): value is TransitionType => {
+  return typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value);
+};
+
+export const isPostCategory = (value: unknown): value is PostCategory => {
+  return typeof value === 'string' && [
+    'Guides',
+    'Reviews',
+    'Blog',
+    'Site Updates',
+    'Critical',
+    '3D Printer',
+    '3D Printer Hardware'
+  ].includes(value);
+};
