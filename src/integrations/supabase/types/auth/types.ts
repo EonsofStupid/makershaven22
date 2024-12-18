@@ -1,25 +1,28 @@
-import { UserRole } from '../enums';
+import { Session, User } from '@supabase/supabase-js';
+import { UserRole } from '../base/enums';
 
-export interface Profile {
-  id: string;
-  username: string;
-  display_name: string;
-  avatar_url: string;
-  role: UserRole;
-  bio: string;
-  website: string;
-  location: string;
-  created_at: string;
-  updated_at: string;
-  last_seen: string;
-  is_banned: boolean;
-  ban_reason?: string;
-  banned_at?: string;
-  banned_by?: string;
-  two_factor_enabled: boolean;
-  two_factor_secret?: string;
-  onboarding_completed: boolean;
-  gamification_enabled: boolean;
-  visual_editor_enabled: boolean;
-  last_login_at: string;
+export interface AuthUser extends User {
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+}
+
+export interface AuthSession extends Session {
+  user: AuthUser;
+}
+
+export interface AuthStore {
+  session: AuthSession | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  isOffline: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setOffline: (isOffline: boolean) => void;
+  signOut: () => Promise<void>;
+  reset: () => void;
 }

@@ -1,5 +1,5 @@
-import type { Json } from '../core/json';
-import type { WorkflowStageType } from '../core/enums';
+import { Json } from '../base/json';
+import { WorkflowStageType } from '../base/enums';
 
 export interface WorkflowStage {
   id: string;
@@ -42,37 +42,27 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
-  const errors: string[] = [];
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(stage => {
+    if (typeof stage !== 'object' || !stage) {
+      return {
+        id: crypto.randomUUID(),
+        name: '',
+        type: 'TASK',
+        order: 0,
+        config: {},
+      };
+    }
 
-  if (!stage.name.trim()) {
-    errors.push('Stage name is required');
-  }
-
-  if (!stage.type) {
-    errors.push('Stage type is required');
-  }
-
-  switch (stage.type) {
-    case 'APPROVAL':
-      if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
-        errors.push('At least one approver is required');
-      }
-      break;
-    case 'TASK':
-      if (stage.config.customFields?.some(field => !field.name)) {
-        errors.push('All custom fields must have a name');
-      }
-      break;
-    case 'CONDITIONAL':
-      if (!stage.config.conditions?.rules?.length) {
-        errors.push('Conditional stages must have at least one rule');
-      }
-      break;
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
+    return {
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'TASK',
+      order: Number(stage.order || 0),
+      config: stage.config as WorkflowStageConfig || {},
+      description: stage.description ? String(stage.description) : undefined
+    };
+  });
 };

@@ -1,5 +1,5 @@
-import { Json } from '../core/json';
-import { ContentStatus, ContentType } from '../core/enums';
+import { Json } from '../base/json';
+import { ContentStatus, ContentType } from '../base/enums';
 
 export interface BaseContent {
   id: string;
@@ -16,4 +16,8 @@ export interface BaseContent {
   slug?: string;
 }
 
-export { ContentStatus, ContentType };
+export interface ContentWithAuthor extends Omit<BaseContent, 'created_by'> {
+  created_by: {
+    display_name: string;
+  };
+}

@@ -1,4 +1,5 @@
-import type { WorkflowStage } from './stage';
+import { Json } from '../base/json';
+import { WorkflowStage } from './stage';
 
 export interface WorkflowTemplate {
   id: string;
@@ -12,7 +13,7 @@ export interface WorkflowTemplate {
   updated_at?: string;
 }
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate) => {
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,
     stages: template.stages.map(stage => ({
@@ -22,5 +23,5 @@ export const serializeWorkflowTemplate = (template: WorkflowTemplate) => {
       order: Number(stage.order),
       config: stage.config || {}
     }))
-  };
+  } as unknown as Json;
 };
