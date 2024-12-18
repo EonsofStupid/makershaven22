@@ -1,23 +1,12 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { supabase } from "@/integrations/supabase/client";
+import { SecurityManager } from "./SecurityManager";
 
-export interface SessionState {
-  session: any | null;
-  setSession: (session: any | null) => void;
-  clearSession: () => void;
-}
-
-export class SessionManager {
-  private static instance: SessionManager | null = null;
-  private initialized: boolean = false;
+class SessionManager {
+  private static instance: SessionManager;
+  private isActive: boolean = false;
 
   private constructor() {
-    // Private constructor to enforce singleton
-    this.initialize = this.initialize.bind(this);
-    this.startSession = this.startSession.bind(this);
-    this.destroy = this.destroy.bind(this);
-    this.cleanup = this.cleanup.bind(this);
-    this.clearSecurityData = this.clearSecurityData.bind(this);
+    // Private constructor for singleton
   }
 
   public static getInstance(): SessionManager {
@@ -27,52 +16,29 @@ export class SessionManager {
     return SessionManager.instance;
   }
 
-  public initialize(): void {
-    if (this.initialized) {
-      console.log('Session already initialized');
+  public async startSession(): Promise<void> {
+    if (this.isActive) {
       return;
     }
-    this.initialized = true;
-    console.log('Session initialized');
-  }
 
-  public startSession(): void {
-    if (!this.initialized) {
-      this.initialize();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      this.isActive = true;
+      console.log("Session started successfully");
     }
-    console.log('Session started');
   }
 
   public destroy(): void {
-    if (this.initialized) {
-      this.initialized = false;
-      console.log('Session destroyed');
+    if (this.isActive) {
+      this.isActive = false;
+      SecurityManager.clearSecurityData();
+      console.log("Session destroyed successfully");
     }
   }
 
-  public cleanup(): void {
-    this.destroy();
-  }
-
-  public clearSecurityData(): void {
-    this.initialized = false;
-    console.log('Security data cleared');
-  }
-
   public isInitialized(): boolean {
-    return this.initialized;
+    return this.isActive;
   }
 }
 
 export const sessionManager = SessionManager.getInstance();
-
-export const useSessionStore = create<SessionState>()(
-  persist(
-    (set) => ({
-      session: null,
-      setSession: (session) => set({ session }),
-      clearSession: () => set({ session: null }),
-    }),
-    { name: 'session-store' }
-  )
-);
