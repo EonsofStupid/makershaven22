@@ -9,6 +9,7 @@ import { RedisFeatureToggles } from './RedisConfigCard/RedisFeatureToggles';
 import { RedisStatusIndicator } from './RedisConfigCard/RedisStatusIndicator';
 import { useRedisConnection } from '@/hooks/useRedisConnection';
 import { useRedisStore } from '@/lib/store/redis-store';
+import { supabase } from '@/integrations/supabase/client';
 
 export const RedisConfigCard = () => {
   const [isSaving, setIsSaving] = useState(false);
