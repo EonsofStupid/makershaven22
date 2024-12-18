@@ -1,5 +1,4 @@
-import { Json, JsonObject, isJsonObject, safeJsonParse } from '../json';
-import { BaseEntity, UserOwnedEntity } from '../core/base';
+import { Json } from '../core/json';
 
 export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
@@ -8,19 +7,20 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: JsonObject;
+  config: WorkflowStageConfig;
   description?: string;
 }
 
-export interface WorkflowTemplate extends Omit<UserOwnedEntity, 'created_by'> {
+export interface WorkflowTemplate {
+  id: string;
   name: string;
   description?: string;
   steps: WorkflowStage[];
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  email?: string;
-  triggers?: Json;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface WorkflowStageConfig {
@@ -55,53 +55,45 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export interface WorkflowFormData {
-  name: string;
-  description: string;
-  stages: WorkflowStage[];
-  is_active?: boolean;
-}
+export const parseWorkflowStage = (data: Json): WorkflowStage => {
+  if (!data || typeof data !== 'object') {
+    return {
+      id: crypto.randomUUID(),
+      name: '',
+      type: 'task',
+      order: 0,
+      config: {},
+    };
+  }
 
-// Type guard for WorkflowStage
-export const isWorkflowStage = (value: unknown): value is WorkflowStage => {
-  if (!isJsonObject(value)) return false;
+  const stage = data as Record<string, unknown>;
   
-  const stage = value as WorkflowStage;
-  return (
-    typeof stage.id === 'string' &&
-    typeof stage.name === 'string' &&
-    typeof stage.type === 'string' &&
-    typeof stage.order === 'number' &&
-    isJsonObject(stage.config)
-  );
-};
-
-// Parse workflow stages safely
-export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data
-    .filter(isWorkflowStage)
-    .map(stage => ({
-      id: stage.id,
-      name: stage.name,
-      type: stage.type as WorkflowStageType,
-      order: stage.order,
-      config: stage.config,
-      description: stage.description
-    }));
-};
-
-// Serialize workflow template safely
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
-    ...template,
-    stages: template.stages?.map(stage => ({
-      ...stage,
-      id: stage.id.toString(),
-      type: stage.type.toString(),
-      order: Number(stage.order),
-      config: stage.config || {}
-    }))
-  } as unknown as Json;
+    id: String(stage.id || crypto.randomUUID()),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'task',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
+  };
+};
+
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
+  return {
+    id: stage.id,
+    name: stage.name,
+    type: stage.type,
+    order: stage.order,
+    config: stage.config,
+    description: stage.description
+  };
+};
+
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  return data.map(parseWorkflowStage);
+};
+
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(serializeWorkflowStage);
 };

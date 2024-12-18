@@ -1,4 +1,4 @@
-import { Json } from './core/json';
+import { Json } from './json';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
@@ -21,11 +21,11 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius?: string;
-  spacing_unit?: string;
-  transition_duration?: string;
-  shadow_color?: string;
-  hover_scale?: string;
+  border_radius: string;
+  spacing_unit: string;
+  transition_duration: string;
+  shadow_color: string;
+  hover_scale: string;
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
@@ -72,4 +72,23 @@ export interface SettingsUpdateParams {
 export interface SettingsResponse {
   data: Settings;
   error: null | Error;
+}
+
+export interface SettingsState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: ThemeMode;
+  themeMode: ThemeMode;
+  systemTheme: ThemeMode;
+  effectiveTheme: ThemeMode;
+  cssVariables: Record<string, string>;
+  setThemeMode: (mode: ThemeMode) => void;
+  setSystemTheme: (theme: ThemeMode) => void;
+  setSettings: (settings: Settings) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setMode: (mode: ThemeMode) => void;
+  updateSettings: (settings: Settings) => Promise<void>;
+  updateTheme: (settings: Settings) => Promise<void>;
 }
