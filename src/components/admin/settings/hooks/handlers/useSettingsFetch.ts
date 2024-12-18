@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Settings } from "../../types";
 import { toast } from "sonner";
-import type { Settings } from "../../types";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -29,7 +29,7 @@ export const useSettingsFetch = () => {
         accent_color: data.accent_color,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        theme_mode: data.theme_mode,
+        theme_mode: data.theme_mode as "light" | "dark" | "system" | undefined,
         text_primary_color: data.text_primary_color,
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,
@@ -49,7 +49,8 @@ export const useSettingsFetch = () => {
         font_weight_bold: data.font_weight_bold,
         line_height_base: data.line_height_base,
         letter_spacing: data.letter_spacing,
-        transition_type: (data.transition_type as 'fade' | 'slide' | 'scale') || 'fade',
+        transition_type: data.transition_type,
+        menu_animation_type: data.menu_animation_type,
         box_shadow: data.box_shadow,
         backdrop_blur: data.backdrop_blur,
         updated_at: data.updated_at,

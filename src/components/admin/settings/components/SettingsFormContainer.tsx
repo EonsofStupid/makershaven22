@@ -6,6 +6,7 @@ import { SettingsFormContent } from "./SettingsFormContent";
 import { SavingIndicator } from "./SavingIndicator";
 import { ResetDialog } from "./ResetDialog";
 import { useSettingsFormState } from "../hooks/useSettingsFormState";
+import { useSettingsForm } from "../hooks/useSettingsForm";
 
 export const SettingsFormContainer = () => {
   const {
@@ -21,6 +22,8 @@ export const SettingsFormContainer = () => {
     isSaving,
   } = useSettingsFormState();
 
+  const formContext = useSettingsForm();
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-[5%] min-h-[calc(100vh-4rem)]">
       <motion.div
@@ -34,7 +37,7 @@ export const SettingsFormContainer = () => {
             onResetClick={() => setShowResetDialog(true)}
             isSaving={isSaving}
           />
-          <SettingsFormContent />
+          <SettingsFormContent formContext={formContext} />
           <SavingIndicator isSaving={isSaving} />
         </Card>
       </motion.div>

@@ -6,7 +6,6 @@ export type Settings = z.infer<typeof settingsSchema> & {
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
-  theme_mode?: 'light' | 'dark' | 'system';
 };
 
 export type SettingsFormData = Settings;
