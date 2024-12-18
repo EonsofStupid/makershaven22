@@ -48,11 +48,11 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   stages: WorkflowStage[];
-  is_active: boolean;
+  steps: WorkflowStage[];
+  is_active?: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
-  steps: Json;
 }
 
 export interface WorkflowFormData {
@@ -115,18 +115,36 @@ export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStag
 };
 
 export const serializeStages = (stages: WorkflowStage[]): Json => {
-  return stages as unknown as Json;
+  return stages.map(stage => ({
+    id: stage.id,
+    name: stage.name,
+    type: stage.type,
+    order: stage.order,
+    config: stage.config,
+    description: stage.description
+  })) as unknown as Json;
 };
 
 export const parseStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
-  return data.map(stage => ({
-    id: typeof stage === 'object' && stage !== null ? String(stage.id || crypto.randomUUID()) : crypto.randomUUID(),
-    name: typeof stage === 'object' && stage !== null ? String(stage.name || '') : '',
-    type: typeof stage === 'object' && stage !== null ? (stage.type as WorkflowStageType || 'task') : 'task',
-    order: typeof stage === 'object' && stage !== null ? Number(stage.order || 0) : 0,
-    config: typeof stage === 'object' && stage !== null ? (stage.config as WorkflowStageConfig || {}) : {},
-    description: typeof stage === 'object' && stage !== null ? String(stage.description || '') : undefined
-  }));
+  return data.map(stage => {
+    if (typeof stage !== 'object' || !stage) return {
+      id: crypto.randomUUID(),
+      name: '',
+      type: 'task' as WorkflowStageType,
+      order: 0,
+      config: {},
+      description: undefined
+    };
+
+    return {
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'task',
+      order: Number(stage.order || 0),
+      config: (stage.config as WorkflowStageConfig) || {},
+      description: stage.description ? String(stage.description) : undefined
+    };
+  });
 };
