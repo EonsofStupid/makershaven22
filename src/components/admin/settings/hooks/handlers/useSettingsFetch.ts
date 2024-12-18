@@ -47,8 +47,8 @@ export const useSettingsFetch = () => {
         backdrop_blur: data.backdrop_blur,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        transition_type: data.transition_type,
-        theme_mode: data.theme_mode,
+        transition_type: data.transition_type as "fade" | "slide" | "scale" | "blur",
+        theme_mode: data.theme_mode as "light" | "dark" | "system",
       };
 
       return settings;
