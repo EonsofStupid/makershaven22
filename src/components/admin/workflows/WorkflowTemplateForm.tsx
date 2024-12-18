@@ -1,54 +1,20 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { WorkflowTemplate, WorkflowFormData, serializeStages, parseStages, validateStage } from "./types";
-import { useSettingsForm } from "./hooks/useSettingsForm";
-import { useTheme } from "@/components/theme/ThemeContext";
-import { SettingsPreview } from "./components/SettingsPreview";
-import { ResetDialog } from "./components/ResetDialog";
-import { SettingsFormHeader } from "./components/SettingsFormHeader";
-import { SavingIndicator } from "./components/SavingIndicator";
+import { WorkflowFormData } from "./types";
+import { useWorkflowForm } from "./hooks/useWorkflowForm";
 import { WorkflowBasicFields } from './components/WorkflowBasicFields';
 import { VisualWorkflowBuilder } from './components/VisualWorkflowBuilder';
 import { toast } from "sonner";
 
 export const WorkflowTemplateForm = () => {
-  const [showResetDialog, setShowResetDialog] = useState(false);
-  const [resetConfirmation, setResetConfirmation] = useState("");
-  const [confirmCheckbox, setConfirmCheckbox] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
-  const { theme, updateTheme } = useTheme();
-
-  const {
-    settings,
-    isLoading,
-    isSaving,
-    handleSettingsUpdate,
-    handleResetToDefault,
-  } = useSettingsForm();
-
-  const form = useForm<WorkflowFormData>({
-    defaultValues: {
-      name: '',
-      description: '',
-      stages: [],
-      is_active: true
-    }
-  });
+  const { form, isLoading, isSaving, handleWorkflowUpdate } = useWorkflowForm();
 
   const handleSubmit = async (data: WorkflowFormData) => {
     try {
-      const serializedStages = serializeStages(data.stages);
-      const templateData = {
-        ...data,
-        steps: serializedStages
-      };
-      
-      await handleSettingsUpdate(templateData);
+      await handleWorkflowUpdate(data);
       toast.success('Workflow template saved successfully');
     } catch (error) {
       console.error('Error saving workflow template:', error);
