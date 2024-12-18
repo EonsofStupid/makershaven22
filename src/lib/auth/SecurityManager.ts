@@ -1,18 +1,25 @@
-import { sessionManager } from './SessionManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ISecurityManager, ISessionManager } from './types/manager-types';
 
-export class SecurityManager {
+export class SecurityManager implements ISecurityManager {
   private static instance: SecurityManager;
-  private sessionManager: typeof sessionManager;
+  private sessionManager: ISessionManager;
 
-  private constructor() {
+  private constructor(sessionManager: ISessionManager) {
     this.sessionManager = sessionManager;
+  }
+
+  public static initialize(sessionManager: ISessionManager): SecurityManager {
+    if (!SecurityManager.instance) {
+      SecurityManager.instance = new SecurityManager(sessionManager);
+    }
+    return SecurityManager.instance;
   }
 
   public static getInstance(): SecurityManager {
     if (!SecurityManager.instance) {
-      SecurityManager.instance = new SecurityManager();
+      throw new Error('SecurityManager must be initialized with a SessionManager first');
     }
     return SecurityManager.instance;
   }
@@ -39,11 +46,8 @@ export class SecurityManager {
       return false;
     }
   }
-
-  public async enforceRateLimit(action: string, limit: number): Promise<boolean> {
-    // Rate limiting implementation
-    return true; // Placeholder
-  }
 }
 
-export const securityManager = SecurityManager.getInstance();
+// Initialize the security manager with the session manager
+import { sessionManager } from './SessionManager';
+export const securityManager = SecurityManager.initialize(sessionManager);

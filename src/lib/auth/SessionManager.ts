@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import { SecurityManager } from "./SecurityManager";
+import { ISessionManager } from "./types/manager-types";
 
-class SessionManager {
+class SessionManager implements ISessionManager {
   private static instance: SessionManager;
   private isActive: boolean = false;
 
@@ -31,7 +31,6 @@ class SessionManager {
   public destroy(): void {
     if (this.isActive) {
       this.isActive = false;
-      SecurityManager.clearSecurityData();
       console.log("Session destroyed successfully");
     }
   }
