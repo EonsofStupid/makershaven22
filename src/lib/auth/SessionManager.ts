@@ -20,7 +20,7 @@ export class SessionManager {
     return SessionManager.instance;
   }
 
-  public startSession(): void {
+  public initialize(): void {
     if (this.initialized) {
       console.log('Session already initialized');
       return;
@@ -29,7 +29,12 @@ export class SessionManager {
     console.log('Session started');
   }
 
-  public destroy(): void {
+  public clearSecurityData(): void {
+    this.initialized = false;
+    console.log('Security data cleared');
+  }
+
+  public cleanup(): void {
     this.initialized = false;
     console.log('Session destroyed');
   }

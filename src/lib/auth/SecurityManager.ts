@@ -1,10 +1,10 @@
-import { SessionManager, sessionManager } from './SessionManager';
+import { sessionManager } from './SessionManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export class SecurityManager {
   private static instance: SecurityManager;
-  private sessionManager: SessionManager;
+  private sessionManager: typeof sessionManager;
 
   private constructor() {
     this.sessionManager = sessionManager;
@@ -15,6 +15,18 @@ export class SecurityManager {
       SecurityManager.instance = new SecurityManager();
     }
     return SecurityManager.instance;
+  }
+
+  public initialize(): void {
+    console.log('Initializing security manager');
+  }
+
+  public clearSecurityData(): void {
+    console.log('Clearing security data');
+  }
+
+  public cleanup(): void {
+    console.log('Cleaning up security manager');
   }
 
   public async validateSession(): Promise<boolean> {
