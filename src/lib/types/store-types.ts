@@ -1,6 +1,5 @@
 import type { Session, User } from '@supabase/supabase-js';
 import type { Settings } from '@/components/admin/settings/types';
-import type { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types/workflow';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
@@ -30,20 +29,6 @@ export interface AuthState {
   setError: (error: Error | null) => void;
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
-  reset: () => void;
-}
-
-export interface WorkflowState {
-  templates: WorkflowTemplate[];
-  activeTemplate: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  initialize: () => Promise<void>;
-  handleTemplateUpdate: (template: WorkflowTemplate) => Promise<void>;
-  setTemplates: (templates: WorkflowTemplate[]) => void;
-  setActiveTemplate: (template: WorkflowTemplate | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
   reset: () => void;
 }
 
