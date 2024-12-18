@@ -1,6 +1,6 @@
 import { Json } from '../core/json';
-import { WorkflowStageType } from '../core/enums';
-import { BaseEntity, UserOwnedEntity } from '../core/base';
+
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
 export interface WorkflowStage {
   id: string;
@@ -11,7 +11,7 @@ export interface WorkflowStage {
   description?: string;
 }
 
-export interface WorkflowTemplate extends UserOwnedEntity {
+export interface WorkflowTemplate {
   id: string;
   name: string;
   description?: string;
@@ -57,6 +57,13 @@ export interface WorkflowStageConfig {
   }>;
 }
 
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
+
 export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
@@ -65,19 +72,20 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
       return {
         id: crypto.randomUUID(),
         name: '',
-        type: 'TASK' as WorkflowStageType,
+        type: 'task' as WorkflowStageType,
         order: 0,
         config: {},
       };
     }
 
+    const stageObj = stage as Record<string, any>;
     return {
-      id: String(stage.id || crypto.randomUUID()),
-      name: String(stage.name || ''),
-      type: (stage.type as WorkflowStageType) || 'TASK',
-      order: Number(stage.order || 0),
-      config: stage.config as WorkflowStageConfig || {},
-      description: stage.description ? String(stage.description) : undefined
+      id: String(stageObj.id || crypto.randomUUID()),
+      name: String(stageObj.name || ''),
+      type: (stageObj.type as WorkflowStageType) || 'task',
+      order: Number(stageObj.order || 0),
+      config: stageObj.config as WorkflowStageConfig || {},
+      description: stageObj.description ? String(stageObj.description) : undefined
     };
   });
 };
@@ -85,12 +93,12 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,
-    steps: template.steps.map(step => ({
-      ...step,
-      id: step.id.toString(),
-      type: step.type.toString(),
-      order: Number(step.order),
-      config: step.config || {}
+    stages: template.stages?.map(stage => ({
+      ...stage,
+      id: stage.id.toString(),
+      type: stage.type.toString(),
+      order: Number(stage.order),
+      config: stage.config || {}
     }))
   } as unknown as Json;
 };

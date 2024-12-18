@@ -1,14 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { WorkflowTemplate } from '@/integrations/supabase/types/workflow/types';
 
 interface WorkflowState {
-  workflows: any[];
-  activeWorkflow: any | null;
+  workflows: WorkflowTemplate[];
+  activeWorkflows: Record<string, WorkflowTemplate>;
   workflowHistory: Record<string, Array<{ action: string; timestamp: string }>>;
   isLoading: boolean;
   error: string | null;
-  setWorkflows: (workflows: any[]) => void;
-  setActiveWorkflow: (id: string, workflow: any) => void;
+  setWorkflows: (workflows: WorkflowTemplate[]) => void;
+  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
   addToHistory: (id: string, entry: { action: string; timestamp: string }) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
@@ -16,20 +17,24 @@ interface WorkflowState {
 
 export const useWorkflowStore = create<WorkflowState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       workflows: [],
-      activeWorkflow: null,
+      activeWorkflows: {},
       workflowHistory: {},
       isLoading: false,
       error: null,
       setWorkflows: (workflows) => set({ workflows }),
-      setActiveWorkflow: (id, workflow) => set({ activeWorkflow: workflow }),
-      addToHistory: (id, entry) => set((state) => ({
-        workflowHistory: {
-          ...state.workflowHistory,
-          [id]: [...(state.workflowHistory[id] || []), entry]
-        }
-      })),
+      setActiveWorkflow: (id, workflow) => 
+        set((state) => ({
+          activeWorkflows: { ...state.activeWorkflows, [id]: workflow }
+        })),
+      addToHistory: (id, entry) => 
+        set((state) => ({
+          workflowHistory: {
+            ...state.workflowHistory,
+            [id]: [...(state.workflowHistory[id] || []), entry]
+          }
+        })),
       setLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
     }),
@@ -37,5 +42,4 @@ export const useWorkflowStore = create<WorkflowState>()(
   )
 );
 
-// Re-export for compatibility
 export const useAppStore = useWorkflowStore;
