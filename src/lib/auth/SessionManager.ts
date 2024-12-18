@@ -1,23 +1,23 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface SessionState {
+export interface SessionState {
   session: any | null;
   setSession: (session: any | null) => void;
   clearSession: () => void;
 }
 
-class SessionManagerClass {
-  private static instance: SessionManagerClass;
+export class SessionManager {
+  private static instance: SessionManager;
   private initialized: boolean = false;
 
   private constructor() {}
 
-  public static getInstance(): SessionManagerClass {
-    if (!SessionManagerClass.instance) {
-      SessionManagerClass.instance = new SessionManagerClass();
+  public static getInstance(): SessionManager {
+    if (!SessionManager.instance) {
+      SessionManager.instance = new SessionManager();
     }
-    return SessionManagerClass.instance;
+    return SessionManager.instance;
   }
 
   public startSession(): void {
@@ -35,7 +35,7 @@ class SessionManagerClass {
   }
 }
 
-export const sessionManager = SessionManagerClass.getInstance();
+export const sessionManager = SessionManager.getInstance();
 
 export const useSessionStore = create<SessionState>()(
   persist(

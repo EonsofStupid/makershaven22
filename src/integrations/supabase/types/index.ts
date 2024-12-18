@@ -15,23 +15,15 @@ export type {
   WorkflowStage, 
   WorkflowStageConfig,
   WorkflowTemplate,
-  serializeWorkflowTemplate,
-  parseWorkflowStages
 } from './workflow';
 
 // Settings types
 export type { 
   Settings, 
   SettingsUpdateParams,
-  SettingsResponse 
+  SettingsResponse,
+  ThemeSettings 
 } from './settings';
-
-// Theme types
-export type { 
-  ThemeSettings, 
-  ThemeState,
-  ThemeMode as ThemeModeType 
-} from './theme';
 
 // Content types
 export type { 
