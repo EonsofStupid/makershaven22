@@ -3,6 +3,8 @@ import { useRedisStore } from '@/lib/store/redis-store';
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Server } from 'lucide-react';
 
 export const RedisConnectionForm = () => {
   const { config, updateConfig } = useRedisStore();
@@ -14,6 +16,17 @@ export const RedisConnectionForm = () => {
 
   return (
     <CardContent className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Server className="w-4 h-4 text-muted-foreground" />
+          <span>Enable Redis</span>
+        </div>
+        <Switch
+          checked={config.enabled}
+          onCheckedChange={(checked) => updateConfig({ enabled: checked })}
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="host">Redis Host</Label>
         <Input

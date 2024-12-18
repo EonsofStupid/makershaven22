@@ -1182,6 +1182,50 @@ export type Database = {
         }
         Relationships: []
       }
+      redis_connection_states: {
+        Row: {
+          connection_id: string
+          created_at: string | null
+          id: string
+          last_connected: string | null
+          last_error: string | null
+          metadata: Json | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string | null
+          id?: string
+          last_connected?: string | null
+          last_error?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string | null
+          id?: string
+          last_connected?: string | null
+          last_error?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "redis_connection_states_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       revision_history: {
         Row: {
           changes: Json
