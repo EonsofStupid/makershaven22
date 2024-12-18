@@ -36,6 +36,11 @@ const App = () => {
                         actionButton: "group-[.toast]:bg-[#41f0db]/20 group-[.toast]:text-white",
                         cancelButton: "group-[.toast]:bg-white/10 group-[.toast]:text-white",
                       },
+                      duration: 4000,
+                      style: {
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                      }
                     }}
                   />
                 </AuthProvider>
