@@ -36,4 +36,4 @@ export const settingsSchema = z.object({
   theme_mode: z.enum(["light", "dark", "system"]).optional(),
 });
 
-export type SettingsSchemaType = z.infer<typeof settingsSchema>;
+export type SettingsSchema = z.infer<typeof settingsSchema>;

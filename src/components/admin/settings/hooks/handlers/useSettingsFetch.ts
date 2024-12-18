@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Settings } from "../../types";
-import { toast } from "sonner";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -16,7 +15,6 @@ export const useSettingsFetch = () => {
 
       if (error) {
         console.error("Error fetching settings:", error);
-        toast.error("Failed to load site settings");
         throw error;
       }
 
@@ -26,9 +24,6 @@ export const useSettingsFetch = () => {
         primary_color: data.primary_color,
         secondary_color: data.secondary_color,
         accent_color: data.accent_color,
-        logo_url: data.logo_url,
-        favicon_url: data.favicon_url,
-        theme_mode: data.theme_mode as "light" | "dark" | "system" | undefined,
         text_primary_color: data.text_primary_color,
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,
@@ -48,12 +43,15 @@ export const useSettingsFetch = () => {
         font_weight_bold: data.font_weight_bold,
         line_height_base: data.line_height_base,
         letter_spacing: data.letter_spacing,
-        transition_type: data.transition_type,
-        menu_animation_type: data.menu_animation_type,
         box_shadow: data.box_shadow,
         backdrop_blur: data.backdrop_blur,
+        logo_url: data.logo_url,
+        favicon_url: data.favicon_url,
         updated_at: data.updated_at,
         updated_by: data.updated_by,
+        transition_type: data.transition_type || "fade",
+        menu_animation_type: data.menu_animation_type || "fade",
+        theme_mode: data.theme_mode || "dark",
       };
 
       return settings;
