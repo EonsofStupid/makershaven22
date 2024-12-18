@@ -2,13 +2,6 @@ import { Json } from '../core/json';
 import { WorkflowStageType } from '../core/enums';
 import { BaseEntity, UserOwnedEntity } from '../core/base';
 
-export interface WorkflowTemplate extends UserOwnedEntity {
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  is_active?: boolean;
-}
-
 export interface WorkflowStage {
   id: string;
   name: string;
@@ -16,6 +9,20 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
+}
+
+export interface WorkflowTemplate extends UserOwnedEntity {
+  id: string;
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+  email?: string;
+  triggers?: Json;
 }
 
 export interface WorkflowStageConfig {
@@ -54,7 +61,7 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => {
-    if (typeof stage !== 'object' || stage === null) {
+    if (typeof stage !== 'object' || !stage) {
       return {
         id: crypto.randomUUID(),
         name: '',

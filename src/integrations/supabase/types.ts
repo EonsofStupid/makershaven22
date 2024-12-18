@@ -317,7 +317,9 @@ export type Database = {
           id: string
           metadata: Json | null
           publish_status: string | null
+          rollback_from: string | null
           rollback_metadata: Json | null
+          scheduled_publish_at: string | null
           version_number: number | null
         }
         Insert: {
@@ -329,7 +331,9 @@ export type Database = {
           id?: string
           metadata?: Json | null
           publish_status?: string | null
+          rollback_from?: string | null
           rollback_metadata?: Json | null
+          scheduled_publish_at?: string | null
           version_number?: number | null
         }
         Update: {
@@ -341,7 +345,9 @@ export type Database = {
           id?: string
           metadata?: Json | null
           publish_status?: string | null
+          rollback_from?: string | null
           rollback_metadata?: Json | null
+          scheduled_publish_at?: string | null
           version_number?: number | null
         }
         Relationships: [
@@ -357,6 +363,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_content_revisions_rollback_from_fkey"
+            columns: ["rollback_from"]
+            isOneToOne: false
+            referencedRelation: "cms_content_revisions"
             referencedColumns: ["id"]
           },
         ]
@@ -1149,6 +1162,41 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          action: string
+          count: number | null
+          created_at: string | null
+          id: string
+          last_reset: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          last_reset?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          count?: number | null
+          created_at?: string | null
+          id?: string
+          last_reset?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rate_limits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recovery_codes: {
         Row: {
           attempts: number | null
@@ -1326,6 +1374,7 @@ export type Database = {
           event_type: string
           id: string
           ip_address: string | null
+          metadata: Json | null
           severity: string
           user_agent: string | null
           user_id: string | null
@@ -1336,6 +1385,7 @@ export type Database = {
           event_type: string
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           severity: string
           user_agent?: string | null
           user_id?: string | null
@@ -1346,6 +1396,7 @@ export type Database = {
           event_type?: string
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           severity?: string
           user_agent?: string | null
           user_id?: string | null
@@ -1595,7 +1646,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           stages?: Json | null
-          steps: Json
+          steps?: Json
           updated_at?: string | null
         }
         Update: {
@@ -1685,6 +1736,12 @@ export type Database = {
           p_stack_trace?: string
         }
         Returns: string
+      }
+      parse_workflow_stages: {
+        Args: {
+          data: Json
+        }
+        Returns: Json
       }
       record_user_activity: {
         Args: {

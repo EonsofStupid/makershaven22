@@ -1,5 +1,5 @@
 // Base types
-export type { Json, JsonObject, JsonArray } from './base/json';
+export type { Json, JsonObject, JsonArray } from './core/json';
 export type { 
   UserRole, 
   ContentStatus, 
@@ -8,38 +8,28 @@ export type {
   ThemeMode,
   TransitionType,
   PostCategory 
-} from './base/enums';
+} from './core/enums';
+
+// Core types
+export type { BaseEntity, UserOwnedEntity, MetadataEntity } from './core/base';
 
 // Workflow types
 export type { 
   WorkflowStage, 
   WorkflowStageConfig,
   WorkflowTemplate,
-} from './workflow';
+} from './workflow/types';
 
 // Settings types
 export type { 
   Settings, 
   SettingsUpdateParams,
   SettingsResponse,
-  ThemeSettings 
-} from './settings';
+} from './settings/types';
 
 // Content types
 export type { 
   BaseContent, 
   ContentWithAuthor,
   ContentRevision 
-} from './content';
-
-// Security types
-export type { SecurityLog } from './security';
-
-// Auth types
-export type { 
-  AuthStore, 
-  AuthUser, 
-  AuthSession,
-  SessionConfig,
-  SessionState 
-} from './auth';
+} from './content/types';
