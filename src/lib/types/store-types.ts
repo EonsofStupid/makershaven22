@@ -1,13 +1,23 @@
 import type { Session, User } from '@supabase/supabase-js';
-import type { Settings } from '@/components/admin/settings/types';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type Status = 'idle' | 'loading' | 'error' | 'success';
+
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
+export interface StoreError {
+  code: string;
+  message: string;
+  details?: unknown;
+}
 
 export interface AuthUser extends User {
   role?: UserRole;
-  username?: string;
-  displayName?: string;
-  avatarUrl?: string;
+  display_name?: string;
+  avatar_url?: string;
 }
 
 export interface AuthSession extends Session {
@@ -18,35 +28,18 @@ export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
   isTransitioning: boolean;
+  error: StoreError | null;
+  isOffline: boolean;
+  
+  // Actions
   initialize: () => Promise<void>;
   handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
+  setError: (error: StoreError | null) => void;
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
-}
-
-export interface ThemeState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: 'light' | 'dark' | 'system';
-  themeMode: 'light' | 'dark' | 'system';
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
-  systemTheme: 'light' | 'dark';
-  setSystemTheme: (theme: 'light' | 'dark') => void;
-  effectiveTheme: 'light' | 'dark';
-  cssVariables: Record<string, string>;
-  setSettings: (settings: Settings) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  updateSettings: (settings: Settings) => Promise<void>;
-  updateTheme: (settings: Settings) => Promise<void>;
 }
