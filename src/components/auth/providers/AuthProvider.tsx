@@ -4,8 +4,7 @@ import { useAuthSetup } from '@/hooks/useAuthSetup';
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
-import { sessionManager } from "@/lib/auth/SessionManager";
-import { securityManager } from "@/lib/auth/SecurityManager";
+import { authManager } from "@/lib/auth/AuthManager";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
@@ -41,13 +40,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize security systems first
+        // Initialize auth manager
         try {
-          sessionManager.startSession();
-          securityManager.initialize();
-          console.log('Security systems initialized');
+          await authManager.startSession();
+          console.log('Auth manager initialized');
         } catch (securityError) {
-          console.error('Error initializing security systems:', securityError);
+          console.error('Error initializing auth manager:', securityError);
           // Continue with auth setup even if security init fails
         }
 
@@ -99,8 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
-      sessionManager.destroy();
-      securityManager.cleanup();
+      authManager.destroy();
     };
   }, [handleAuthChange]);
 

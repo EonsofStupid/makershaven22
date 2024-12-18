@@ -80,8 +80,7 @@ class AuthManager {
         user_id: userId,
         event_type: eventType,
         severity,
-        details,
-        ip_address: null // In a real app, you'd get this from the request
+        details
       });
     } catch (error) {
       console.error('Failed to log security event:', error);

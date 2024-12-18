@@ -3,11 +3,10 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from "sonner";
 import { useSessionManagement } from './auth/useSessionManagement';
 import { useAuthValidation } from './auth/useAuthValidation';
-import { handleSecurityEvent, handleSessionTimeout } from '@/utils/auth/securityHandlers';
+import { handleSecurityEvent } from '@/utils/auth/securityHandlers';
 import { supabase } from "@/integrations/supabase/client";
 import { attachCSRFToken, clearCSRFToken } from '@/utils/auth/csrfProtection';
-import { sessionManager } from '@/lib/auth/SessionManager';
-import { securityManager } from '@/lib/auth/SecurityManager';
+import { authManager } from '@/lib/auth/AuthManager';
 
 export const useAuthSetup = () => {
   const { setLoading, setError } = useAuthStore();
@@ -35,37 +34,15 @@ export const useAuthSetup = () => {
         try {
           await attachCSRFToken();
           await validateAuthAttempt(session);
-          
-          // Initialize security managers
-          await sessionManager.startSession();
-          securityManager.initialize();
+          await authManager.startSession();
           
         } catch (validationError) {
           console.error('Auth validation failed:', validationError);
           clearCSRFToken();
-          sessionManager.destroy();
-          securityManager.clearSecurityData();
+          authManager.destroy();
           await supabase.auth.signOut();
           throw validationError;
         }
-
-        sessionTimeoutRef.current = handleSessionTimeout(async () => {
-          console.log('Session timeout - attempting refresh');
-          try {
-            const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
-            
-            if (refreshError || !refreshResult.session) {
-              throw new Error(refreshError?.message || 'Session refresh failed');
-            }
-          } catch (refreshError) {
-            console.error('Session refresh failed:', refreshError);
-            clearCSRFToken();
-            sessionManager.destroy();
-            securityManager.clearSecurityData();
-            await supabase.auth.signOut();
-            toast.error('Session expired. Please sign in again.');
-          }
-        });
 
         await handleSessionUpdate(session);
         
@@ -74,8 +51,7 @@ export const useAuthSetup = () => {
         retryAttempts.current = 0;
       } else {
         clearCSRFToken();
-        sessionManager.destroy();
-        securityManager.clearSecurityData();
+        authManager.destroy();
         await handleSessionUpdate(session);
         toast.success('Signed out successfully');
       }
