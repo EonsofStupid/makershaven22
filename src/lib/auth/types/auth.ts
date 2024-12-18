@@ -1,54 +1,26 @@
-export interface SessionConfig {
-  refreshInterval: number;
-  sessionTimeout: number;
-  storageKey: string;
-  onSessionExpired?: () => void;
-  onRefreshError?: (error: Error) => void;
-}
+export type SecurityEventSeverity = 'info' | 'warning' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
 
-export interface SessionState {
-  isAuthenticated: boolean;
-  lastActivity: Date;
-  token?: string;
-}
-
-export type SessionEventType = 'mousedown' | 'keydown' | 'touchstart' | 'scroll';
-
-export interface AuthState {
-  isLoading: boolean;
-  hasAccess: boolean;
-  error: Error | { message: string } | null;
-  isTransitioning?: boolean;
-}
-
-export interface AuthUser {
+export interface SecurityEvent {
   id: string;
-  email?: string | null;
-  role?: string;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  type: string;
+  severity: SecurityEventSeverity;
+  category: SecurityEventCategory;
+  timestamp: string;
+  userId?: string;
+  metadata?: Record<string, any>;
 }
 
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
-}
-
-export interface AuthStore {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+export interface SecurityLog {
+  id: string;
+  event_type: string;
+  ip_address: string | null;
+  user_id: string | null;
+  created_at: string;
+  metadata: Record<string, any>;
+  user_agent: string | null;
+  profiles?: {
+    username: string | null;
+    display_name: string | null;
+  } | null;
 }
