@@ -3,7 +3,7 @@ export type JsonArray = Json[];
 export type JsonObject = { [key: string]: Json | undefined };
 export type Json = JsonPrimitive | JsonObject | JsonArray;
 
-// Type guards for runtime type checking
+// Type guards
 export const isJsonPrimitive = (value: unknown): value is JsonPrimitive => {
   return value === null || 
     typeof value === "string" || 
@@ -24,17 +24,4 @@ export const isJsonObject = (value: unknown): value is JsonObject => {
 
 export const isJson = (value: unknown): value is Json => {
   return isJsonPrimitive(value) || isJsonArray(value) || isJsonObject(value);
-};
-
-// Type assertion helper
-export const assertJson = <T extends Json>(value: unknown): T => {
-  if (!isJson(value)) {
-    throw new Error('Value is not valid JSON');
-  }
-  return value as T;
-};
-
-// Utility type for working with JSON data
-export type JsonData<T> = {
-  [P in keyof T]: T[P] extends Json ? T[P] : never;
 };
