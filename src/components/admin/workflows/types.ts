@@ -1,13 +1,45 @@
-import { Json } from '@/integrations/supabase/types';
+import { Json } from "@/integrations/supabase/types";
 
 export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: any;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
+}
 
 export interface WorkflowStage {
   id: string;
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: Record<string, any>;
+  config: WorkflowStageConfig;
   description?: string;
 }
 
@@ -28,6 +60,13 @@ export interface WorkflowFormData {
   description: string;
   stages: WorkflowStage[];
   is_active?: boolean;
+}
+
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
 }
 
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
@@ -65,6 +104,16 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   };
 };
 
+export const isValidStageUpdate = (update: Partial<WorkflowStage>): boolean => {
+  if (!update.id) return false;
+  if (update.name !== undefined && !update.name.trim()) return false;
+  return true;
+};
+
+export const createStageUpdate = (stageId: string, updates: Partial<WorkflowStage>): Partial<WorkflowStage> => {
+  return { id: stageId, ...updates };
+};
+
 export const serializeStages = (stages: WorkflowStage[]): Json => {
   return stages as unknown as Json;
 };
@@ -77,7 +126,7 @@ export const parseStages = (data: Json): WorkflowStage[] => {
     name: typeof stage === 'object' && stage !== null ? String(stage.name || '') : '',
     type: typeof stage === 'object' && stage !== null ? (stage.type as WorkflowStageType || 'task') : 'task',
     order: typeof stage === 'object' && stage !== null ? Number(stage.order || 0) : 0,
-    config: typeof stage === 'object' && stage !== null ? (stage.config as Record<string, any> || {}) : {},
+    config: typeof stage === 'object' && stage !== null ? (stage.config as WorkflowStageConfig || {}) : {},
     description: typeof stage === 'object' && stage !== null ? String(stage.description || '') : undefined
   }));
 };
