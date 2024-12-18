@@ -1,45 +1,29 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { toast } from 'sonner';
 
 interface WorkflowState {
-  activeWorkflows: Record<string, any>;
-  workflowHistory: Record<string, any[]>;
-  setActiveWorkflow: (id: string, data: any) => void;
-  addToHistory: (id: string, data: any) => void;
-  clearWorkflowHistory: (id: string) => void;
-  reset: () => void;
+  workflows: any[];
+  activeWorkflow: any | null;
+  isLoading: boolean;
+  error: string | null;
+  setWorkflows: (workflows: any[]) => void;
+  setActiveWorkflow: (workflow: any | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
-export const useAppStore = create<WorkflowState>()(
+export const useWorkflowStore = create<WorkflowState>()(
   persist(
-    (set, get) => ({
-      activeWorkflows: {},
-      workflowHistory: {},
-      setActiveWorkflow: (id, data) => 
-        set((state) => ({ 
-          activeWorkflows: { ...state.activeWorkflows, [id]: data }
-        })),
-      addToHistory: (id, data) =>
-        set((state) => ({
-          workflowHistory: {
-            ...state.workflowHistory,
-            [id]: [...(state.workflowHistory[id] || []), data]
-          }
-        })),
-      clearWorkflowHistory: (id) =>
-        set((state) => {
-          const { [id]: _, ...rest } = state.workflowHistory;
-          return { workflowHistory: rest };
-        }),
-      reset: () => set({ activeWorkflows: {}, workflowHistory: {} }),
+    (set) => ({
+      workflows: [],
+      activeWorkflow: null,
+      isLoading: false,
+      error: null,
+      setWorkflows: (workflows) => set({ workflows }),
+      setActiveWorkflow: (workflow) => set({ activeWorkflow: workflow }),
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => set({ error }),
     }),
-    {
-      name: 'workflow-storage',
-      partialize: (state) => ({ 
-        activeWorkflows: state.activeWorkflows,
-        workflowHistory: state.workflowHistory 
-      }),
-    }
+    { name: 'workflow-store' }
   )
 );
