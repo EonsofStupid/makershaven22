@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { useNavigationStore } from "../NavigationState";
-import { useSettingsStore } from "@/lib/store/settings-store";
+import { useAuthStore } from "@/lib/store/settings-store";
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -11,7 +11,7 @@ interface NavigationContainerProps {
 
 export const NavigationContainer = ({ children }: NavigationContainerProps) => {
   const { isScrolled, mousePosition, setIsScrolled, setMousePosition } = useNavigationStore();
-  const { settings } = useSettingsStore();
+  const { settings } = useAuthStore();
 
   // Handle scroll effects
   useEffect(() => {

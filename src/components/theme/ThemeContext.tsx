@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { useSettingsStore } from "@/lib/store/settings-store";
+import { useAuthStore } from "@/lib/store/settings-store";
 import type { Settings } from "@/components/admin/settings/types";
 
 interface ThemeContextType {
@@ -10,7 +10,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { settings, updateSettings } = useSettingsStore();
+  const { settings, updateSettings } = useAuthStore();
 
   const value = {
     theme: settings,

@@ -1,10 +1,10 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
-import { useSettingsStore } from '@/lib/store/settings-store';
+import { useAuthStore } from '@/lib/store/settings-store';
 import { SettingsFormContainer } from "./components/SettingsFormContainer";
 
 export const SettingsForm = () => {
-  const isLoading = useSettingsStore((state) => state.isLoading);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   if (isLoading) {
     return (
