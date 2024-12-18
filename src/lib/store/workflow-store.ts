@@ -1,45 +1,25 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { WorkflowTemplate } from '@/integrations/supabase/types/workflow/types';
+import { WorkflowState, WorkflowTemplate } from './types/workflow';
 
-interface WorkflowState {
-  workflows: WorkflowTemplate[];
-  activeWorkflows: Record<string, WorkflowTemplate>;
-  workflowHistory: Record<string, Array<{ action: string; timestamp: string }>>;
-  isLoading: boolean;
-  error: string | null;
-  setWorkflows: (workflows: WorkflowTemplate[]) => void;
-  setActiveWorkflow: (id: string, workflow: WorkflowTemplate) => void;
-  addToHistory: (id: string, entry: { action: string; timestamp: string }) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
-}
+export const useWorkflowStore = create<WorkflowState>((set) => ({
+  workflows: [],
+  activeWorkflow: null,
+  isLoading: false,
+  error: null,
 
-export const useWorkflowStore = create<WorkflowState>()(
-  persist(
-    (set) => ({
-      workflows: [],
-      activeWorkflows: {},
-      workflowHistory: {},
-      isLoading: false,
-      error: null,
-      setWorkflows: (workflows) => set({ workflows }),
-      setActiveWorkflow: (id, workflow) => 
-        set((state) => ({
-          activeWorkflows: { ...state.activeWorkflows, [id]: workflow }
-        })),
-      addToHistory: (id, entry) => 
-        set((state) => ({
-          workflowHistory: {
-            ...state.workflowHistory,
-            [id]: [...(state.workflowHistory[id] || []), entry]
-          }
-        })),
-      setLoading: (isLoading) => set({ isLoading }),
-      setError: (error) => set({ error }),
-    }),
-    { name: 'workflow-store' }
-  )
-);
-
-export const useAppStore = useWorkflowStore;
+  setWorkflows: (workflows) => set({ workflows }),
+  setActiveWorkflow: (workflow) => set({ activeWorkflow: workflow }),
+  addWorkflow: (workflow) => set((state) => ({ 
+    workflows: [...state.workflows, workflow] 
+  })),
+  updateWorkflow: (id, updates) => set((state) => ({
+    workflows: state.workflows.map((w) => 
+      w.id === id ? { ...w, ...updates } : w
+    )
+  })),
+  deleteWorkflow: (id) => set((state) => ({
+    workflows: state.workflows.filter((w) => w.id !== id)
+  })),
+  setLoading: (loading) => set({ isLoading: loading }),
+  setError: (error) => set({ error })
+}));
