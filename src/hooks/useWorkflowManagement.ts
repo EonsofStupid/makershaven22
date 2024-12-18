@@ -24,14 +24,14 @@ export const useWorkflowManagement = () => {
     mutationFn: async (workflow: Partial<WorkflowTemplate>) => {
       const { data, error } = await supabase
         .from('cms_workflows')
-        .insert(workflow)
+        .insert({ ...workflow, name: workflow.name || 'New Workflow' })
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['workflows'] });
-      setActiveWorkflow(data.id, data);
+      setActiveWorkflow(data.id, data as WorkflowTemplate);
       toast.success('Workflow created successfully!');
     },
     onError: (error) => {

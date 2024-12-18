@@ -86,7 +86,7 @@ export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
     order: stage.order,
     config: stage.config,
     description: stage.description
-  };
+  } as unknown as Json;
 };
 
 export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
@@ -95,5 +95,5 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
 };
 
 export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
-  return stages.map(serializeWorkflowStage);
+  return stages.map(serializeWorkflowStage) as unknown as Json;
 };
