@@ -18,10 +18,12 @@ export interface AuthUser extends User {
   role?: UserRole;
   display_name?: string;
   avatar_url?: string;
+  user_metadata?: Record<string, any>;
 }
 
 export interface AuthSession extends Session {
   user: AuthUser;
+  token_type: string;
 }
 
 export interface AuthState {
@@ -31,6 +33,7 @@ export interface AuthState {
   isTransitioning: boolean;
   error: StoreError | null;
   isOffline: boolean;
+  initialSetupDone: boolean;
   
   // Actions
   initialize: () => Promise<void>;
@@ -42,4 +45,24 @@ export interface AuthState {
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
+}
+
+export interface SyncState {
+  lastSynced: Date | null;
+  isSyncing: boolean;
+  syncError: StoreError | null;
+  pendingChanges: number;
+}
+
+export interface AuditInfo {
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export interface Result<T> {
+  data?: T;
+  error?: StoreError;
+  validation?: ValidationError[];
 }
