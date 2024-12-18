@@ -3,11 +3,11 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/
 import { Input } from "@/components/ui/input";
 import { ColorPicker } from "./ColorPicker";
 import { UseFormReturn } from "react-hook-form";
-import { Settings } from "@/integrations/supabase/types";
+import { SettingsFormData } from "../types";
 import { CSSEffectsControl } from "./CSSEffectsControl";
 
 interface AdvancedCSSSectionProps {
-  form: UseFormReturn<Settings>;
+  form: UseFormReturn<SettingsFormData>;
 }
 
 export const AdvancedCSSSection: React.FC<AdvancedCSSSectionProps> = ({ form }) => {

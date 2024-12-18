@@ -2,10 +2,10 @@ import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ColorPicker } from "./ColorPicker";
 import { UseFormReturn } from "react-hook-form";
-import { Settings } from "@/integrations/supabase/types";
+import { SettingsFormData } from "../types";
 
 interface NeonColorsSectionProps {
-  form: UseFormReturn<Settings>;
+  form: UseFormReturn<SettingsFormData>;
 }
 
 export const NeonColorsSection: React.FC<NeonColorsSectionProps> = ({ form }) => {

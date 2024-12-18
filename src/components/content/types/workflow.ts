@@ -1,32 +1,45 @@
-import type { WorkflowStage, WorkflowTemplate } from '@/integrations/supabase/types/workflow/types';
+import { Json } from "@/integrations/supabase/types";
+
+export interface WorkflowStep {
+  id: string;
+  name: string;
+  type: string;
+  config: Json;
+  [key: string]: Json; // Add index signature for Json compatibility
+}
 
 export interface WorkflowFormData {
   name: string;
   description: string;
-  steps: WorkflowStage[];
+  steps: WorkflowStep[];
 }
 
-export type { WorkflowStage, WorkflowTemplate };
+export interface WorkflowData {
+  id: string;
+  name: string;
+  description: string | null;
+  steps: Json;
+  triggers?: Json;
+  created_by?: string;
+  updated_at?: string;
+}
 
-export const parseWorkflowSteps = (data: any[]): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data.map(step => ({
-    id: step.id || crypto.randomUUID(),
+export interface ParsedWorkflowData extends Omit<WorkflowData, 'steps'> {
+  steps: WorkflowStep[];
+}
+
+// Helper function to convert between types
+export const parseWorkflowSteps = (steps: Json): WorkflowStep[] => {
+  if (!Array.isArray(steps)) return [];
+  return steps.map((step: any) => ({
+    id: step.id || '',
     name: step.name || '',
-    type: step.type || 'TASK',
-    order: step.order || 0,
+    type: step.type || '',
     config: step.config || {},
-    description: step.description
+    ...step
   }));
 };
 
-export const serializeWorkflowSteps = (steps: WorkflowStage[]): any[] => {
-  return steps.map(step => ({
-    ...step,
-    id: step.id.toString(),
-    type: step.type.toString(),
-    order: Number(step.order),
-    config: step.config || {}
-  }));
+export const serializeWorkflowSteps = (steps: WorkflowStep[]): Json => {
+  return steps as Json;
 };

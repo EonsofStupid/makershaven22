@@ -1,4 +1,4 @@
-import { Json } from "@/integrations/supabase/types";
+import { Json } from '@/integrations/supabase/types';
 
 export interface SecuritySettings extends Record<string, Json> {
   ip_whitelist: string[];

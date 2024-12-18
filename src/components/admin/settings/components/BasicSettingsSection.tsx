@@ -2,11 +2,11 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormRegister, FormState } from "react-hook-form";
-import { Settings } from "@/integrations/supabase/types";
+import { SettingsFormData } from "../types";
 
 interface BasicSettingsSectionProps {
-  register: UseFormRegister<Settings>;
-  formState: FormState<Settings>;
+  register: UseFormRegister<SettingsFormData>;
+  formState: FormState<SettingsFormData>;
 }
 
 export const BasicSettingsSection: React.FC<BasicSettingsSectionProps> = ({

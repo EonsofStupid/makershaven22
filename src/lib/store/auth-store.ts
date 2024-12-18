@@ -1,149 +1,82 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
-import type { AuthState, AuthUser, AuthSession } from '../types/store-types';
-import { toast } from 'sonner';
+import { persist } from 'zustand/middleware';
+import type { AuthStore, AuthUser, AuthSession } from '@/lib/auth/types/auth';
+import { supabase } from "@/integrations/supabase/client";
+import { sessionManager } from '@/lib/auth/SessionManager';
+import { securityManager } from '@/lib/auth/SecurityManager';
+import { authLogger } from '@/lib/auth/AuthLogger';
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  session: null,
-  user: null,
-  isLoading: true,
-  error: null,
-  isOffline: false,
-  isTransitioning: false,
-
-  initialize: async () => {
-    try {
-      console.log("Initializing auth...");
-      set({ isLoading: true });
-
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error("Session error:", sessionError);
-        throw sessionError;
-      }
-
-      if (session?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          // Don't throw here, just log the error
-          toast.error("Failed to load user profile");
-        }
-
-        // Merge auth user with profile data
-        const enrichedUser: AuthUser = {
-          ...session.user,
-          role: profile?.role || 'subscriber',
-          username: profile?.username,
-          displayName: profile?.display_name,
-          avatarUrl: profile?.avatar_url,
-        };
-
-        const enrichedSession: AuthSession = {
-          ...session,
-          user: enrichedUser,
-        };
-
-        set({ 
-          session: enrichedSession,
-          user: enrichedUser,
-          isLoading: false 
-        });
-      } else {
-        set({ 
-          session: null,
-          user: null,
-          isLoading: false 
-        });
-      }
-    } catch (error) {
-      console.error("Auth initialization error:", error);
-      set({ 
-        error: error as Error,
-        isLoading: false 
-      });
-      toast.error("Failed to initialize authentication");
-    }
-  },
-
-  handleSessionUpdate: async (session: AuthSession | null) => {
-    try {
-      if (session?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          toast.error("Failed to load user profile");
-          return;
-        }
-
-        const enrichedUser: AuthUser = {
-          ...session.user,
-          role: profile?.role || 'subscriber',
-          username: profile?.username,
-          displayName: profile?.display_name,
-          avatarUrl: profile?.avatar_url,
-        };
-
-        const enrichedSession: AuthSession = {
-          ...session,
-          user: enrichedUser,
-        };
-
-        set({ session: enrichedSession, user: enrichedUser });
-      } else {
-        set({ session: null, user: null });
-      }
-    } catch (error) {
-      console.error("Session update error:", error);
-      toast.error("Failed to update session");
-    }
-  },
-
-  setSession: (session: AuthSession | null) => set({ session }),
-  setUser: (user: AuthUser | null) => set({ user }),
-  setLoading: (isLoading: boolean) => set({ isLoading }),
-  setError: (error: Error | null) => set({ error }),
-  setOffline: (isOffline: boolean) => set({ isOffline }),
-
-  signOut: async () => {
-    try {
-      set({ isTransitioning: true });
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      set({ 
-        session: null,
-        user: null,
-        isTransitioning: false 
-      });
-      
-      toast.success("Signed out successfully");
-    } catch (error) {
-      console.error("Sign out error:", error);
-      set({ isTransitioning: false });
-      toast.error("Failed to sign out");
-    }
-  },
-
-  reset: () => {
-    set({
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
       session: null,
       user: null,
-      isLoading: false,
+      isLoading: true,
       error: null,
-      isOffline: false,
-      isTransitioning: false,
-    });
-  },
-}));
+      isOffline: !navigator.onLine,
+      setSession: (session) => {
+        authLogger.info('Setting session', { userId: session?.user?.id });
+        set({ session });
+      },
+      setUser: (user) => {
+        authLogger.info('Setting user', { userId: user?.id });
+        set({ user });
+      },
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => {
+        if (error) {
+          authLogger.error('Auth error occurred', error);
+        }
+        set({ error });
+      },
+      setOffline: (isOffline) => set({ isOffline }),
+      signOut: async () => {
+        try {
+          authLogger.info('Signing out user', { userId: get().user?.id });
+          set({ isLoading: true, error: null });
+          
+          await sessionManager.handleSignOut();
+          securityManager.clearSecurityData();
+          
+          set({ session: null, user: null });
+        } catch (error) {
+          const authError = error instanceof Error ? error : new Error('Sign out failed');
+          authLogger.error('Sign out error', authError);
+          set({ error: authError });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      reset: () => {
+        authLogger.info('Resetting auth store');
+        set({ 
+          session: null, 
+          user: null, 
+          isLoading: false, 
+          error: null 
+        });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({ 
+        session: state.session,
+        user: state.user 
+      }),
+    }
+  )
+);
+
+// Set up online/offline listeners
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    useAuthStore.getState().setOffline(false);
+    authLogger.info('Application is online');
+  });
+  
+  window.addEventListener('offline', () => {
+    useAuthStore.getState().setOffline(true);
+    authLogger.warn('Application is offline');
+  });
+}

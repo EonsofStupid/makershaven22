@@ -9,9 +9,8 @@ interface AvatarFallbackContentProps {
 export const AvatarFallbackContent = ({ email, className }: AvatarFallbackContentProps) => {
   return (
     <div className={cn(
-      "bg-gradient-to-br from-[#41f0db]/20 to-[#8000ff]/20 text-white",
+      "bg-gradient-to-br from-[#41f0db]/20 to-[#8000ff]/20 text-white border border-white/10",
       "flex items-center justify-center w-full h-full",
-      "transition-all duration-300 group-hover:from-[#41f0db]/30 group-hover:to-[#8000ff]/30",
       className
     )}>
       {email?.[0]?.toUpperCase() || <UserRound className="h-5 w-5 text-white/70" />}

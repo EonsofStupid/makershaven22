@@ -1,32 +1,14 @@
-import { useContentStore } from '@/lib/store/content-store';
-import type { BaseContent } from '../types/contentTypes';
+import { useContentQuery } from "./useContentQuery";
+import { useContentMutations } from "./useContentMutations";
 
 export const useContent = (contentId?: string) => {
-  const { 
-    content,
-    currentContent,
-    isLoading,
-    error,
-    fetchContent,
-    setCurrentContent,
-    createContent,
-    updateContent,
-    deleteContent
-  } = useContentStore();
-
-  // If contentId is provided, find that specific content
-  const specificContent = contentId 
-    ? content.find(item => item.id === contentId) 
-    : null;
+  const { data: content, isLoading } = useContentQuery(contentId);
+  const { createContent, updateContent } = useContentMutations();
 
   return {
-    content: specificContent || currentContent,
+    content,
     isLoading,
-    error,
-    fetchContent,
-    setCurrentContent,
     createContent,
     updateContent,
-    deleteContent
   };
 };

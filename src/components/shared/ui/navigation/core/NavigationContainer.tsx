@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { useNavigationStore } from "../NavigationState";
-import { useAuthStore } from "@/lib/store/settings-store";
+import { useTheme } from '@/components/theme/ThemeContext';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -11,7 +11,7 @@ interface NavigationContainerProps {
 
 export const NavigationContainer = ({ children }: NavigationContainerProps) => {
   const { isScrolled, mousePosition, setIsScrolled, setMousePosition } = useNavigationStore();
-  const { settings } = useAuthStore();
+  const { theme } = useTheme();
 
   // Handle scroll effects
   useEffect(() => {
@@ -35,6 +35,7 @@ export const NavigationContainer = ({ children }: NavigationContainerProps) => {
     
     if (Math.abs(x - mousePosition.x) > 1 || Math.abs(y - mousePosition.y) > 1) {
       setMousePosition({ x, y });
+      console.log('Mouse position updated:', { x, y });
     }
   };
 
@@ -45,15 +46,15 @@ export const NavigationContainer = ({ children }: NavigationContainerProps) => {
     });
   };
 
-  const neonCyan = settings?.neon_cyan || '#41f0db';
-  const neonPink = settings?.neon_pink || '#ff0abe';
-  const neonPurple = settings?.neon_purple || '#8000ff';
+  const neonCyan = theme?.neon_cyan || '#41f0db';
+  const neonPink = theme?.neon_pink || '#ff0abe';
+  const neonPurple = theme?.neon_purple || '#8000ff';
 
   return (
     <motion.nav 
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: parseFloat(settings?.transition_duration || '0.3') }}
+      transition={{ duration: parseFloat(theme?.transition_duration || '0.3') }}
       className={cn(
         "fixed top-0 left-0 right-0 z-[100] h-[3.7rem]",
         "before:content-[''] before:absolute before:inset-0 before:bg-cyber-texture before:opacity-10",
@@ -78,7 +79,7 @@ export const NavigationContainer = ({ children }: NavigationContainerProps) => {
         `,
         backdropFilter: isScrolled ? 'blur(16px)' : 'blur(12px)',
         borderBottom: `1px solid ${neonPurple}50`,
-        transition: `all ${settings?.transition_duration || '0.3s'} ease-in-out`,
+        transition: `all ${theme?.transition_duration || '0.3s'} ease-in-out`,
       }}
     >
       <div className="container mx-auto px-4">

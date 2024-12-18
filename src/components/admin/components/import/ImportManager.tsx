@@ -13,7 +13,7 @@ export const ImportManager = () => {
       try {
         const { data, error } = await supabase
           .from('import_sessions')
-          .select('*')
+          .select('id, name, description, updated_at, created_by')
           .order('created_at', { ascending: false });
 
         if (error) throw error;

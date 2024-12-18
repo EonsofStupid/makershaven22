@@ -17,7 +17,7 @@ const WorkflowsManagement = () => {
       console.log('Fetching workflows...');
       const { data, error } = await supabase
         .from('cms_workflows')
-        .select('*')
+        .select('id, name, email, role, updated_at')
         .order('name');
 
       if (error) {

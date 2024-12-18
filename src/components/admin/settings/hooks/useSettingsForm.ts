@@ -1,6 +1,4 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Settings } from "@/integrations/supabase/types";
+import { useState } from "react";
 import { useSettingsFetch } from "./handlers/useSettingsFetch";
 import { useSettingsUpdateHandlers } from "./handlers/useSettingsUpdateHandlers";
 import { useSettingsReset } from "./handlers/useSettingsReset";
@@ -17,12 +15,7 @@ export const useSettingsForm = () => {
   } = useSettingsUpdateHandlers();
   const { isResetting, handleResetToDefault } = useSettingsReset();
 
-  const form = useForm<Settings>({
-    defaultValues: settings || {}
-  });
-
   return {
-    form,
     settings,
     isLoading,
     isSaving,

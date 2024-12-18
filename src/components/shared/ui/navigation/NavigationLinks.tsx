@@ -3,9 +3,13 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { memo } from "react";
 
 export const NavigationLinks = memo(() => {
-  const { user } = useAuthStore();
+  const { session, user } = useAuthStore();
 
-  console.log('NavigationLinks render - User role:', user?.role);
+  console.log('NavigationLinks render - Session:', {
+    isAuthenticated: !!session,
+    userId: session?.user?.id,
+    role: user?.role
+  });
 
   return (
     <div className="hidden md:flex items-center space-x-6">

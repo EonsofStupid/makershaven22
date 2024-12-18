@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ContentType } from '@/integrations/supabase/types';
+import type { ContentType } from '../types/contentTypes';
 
 interface ContentTypeSelectorProps {
   value: ContentType;
