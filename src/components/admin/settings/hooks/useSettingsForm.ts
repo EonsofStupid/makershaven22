@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSettingsStore } from "@/lib/store/settings-store";
-import { Settings, SettingsFormData, settingsSchema, UseSettingsFormReturn } from "../types";
+import { Settings, SettingsFormData, settingsSchema } from "../types";
 import { useSettingsUpdateHandlers } from "./handlers/useSettingsUpdateHandlers";
 import { useSettingsFetch } from "./handlers/useSettingsFetch";
 import { useSettingsReset } from "./handlers/useSettingsReset";
 
-export const useSettingsForm = (): UseSettingsFormReturn => {
+export const useSettingsForm = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const { data: settings, isLoading } = useSettingsFetch();

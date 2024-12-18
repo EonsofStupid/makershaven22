@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Settings } from "../../types";
 
@@ -47,11 +46,9 @@ export const useSettingsFetch = () => {
         backdrop_blur: data.backdrop_blur,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        updated_at: data.updated_at,
-        updated_by: data.updated_by,
-        transition_type: data.transition_type as "fade" | "slide" | "scale" | "blur" || "fade",
-        menu_animation_type: data.menu_animation_type as "fade" | "slide-down" | "scale" | "blur" || "fade",
-        theme_mode: data.theme_mode as "light" | "dark" | "system" || "dark",
+        transition_type: data.transition_type as "fade" | "slide" | "scale" | "blur",
+        menu_animation_type: data.menu_animation_type as "fade" | "slide-down" | "scale" | "blur",
+        theme_mode: data.theme_mode as "light" | "dark" | "system",
       };
 
       return settings;
