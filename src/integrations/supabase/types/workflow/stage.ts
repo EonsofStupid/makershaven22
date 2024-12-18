@@ -1,5 +1,6 @@
 import { Json } from '../base/json';
-import { WorkflowStageType } from '../base/enums';
+
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
 export interface WorkflowStage {
   id: string;
@@ -42,27 +43,25 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data.map(stage => {
-    if (typeof stage !== 'object' || !stage) {
-      return {
-        id: crypto.randomUUID(),
-        name: '',
-        type: 'TASK',
-        order: 0,
-        config: {},
-      };
-    }
-
+export const parseWorkflowStage = (data: Json): WorkflowStage => {
+  if (!data || typeof data !== 'object') {
     return {
-      id: String(stage.id || crypto.randomUUID()),
-      name: String(stage.name || ''),
-      type: (stage.type as WorkflowStageType) || 'TASK',
-      order: Number(stage.order || 0),
-      config: stage.config as WorkflowStageConfig || {},
-      description: stage.description ? String(stage.description) : undefined
+      id: crypto.randomUUID(),
+      name: '',
+      type: 'task',
+      order: 0,
+      config: {},
     };
-  });
+  }
+
+  const stage = data as Record<string, unknown>;
+  
+  return {
+    id: String(stage.id || crypto.randomUUID()),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'task',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
+  };
 };
