@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { TransitionType } from "@/integrations/supabase/types/settings/theme";
 
 export const settingsSchema = z.object({
   site_title: z.string().min(1, "Site title is required"),
@@ -11,9 +10,9 @@ export const settingsSchema = z.object({
   text_secondary_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
   text_link_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
   text_heading_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  neon_cyan: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  neon_pink: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  neon_purple: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
+  neon_cyan: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format").optional(),
+  neon_pink: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format").optional(),
+  neon_purple: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format").optional(),
   border_radius: z.string(),
   spacing_unit: z.string(),
   transition_duration: z.string(),
@@ -28,6 +27,10 @@ export const settingsSchema = z.object({
   letter_spacing: z.string(),
   box_shadow: z.string().optional(),
   backdrop_blur: z.string().optional(),
+  logo_url: z.string().optional(),
+  favicon_url: z.string().optional(),
+  updated_at: z.string().optional(),
+  updated_by: z.string().optional(),
   transition_type: z.enum(["fade", "slide", "scale", "blur"]).optional(),
   menu_animation_type: z.enum(["fade", "slide-down", "scale", "blur"]).optional(),
   theme_mode: z.enum(["light", "dark", "system"]).optional(),

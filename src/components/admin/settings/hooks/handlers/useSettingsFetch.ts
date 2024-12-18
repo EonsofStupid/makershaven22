@@ -20,7 +20,6 @@ export const useSettingsFetch = () => {
         throw error;
       }
 
-      // Transform the data to match Settings type
       const settings: Settings = {
         site_title: data.site_title,
         tagline: data.tagline,
@@ -34,9 +33,9 @@ export const useSettingsFetch = () => {
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,
         text_heading_color: data.text_heading_color,
-        neon_cyan: data.neon_cyan || '#41f0db',
-        neon_pink: data.neon_pink || '#ff0abe',
-        neon_purple: data.neon_purple || '#8000ff',
+        neon_cyan: data.neon_cyan,
+        neon_pink: data.neon_pink,
+        neon_purple: data.neon_purple,
         border_radius: data.border_radius,
         spacing_unit: data.spacing_unit,
         transition_duration: data.transition_duration,
@@ -54,10 +53,9 @@ export const useSettingsFetch = () => {
         box_shadow: data.box_shadow,
         backdrop_blur: data.backdrop_blur,
         updated_at: data.updated_at,
-        updated_by: data.updated_by
+        updated_by: data.updated_by,
       };
 
-      console.log("Settings fetched successfully:", settings);
       return settings;
     },
     retry: 1,
