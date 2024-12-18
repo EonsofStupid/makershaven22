@@ -3,6 +3,15 @@ export type JsonArray = Json[];
 export type JsonObject = { [key: string]: Json | undefined };
 export type Json = JsonPrimitive | JsonObject | JsonArray;
 
+export interface SettingValue {
+  label: string;
+  value: boolean;
+}
+
+export interface DatabaseSettings {
+  [key: string]: SettingValue;
+}
+
 // Type guards
 export const isJsonPrimitive = (value: unknown): value is JsonPrimitive => {
   return value === null || 
