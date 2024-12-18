@@ -1,23 +1,20 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import checker from 'vite-plugin-checker';
-
-export default defineConfig({
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { componentTagger } from "lovable-tagger";
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
   plugins: [
     react(),
-    checker({
-      typescript: {
-        abortOnError: false, // Do not abort build on TypeScript errors
-      },
-      eslint: {
-        abortOnError: false, // Do not abort build on ESLint errors
-      },
-    }),
-  ],
-  server: {
-    hmr: false, // Disable Hot Module Replacement to disable live preview
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
-  build: {
-    // Any additional build configurations
-  },
-});
+}));
