@@ -29,14 +29,25 @@ export class SessionManager {
     console.log('Session started');
   }
 
-  public clearSecurityData(): void {
+  public startSession(): void {
+    if (!this.initialized) {
+      this.initialize();
+    }
+    console.log('Session started');
+  }
+
+  public destroy(): void {
     this.initialized = false;
-    console.log('Security data cleared');
+    console.log('Session destroyed');
   }
 
   public cleanup(): void {
+    this.destroy();
+  }
+
+  public clearSecurityData(): void {
     this.initialized = false;
-    console.log('Session destroyed');
+    console.log('Security data cleared');
   }
 }
 
