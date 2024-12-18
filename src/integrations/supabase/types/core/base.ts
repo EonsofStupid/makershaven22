@@ -1,3 +1,5 @@
+import { Json } from './json';
+
 export interface BaseEntity {
   id: string;
   created_at?: string;
@@ -12,3 +14,5 @@ export interface UserOwnedEntity extends BaseEntity {
 export interface MetadataEntity extends BaseEntity {
   metadata?: Json;
 }
+
+export type { Json, JsonObject, JsonArray } from './json';

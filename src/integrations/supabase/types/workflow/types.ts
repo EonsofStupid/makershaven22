@@ -1,4 +1,5 @@
-import { Json } from '../core/json';
+import { Json, JsonObject } from '../core/json';
+import { BaseEntity, UserOwnedEntity } from '../core/base';
 
 export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
@@ -7,20 +8,17 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: WorkflowStageConfig;
+  config: JsonObject;
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends Omit<UserOwnedEntity, 'created_by'> {
   name: string;
   description?: string;
   steps: WorkflowStage[];
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  created_at?: string;
-  updated_at?: string;
   email?: string;
   triggers?: Json;
 }
@@ -64,7 +62,7 @@ export interface WorkflowFormData {
   is_active?: boolean;
 }
 
-export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => {
@@ -78,13 +76,13 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
       };
     }
 
-    const stageObj = stage as Record<string, any>;
+    const stageObj = stage as JsonObject;
     return {
       id: String(stageObj.id || crypto.randomUUID()),
       name: String(stageObj.name || ''),
       type: (stageObj.type as WorkflowStageType) || 'task',
       order: Number(stageObj.order || 0),
-      config: stageObj.config as WorkflowStageConfig || {},
+      config: stageObj.config as JsonObject || {},
       description: stageObj.description ? String(stageObj.description) : undefined
     };
   });
