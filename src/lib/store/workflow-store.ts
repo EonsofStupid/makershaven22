@@ -1,43 +1,41 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { WorkflowTemplate, WorkflowStage } from '@/integrations/supabase/types/core/workflow';
+import { WorkflowState } from '../types/store-types';
+import { WorkflowTemplate } from '@/integrations/supabase/types/database/core/workflow-types';
 import { supabase } from '@/integrations/supabase/client';
 
-interface WorkflowState {
-  workflows: WorkflowTemplate[];
-  activeWorkflow: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  initialize: () => Promise<void>;
-  setWorkflows: (workflows: WorkflowTemplate[]) => void;
-  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  reset: () => void;
-}
+const initialState: WorkflowState = {
+  workflows: [],
+  activeWorkflow: null,
+  isLoading: false,
+  error: null
+};
 
 export const useWorkflowStore = create<WorkflowState>()(
   persist(
     (set, get) => ({
-      workflows: [],
-      activeWorkflow: null,
-      isLoading: false,
-      error: null,
-      initialize: async () => {
+      ...initialState,
+      
+      setWorkflows: (workflows: WorkflowTemplate[]) => set({ workflows }),
+      setActiveWorkflow: (workflow: WorkflowTemplate | null) => set({ activeWorkflow: workflow }),
+      setLoading: (isLoading: boolean) => set({ isLoading }),
+      setError: (error: Error | null) => set({ error }),
+      
+      fetchWorkflows: async () => {
         set({ isLoading: true });
         try {
           const { data, error } = await supabase
             .from('cms_workflows')
             .select('*');
-
+            
           if (error) throw error;
-
+          
           const workflows = data.map(workflow => ({
             ...workflow,
             steps: Array.isArray(workflow.steps) ? workflow.steps : [],
             stages: Array.isArray(workflow.stages) ? workflow.stages : []
-          }));
-
+          })) as WorkflowTemplate[];
+          
           set({ workflows, error: null });
         } catch (error) {
           set({ error: error as Error });
@@ -45,11 +43,8 @@ export const useWorkflowStore = create<WorkflowState>()(
           set({ isLoading: false });
         }
       },
-      setWorkflows: (workflows) => set({ workflows }),
-      setActiveWorkflow: (workflow) => set({ activeWorkflow: workflow }),
-      setLoading: (loading) => set({ isLoading: loading }),
-      setError: (error) => set({ error }),
-      reset: () => set({ workflows: [], activeWorkflow: null, error: null })
+      
+      reset: () => set(initialState)
     }),
     {
       name: 'workflow-store',

@@ -1,68 +1,31 @@
-import type { Session, User } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
+import { ThemeSettings, WorkflowTemplate } from '@/integrations/supabase/types/database/core';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-export type Status = 'idle' | 'loading' | 'error' | 'success';
-
-export interface ValidationError {
-  field: string;
-  message: string;
-}
-
-export interface StoreError {
-  code: string;
-  message: string;
-  details?: unknown;
-}
-
-export interface AuthUser extends User {
-  role?: UserRole;
-  display_name?: string;
-  avatar_url?: string;
+export interface AuthUser extends Omit<User, 'user_metadata'> {
   user_metadata?: Record<string, any>;
+  role?: string;
 }
 
-export interface AuthSession extends Session {
+export interface AuthSession extends Omit<Session, 'user'> {
   user: AuthUser;
-  token_type: string;
 }
 
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  isTransitioning: boolean;
-  error: StoreError | null;
-  isOffline: boolean;
-  initialSetupDone: boolean;
-  
-  // Actions
-  initialize: () => Promise<void>;
-  handleSessionUpdate: (session: AuthSession | null) => Promise<void>;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: StoreError | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+  error: Error | null;
 }
 
-export interface SyncState {
-  lastSynced: Date | null;
-  isSyncing: boolean;
-  syncError: StoreError | null;
-  pendingChanges: number;
+export interface ThemeState {
+  settings: ThemeSettings | null;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-export interface AuditInfo {
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
-  updatedBy: string;
-}
-
-export interface Result<T> {
-  data?: T;
-  error?: StoreError;
-  validation?: ValidationError[];
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
 }

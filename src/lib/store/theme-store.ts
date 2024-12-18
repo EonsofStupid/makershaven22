@@ -1,44 +1,40 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ThemeSettings } from '@/integrations/supabase/types';
+import { ThemeState } from '../types/store-types';
+import { ThemeSettings } from '@/integrations/supabase/types/database/core/settings-types';
+import { supabase } from '@/integrations/supabase/client';
 
-export interface ThemeState {
-  settings: ThemeSettings | null;
-  isLoading: boolean;
-  error: Error | null;
-  themeMode: 'light' | 'dark' | 'system';
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
-  systemTheme: 'light' | 'dark';
-  setSystemTheme: (theme: 'light' | 'dark') => void;
-  effectiveTheme: 'light' | 'dark';
-  cssVariables: Record<string, string>;
-  themeState: Record<string, any>;
-  updateTheme: (settings: ThemeSettings) => Promise<void>;
-}
+const initialState: ThemeState = {
+  settings: null,
+  isLoading: false,
+  error: null
+};
 
 export const useThemeStore = create<ThemeState>()(
   persist(
-    (set, get) => ({
-      settings: null,
-      isLoading: false,
-      error: null,
-      themeMode: 'system',
-      systemTheme: 'dark',
-      effectiveTheme: 'dark',
-      cssVariables: {},
-      themeState: {},
-      setThemeMode: (mode) => set({ themeMode: mode }),
-      setSystemTheme: (theme) => set({ systemTheme: theme }),
-      updateTheme: async (settings) => {
+    (set) => ({
+      ...initialState,
+      
+      setSettings: (settings: ThemeSettings) => set({ settings }),
+      setLoading: (isLoading: boolean) => set({ isLoading }),
+      setError: (error: Error | null) => set({ error }),
+      
+      updateSettings: async (settings: ThemeSettings) => {
+        set({ isLoading: true });
         try {
-          set({ isLoading: true });
-          // Theme update logic here
-          set({ settings, isLoading: false });
+          const { data, error } = await supabase.rpc('update_site_settings', settings);
+          if (error) throw error;
+          set({ settings: data, error: null });
         } catch (error) {
-          set({ error: error as Error, isLoading: false });
+          set({ error: error as Error });
+        } finally {
+          set({ isLoading: false });
         }
       }
     }),
-    { name: 'theme-store' }
+    {
+      name: 'theme-store',
+      partialize: (state) => ({ settings: state.settings })
+    }
   )
 );

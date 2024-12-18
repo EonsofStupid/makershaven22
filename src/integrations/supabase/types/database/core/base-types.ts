@@ -1,16 +1,4 @@
-import type { Json } from './json';
-
-export type TableDefinition<RowType extends { id: string }> = {
-  Row: Readonly<RowType>;
-  Insert: Partial<RowType> & Required<Pick<RowType, "id">>;
-  Update: Partial<RowType>;
-  Relationships: Array<{
-    foreignKeyName: string;
-    columns: Array<keyof RowType>;
-    referencedRelation: string;
-    referencedColumns: Array<keyof RowType>;
-  }>;
-};
+import { Json } from '../json';
 
 export interface BaseEntity {
   id: string;
@@ -18,11 +6,18 @@ export interface BaseEntity {
   updated_at?: string;
 }
 
-export interface AuditableEntity extends BaseEntity {
-  created_by?: string;
+export interface BaseContentEntity extends BaseEntity {
+  title: string;
+  content?: Json;
+  metadata?: Json;
+  created_by: string;
   updated_by?: string;
+  version?: number;
 }
 
-export interface MetadataEntity extends BaseEntity {
-  metadata?: Json;
+export interface BaseWorkflowEntity extends BaseEntity {
+  name: string;
+  description?: string;
+  is_active?: boolean;
+  created_by?: string;
 }
