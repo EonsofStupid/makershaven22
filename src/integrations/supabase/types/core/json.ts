@@ -1,17 +1,25 @@
-export type JsonPrimitive = string | number | boolean | null;
-export type JsonArray = Json[];
-export type JsonObject = { [key: string]: Json | undefined };
-export type Json = JsonPrimitive | JsonObject | JsonArray;
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
-// Type guards
+export type JsonObject = { [key: string]: Json | undefined };
+export type JsonArray = Json[];
+
 export const isJsonObject = (value: unknown): value is JsonObject => {
-  return typeof value === "object" && 
-    value !== null && 
-    !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
-export const parseJsonField = <T>(json: Json, field: string, defaultValue: T): T => {
-  if (!isJsonObject(json)) return defaultValue;
-  const value = json[field];
-  return (value as T) ?? defaultValue;
+export const parseJsonSafely = <T>(value: Json): T | null => {
+  try {
+    if (typeof value === 'string') {
+      return JSON.parse(value) as T;
+    }
+    return value as T;
+  } catch {
+    return null;
+  }
 };
