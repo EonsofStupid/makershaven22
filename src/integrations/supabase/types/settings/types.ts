@@ -1,73 +1,73 @@
-import { Json } from '../core/json';
-import { ThemeMode, TransitionType } from '../core/enums';
+import { Json } from '../base/json';
 
-export interface Settings {
+export type SettingValueType = 'string' | 'number' | 'boolean' | 'json';
+
+export interface AdminSetting {
   id: string;
-  site_title: string;
-  tagline?: string;
-  primary_color?: string;
-  secondary_color?: string;
-  accent_color?: string;
-  text_primary_color?: string;
-  text_secondary_color?: string;
-  text_link_color?: string;
-  text_heading_color?: string;
-  font_family_heading: string;
-  font_family_body: string;
-  font_size_base: string;
-  font_weight_normal: string;
-  font_weight_bold: string;
-  line_height_base: string;
-  letter_spacing: string;
-  border_radius?: string;
-  spacing_unit?: string;
-  transition_duration?: string;
-  shadow_color?: string;
-  hover_scale?: string;
-  neon_cyan?: string;
-  neon_pink?: string;
-  neon_purple?: string;
-  box_shadow?: string;
-  backdrop_blur?: string;
-  logo_url?: string;
-  favicon_url?: string;
-  updated_at?: string;
-  updated_by?: string;
-  security_settings?: Json;
-  transition_type?: TransitionType;
-  theme_mode?: ThemeMode;
-  state_version?: number;
-  last_sync?: string;
+  setting_key: string;
+  setting_value: string | null;
+  setting_type: SettingValueType;
+  created_at?: string;
+  updated_at?: string | null;
 }
 
-export interface SettingsUpdateParams {
-  p_site_title: string;
-  p_tagline: string;
-  p_primary_color: string;
-  p_secondary_color: string;
-  p_accent_color: string;
-  p_text_primary_color: string;
-  p_text_secondary_color: string;
-  p_text_link_color: string;
-  p_text_heading_color: string;
-  p_neon_cyan: string;
-  p_neon_pink: string;
-  p_neon_purple: string;
-  p_border_radius: string;
-  p_spacing_unit: string;
-  p_transition_duration: string;
-  p_shadow_color: string;
-  p_hover_scale: string;
-  p_font_family_heading: string;
-  p_font_family_body: string;
-  p_font_size_base: string;
-  p_font_weight_normal: string;
-  p_font_weight_bold: string;
-  p_line_height_base: string;
-  p_letter_spacing: string;
-}
+// Type guard to check if a value matches our setting type
+export const isValidSettingValue = (value: unknown, type: SettingValueType): boolean => {
+  switch (type) {
+    case 'string':
+      return typeof value === 'string';
+    case 'number':
+      return typeof value === 'number';
+    case 'boolean':
+      return typeof value === 'boolean';
+    case 'json':
+      try {
+        JSON.parse(String(value));
+        return true;
+      } catch {
+        return false;
+      }
+    default:
+      return false;
+  }
+};
 
-export interface SettingsResponse {
-  data: Settings;
-  error: null | Error;
-}
+// Type guard for settings object
+export const isAdminSetting = (obj: unknown): obj is AdminSetting => {
+  if (!obj || typeof obj !== 'object') return false;
+  
+  const setting = obj as AdminSetting;
+  return (
+    typeof setting.setting_key === 'string' &&
+    (setting.setting_value === null || typeof setting.setting_value === 'string') &&
+    ['string', 'number', 'boolean', 'json'].includes(setting.setting_type)
+  );
+};
+
+// Utility type for settings with specific value types
+export type TypedSetting<T> = Omit<AdminSetting, 'setting_value'> & {
+  setting_value: T | null;
+};
+
+// Helper function to safely parse setting values
+export const parseSettingValue = <T>(
+  setting: AdminSetting,
+  defaultValue: T
+): T => {
+  if (!setting.setting_value) return defaultValue;
+
+  try {
+    switch (setting.setting_type) {
+      case 'number':
+        return Number(setting.setting_value) as T;
+      case 'boolean':
+        return (setting.setting_value.toLowerCase() === 'true') as unknown as T;
+      case 'json':
+        return JSON.parse(setting.setting_value) as T;
+      default:
+        return setting.setting_value as unknown as T;
+    }
+  } catch {
+    return defaultValue;
+  }
+};

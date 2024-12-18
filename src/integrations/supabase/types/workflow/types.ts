@@ -1,4 +1,4 @@
-import { Json, JsonObject } from '../core/json';
+import { Json, JsonObject, isJsonObject, safeJsonParse } from '../json';
 import { BaseEntity, UserOwnedEntity } from '../core/base';
 
 export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
@@ -62,32 +62,37 @@ export interface WorkflowFormData {
   is_active?: boolean;
 }
 
+// Type guard for WorkflowStage
+export const isWorkflowStage = (value: unknown): value is WorkflowStage => {
+  if (!isJsonObject(value)) return false;
+  
+  const stage = value as WorkflowStage;
+  return (
+    typeof stage.id === 'string' &&
+    typeof stage.name === 'string' &&
+    typeof stage.type === 'string' &&
+    typeof stage.order === 'number' &&
+    isJsonObject(stage.config)
+  );
+};
+
+// Parse workflow stages safely
 export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
-  return data.map(stage => {
-    if (typeof stage !== 'object' || !stage) {
-      return {
-        id: crypto.randomUUID(),
-        name: '',
-        type: 'task' as WorkflowStageType,
-        order: 0,
-        config: {},
-      };
-    }
-
-    const stageObj = stage as JsonObject;
-    return {
-      id: String(stageObj.id || crypto.randomUUID()),
-      name: String(stageObj.name || ''),
-      type: (stageObj.type as WorkflowStageType) || 'task',
-      order: Number(stageObj.order || 0),
-      config: stageObj.config as JsonObject || {},
-      description: stageObj.description ? String(stageObj.description) : undefined
-    };
-  });
+  return data
+    .filter(isWorkflowStage)
+    .map(stage => ({
+      id: stage.id,
+      name: stage.name,
+      type: stage.type as WorkflowStageType,
+      order: stage.order,
+      config: stage.config,
+      description: stage.description
+    }));
 };
 
+// Serialize workflow template safely
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,

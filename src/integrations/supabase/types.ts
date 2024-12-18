@@ -1877,6 +1877,7 @@ export type Database = {
         | "Critical"
         | "3D Printer"
         | "3D Printer Hardware"
+      setting_value_type: "string" | "number" | "boolean" | "json"
       theme_mode: "light" | "dark" | "system"
       transition_type: "fade" | "slide" | "scale" | "blur"
       user_role: "subscriber" | "maker" | "admin" | "super_admin"
