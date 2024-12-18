@@ -2,20 +2,23 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { AuthGuard } from "@/components/auth/AuthGuard";
+import { AuthGuard } from "@/lib/auth/AuthGuard";
 import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from "sonner";
 import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
-import LandingPage from "@/pages/site/landing";
-import Index from "@/pages/Index";
-import Login from "@/pages/auth/login";
-import Register from "@/pages/auth/register";
 
 export const AppRoutes = () => {
   const { session, user, isLoading } = useAuthStore();
   
+  console.log('AppRoutes: Session state:', { 
+    userId: session?.user?.id,
+    role: user?.role,
+    isLoading,
+    hasSession: !!session
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -28,18 +31,6 @@ export const AppRoutes = () => {
     <PageTransition>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          {/* Landing page for non-authenticated users */}
-          <Route 
-            path="/" 
-            element={
-              !session ? (
-                <LandingPage />
-              ) : (
-                <Index />
-              )
-            } 
-          />
-
           {/* Public Routes - Always Accessible */}
           {publicRoutes.map((route) => (
             <Route
@@ -81,24 +72,6 @@ export const AppRoutes = () => {
               }
             />
           ))}
-
-          {/* Auth routes */}
-          <Route 
-            path="/login" 
-            element={
-              <AuthGuard requireAuth={false}>
-                <Login />
-              </AuthGuard>
-            } 
-          />
-          <Route 
-            path="/register" 
-            element={
-              <AuthGuard requireAuth={false}>
-                <Register />
-              </AuthGuard>
-            } 
-          />
 
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />

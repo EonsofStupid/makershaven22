@@ -1,97 +1,8 @@
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { ArrowRight, Calendar, Clock } from "lucide-react";
-import { useAuthStore } from "@/lib/store/auth-store";
-import { toast } from "sonner";
-
-const FeaturedPost = () => {
-  const { user } = useAuthStore();
-
-  const handleReadMore = () => {
-    if (!user) {
-      toast.error("Please sign in to read the full post", {
-        description: "Create an account to access all content"
-      });
-    }
-  };
-
-  return (
-    <div className="glass-card p-6 mb-12">
-      <span className="inline-block px-3 py-1 bg-primary/20 text-primary rounded-full text-sm mb-4">
-        Featured
-      </span>
-      <h2 className="text-3xl font-bold mb-4">The Rise of Indie Podcasts in 2024</h2>
-      <p className="text-foreground/80 mb-6">
-        Discover how independent podcasters are reshaping the media landscape with unique
-        perspectives and innovative content formats.
-      </p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center text-sm text-foreground/60">
-            <Calendar className="w-4 h-4 mr-1" />
-            <span>Mar 15, 2024</span>
-          </div>
-          <div className="flex items-center text-sm text-foreground/60">
-            <Clock className="w-4 h-4 mr-1" />
-            <span>5 min read</span>
-          </div>
-        </div>
-        <Link
-          to={user ? "/post/1" : "/login"}
-          onClick={!user ? handleReadMore : undefined}
-          className="flex items-center text-primary hover:text-primary/80 transition-colors"
-        >
-          Read More <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-const PostCard = ({ delay, id }: { delay: number; id: number }) => {
-  const { user } = useAuthStore();
-
-  const handleReadMore = () => {
-    if (!user) {
-      toast.error("Please sign in to read the full post", {
-        description: "Create an account to access all content"
-      });
-    }
-  };
-
-  return (
-    <div
-      className="glass-card p-6"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <img
-        src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
-        alt="Post thumbnail"
-        className="w-full h-48 object-cover rounded-md mb-4"
-      />
-      <span className="inline-block px-3 py-1 bg-secondary/20 text-secondary rounded-full text-sm mb-4">
-        TV Shows
-      </span>
-      <h3 className="text-xl font-bold mb-2">Must-Watch Series of the Month</h3>
-      <p className="text-foreground/80 mb-4">
-        Our curated list of the most compelling series that you shouldn't miss this month.
-      </p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center text-sm text-foreground/60">
-          <Calendar className="w-4 h-4 mr-1" />
-          <span>Mar 14, 2024</span>
-        </div>
-        <Link
-          to={user ? `/post/${id}` : "/login"}
-          onClick={!user ? handleReadMore : undefined}
-          className="flex items-center text-primary hover:text-primary/80 transition-colors"
-        >
-          Read More <ArrowRight className="w-4 h-4 ml-1" />
-        </Link>
-      </div>
-    </div>
-  );
-};
+import { useAuthStore } from '@/lib/store/auth-store';
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   const { user } = useAuthStore();
@@ -102,12 +13,99 @@ const Index = () => {
 
   return (
     <Layout>
-      <FeaturedPost />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <PostCard key={i} delay={i * 100} id={i + 2} />
-        ))}
-      </div>
+      {/* Hero Section */}
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'url("/lovable-uploads/293dada8-67ab-4da3-8f66-2f83623340b5.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-[#151A24]/80 via-[#151A24]/50 to-[#151A24]" />
+        </div>
+
+        {/* Hero Content */}
+        <motion.div 
+          className="container relative z-10 px-6 space-y-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="text-6xl md:text-7xl font-bold text-center">
+            <span className="neon-text-cyan">Build</span>{" "}
+            <span className="neon-text-pink">Your Vision</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-center text-gray-300 max-w-3xl mx-auto">
+            Join our community of makers and bring your ideas to life
+          </p>
+        </motion.div>
+
+        {/* Animated Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+      </section>
+
+      {/* Feature Cards Section */}
+      <section className="relative py-20 bg-[#151A24]">
+        <div className="container px-6">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {/* Card 1 */}
+            <Card className="p-6 bg-glass-card hover:bg-glass-hover transition-all duration-300 border-neon-cyan/20 group">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="h-12 w-12 rounded-lg bg-neon-cyan/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl neon-text-cyan">🛠️</span>
+                </div>
+                <h3 className="text-xl font-bold neon-text-cyan">Design Tools</h3>
+                <p className="text-gray-300">Advanced tools for creating and customizing your 3D printer builds</p>
+              </motion.div>
+            </Card>
+
+            {/* Card 2 */}
+            <Card className="p-6 bg-glass-card hover:bg-glass-hover transition-all duration-300 border-neon-pink/20 group">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="space-y-4"
+              >
+                <div className="h-12 w-12 rounded-lg bg-neon-pink/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl neon-text-pink">🤝</span>
+                </div>
+                <h3 className="text-xl font-bold neon-text-pink">Community</h3>
+                <p className="text-gray-300">Connect with fellow makers and share your experiences</p>
+              </motion.div>
+            </Card>
+
+            {/* Card 3 */}
+            <Card className="p-6 bg-glass-card hover:bg-glass-hover transition-all duration-300 border-neon-purple/20 group">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="space-y-4"
+              >
+                <div className="h-12 w-12 rounded-lg bg-neon-purple/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl neon-text-purple">📚</span>
+                </div>
+                <h3 className="text-xl font-bold neon-text-purple">Resources</h3>
+                <p className="text-gray-300">Comprehensive guides and documentation for your builds</p>
+              </motion.div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
     </Layout>
   );
 };

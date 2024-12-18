@@ -2,45 +2,77 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl) throw new Error('VITE_SUPABASE_URL is required');
-if (!supabaseAnonKey) throw new Error('VITE_SUPABASE_ANON_KEY is required');
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables');
+}
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Create a single instance of the Supabase client with explicit options
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  },
+  db: {
+    schema: 'public'
+  },
+  // Add retries for failed requests
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+});
 
-// Utility function for retrying Supabase operations
+// Export utility functions that use the single client instance
+export const uploadMedia = async (file: File) => {
+  try {
+    const { data, error } = await supabase.storage
+      .from('media')
+      .upload(`uploads/${Date.now()}-${file.name}`, file);
+
+    if (error) {
+      console.error('Media upload error:', error);
+      throw error;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('media')
+      .getPublicUrl(data.path);
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error in uploadMedia:', error);
+    throw error;
+  }
+};
+
+// Add a helper function to handle retries
 export const withRetry = async <T>(
-  operation: () => Promise<{ data: T | null; error: any }>,
-  maxAttempts = 3,
+  operation: () => Promise<T>,
+  maxRetries = 3,
   delay = 1000
-): Promise<{ data: T | null; error: any }> => {
-  let attempts = 0;
+): Promise<T> => {
+  let lastError: Error | null = null;
   
-  while (attempts < maxAttempts) {
+  for (let i = 0; i < maxRetries; i++) {
     try {
-      const result = await operation();
-      if (!result.error) return result;
-      
-      attempts++;
-      if (attempts === maxAttempts) return result;
-      
-      await new Promise(resolve => setTimeout(resolve, delay * attempts));
+      return await operation();
     } catch (error) {
-      if (attempts === maxAttempts - 1) return { data: null, error };
-      attempts++;
-      await new Promise(resolve => setTimeout(resolve, delay * attempts));
+      console.error(`Attempt ${i + 1} failed:`, error);
+      lastError = error as Error;
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+      }
     }
   }
   
-  return { data: null, error: new Error('Max retry attempts reached') };
-};
-
-export const uploadMedia = async (file: File, path: string) => {
-  const { data, error } = await supabase.storage
-    .from('media')
-    .upload(path, file);
-
-  if (error) throw error;
-  return data;
+  throw lastError;
 };

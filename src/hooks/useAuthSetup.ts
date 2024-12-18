@@ -1,11 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { useAtom } from 'jotai';
-import { 
-  setSessionAtom,
-  setUserAtom,
-  setLoadingStateAtom,
-  setAuthErrorAtom
-} from '@/lib/store/atoms/auth';
+import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from "sonner";
 import { useSessionManagement } from './auth/useSessionManagement';
 import { useAuthValidation } from './auth/useAuthValidation';
@@ -16,10 +10,7 @@ import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
 
 export const useAuthSetup = () => {
-  const [, setLoading] = useAtom(setLoadingStateAtom);
-  const [, setError] = useAtom(setAuthErrorAtom);
-  const [, setSession] = useAtom(setSessionAtom);
-  const [, setUser] = useAtom(setUserAtom);
+  const { setLoading, setError } = useAuthStore();
   const initialSetupDone = useRef(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout>();
   const retryAttempts = useRef(0);
@@ -30,7 +21,7 @@ export const useAuthSetup = () => {
   
   const handleAuthChange = useCallback(async (session) => {
     console.log('Handling auth change:', session?.user?.id);
-    setLoading({ isLoading: true });
+    setLoading(true);
     setError(null);
     
     try {
@@ -45,6 +36,7 @@ export const useAuthSetup = () => {
           await attachCSRFToken();
           await validateAuthAttempt(session);
           
+          // Initialize security managers
           await sessionManager.startSession();
           securityManager.initialize();
           
@@ -111,9 +103,9 @@ export const useAuthSetup = () => {
         description: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
     } finally {
-      setLoading({ isLoading: false });
+      setLoading(false);
     }
-  }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt, setSession, setUser]);
+  }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt]);
 
   return { handleAuthChange, initialSetupDone };
 };

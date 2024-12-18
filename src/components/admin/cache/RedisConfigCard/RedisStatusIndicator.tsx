@@ -1,11 +1,10 @@
 import React from 'react';
-import { useAtom } from 'jotai';
 import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { redisStatusAtom } from '@/lib/store/atoms/redis/redis-atoms';
+import { useRedisStore } from '@/lib/store/redis-store';
 
 export const RedisStatusIndicator = () => {
-  const [status] = useAtom(redisStatusAtom);
+  const status = useRedisStore((state) => state.status);
 
   return (
     <CardContent className="flex items-center justify-between border-t">

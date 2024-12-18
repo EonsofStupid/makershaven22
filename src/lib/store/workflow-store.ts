@@ -11,7 +11,7 @@ interface WorkflowState {
   reset: () => void;
 }
 
-export const useWorkflowStore = create<WorkflowState>()(
+export const useAppStore = create<WorkflowState>()(
   persist(
     (set, get) => ({
       activeWorkflows: {},

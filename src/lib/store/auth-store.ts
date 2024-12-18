@@ -1,131 +1,82 @@
-import { useAtom } from 'jotai';
-import { 
-  sessionAtom, 
-  userAtom, 
-  loadingStateAtom,
-  authErrorAtom,
-  setSessionAtom,
-  setUserAtom,
-  setLoadingStateAtom,
-  setAuthErrorAtom,
-  isTransitioningAtom,
-  setIsTransitioningAtom,
-  authLoadingAtom,
-  setAuthLoadingAtom
-} from './atoms/auth';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { AuthStore, AuthUser, AuthSession } from '@/lib/auth/types/auth';
 import { supabase } from "@/integrations/supabase/client";
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthSession, AuthUser } from '@/lib/auth/types/auth';
-import { toast } from 'sonner';
 import { authLogger } from '@/lib/auth/AuthLogger';
 
-export const useAuthStore = () => {
-  // Read-only atoms
-  const [session] = useAtom(sessionAtom);
-  const [user] = useAtom(userAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
-  const [error] = useAtom(authErrorAtom);
-  const [isTransitioning] = useAtom(isTransitioningAtom);
-  const [isLoading] = useAtom(authLoadingAtom);
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      session: null,
+      user: null,
+      isLoading: true,
+      error: null,
+      isOffline: !navigator.onLine,
+      setSession: (session) => {
+        authLogger.info('Setting session', { userId: session?.user?.id });
+        set({ session });
+      },
+      setUser: (user) => {
+        authLogger.info('Setting user', { userId: user?.id });
+        set({ user });
+      },
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => {
+        if (error) {
+          authLogger.error('Auth error occurred', error);
+        }
+        set({ error });
+      },
+      setOffline: (isOffline) => set({ isOffline }),
+      signOut: async () => {
+        try {
+          authLogger.info('Signing out user', { userId: get().user?.id });
+          set({ isLoading: true, error: null });
+          
+          await sessionManager.handleSignOut();
+          securityManager.clearSecurityData();
+          
+          set({ session: null, user: null });
+        } catch (error) {
+          const authError = error instanceof Error ? error : new Error('Sign out failed');
+          authLogger.error('Sign out error', authError);
+          set({ error: authError });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      reset: () => {
+        authLogger.info('Resetting auth store');
+        set({ 
+          session: null, 
+          user: null, 
+          isLoading: false, 
+          error: null 
+        });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({ 
+        session: state.session,
+        user: state.user 
+      }),
+    }
+  )
+);
+
+// Set up online/offline listeners
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    useAuthStore.getState().setOffline(false);
+    authLogger.info('Application is online');
+  });
   
-  // Writable atoms
-  const [, setSession] = useAtom(setSessionAtom);
-  const [, setUser] = useAtom(setUserAtom);
-  const [, setLoading] = useAtom(setLoadingStateAtom);
-  const [, setError] = useAtom(setAuthErrorAtom);
-  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
-  const [, setAuthLoading] = useAtom(setAuthLoadingAtom);
-
-  const handleAuthError = (error: Error) => {
-    authLogger.error('Auth error:', error);
-    setError(error);
-    toast.error('Authentication error', {
-      description: error.message
-    });
-  };
-
-  const signOut = async () => {
-    try {
-      authLogger.info('Signing out user:', user?.id);
-      setLoading({ isLoading: true });
-      setError(null);
-      
-      await sessionManager.handleSignOut();
-      securityManager.clearSecurityData();
-      
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      setSession(null);
-      setUser(null);
-      
-      authLogger.info('Sign out successful');
-      toast.success('Signed out successfully');
-    } catch (error) {
-      const authError = error instanceof Error ? error : new Error('Sign out failed');
-      handleAuthError(authError);
-      throw error;
-    } finally {
-      setLoading({ isLoading: false });
-    }
-  };
-
-  const refreshSession = async () => {
-    try {
-      setLoading({ isLoading: true });
-      authLogger.info('Refreshing session');
-      const { data: { session }, error } = await supabase.auth.refreshSession();
-      if (error) throw error;
-      
-      if (session) {
-        const authSession: AuthSession = {
-          user: session.user as AuthUser,
-          expires_at: session.expires_at,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token
-        };
-        
-        setSession(authSession);
-        setUser(authSession.user);
-        authLogger.info('Session refreshed successfully');
-      }
-    } catch (error) {
-      handleAuthError(error instanceof Error ? error : new Error('Session refresh failed'));
-    } finally {
-      setLoading({ isLoading: false });
-    }
-  };
-
-  const reset = () => {
-    authLogger.info('Resetting auth store');
-    setSession(null);
-    setUser(null);
-    setLoading({ isLoading: false });
-    setError(null);
-    setIsTransitioning(false);
-  };
-
-  return {
-    // State
-    session,
-    user,
-    loadingState,
-    error,
-    isTransitioning,
-    isLoading,
-    
-    // Setters
-    setSession,
-    setUser,
-    setLoading,
-    setError,
-    setIsTransitioning,
-    setAuthLoading,
-    
-    // Actions
-    signOut,
-    refreshSession,
-    reset,
-  };
-};
+  window.addEventListener('offline', () => {
+    useAuthStore.getState().setOffline(true);
+    authLogger.warn('Application is offline');
+  });
+}

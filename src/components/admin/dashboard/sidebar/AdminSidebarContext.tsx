@@ -1,25 +1,28 @@
-import React, { useEffect } from 'react';
-import { useAtom } from 'jotai';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { 
-  sidebarOpenAtom, 
-  sidebarExpandedAtom, 
-  sidebarActiveTabAtom, 
-  sidebarShortcutsAtom 
-} from '@/lib/store/atoms/sidebar';
-import type { AdminToolbarShortcut } from '@/integrations/supabase/types/tables/admin';
 
-interface AdminSidebarProviderProps {
-  children: React.ReactNode;
+interface AdminSidebarContextType {
+  isOpen: boolean;
+  isExpanded: boolean;
+  activeTab: string;
+  shortcuts: string[];
+  setIsOpen: (value: boolean) => void;
+  setIsExpanded: (value: boolean) => void;
+  setActiveTab: (tab: string) => void;
+  addShortcut: (id: string) => void;
+  removeShortcut: (id: string) => void;
 }
 
-export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) => {
-  const [isOpen, setIsOpen] = useAtom(sidebarOpenAtom);
-  const [isExpanded, setIsExpanded] = useAtom(sidebarExpandedAtom);
-  const [activeTab, setActiveTab] = useAtom(sidebarActiveTabAtom);
-  const [shortcuts, setShortcuts] = useAtom(sidebarShortcutsAtom);
+const AdminSidebarContext = createContext<AdminSidebarContextType | undefined>(undefined);
 
+export const AdminSidebarProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [shortcuts, setShortcuts] = useState<string[]>([]);
+
+  // Load shortcuts from Supabase on mount
   useEffect(() => {
     const loadShortcuts = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -27,7 +30,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
 
       const { data, error } = await supabase
         .from('admin_toolbar_shortcuts')
-        .select('*')
+        .select('item_id')
         .eq('user_id', user.id)
         .order('position');
 
@@ -40,7 +43,7 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     };
 
     loadShortcuts();
-  }, [setShortcuts]);
+  }, []);
 
   const addShortcut = async (id: string) => {
     if (shortcuts.includes(id)) return;
@@ -84,29 +87,25 @@ export const AdminSidebarProvider = ({ children }: AdminSidebarProviderProps) =>
     setShortcuts(shortcuts.filter(s => s !== id));
   };
 
-  const contextValue = {
-    isOpen,
-    isExpanded,
-    activeTab,
-    shortcuts,
-    setIsOpen,
-    setIsExpanded,
-    setActiveTab,
-    addShortcut,
-    removeShortcut
-  };
-
   return (
-    <AdminSidebarContext.Provider value={contextValue}>
+    <AdminSidebarContext.Provider value={{ 
+      isOpen, 
+      isExpanded,
+      activeTab,
+      setIsOpen, 
+      setIsExpanded,
+      setActiveTab,
+      shortcuts, 
+      addShortcut, 
+      removeShortcut 
+    }}>
       {children}
     </AdminSidebarContext.Provider>
   );
 };
 
-const AdminSidebarContext = React.createContext<any>(undefined);
-
 export const useAdminSidebar = () => {
-  const context = React.useContext(AdminSidebarContext);
+  const context = useContext(AdminSidebarContext);
   if (context === undefined) {
     throw new Error('useAdminSidebar must be used within an AdminSidebarProvider');
   }

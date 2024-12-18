@@ -6,59 +6,29 @@ import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
-import { AuthErrorBoundary } from "@/components/auth/error-handling/AuthErrorBoundary";
-import { LoadingOverlay } from "@/components/auth/components/loading/LoadingOverlay";
-import { useAtom } from 'jotai';
-import { 
-  sessionAtom,
-  userAtom,
-  loadingStateAtom,
-  authErrorAtom,
-  setSessionAtom,
-  setUserAtom,
-  setLoadingStateAtom,
-  setAuthErrorAtom,
-  isTransitioningAtom,
-  setIsTransitioningAtom
-} from '@/lib/store/atoms/auth';
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
-  const [session] = useAtom(sessionAtom);
-  const [, setSession] = useAtom(setSessionAtom);
-  const [, setUser] = useAtom(setUserAtom);
-  const [loadingState] = useAtom(loadingStateAtom);
-  const [, setLoadingState] = useAtom(setLoadingStateAtom);
-  const [error] = useAtom(authErrorAtom);
-  const [, setError] = useAtom(setAuthErrorAtom);
-  const [isTransitioning] = useAtom(isTransitioningAtom);
-  const [, setIsTransitioning] = useAtom(setIsTransitioningAtom);
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
     
+    // Apply security headers
     const initSecurity = async () => {
       try {
-        setLoadingState({ isLoading: true, message: 'Initializing security...' });
         const success = await applySecurityHeaders();
         if (!success) {
           console.warn('Security headers could not be applied, continuing with default security settings');
         }
       } catch (error) {
         console.error('Error initializing security headers:', error);
-        setError(error instanceof Error ? error : new Error('Failed to initialize security'));
-        return false;
       }
-      return true;
     };
+
+    initSecurity();
 
     if (initialSetupDone.current) {
       console.log('Initial setup already done, skipping');
-      setLoadingState({ isLoading: false });
       return;
     }
     
@@ -68,44 +38,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const retryDelay = 1000;
 
     const setupAuth = async () => {
-      setLoadingState({ isLoading: true, message: 'Setting up authentication...' });
-      
       try {
-        setIsTransitioning(true);
+        console.log('Starting auth setup');
         
-        const securityInitialized = await initSecurity();
-        if (!securityInitialized) {
-          throw new Error('Security initialization failed');
-        }
-        
+        // Initialize security systems first
         try {
-          await sessionManager.startSession();
-          await securityManager.initialize();
+          sessionManager.startSession();
+          securityManager.initialize();
           console.log('Security systems initialized');
         } catch (securityError) {
           console.error('Error initializing security systems:', securityError);
-          throw securityError;
+          // Continue with auth setup even if security init fails
         }
 
-        const { data: { session: supabaseSession }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           if (sessionError.message.includes('refresh_token_not_found')) {
             console.log('Refresh token not found, signing out');
             await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setLoadingState({ isLoading: false });
-            setIsTransitioning(false);
             return;
           }
           throw sessionError;
         }
 
-        console.log('Initial session check:', supabaseSession?.user?.id || 'No session');
-        await handleAuthChange(supabaseSession);
-        setLoadingState({ isLoading: false });
-        setIsTransitioning(false);
+        console.log('Initial session check:', session?.user?.id || 'No session');
+        await handleAuthChange(session);
 
       } catch (error) {
         console.error("Auth setup error:", error);
@@ -114,36 +72,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           console.log(`Retrying auth setup (${retryCount}/${maxRetries})...`);
           setTimeout(setupAuth, retryDelay * retryCount);
         } else {
-          setError(error instanceof Error ? error : new Error('Failed to initialize authentication'));
-          setIsTransitioning(false);
-          setLoadingState({ isLoading: false });
+          toast.error('Failed to initialize authentication', {
+            description: 'Please refresh the page or try again later.',
+          });
         }
       }
     };
 
     setupAuth();
 
+    console.log('Setting up auth state change subscription');
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, supabaseSession) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       try {
-        console.log('Auth state changed:', event, supabaseSession?.user?.id);
-        setLoadingState({ 
-          isLoading: true, 
-          message: 'Updating authentication state...' 
-        });
-        setIsTransitioning(true);
-
-        await handleAuthChange(supabaseSession);
-        setLoadingState({ isLoading: false });
+        console.log('Auth state changed:', _event, session?.user?.id);
+        await handleAuthChange(session);
       } catch (error) {
         console.error('Auth state change error:', error);
-        setError(error instanceof Error ? error : new Error('Authentication error occurred'));
         toast.error('Authentication error', {
           description: 'There was a problem with your session. Please try signing in again.',
         });
-      } finally {
-        setIsTransitioning(false);
       }
     });
     
@@ -152,26 +101,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       subscription.unsubscribe();
       sessionManager.destroy();
       securityManager.cleanup();
-      setLoadingState({ isLoading: false });
     };
-  }, [handleAuthChange, setLoadingState, setSession, setUser, setError, setIsTransitioning]);
+  }, [handleAuthChange]);
 
   return (
-    <AuthErrorBoundary>
-      <LoadingOverlay 
-        isVisible={loadingState.isLoading} 
-        message={loadingState.message}
-        timeout={120000}
-        onTimeout={() => setError(new Error('Operation timed out'))}
-      />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
-    </AuthErrorBoundary>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {children}
+    </motion.div>
   );
 };

@@ -10,10 +10,18 @@ import { BlogPostMeta } from './components/BlogPostMeta';
 import { ImageValidation } from './components/ImageValidation';
 import { useCyberpunkViewer } from './components/viewer/useCyberpunkViewer';
 import CyberpunkBlogViewer from './components/viewer/CyberpunkBlogViewer';
-import type { BlogPost } from '@/integrations/supabase/types/content';
 
 interface BlogPostCardProps {
-  post: BlogPost;
+  post: {
+    id: string;
+    title: string;
+    content: string;
+    excerpt?: string | null;
+    featured_image?: string | null;
+    published_at?: string | null;
+    views_count?: number | null;
+    images?: string[];
+  };
 }
 
 const BlogPostCard: React.FC<BlogPostCardProps> = ({ post }) => {

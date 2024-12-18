@@ -1,157 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { WorkflowFormHeader } from './components/WorkflowFormHeader';
+import React, { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { Accordion } from "@/components/ui/accordion";
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { WorkflowFormData } from "./types";
+import { useWorkflowForm } from "./hooks/useWorkflowForm";
 import { WorkflowBasicFields } from './components/WorkflowBasicFields';
 import { VisualWorkflowBuilder } from './components/VisualWorkflowBuilder';
-import { WorkflowTemplate, WorkflowFormData, serializeStages, parseStages, validateStage } from './types';
+import { toast } from "sonner";
 
 export const WorkflowTemplateForm = () => {
-  const { id } = useParams();
-  const queryClient = useQueryClient();
-  const isNewTemplate = !id;
+  const { form, isLoading, isSaving, handleWorkflowUpdate } = useWorkflowForm();
 
-  const [formData, setFormData] = useState<WorkflowFormData>({
-    name: '',
-    description: '',
-    stages: [],
-    is_active: true
-  });
-
-  const { data: template, isLoading } = useQuery({
-    queryKey: ['workflow-template', id],
-    queryFn: async () => {
-      if (isNewTemplate) return null;
-      
-      const { data, error } = await supabase
-        .from('workflow_templates')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching template:', error);
-        toast.error('Failed to fetch template');
-        throw error;
-      }
-      
-      return {
-        ...data,
-        stages: parseStages(data.stages)
-      } as WorkflowTemplate;
-    },
-    enabled: !isNewTemplate
-  });
-
-  useEffect(() => {
-    if (template) {
-      setFormData({
-        name: template.name,
-        description: template.description || '',
-        stages: template.stages,
-        is_active: template.is_active
-      });
+  const handleSubmit = async (data: WorkflowFormData) => {
+    try {
+      await handleWorkflowUpdate(data);
+      toast.success('Workflow template saved successfully');
+    } catch (error) {
+      console.error('Error saving workflow template:', error);
+      toast.error('Failed to save workflow template');
     }
-  }, [template]);
-
-  const mutation = useMutation({
-    mutationFn: async (data: WorkflowFormData) => {
-      const templateData = {
-        name: data.name,
-        description: data.description,
-        stages: serializeStages(data.stages),
-        is_active: data.is_active
-      };
-
-      if (isNewTemplate) {
-        const { data: newTemplate, error } = await supabase
-          .from('workflow_templates')
-          .insert([templateData])
-          .select()
-          .single();
-
-        if (error) throw error;
-        return newTemplate;
-      } else {
-        const { data: updatedTemplate, error } = await supabase
-          .from('workflow_templates')
-          .update(templateData)
-          .eq('id', id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return updatedTemplate;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workflow-templates'] });
-      toast.success(`Template ${isNewTemplate ? 'created' : 'updated'} successfully`);
-    },
-    onError: (error) => {
-      console.error('Error saving template:', error);
-      toast.error(`Failed to ${isNewTemplate ? 'create' : 'update'} template`);
-    }
-  });
-
-  const handleSubmit = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    
-    // Validate template name
-    if (!formData.name.trim()) {
-      toast.error('Template name is required');
-      return;
-    }
-
-    // Validate all stages
-    const stageValidations = formData.stages.map(validateStage);
-    const invalidStages = stageValidations.filter(v => !v.isValid);
-
-    if (invalidStages.length > 0) {
-      toast.error(`Please fix validation errors in ${invalidStages.length} stage(s)`);
-      return;
-    }
-
-    mutation.mutate(formData);
   };
 
-  const handleFieldChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  if (!isNewTemplate && isLoading) {
-    return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <WorkflowFormHeader 
-        isNewTemplate={isNewTemplate}
-        isPending={mutation.isPending}
-        onSubmit={handleSubmit}
-      />
-
-      <Card className="p-6 bg-black/40 backdrop-blur-xl border-white/10">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <WorkflowBasicFields
-            name={formData.name}
-            description={formData.description}
-            isActive={formData.is_active}
-            onChange={handleFieldChange}
-          />
-
-          <div className="border-t border-white/10 pt-6">
-            <VisualWorkflowBuilder
-              stages={formData.stages}
-              onChange={(stages) => handleFieldChange('stages', stages)}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-[5%] min-h-[calc(100vh-4rem)]">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
+        <Card className="p-6 bg-gray-800/50 border border-white/10 backdrop-blur-sm">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <WorkflowBasicFields
+              name={form.watch('name')}
+              description={form.watch('description')}
+              isActive={form.watch('is_active')}
+              onChange={(field, value) => form.setValue(field as any, value)}
             />
-          </div>
-        </form>
-      </Card>
+            
+            <div className="border-t border-white/10 pt-6">
+              <VisualWorkflowBuilder
+                stages={form.watch('stages')}
+                onChange={(stages) => form.setValue('stages', stages)}
+              />
+            </div>
+          </form>
+        </Card>
+      </motion.div>
     </div>
   );
 };

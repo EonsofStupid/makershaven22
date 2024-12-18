@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useWorkflowStore } from '@/lib/store/workflow-store';
+import { useAppStore } from '@/lib/store/workflow-store';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus } from 'lucide-react';
@@ -20,7 +20,7 @@ interface Workflow {
 }
 
 export const WorkflowManagement = () => {
-  const { activeWorkflows, setActiveWorkflow, addToHistory } = useWorkflowStore();
+  const { activeWorkflows, setActiveWorkflow, addToHistory } = useAppStore();
 
   const { data: workflows, isLoading } = useQuery({
     queryKey: ['workflows'],
@@ -28,7 +28,7 @@ export const WorkflowManagement = () => {
       console.log('Fetching workflows...');
       const { data, error } = await supabase
         .from('cms_workflows')
-        .select('*')
+        .select('id, name, description, updated_at')
         .order('updated_at', { ascending: false });
 
       if (error) {
@@ -145,7 +145,7 @@ export const WorkflowManagement = () => {
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
-          {Object.entries(useWorkflowStore.getState().workflowHistory).map(([id, history]) => (
+          {Object.entries(useAppStore.getState().workflowHistory).map(([id, history]) => (
             <div key={id} className="bg-gray-800/50 border border-white/10 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-white mb-2">
                 Workflow {workflows?.find(w => w.id === id)?.name || id}

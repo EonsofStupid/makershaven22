@@ -1,56 +1,26 @@
-import type { Session } from '@supabase/supabase-js';
-import { Json } from '@/integrations/supabase/types';
+export type SecurityEventSeverity = 'info' | 'warning' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-export type SecurityEventSeverity = 'low' | 'medium' | 'high';
-export type SecurityEventCategory = 'auth' | 'session' | 'security' | 'pin' | 'audit';
-
-export interface AuthUser {
+export interface SecurityEvent {
   id: string;
-  email?: string | null;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  lastSeen?: Date;
-  isBanned?: boolean;
-  banReason?: string;
-  bannedAt?: Date;
-  bannedBy?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
-
-export interface SessionConfig {
-  refreshInterval: number;
-  sessionTimeout: number;
-  storageKey: string;
-  onSessionExpired?: () => void;
-  onRefreshError?: (error: Error) => void;
-}
-
-export interface SessionState {
-  isAuthenticated: boolean;
-  lastActivity: Date;
-  token?: string;
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
+  type: string;
+  severity: SecurityEventSeverity;
+  category: SecurityEventCategory;
+  timestamp: string;
+  userId?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface SecurityLog {
   id: string;
-  userId: string;
-  eventType: string;
-  severity: SecurityEventSeverity;
-  category: SecurityEventCategory;
-  ipAddress?: string;
-  userAgent?: string;
-  metadata?: Record<string, any>;
-  createdAt: Date;
+  event_type: string;
+  ip_address: string | null;
+  user_id: string | null;
+  created_at: string;
+  metadata: Record<string, any>;
+  user_agent: string | null;
+  profiles?: {
+    username: string | null;
+    display_name: string | null;
+  } | null;
 }
