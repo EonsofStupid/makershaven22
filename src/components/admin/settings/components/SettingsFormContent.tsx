@@ -1,6 +1,6 @@
 import React from "react";
 import { Accordion } from "@/components/ui/accordion";
-import { useSettingsForm } from "../hooks/useSettingsForm";
+import { UseSettingsFormReturn } from "../types";
 import { ThemeImportSection } from "../sections/ThemeImportSection";
 import { ColorSection } from "../sections/ColorSection";
 import { TextStylesSection } from "../sections/TextStylesSection";
@@ -9,8 +9,12 @@ import { TransitionConfigSection } from "../sections/TransitionConfigSection";
 import { AnimationsSection } from "../sections/AnimationsSection";
 import { AdvancedEffectsSection } from "../sections/AdvancedEffectsSection";
 
-export const SettingsFormContent = () => {
-  const { form } = useSettingsForm();
+interface SettingsFormContentProps {
+  formContext: UseSettingsFormReturn;
+}
+
+export const SettingsFormContent: React.FC<SettingsFormContentProps> = ({ formContext }) => {
+  const { form } = formContext;
 
   return (
     <form className="space-y-6">
