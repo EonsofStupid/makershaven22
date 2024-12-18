@@ -1,9 +1,10 @@
-import { Json } from '../core';
+import { Json } from '../core/json';
+import type { WorkflowStageType } from '../core/enums';
 
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: string;
+  type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
   description?: string;
@@ -14,7 +15,8 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   steps: WorkflowStage[];
-  is_active: boolean;
+  stages: WorkflowStage[];
+  is_active?: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
@@ -52,19 +54,40 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: Json): WorkflowStage[] => {
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
-  return data.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: stage.type || 'TASK',
-    order: stage.order || 0,
-    config: stage.config || {},
-    description: stage.description
-  }));
+  return data.map(stage => {
+    if (typeof stage !== 'object' || !stage) {
+      return {
+        id: crypto.randomUUID(),
+        name: '',
+        type: 'TASK' as WorkflowStageType,
+        order: 0,
+        config: {},
+      };
+    }
+
+    return {
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'TASK',
+      order: Number(stage.order || 0),
+      config: stage.config as WorkflowStageConfig || {},
+      description: stage.description ? String(stage.description) : undefined
+    };
+  });
 };
 
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return template as unknown as Json;
+  return {
+    ...template,
+    stages: template.stages.map(stage => ({
+      ...stage,
+      id: stage.id.toString(),
+      type: stage.type.toString(),
+      order: Number(stage.order),
+      config: stage.config || {}
+    }))
+  } as unknown as Json;
 };

@@ -23,9 +23,11 @@ export const useWorkflowForm = () => {
     try {
       const serializedData = serializeWorkflowTemplate(formData);
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('workflow_templates')
-        .insert([serializedData]);
+        .insert([serializedData])
+        .select()
+        .single();
 
       if (error) throw error;
       toast.success('Workflow template saved successfully');
