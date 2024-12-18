@@ -1,17 +1,19 @@
-import { Json } from '../core/json';
-import { ThemeMode, TransitionType } from '../core/enums';
+import { Json } from "../core/json";
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface ThemeSettings {
   id: string;
   site_title: string;
-  tagline?: string | null;
-  primary_color?: string | null;
-  secondary_color?: string | null;
-  accent_color?: string | null;
-  text_primary_color?: string | null;
-  text_secondary_color?: string | null;
-  text_link_color?: string | null;
-  text_heading_color?: string | null;
+  tagline?: string;
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color?: string;
+  text_primary_color?: string;
+  text_secondary_color?: string;
+  text_link_color?: string;
+  text_heading_color?: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -19,25 +21,25 @@ export interface ThemeSettings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius?: string | null;
-  spacing_unit?: string | null;
-  transition_duration?: string | null;
-  shadow_color?: string | null;
-  hover_scale?: string | null;
+  border_radius?: string;
+  spacing_unit?: string;
+  transition_duration?: string;
+  shadow_color?: string;
+  hover_scale?: string;
   neon_cyan?: string;
   neon_pink?: string;
   neon_purple?: string;
-  box_shadow?: string | null;
-  backdrop_blur?: string | null;
-  logo_url?: string | null;
-  favicon_url?: string | null;
-  updated_at?: string | null;
-  updated_by?: string | null;
-  security_settings?: Json | null;
+  box_shadow?: string;
+  backdrop_blur?: string;
+  logo_url?: string;
+  favicon_url?: string;
+  updated_at?: string;
+  updated_by?: string;
+  security_settings?: Json;
   transition_type?: TransitionType;
   theme_mode?: ThemeMode;
-  state_version?: number | null;
-  last_sync?: string | null;
+  state_version?: number;
+  last_sync?: string;
 }
 
 export interface ThemeUpdateParams {
@@ -65,23 +67,4 @@ export interface ThemeUpdateParams {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
-}
-
-export interface ThemeState {
-  settings: ThemeSettings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: ThemeMode;
-  themeMode: ThemeMode;
-  systemTheme: 'light' | 'dark';
-  effectiveTheme: 'light' | 'dark';
-  cssVariables: Record<string, string>;
-  setThemeMode: (mode: ThemeMode) => void;
-  setSystemTheme: (theme: 'light' | 'dark') => void;
-  setSettings: (settings: ThemeSettings) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setMode: (mode: ThemeMode) => void;
-  updateSettings: (settings: ThemeSettings) => Promise<void>;
-  updateTheme: (settings: ThemeSettings) => Promise<void>;
 }

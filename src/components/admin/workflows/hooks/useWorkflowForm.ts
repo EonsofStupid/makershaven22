@@ -1,34 +1,31 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { WorkflowFormData, WorkflowTemplate } from '../types';
 import { supabase } from '@/integrations/supabase/client';
+import { WorkflowTemplate, WorkflowStage, serializeWorkflowTemplate } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
 export const useWorkflowForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const form = useForm<WorkflowFormData>({
+  const form = useForm<WorkflowTemplate>({
     defaultValues: {
       name: '',
       description: '',
       stages: [],
+      steps: [],
       is_active: true
     }
   });
 
-  const handleWorkflowUpdate = async (formData: WorkflowFormData) => {
+  const handleWorkflowUpdate = async (formData: WorkflowTemplate) => {
     setIsSaving(true);
     try {
+      const serializedData = serializeWorkflowTemplate(formData);
+      
       const { error } = await supabase
         .from('workflow_templates')
-        .insert([{
-          name: formData.name,
-          description: formData.description,
-          stages: formData.stages,
-          is_active: formData.is_active,
-          steps: formData.stages // For backward compatibility
-        }]);
+        .insert([serializedData]);
 
       if (error) throw error;
       toast.success('Workflow template saved successfully');
