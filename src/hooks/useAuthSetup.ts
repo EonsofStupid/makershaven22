@@ -1,25 +1,24 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth-store';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useAuthSetup = () => {
-  const { initialize, setLoading, setError } = useAuthStore();
+  const { initialize, session, setSession } = useAuthStore();
 
   useEffect(() => {
-    const setupAuth = async () => {
-      try {
-        console.log('Starting auth setup');
-        setLoading(true);
-        await initialize();
-      } catch (error) {
-        console.error('Auth setup error:', error);
-        setError(error as any);
-        toast.error('Failed to initialize authentication');
+    initialize();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
       }
-    };
+    );
 
-    setupAuth();
-  }, [initialize, setLoading, setError]);
+    return () => subscription.unsubscribe();
+  }, [initialize, setSession]);
 
-  return null;
+  return {
+    session,
+    handleAuthChange: (session: Session | null) => setSession(session)
+  };
 };
