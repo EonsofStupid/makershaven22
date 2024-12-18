@@ -73,22 +73,3 @@ export interface SettingsResponse {
   data: Settings;
   error: null | Error;
 }
-
-export interface SettingsState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: ThemeMode;
-  themeMode: ThemeMode;
-  systemTheme: ThemeMode;
-  effectiveTheme: ThemeMode;
-  cssVariables: Record<string, string>;
-  setThemeMode: (mode: ThemeMode) => void;
-  setSystemTheme: (theme: ThemeMode) => void;
-  setSettings: (settings: Settings) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setMode: (mode: ThemeMode) => void;
-  updateSettings: (settings: Settings) => Promise<void>;
-  updateTheme: (settings: Settings) => Promise<void>;
-}

@@ -34,3 +34,10 @@ export const isJsonObject = (value: unknown): value is JsonObject => {
 export const isJson = (value: unknown): value is Json => {
   return isJsonPrimitive(value) || isJsonArray(value) || isJsonObject(value);
 };
+
+export const isSettingValue = (value: unknown): value is SettingValue => {
+  if (!value || typeof value !== 'object') return false;
+  return 'label' in value && 'value' in value &&
+    typeof (value as any).label === 'string' &&
+    typeof (value as any).value === 'boolean';
+};
