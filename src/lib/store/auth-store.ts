@@ -6,7 +6,10 @@ interface AuthState {
   session: any | null;
   user: any | null;
   isLoading: boolean;
+  isTransitioning: boolean;
   error: string | null;
+  initialize: () => Promise<void>;
+  handleSessionUpdate: (session: any) => Promise<void>;
   setSession: (session: any | null) => void;
   setUser: (user: any | null) => void;
   setLoading: (isLoading: boolean) => void;
@@ -16,11 +19,38 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       session: null,
       user: null,
-      isLoading: false,
+      isLoading: true,
+      isTransitioning: false,
       error: null,
+      initialize: async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            set({ session, user: session.user });
+          }
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Failed to initialize auth' });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      handleSessionUpdate: async (session) => {
+        set({ isTransitioning: true });
+        try {
+          if (session) {
+            set({ session, user: session.user });
+          } else {
+            set({ session: null, user: null });
+          }
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Session update failed' });
+        } finally {
+          set({ isTransitioning: false });
+        }
+      },
       setSession: (session) => set({ session }),
       setUser: (user) => set({ user }),
       setLoading: (isLoading) => set({ isLoading }),
@@ -29,8 +59,8 @@ export const useAuthStore = create<AuthState>()(
         try {
           await supabase.auth.signOut();
           set({ session: null, user: null });
-        } catch (error: any) {
-          set({ error: error.message });
+        } catch (error) {
+          set({ error: error instanceof Error ? error.message : 'Sign out failed' });
         }
       },
     }),
