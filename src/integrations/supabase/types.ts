@@ -365,8 +365,11 @@ export type Database = {
         Row: {
           created_by: string | null
           description: string | null
+          email: string | null
           id: string
+          is_active: boolean | null
           name: string
+          stages: Json | null
           steps: Json
           triggers: Json | null
           updated_at: string | null
@@ -374,8 +377,11 @@ export type Database = {
         Insert: {
           created_by?: string | null
           description?: string | null
+          email?: string | null
           id?: string
+          is_active?: boolean | null
           name: string
+          stages?: Json | null
           steps: Json
           triggers?: Json | null
           updated_at?: string | null
@@ -383,8 +389,11 @@ export type Database = {
         Update: {
           created_by?: string | null
           description?: string | null
+          email?: string | null
           id?: string
+          is_active?: boolean | null
           name?: string
+          stages?: Json | null
           steps?: Json
           triggers?: Json | null
           updated_at?: string | null
@@ -604,6 +613,7 @@ export type Database = {
           file_size: number | null
           id: string
           metadata: Json | null
+          name: string | null
           row_count: number | null
           status: string
           type: string | null
@@ -617,6 +627,7 @@ export type Database = {
           file_size?: number | null
           id?: string
           metadata?: Json | null
+          name?: string | null
           row_count?: number | null
           status: string
           type?: string | null
@@ -630,6 +641,7 @@ export type Database = {
           file_size?: number | null
           id?: string
           metadata?: Json | null
+          name?: string | null
           row_count?: number | null
           status?: string
           type?: string | null
@@ -643,10 +655,13 @@ export type Database = {
           created_at: string | null
           description: string | null
           difficulty_level: string | null
+          email: string | null
           estimated_time: string | null
           id: string
           likes_count: number | null
+          name: string | null
           parts_count: number | null
+          role: string | null
           status: string | null
           title: string
           updated_at: string | null
@@ -657,10 +672,13 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           difficulty_level?: string | null
+          email?: string | null
           estimated_time?: string | null
           id?: string
           likes_count?: number | null
+          name?: string | null
           parts_count?: number | null
+          role?: string | null
           status?: string | null
           title: string
           updated_at?: string | null
@@ -671,10 +689,13 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           difficulty_level?: string | null
+          email?: string | null
           estimated_time?: string | null
           id?: string
           likes_count?: number | null
+          name?: string | null
           parts_count?: number | null
+          role?: string | null
           status?: string | null
           title?: string
           updated_at?: string | null
@@ -992,6 +1013,7 @@ export type Database = {
           last_seen: string | null
           location: string | null
           lockout_until: string | null
+          name: string | null
           onboarding_completed: boolean | null
           pin_enabled: boolean | null
           pin_hash: string | null
@@ -1021,6 +1043,7 @@ export type Database = {
           last_seen?: string | null
           location?: string | null
           lockout_until?: string | null
+          name?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           pin_hash?: string | null
@@ -1050,6 +1073,7 @@ export type Database = {
           last_seen?: string | null
           location?: string | null
           lockout_until?: string | null
+          name?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           pin_hash?: string | null
@@ -1225,6 +1249,7 @@ export type Database = {
           event_type: string
           id: string
           ip_address: string | null
+          metadata: Json | null
           severity: string
           user_id: string | null
         }
@@ -1234,6 +1259,7 @@ export type Database = {
           event_type: string
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           severity: string
           user_id?: string | null
         }
@@ -1243,6 +1269,7 @@ export type Database = {
           event_type?: string
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           severity?: string
           user_id?: string | null
         }
@@ -1322,6 +1349,7 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: string | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -1359,6 +1387,7 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: string | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -1396,6 +1425,7 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: string | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -1509,6 +1539,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          stages: Json | null
           steps: Json
           updated_at: string | null
         }
@@ -1519,6 +1550,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          stages?: Json | null
           steps: Json
           updated_at?: string | null
         }
@@ -1529,6 +1561,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          stages?: Json | null
           steps?: Json
           updated_at?: string | null
         }
@@ -1700,6 +1733,7 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: string | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
