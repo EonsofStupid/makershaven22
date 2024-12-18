@@ -1,33 +1,23 @@
 import { create } from 'zustand';
-import type { ContentRevision } from '@/integrations/supabase/types/content';
+import { persist } from 'zustand/middleware';
 
 interface RevisionState {
-  selectedVersions: { left: number; right: number };
-  revisions: ContentRevision[];
-  rollbackVersion: number | null;
-  showRollbackConfirm: boolean;
-  setSelectedVersions: (versions: { left: number; right: number }) => void;
-  setRevisions: (revisions: ContentRevision[]) => void;
-  setRollbackVersion: (version: number | null) => void;
-  setShowRollbackConfirm: (show: boolean) => void;
+  revisions: any[];
+  activeRevision: any | null;
+  setRevisions: (revisions: any[]) => void;
+  setActiveRevision: (revision: any | null) => void;
+  clearRevisions: () => void;
 }
 
-export const useRevisionStore = create<RevisionState>((set) => ({
-  selectedVersions: { left: 1, right: 1 },
-  revisions: [],
-  rollbackVersion: null,
-  showRollbackConfirm: false,
-  setSelectedVersions: (versions) => set({ selectedVersions: versions }),
-  setRevisions: (revisions) => set({ revisions }),
-  setRollbackVersion: (version) => set({ rollbackVersion: version }),
-  setShowRollbackConfirm: (show) => set({ showRollbackConfirm: show }),
-}));
-
-// Helper function to get selected revisions
-export const getSelectedRevisions = (state: RevisionState) => {
-  const { revisions, selectedVersions } = state;
-  return {
-    left: revisions.find(r => r.version_number === selectedVersions.left),
-    right: revisions.find(r => r.version_number === selectedVersions.right)
-  };
-};
+export const useRevisionStore = create<RevisionState>()(
+  persist(
+    (set) => ({
+      revisions: [],
+      activeRevision: null,
+      setRevisions: (revisions) => set({ revisions }),
+      setActiveRevision: (revision) => set({ activeRevision: revision }),
+      clearRevisions: () => set({ revisions: [], activeRevision: null }),
+    }),
+    { name: 'revision-store' }
+  )
+);
