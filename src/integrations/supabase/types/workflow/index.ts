@@ -1,5 +1,5 @@
-import { Json } from '../core/json';
-import type { WorkflowStageType } from '../core/enums';
+import { Json } from '../base/json';
+import { WorkflowStageType } from '../base/enums';
 
 export interface WorkflowStage {
   id: string;
@@ -15,7 +15,7 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   steps: WorkflowStage[];
-  stages: WorkflowStage[];
+  stages?: WorkflowStage[];
   is_active?: boolean;
   created_by?: string;
   created_at?: string;
@@ -68,13 +68,14 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
       };
     }
 
+    const stageObj = stage as Record<string, any>;
     return {
-      id: String(stage.id || crypto.randomUUID()),
-      name: String(stage.name || ''),
-      type: (stage.type as WorkflowStageType) || 'TASK',
-      order: Number(stage.order || 0),
-      config: stage.config as WorkflowStageConfig || {},
-      description: stage.description ? String(stage.description) : undefined
+      id: String(stageObj.id || crypto.randomUUID()),
+      name: String(stageObj.name || ''),
+      type: (stageObj.type as WorkflowStageType) || 'TASK',
+      order: Number(stageObj.order || 0),
+      config: stageObj.config as WorkflowStageConfig || {},
+      description: stageObj.description ? String(stageObj.description) : undefined
     };
   });
 };
@@ -82,7 +83,7 @@ export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,
-    stages: template.stages.map(stage => ({
+    stages: template.stages?.map(stage => ({
       ...stage,
       id: stage.id.toString(),
       type: stage.type.toString(),

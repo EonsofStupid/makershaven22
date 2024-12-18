@@ -1,5 +1,5 @@
-import { Json } from '../base';
-import { ThemeMode, TransitionType } from '../core/enums';
+import { Json } from '../base/json';
+import { ThemeMode } from '../base/enums';
 
 export interface Settings {
   id: string;
@@ -34,7 +34,7 @@ export interface Settings {
   updated_at?: string;
   updated_by?: string;
   security_settings?: Json;
-  transition_type?: TransitionType;
+  transition_type?: string;
   theme_mode?: ThemeMode;
   state_version?: number;
   last_sync?: string;
