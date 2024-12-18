@@ -9,8 +9,10 @@ import { useSettingsReset } from "./handlers/useSettingsReset";
 export const useSettingsForm = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  
   const { data: settings, isLoading } = useSettingsFetch();
-  const { handleMediaUpload, isSaving } = useSettingsUpdateHandlers();
+  const { handleMediaUpload } = useSettingsUpdateHandlers();
   const { isResetting, handleResetToDefault } = useSettingsReset();
 
   const form = useForm<SettingsFormData>({
@@ -29,7 +31,12 @@ export const useSettingsForm = () => {
   };
 
   const handleSettingsUpdate = async (formData: Settings) => {
-    await handleMediaUpload(formData as any, 'settings');
+    setIsSaving(true);
+    try {
+      await handleMediaUpload(formData as any, 'settings');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return {

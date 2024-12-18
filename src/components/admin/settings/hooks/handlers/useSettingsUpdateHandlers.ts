@@ -1,11 +1,12 @@
 import { uploadMedia } from '@/integrations/supabase/supabase-service';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { toast } from 'sonner';
+import { Settings } from '../../types';
 
 export const useSettingsUpdateHandlers = () => {
   const { updateSetting } = useSettingsStore();
 
-  const handleMediaUpload = async (file: File, key: string) => {
+  const handleMediaUpload = async (file: File, key: keyof Settings) => {
     try {
       const url = await uploadMedia(file, 'settings-media');
       updateSetting(key, url);

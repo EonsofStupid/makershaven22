@@ -3,13 +3,13 @@ import { z } from "zod";
 export const settingsSchema = z.object({
   site_title: z.string().min(1, "Site title is required"),
   tagline: z.string().optional(),
-  primary_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  secondary_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  accent_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  text_primary_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  text_secondary_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  text_link_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
-  text_heading_color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid color format"),
+  primary_color: z.string(),
+  secondary_color: z.string(),
+  accent_color: z.string(),
+  text_primary_color: z.string(),
+  text_secondary_color: z.string(),
+  text_link_color: z.string(),
+  text_heading_color: z.string(),
   neon_cyan: z.string().optional(),
   neon_pink: z.string().optional(),
   neon_purple: z.string().optional(),
@@ -30,7 +30,6 @@ export const settingsSchema = z.object({
   logo_url: z.string().optional(),
   favicon_url: z.string().optional(),
   transition_type: z.enum(["fade", "slide", "scale", "blur"]).optional(),
-  menu_animation_type: z.enum(["fade", "slide-down", "scale", "blur"]).optional(),
   theme_mode: z.enum(["light", "dark", "system"]).optional(),
 });
 
