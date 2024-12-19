@@ -1,39 +1,33 @@
 import React from 'react';
+import { Card } from "@/components/ui/card";
+import { StageConfigUpdateProps, WorkflowStageType } from '@/lib/types/workflow/types';
 import { ApprovalConfig } from './config/ApprovalConfig';
 import { ReviewConfig } from './config/ReviewConfig';
 import { TaskConfig } from './config/TaskConfig';
 import { NotificationConfig } from './config/NotificationConfig';
-import type { WorkflowStage, StageConfigUpdateProps } from '@/lib/types/database/tables/workflow';
 
-export const StageConfigPanel: React.FC<StageConfigUpdateProps> = ({ 
-  stage,
-  onUpdate
-}) => {
-  const handleConfigChange = (config: WorkflowStage['config']) => {
-    onUpdate({ config });
-  };
-
-  const renderConfig = () => {
-    switch (stage.type) {
-      case 'approval':
-        return <ApprovalConfig config={stage.config} onChange={handleConfigChange} />;
-      case 'review':
-        return <ReviewConfig config={stage.config} onChange={handleConfigChange} />;
-      case 'task':
-        return <TaskConfig config={stage.config} onChange={handleConfigChange} />;
-      case 'notification':
-        return <NotificationConfig config={stage.config} onChange={handleConfigChange} />;
-      case 'conditional':
-        return <div className="text-white/60">Conditional configuration coming soon</div>;
-      default:
-        return null;
-    }
+const StageConfigPanel: React.FC<StageConfigUpdateProps> = ({ config, onChange }) => {
+  const handleConfigChange = (updatedConfig: Partial<WorkflowStageType>) => {
+    onChange({ ...config, ...updatedConfig });
   };
 
   return (
-    <div className="mt-4 border-t border-white/10 pt-4">
-      <h4 className="text-sm font-medium text-white mb-4">Stage Configuration</h4>
-      {renderConfig()}
-    </div>
+    <Card className="p-4 bg-gray-800/50 border border-white/10">
+      <h3 className="text-lg font-semibold text-white">Stage Configuration</h3>
+      {config.type === 'approval' && (
+        <ApprovalConfig config={config} onChange={handleConfigChange} />
+      )}
+      {config.type === 'review' && (
+        <ReviewConfig config={config} onChange={handleConfigChange} />
+      )}
+      {config.type === 'task' && (
+        <TaskConfig config={config} onChange={handleConfigChange} />
+      )}
+      {config.type === 'notification' && (
+        <NotificationConfig config={config} onChange={handleConfigChange} />
+      )}
+    </Card>
   );
 };
+
+export default StageConfigPanel;

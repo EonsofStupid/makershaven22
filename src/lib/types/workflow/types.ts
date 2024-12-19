@@ -1,6 +1,37 @@
 import { Json } from '../core/json';
+import { WorkflowStageType } from '../base/enums';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: Json;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
+}
 
 export interface WorkflowStage {
   id: string;
@@ -23,77 +54,26 @@ export interface WorkflowTemplate {
   updated_at?: string;
 }
 
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
+export interface WorkflowFormData extends WorkflowTemplate {}
+
+export interface StageUpdateFunction {
+  (stageId: string, updates: Partial<WorkflowStage>): void;
 }
 
-export const parseWorkflowStage = (data: Json): WorkflowStage => {
-  if (!data || typeof data !== 'object') {
-    return {
-      id: crypto.randomUUID(),
-      name: '',
-      type: 'task',
-      order: 0,
-      config: {},
-    };
-  }
+export interface StageConfigUpdateProps {
+  config: WorkflowStageConfig;
+  onChange: (config: WorkflowStageConfig) => void;
+}
 
-  const stage = data as Record<string, unknown>;
-  
-  return {
-    id: String(stage.id || crypto.randomUUID()),
-    name: String(stage.name || ''),
-    type: (stage.type as WorkflowStageType) || 'task',
-    order: Number(stage.order || 0),
-    config: stage.config as WorkflowStageConfig || {},
-    description: stage.description ? String(stage.description) : undefined
-  };
-};
-
-export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return {
-    id: stage.id,
-    name: stage.name,
-    type: stage.type,
-    order: stage.order,
-    config: stage.config,
-    description: stage.description
-  } as unknown as Json;
-};
-
-export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  return data.map(parseWorkflowStage);
-};
-
-export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
-  return stages.map(serializeWorkflowStage) as unknown as Json;
-};
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
+  initialize: () => Promise<void>;
+  setWorkflows: (workflows: WorkflowTemplate[]) => void;
+  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
+}
