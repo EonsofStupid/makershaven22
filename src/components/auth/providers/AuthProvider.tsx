@@ -7,7 +7,7 @@ import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { authManager } from "@/lib/auth/AuthManager";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { handleAuthChange, initialSetupDone } = useAuthSetup();
+  const { handleAuthChange } = useAuthSetup();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -25,13 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initSecurity();
-
-    if (initialSetupDone.current) {
-      console.log('Initial setup already done, skipping');
-      return;
-    }
     
-    initialSetupDone.current = true;
     let retryCount = 0;
     const maxRetries = 3;
     const retryDelay = 1000;
@@ -46,7 +40,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log('Auth manager initialized');
         } catch (securityError) {
           console.error('Error initializing auth manager:', securityError);
-          // Continue with auth setup even if security init fails
         }
 
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
