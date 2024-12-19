@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import type { Json } from '../core/json';
+import type { ThemeMode, TransitionType } from '../core/enums';
+import type { SecuritySettings } from '../security/types';
 
-// Base settings interface that matches database structure
+// Base Settings Interface
 export interface Settings {
   id: string;
   site_title: string;
@@ -32,15 +34,15 @@ export interface Settings {
   backdrop_blur: string;
   logo_url?: string;
   favicon_url?: string;
-  security_settings?: Json;
-  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
+  security_settings?: SecuritySettings;
+  transition_type?: TransitionType;
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-  theme_mode?: 'light' | 'dark' | 'system';
+  theme_mode?: ThemeMode;
   state_version?: number;
   last_sync?: string;
 }
 
-// Zod schema for validation
+// Zod Schema for Form Validation
 export const settingsSchema = z.object({
   id: z.string().optional(),
   site_title: z.string().min(1, "Site title is required"),
@@ -81,3 +83,9 @@ export const settingsSchema = z.object({
 
 // Type for form data derived from schema
 export type SettingsFormData = z.infer<typeof settingsSchema>;
+
+// Response type for settings API
+export interface SettingsResponse {
+  data: Settings | null;
+  error: Error | null;
+}
