@@ -1,10 +1,12 @@
 import { Json } from '../core/json';
-import { WorkflowStageType } from '../core/enums';
 import { BaseEntity, UserOwnedEntity } from '../core/base';
+
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowTemplate extends UserOwnedEntity {
   name: string;
   description?: string;
+  stages: WorkflowStage[];
   steps: WorkflowStage[];
   is_active?: boolean;
 }
@@ -50,40 +52,24 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
-  if (!Array.isArray(data)) return [];
-  
-  return data.map(stage => {
-    if (typeof stage !== 'object' || stage === null) {
-      return {
-        id: crypto.randomUUID(),
-        name: '',
-        type: 'TASK' as WorkflowStageType,
-        order: 0,
-        config: {},
-      };
-    }
+export interface WorkflowFormData {
+  id?: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
 
-    return {
-      id: String(stage.id || crypto.randomUUID()),
-      name: String(stage.name || ''),
-      type: (stage.type as WorkflowStageType) || 'TASK',
-      order: Number(stage.order || 0),
-      config: stage.config as WorkflowStageConfig || {},
-      description: stage.description ? String(stage.description) : undefined
-    };
-  });
-};
+export interface StageConfigUpdateProps {
+  config: WorkflowStageConfig;
+  onConfigUpdate: (config: WorkflowStageConfig) => void;
+}
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return {
-    ...template,
-    steps: template.steps.map(step => ({
-      ...step,
-      id: step.id.toString(),
-      type: step.type.toString(),
-      order: Number(step.order),
-      config: step.config || {}
-    }))
-  } as unknown as Json;
-};
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
+}

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const settingsSchema = z.object({
+  id: z.string().optional(),
   site_title: z.string().min(1, "Site title is required"),
   tagline: z.string().optional(),
   primary_color: z.string().optional(),
@@ -31,6 +32,10 @@ export const settingsSchema = z.object({
   favicon_url: z.string().optional(),
   transition_type: z.enum(['fade', 'slide', 'scale', 'blur']).optional(),
   menu_animation_type: z.enum(['fade', 'slide-down', 'scale', 'blur']).optional(),
+  security_settings: z.record(z.any()).optional(),
+  theme_mode: z.enum(['light', 'dark', 'system']).optional(),
+  state_version: z.number().optional(),
+  last_sync: z.string().optional(),
 });
 
 export type SettingsFormData = z.infer<typeof settingsSchema>;
