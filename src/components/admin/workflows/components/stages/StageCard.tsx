@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { GripVertical, X, AlertCircle } from 'lucide-react';
 import { StageTypeSelector } from './StageTypeSelector';
 import { StageConfigPanel } from './StageConfigPanel';
-import type { WorkflowStage, StageUpdateFunction } from '../../types';
-import { validateStage, isValidStageUpdate, createStageUpdate } from '../../types';
+import { WorkflowStage, StageUpdateFunction } from '@/integrations/supabase/types/workflow/base';
+import { validateStage } from '@/integrations/supabase/types/workflow/validation';
 
 interface StageCardProps {
   stage: WorkflowStage;
@@ -26,37 +26,20 @@ export const StageCard = ({
 }: StageCardProps) => {
   const validation = validateStage(stage);
 
-  // Type-safe event handlers with validation
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const update = createStageUpdate(stage.id, { name: e.target.value });
-    if (isValidStageUpdate(update)) {
-      onUpdate(stage.id, update);
-    }
+    onUpdate(stage.id, { name: e.target.value });
   };
 
   const handleTypeChange = (value: WorkflowStage['type']) => {
-    const update = createStageUpdate(stage.id, { type: value });
-    if (isValidStageUpdate(update)) {
-      onUpdate(stage.id, update);
-    }
+    onUpdate(stage.id, { type: value });
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const update = createStageUpdate(stage.id, { description: e.target.value });
-    if (isValidStageUpdate(update)) {
-      onUpdate(stage.id, update);
-    }
+    onUpdate(stage.id, { description: e.target.value });
   };
 
   const handleConfigUpdate = (updates: Partial<WorkflowStage>) => {
-    const update = createStageUpdate(stage.id, updates);
-    if (isValidStageUpdate(update)) {
-      onUpdate(stage.id, update);
-    }
-  };
-
-  const handleDelete = () => {
-    onDelete(stage.id);
+    onUpdate(stage.id, updates);
   };
 
   return (
@@ -130,7 +113,7 @@ export const StageCard = ({
         <Button
           type="button"
           variant="ghost"
-          onClick={handleDelete}
+          onClick={() => onDelete(stage.id)}
           className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
         >
           <X className="w-4 h-4" />
