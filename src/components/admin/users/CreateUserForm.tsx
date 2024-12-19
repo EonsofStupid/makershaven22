@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { RoleSelector } from './RoleSelector';
-import { UserRole } from '@/components/auth/types';
+import { UserRole } from '@/lib/types/auth';
 
 const createUserSchema = z.object({
   email: z.string().email(),

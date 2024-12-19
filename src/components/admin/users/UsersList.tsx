@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { RoleSelector } from './RoleSelector';
 import { UserTableRowActions } from './UserTableRowActions';
 import { ErrorState } from '@/components/shared/error-handling/ErrorState';
-import { UserRole } from '@/components/auth/types';
+import { UserRole } from '@/lib/types/auth';
 
 interface UsersListProps {
   searchQuery: string;

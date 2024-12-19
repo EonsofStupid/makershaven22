@@ -11,7 +11,7 @@ import { Eye } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import type { BaseContent } from '@/components/content/types/cms';
+import type { BaseContent } from '@/lib/types/content';
 
 interface PreviewDialogProps {
   content: BaseContent;

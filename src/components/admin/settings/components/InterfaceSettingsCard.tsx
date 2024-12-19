@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { SettingValue } from '@/integrations/supabase/types/core/json';
-import { Settings } from '@/integrations/supabase/types/settings/types';
+import { SettingValue } from '@/lib/types/json';
+import { Settings } from '@/lib/types/settings/settings/types';
 
 interface InterfaceSettingsProps {
   settings: Record<string, SettingValue>;

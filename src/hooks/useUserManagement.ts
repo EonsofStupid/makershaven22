@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { UserRole } from '@/components/auth/types';
+import type { UserRole } from '@/lib/types/auth';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();

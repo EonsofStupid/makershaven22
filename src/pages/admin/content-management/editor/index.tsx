@@ -7,10 +7,10 @@ import { ImageUploadZone } from "@/components/uploads";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import RichTextEditor from "@/components/content/blog/components/RichTextEditor";
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/lib/types";
 import { PreviewDialog } from "@/components/content/blog/components/preview/PreviewDialog";
 import { X } from "lucide-react";
-import type { BaseContent } from "@/components/content/types/cms";
+import type { BaseContent } from "@/lib/types/content";
 
 type PostCategory = Database["public"]["Enums"]["post_category"];
 

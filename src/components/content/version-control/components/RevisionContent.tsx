@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RevisionMetadata } from './RevisionMetadata';
-import type { ContentRevision } from '@/integrations/supabase/types/content';
+import type { ContentRevision } from '@/lib/types/content';
 
 interface RevisionContentProps {
   revision: ContentRevision | null;

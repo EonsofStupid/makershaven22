@@ -9,8 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { WorkflowForm } from "@/components/admin/workflows/WorkflowForm";
-import type { WorkflowFormData, WorkflowData, ParsedWorkflowData } from "@/components/content/types/workflow";
-import { parseWorkflowSteps, serializeWorkflowSteps } from "@/components/content/types/workflow";
+import type { WorkflowFormData, WorkflowData, ParsedWorkflowData } from "@/lib/types/workflow";
+import { parseWorkflowSteps, serializeWorkflowSteps } from "@/lib/types/workflow";
 
 const WorkflowEditor = () => {
   const { id } = useParams();

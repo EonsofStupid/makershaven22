@@ -13,7 +13,7 @@ import { useUserManagement } from '@/hooks/useUserManagement';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from "sonner";
 import { BanUserDialog } from './BanUserDialog';
-import { UserRole } from '@/components/auth/types';
+import { UserRole } from '@/lib/types/auth';
 import { BanAction } from './actions/BanAction';
 import { UnbanAction } from './actions/UnbanAction';
 import { RoleActions } from './actions/RoleActions';

@@ -2,7 +2,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Clock, User, Info, GitBranch, Calendar, FileText } from 'lucide-react';
-import type { ContentRevision } from '@/integrations/supabase/types/content';
+import type { ContentRevision } from '@/lib/types/content';
 
 interface RevisionMetadataProps {
   revision: ContentRevision;

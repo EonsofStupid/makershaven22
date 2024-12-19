@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
