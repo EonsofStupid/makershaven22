@@ -1,4 +1,4 @@
-import { Json } from '../core/json';
+import { Json } from '@/lib/types/core/json';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
