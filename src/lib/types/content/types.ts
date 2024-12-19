@@ -4,16 +4,16 @@ import { ContentStatus, ContentType } from '../core/enums';
 export interface BaseContent {
   id: string;
   title: string;
+  content: Json;
   type: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
   status: ContentStatus;
-  version?: number;
   created_by: string;
-  updated_by?: string;
   created_at: string;
   updated_at?: string;
+  metadata?: Json;
+  version?: number;
+  slug?: string;
+  updated_by?: string;
 }
 
 export interface ContentRevision {
@@ -24,25 +24,23 @@ export interface ContentRevision {
   version_number: number;
   created_by: string;
   created_at: string;
+  profiles: { display_name: string };
   change_summary?: string;
-  publish_status?: string;
-  scheduled_publish_at?: string;
-  rollback_from?: string;
   rollback_metadata?: Json;
 }
 
-export interface ContentWithAuthor {
+export interface SecurityLog {
   id: string;
-  title: string;
-  type: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
-  status: ContentStatus;
-  version?: number;
+  user_id: string;
+  event_type: string;
+  severity: string;
+  details: Json;
+  metadata: Json;
+  ip_address: string;
+  user_agent: string;
   created_at: string;
-  updated_at?: string;
-  created_by: {
+  profiles?: {
+    username: string;
     display_name: string;
   };
 }

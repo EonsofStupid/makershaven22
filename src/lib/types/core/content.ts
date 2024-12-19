@@ -1,8 +1,8 @@
-import { Json } from '../core';
-import { ContentStatus, ContentType } from '../core';
+import { Json } from './base';
+import { ContentStatus, ContentType } from './enums';
+import { BaseEntity } from './base';
 
-export interface BaseContent {
-  id: string;
+export interface BaseContent extends BaseEntity {
   title: string;
   type: ContentType;
   content?: Json;
@@ -12,8 +12,6 @@ export interface BaseContent {
   version?: number;
   created_by: string;
   updated_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface ContentRevision {
@@ -21,14 +19,10 @@ export interface ContentRevision {
   content_id: string;
   content: Json;
   metadata?: Json;
-  created_by?: string;
-  created_at: string;
   version_number: number;
+  created_by: string;
+  created_at: string;
   change_summary?: string;
-  publish_status?: string;
-  scheduled_publish_at?: string;
-  rollback_from?: string;
-  rollback_metadata?: Json;
 }
 
 export interface ContentRelationship {

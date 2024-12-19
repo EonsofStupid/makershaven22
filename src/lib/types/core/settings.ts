@@ -1,8 +1,8 @@
-import { Json } from '../core/json';
-import { ThemeMode, TransitionType } from '../theme/types';
+import { Json } from './base';
+import { ThemeMode, TransitionType } from './enums';
+import { BaseEntity } from './base';
 
-export interface Settings {
-  id: string;
+export interface Settings extends BaseEntity {
   site_title: string;
   tagline?: string;
   primary_color?: string;
@@ -31,17 +31,12 @@ export interface Settings {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-  updated_at?: string;
   updated_by?: string;
+  theme_mode?: ThemeMode;
   security_settings?: Json;
   transition_type?: TransitionType;
-  theme_mode?: ThemeMode;
   state_version?: number;
   last_sync?: string;
-}
-
-export interface SettingsFormData extends Settings {
-  // Additional form-specific fields can be added here
 }
 
 export interface SettingsUpdateParams {

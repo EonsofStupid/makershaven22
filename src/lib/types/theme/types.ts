@@ -1,5 +1,7 @@
-import { Json } from '../base/json';
-import { ThemeMode } from '../base/enums';
+import { Json } from '../core/json';
+
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 export interface ThemeSettings {
   id: string;
@@ -34,7 +36,7 @@ export interface ThemeSettings {
   updated_at?: string;
   updated_by?: string;
   security_settings?: Json;
-  transition_type?: string;
+  transition_type?: TransitionType;
   theme_mode?: ThemeMode;
   state_version?: number;
   last_sync?: string;
@@ -52,7 +54,7 @@ export interface ThemeState {
   setThemeMode: (mode: ThemeMode) => void;
   setSystemTheme: (theme: ThemeMode) => void;
   setSettings: (settings: ThemeSettings) => void;
-  setLoading: (loading: boolean) => void;
+  setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
   setMode: (mode: ThemeMode) => void;
   updateSettings: (settings: ThemeSettings) => Promise<void>;

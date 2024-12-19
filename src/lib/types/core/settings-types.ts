@@ -1,7 +1,6 @@
-import { Json } from '../json';
-import { ThemeMode, TransitionType } from './enums';
+import { Json } from './base-types';
 
-export interface ThemeSettings {
+export interface Settings {
   id: string;
   site_title: string;
   tagline?: string;
@@ -34,9 +33,7 @@ export interface ThemeSettings {
   updated_at?: string;
   updated_by?: string;
   security_settings?: Json;
-  transition_type?: TransitionType;
-  theme_mode?: ThemeMode;
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  transition_type?: string;
   state_version?: number;
   last_sync?: string;
 }
@@ -69,6 +66,6 @@ export interface SettingsUpdateParams {
 }
 
 export interface SettingsResponse {
-  data: ThemeSettings;
+  data: Settings;
   error: null | Error;
 }

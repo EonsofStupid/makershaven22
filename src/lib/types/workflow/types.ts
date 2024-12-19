@@ -1,6 +1,22 @@
-import { Json } from '../base/json';
+import { Json } from '../core/json';
+import { WorkflowStageType } from '../core/enums';
+import { BaseEntity, UserOwnedEntity } from '../core/base';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+export interface WorkflowTemplate extends UserOwnedEntity {
+  name: string;
+  description?: string;
+  steps: WorkflowStage[];
+  is_active?: boolean;
+}
+
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  description?: string;
+}
 
 export interface WorkflowStageConfig {
   assignees?: string[];
@@ -22,7 +38,7 @@ export interface WorkflowStageConfig {
     rules: Array<{
       field: string;
       operator: string;
-      value: Json;
+      value: any;
     }>;
   };
   requiredApprovers?: number;
@@ -32,85 +48,42 @@ export interface WorkflowStageConfig {
     required: boolean;
     options?: string[];
   }>;
-  [key: string]: any; // Add index signature for JSON compatibility
-}
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  description?: string;
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface WorkflowFormData extends WorkflowTemplate {}
-
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
-
-export interface StageConfigUpdateProps {
-  config: WorkflowStageConfig;
-  onChange: (config: WorkflowStageConfig) => void;
-}
-
-export interface WorkflowState {
-  workflows: WorkflowTemplate[];
-  activeWorkflow: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-  initialize: () => Promise<void>;
-  setWorkflows: (workflows: WorkflowTemplate[]) => void;
-  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  reset: () => void;
-  handleWorkflowUpdate?: (workflow: WorkflowTemplate) => Promise<void>;
 }
 
 export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => {
-    if (typeof stage !== 'object' || !stage) {
+    if (typeof stage !== 'object' || stage === null) {
       return {
         id: crypto.randomUUID(),
         name: '',
-        type: 'task',
+        type: 'TASK' as WorkflowStageType,
         order: 0,
         config: {},
       };
     }
 
-    const stageObj = stage as Record<string, any>;
     return {
-      id: String(stageObj.id || crypto.randomUUID()),
-      name: String(stageObj.name || ''),
-      type: (stageObj.type as WorkflowStageType) || 'task',
-      order: Number(stageObj.order || 0),
-      config: stageObj.config as WorkflowStageConfig || {},
-      description: stageObj.description ? String(stageObj.description) : undefined
+      id: String(stage.id || crypto.randomUUID()),
+      name: String(stage.name || ''),
+      type: (stage.type as WorkflowStageType) || 'TASK',
+      order: Number(stage.order || 0),
+      config: stage.config as WorkflowStageConfig || {},
+      description: stage.description ? String(stage.description) : undefined
     };
   });
 };
 
-export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
-  return stages.map(stage => ({
-    ...stage,
-    id: stage.id.toString(),
-    type: stage.type.toString(),
-    order: Number(stage.order),
-    config: stage.config || {}
-  })) as Json;
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
+  return {
+    ...template,
+    steps: template.steps.map(step => ({
+      ...step,
+      id: step.id.toString(),
+      type: step.type.toString(),
+      order: Number(step.order),
+      config: step.config || {}
+    }))
+  } as unknown as Json;
 };

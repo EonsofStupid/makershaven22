@@ -1,25 +1,25 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+import { UserRole } from '../enums';
 
 export interface Profile {
   id: string;
-  username: string | null;
-  display_name: string | null;
-  avatar_url: string | null;
-  role: UserRole | null;
-  bio: string | null;
-  website: string | null;
-  location: string | null;
+  username: string;
+  display_name: string;
+  avatar_url: string;
+  role: UserRole;
+  bio: string;
+  website: string;
+  location: string;
   created_at: string;
   updated_at: string;
-  last_seen: string | null;
-  is_banned: boolean | null;
-  ban_reason: string | null;
-  banned_at: string | null;
-  banned_by: string | null;
-  two_factor_enabled: boolean | null;
-  two_factor_secret: string | null;
-  onboarding_completed: boolean | null;
-  gamification_enabled: boolean | null;
-  visual_editor_enabled: boolean | null;
-  last_login_at: string | null;
+  last_seen: string;
+  is_banned: boolean;
+  ban_reason?: string;
+  banned_at?: string;
+  banned_by?: string;
+  two_factor_enabled: boolean;
+  two_factor_secret?: string;
+  onboarding_completed: boolean;
+  gamification_enabled: boolean;
+  visual_editor_enabled: boolean;
+  last_login_at: string;
 }

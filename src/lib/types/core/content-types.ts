@@ -1,8 +1,10 @@
-import { Json } from '../core';
-import { ContentStatus, ContentType } from '../core';
+import { Json } from './base-types';
+import { BaseEntity, UserOwnedEntity } from './base-types';
 
-export interface BaseContent {
-  id: string;
+export type ContentType = 'page' | 'component' | 'template' | 'workflow';
+export type ContentStatus = 'draft' | 'published' | 'archived';
+
+export interface BaseContent extends UserOwnedEntity {
   title: string;
   type: ContentType;
   content?: Json;
@@ -10,19 +12,13 @@ export interface BaseContent {
   slug?: string;
   status?: ContentStatus;
   version?: number;
-  created_by: string;
-  updated_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
-export interface ContentRevision {
-  id: string;
+export interface ContentRevision extends BaseEntity {
   content_id: string;
   content: Json;
   metadata?: Json;
   created_by?: string;
-  created_at: string;
   version_number: number;
   change_summary?: string;
   publish_status?: string;

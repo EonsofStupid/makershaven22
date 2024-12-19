@@ -1,42 +1,56 @@
-export interface AuthStore {
-  session: any | null;
-  user: any | null;
-  isLoading: boolean;
-  isTransitioning: boolean;
-  error: string | null;
-  initialize: () => Promise<void>;
-  handleSessionUpdate: (session: any) => Promise<void>;
-  setSession: (session: any | null) => void;
-  setUser: (user: any | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
-  signOut: () => Promise<void>;
-}
+import type { Session } from '@supabase/supabase-js';
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
 export interface AuthUser {
   id: string;
-  email?: string;
-  role?: string;
+  email?: string | null;
+  role?: UserRole;
   username?: string;
   displayName?: string;
-  avatarUrl?: string;
 }
 
 export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
   user: AuthUser;
+  expires_at?: number;
 }
 
-export interface SessionConfig {
-  timeoutMinutes: number;
-  maxAttempts: number;
-  lockoutMinutes: number;
+export interface AuthState {
+  isLoading: boolean;
+  hasAccess: boolean;
+  error: Error | { message: string } | null;
 }
 
-export interface SessionState {
-  session: any | null;
-  setSession: (session: any | null) => void;
-  clearSession: () => void;
+export interface AuthGuardProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredRole?: UserRole | UserRole[];
+  fallbackPath?: string;
+  loadingComponent?: React.ReactNode;
+  unauthorizedComponent?: React.ReactNode;
+  onError?: (error: Error | { message: string }) => void;
+}
+
+export interface RoleHierarchy {
+  [key: string]: number;
+}
+
+export interface PinLoginResponse {
+  success: boolean;
+  message: string;
+  locked_until?: string;
+  attempts_remaining?: number;
+}
+
+export interface PinSetupResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface Profile {
+  id: string;
+  username?: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  role?: UserRole;
 }
