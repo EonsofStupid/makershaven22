@@ -1,53 +1,62 @@
 import React from 'react';
-import { Database } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-type PostCategory = Database["public"]["Enums"]["post_category"];
+import { Settings } from '@/lib/types/settings';
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface SEOSectionProps {
-  selectedCategory: PostCategory | null;
-  onCategorySelect: (category: PostCategory) => void;
+  title: string;
+  description: string;
+  keywords: string;
+  onUpdate: (field: string, value: string) => void;
 }
 
-const CATEGORIES = [
-  'Guides',
-  'Reviews',
-  'Blog',
-  'Site Updates',
-  'Critical',
-  '3D Printer',
-  '3D Printer Hardware'
-] as const;
-
-const SEOSection: React.FC<SEOSectionProps> = ({ selectedCategory, onCategorySelect }) => {
+export const SEOSection: React.FC<SEOSectionProps> = ({
+  title,
+  description,
+  keywords,
+  onUpdate,
+}) => {
   return (
-    <div className="p-6 space-y-6">
+    <Card className="p-6 space-y-6 bg-gray-800/50 border border-white/10">
+      <h3 className="text-xl font-semibold text-white">SEO Settings</h3>
+      
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white">Category</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => onCategorySelect(category)}
-              className={cn(
-                "flex items-center justify-between px-4 py-2 rounded-md border transition-all duration-300",
-                selectedCategory === category
-                  ? "border-neon-cyan bg-neon-cyan/10 text-white"
-                  : "border-white/10 hover:border-neon-cyan/50 text-white/70 hover:text-white"
-              )}
-            >
-              <span>{category}</span>
-              {selectedCategory === category && (
-                <Check className="w-4 h-4 text-neon-cyan animate-fade-in" />
-              )}
-            </button>
-          ))}
+        <div>
+          <Label htmlFor="seo-title">SEO Title</Label>
+          <Input
+            id="seo-title"
+            value={title}
+            onChange={(e) => onUpdate('title', e.target.value)}
+            placeholder="Enter SEO title"
+            className="bg-white/5 border-white/10 text-white"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="seo-description">Meta Description</Label>
+          <Textarea
+            id="seo-description"
+            value={description}
+            onChange={(e) => onUpdate('description', e.target.value)}
+            placeholder="Enter meta description"
+            className="bg-white/5 border-white/10 text-white"
+            rows={4}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="seo-keywords">Keywords</Label>
+          <Input
+            id="seo-keywords"
+            value={keywords}
+            onChange={(e) => onUpdate('keywords', e.target.value)}
+            placeholder="Enter keywords (comma-separated)"
+            className="bg-white/5 border-white/10 text-white"
+          />
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
-
-export default SEOSection;
