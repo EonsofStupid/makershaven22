@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { GripVertical, X, AlertCircle } from 'lucide-react';
 import { StageTypeSelector } from './StageTypeSelector';
 import { StageConfigPanel } from './StageConfigPanel';
-import { WorkflowStage, StageUpdateFunction } from '@/integrations/supabase/types/workflow/base';
-import { validateStage } from '@/integrations/supabase/types/workflow/validation';
+import { WorkflowStage, StageUpdateFunction } from '@/lib/types/workflow';
+import { validateStage } from '@/lib/types/workflow';
 
 interface StageCardProps {
   stage: WorkflowStage;

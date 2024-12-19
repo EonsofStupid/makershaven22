@@ -6,7 +6,7 @@ import { useWorkflowForm } from "./hooks/useWorkflowForm";
 import { WorkflowBasicFields } from './components/WorkflowBasicFields';
 import { VisualWorkflowBuilder } from './components/VisualWorkflowBuilder';
 import { toast } from "sonner";
-import { WorkflowFormData } from "@/integrations/supabase/types/workflow/base";
+import { WorkflowFormData } from "@/lib/types/workflow";
 
 export const WorkflowTemplateForm = () => {
   const { form, isLoading, isSaving, handleWorkflowUpdate } = useWorkflowForm();
