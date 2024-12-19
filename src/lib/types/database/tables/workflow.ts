@@ -1,38 +1,57 @@
-import { Json } from '../../core/json';
+import type { Json } from '../core/json';
+import type { WorkflowStageType } from '../core/enums';
+import type { BaseRow, BaseTable } from '../core/base';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
-
-export interface WorkflowStage {
-  id: string;
+export interface WorkflowStage extends BaseRow {
+  name: string;
   type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
-  name: string;
   description?: string;
 }
 
-export interface WorkflowStageConfig {
-  [key: string]: Json;
-}
-
-export interface WorkflowFormData {
-  id?: string;
+export interface WorkflowTemplate extends BaseRow {
   name: string;
   description?: string;
+  steps: WorkflowStage[];
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
-export interface StageConfigUpdateProps {
-  stage: WorkflowStage;
-  onUpdate: (updates: Partial<WorkflowStage>) => void;
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: Json;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
 }
 
-export type StageUpdateFunction = (updates: Partial<WorkflowStage>) => void;
-
-export const validateStage = (stage: WorkflowStage): boolean => {
-  return !!(stage.id && stage.type && stage.name);
-};
+export interface WorkflowTables {
+  workflow_templates: BaseTable<WorkflowTemplate>;
+  workflow_stages: BaseTable<WorkflowStage>;
+}
