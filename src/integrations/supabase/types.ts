@@ -1923,11 +1923,11 @@ export type Database = {
       transition_type: "fade" | "slide" | "scale" | "blur"
       user_role: "subscriber" | "maker" | "admin" | "super_admin"
       workflow_stage_type:
-        | "APPROVAL"
-        | "REVIEW"
-        | "TASK"
-        | "NOTIFICATION"
-        | "CONDITIONAL"
+        | "approval"
+        | "review"
+        | "task"
+        | "notification"
+        | "conditional"
     }
     CompositeTypes: {
       [_ in never]: never
