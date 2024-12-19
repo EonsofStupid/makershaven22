@@ -1,57 +1,38 @@
-import type { Json } from '../core/json';
-import type { WorkflowStageType } from '../core/enums';
-import type { BaseRow, BaseTable } from '../core/base';
+import { Json } from '../../core/json';
 
-export interface WorkflowStage extends BaseRow {
-  name: string;
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+
+export interface WorkflowStage {
+  id: string;
   type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
-  description?: string;
-}
-
-export interface WorkflowTemplate extends BaseRow {
   name: string;
   description?: string;
-  steps: WorkflowStage[];
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
 }
 
 export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: Json;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
+  [key: string]: Json;
 }
 
-export interface WorkflowTables {
-  workflow_templates: BaseTable<WorkflowTemplate>;
-  workflow_stages: BaseTable<WorkflowStage>;
+export interface WorkflowFormData {
+  id?: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
 }
+
+export interface StageConfigUpdateProps {
+  stage: WorkflowStage;
+  onUpdate: (updates: Partial<WorkflowStage>) => void;
+}
+
+export type StageUpdateFunction = (updates: Partial<WorkflowStage>) => void;
+
+export const validateStage = (stage: WorkflowStage): boolean => {
+  return !!(stage.id && stage.type && stage.name);
+};
