@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { supabase } from '@/integrations/supabase/client';
-import type { AuthSession } from '@/lib/types/store-types';
+import type { AuthSession } from '@/lib/types/auth/types';
 
 interface AuthProviderProps {
   children: React.ReactNode;

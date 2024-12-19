@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { WorkflowStageType } from '@/lib/types/database/tables/workflow';
+import { WorkflowStageType } from '@/lib/types/workflow/types';
 
 interface StageTypeSelectorProps {
   value: WorkflowStageType;
@@ -31,3 +31,4 @@ export const StageTypeSelector = ({ value, onChange }: StageTypeSelectorProps) =
     </Select>
   );
 };
+

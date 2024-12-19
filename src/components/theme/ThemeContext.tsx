@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Settings } from "@/components/admin/settings/types";
+import { Settings } from "@/lib/types/settings/types";
 import { useThemeSetup } from "./hooks/useThemeSetup";
 import { useThemeSubscription } from "./hooks/useThemeSubscription";
 import { applyThemeToDocument } from "./utils/themeUtils";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/store/auth-store';
 
 interface ThemeContextType {
