@@ -1,5 +1,5 @@
 import { useWorkflowStore } from '@/lib/store/workflow-store';
-import { WorkflowTemplate } from '@/integrations/supabase/types/workflow';
+import type { WorkflowTemplate } from '@/lib/types/database/tables/workflow';
 
 export const useWorkflowManagement = () => {
   const {

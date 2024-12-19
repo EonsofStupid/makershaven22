@@ -16,11 +16,11 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   steps: WorkflowStage[];
+  stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
-  profile?: Profile;
 }
 
 export interface WorkflowStageConfig {
@@ -55,6 +55,26 @@ export interface WorkflowStageConfig {
   }>;
 }
 
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
+
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
+  initialize: () => Promise<void>;
+  setWorkflows: (workflows: WorkflowTemplate[]) => void;
+  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  reset: () => void;
+}
+
 export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
@@ -69,7 +89,7 @@ export const validateStage = (stage: WorkflowStage): { isValid: boolean; errors:
   switch (stage.type) {
     case 'APPROVAL':
       if (!stage.config.requiredApprovers || stage.config.requiredApprovers < 1) {
-        errors.push('At least one approver is required for approval stages');
+        errors.push('At least one approver is required');
       }
       break;
     case 'TASK':

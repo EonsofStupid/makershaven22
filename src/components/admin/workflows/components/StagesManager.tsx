@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { WorkflowStage } from '../types';
+import type { WorkflowStage } from '@/lib/types/database/tables/workflow';
 
 interface StagesManagerProps {
   stages: WorkflowStage[];

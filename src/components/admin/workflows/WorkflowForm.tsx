@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { WorkflowFormData } from "@/components/content/types/workflow";
+import type { WorkflowFormData } from "@/lib/types/database/tables/workflow";
 
 interface WorkflowFormProps {
   formData: WorkflowFormData;

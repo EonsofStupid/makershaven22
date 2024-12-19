@@ -6,6 +6,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import type { WorkflowTemplate } from '@/lib/types/database/tables/workflow';
 
 export const WorkflowManagement = () => {
   const { 
