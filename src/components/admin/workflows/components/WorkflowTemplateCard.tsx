@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, X, Edit, Trash } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { WorkflowTemplate } from '../types';
+import type { WorkflowTemplate } from '@/lib/types/workflow/types';
 
 interface WorkflowTemplateCardProps {
   template: WorkflowTemplate;

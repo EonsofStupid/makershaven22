@@ -1,7 +1,6 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -69,12 +68,11 @@ export const StagesManager = ({ stages, onChange }: StagesManagerProps) => {
                   />
                 </div>
                 <div>
-                  <Textarea
+                  <Input
                     value={stage.description}
                     onChange={(e) => updateStage(stage.id, { description: e.target.value })}
                     placeholder="Stage description (optional)"
                     className="bg-white/5 border-white/10 text-white"
-                    rows={2}
                   />
                 </div>
               </div>
