@@ -1,27 +1,35 @@
-import { AuthSession, AuthUser } from "@/integrations/supabase/types/auth";
+import { Session, User } from '@supabase/supabase-js';
 
-export interface StoreError {
-  message: string;
-  code?: string;
+export interface AuthSession extends Session {
+  user: User & {
+    user_metadata: {
+      avatar_url?: string;
+      full_name?: string;
+      name?: string;
+    };
+  };
 }
 
 export interface AuthState {
   session: AuthSession | null;
-  user: AuthUser | null;
+  user: User | null;
   isLoading: boolean;
-  error: StoreError | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-  initialSetupDone: boolean;
-  
-  // Auth actions
+  error: Error | null;
+}
+
+export interface ThemeState {
+  mode: 'light' | 'dark' | 'system';
+  systemTheme: 'light' | 'dark';
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+  setSystemTheme: (theme: 'light' | 'dark') => void;
+}
+
+export interface WorkflowState {
+  workflows: any[];
+  activeWorkflow: any | null;
+  isLoading: boolean;
+  error: Error | null;
   initialize: () => Promise<void>;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: StoreError | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  handleSessionUpdate: (session: AuthSession | null) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+  setActiveWorkflow: (workflow: any) => void;
+  handleWorkflowUpdate: (workflow: any) => Promise<void>;
 }
