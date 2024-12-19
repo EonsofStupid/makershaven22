@@ -1,5 +1,6 @@
-import { Json } from '../core/json';
-import { WorkflowStageType } from '../base/enums';
+import { Json } from '../base/json';
+
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
 export interface WorkflowStageConfig {
   assignees?: string[];
@@ -31,6 +32,7 @@ export interface WorkflowStageConfig {
     required: boolean;
     options?: string[];
   }>;
+  [key: string]: any; // Add index signature for JSON compatibility
 }
 
 export interface WorkflowStage {
@@ -56,9 +58,7 @@ export interface WorkflowTemplate {
 
 export interface WorkflowFormData extends WorkflowTemplate {}
 
-export interface StageUpdateFunction {
-  (stageId: string, updates: Partial<WorkflowStage>): void;
-}
+export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
 
 export interface StageConfigUpdateProps {
   config: WorkflowStageConfig;
@@ -76,4 +76,41 @@ export interface WorkflowState {
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   reset: () => void;
+  handleWorkflowUpdate?: (workflow: WorkflowTemplate) => Promise<void>;
 }
+
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(stage => {
+    if (typeof stage !== 'object' || !stage) {
+      return {
+        id: crypto.randomUUID(),
+        name: '',
+        type: 'task',
+        order: 0,
+        config: {},
+      };
+    }
+
+    const stageObj = stage as Record<string, any>;
+    return {
+      id: String(stageObj.id || crypto.randomUUID()),
+      name: String(stageObj.name || ''),
+      type: (stageObj.type as WorkflowStageType) || 'task',
+      order: Number(stageObj.order || 0),
+      config: stageObj.config as WorkflowStageConfig || {},
+      description: stageObj.description ? String(stageObj.description) : undefined
+    };
+  });
+};
+
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => ({
+    ...stage,
+    id: stage.id.toString(),
+    type: stage.type.toString(),
+    order: Number(stage.order),
+    config: stage.config || {}
+  })) as Json;
+};
