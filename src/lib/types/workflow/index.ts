@@ -1,23 +1,23 @@
-import { Json } from '../core';
+import { BaseEntity, UserOwnedEntity } from '../core/base';
+import { Json } from '../core/json';
+
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+
+export interface WorkflowTemplate extends UserOwnedEntity {
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  steps: WorkflowStage[];
+  is_active?: boolean;
+}
 
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: string;
+  type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
   description?: string;
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  steps: WorkflowStage[];
-  is_active: boolean;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface WorkflowStageConfig {
@@ -52,19 +52,44 @@ export interface WorkflowStageConfig {
   }>;
 }
 
-export const parseStages = (data: Json): WorkflowStage[] => {
+export interface WorkflowFormData {
+  id?: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
+
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
+  initialize: () => Promise<void>;
+  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
+  handleWorkflowUpdate: (workflow: WorkflowTemplate) => Promise<void>;
+  setError: (error: Error | null) => void;
+}
+
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
-    id: stage.id || crypto.randomUUID(),
-    name: stage.name || '',
-    type: stage.type || 'TASK',
-    order: stage.order || 0,
-    config: stage.config || {},
-    description: stage.description
+    id: String(stage.id || crypto.randomUUID()),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'TASK',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
   }));
 };
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return template as unknown as Json;
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => ({
+    ...stage,
+    id: stage.id.toString(),
+    type: stage.type.toString(),
+    order: Number(stage.order),
+    config: stage.config || {}
+  })) as unknown as Json;
 };
