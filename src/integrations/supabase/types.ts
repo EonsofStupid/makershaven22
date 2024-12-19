@@ -120,6 +120,41 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          refresh_token: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          refresh_token?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          refresh_token?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auth_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -1016,6 +1051,7 @@ export type Database = {
           bio: string | null
           created_at: string | null
           display_name: string | null
+          email: string | null
           failed_login_attempts: number | null
           failed_pin_attempts: number | null
           gamification_enabled: boolean | null
@@ -1026,6 +1062,7 @@ export type Database = {
           last_seen: string | null
           location: string | null
           lockout_until: string | null
+          metadata: Json | null
           name: string | null
           onboarding_completed: boolean | null
           pin_enabled: boolean | null
@@ -1046,6 +1083,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          email?: string | null
           failed_login_attempts?: number | null
           failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
@@ -1056,6 +1094,7 @@ export type Database = {
           last_seen?: string | null
           location?: string | null
           lockout_until?: string | null
+          metadata?: Json | null
           name?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
@@ -1076,6 +1115,7 @@ export type Database = {
           bio?: string | null
           created_at?: string | null
           display_name?: string | null
+          email?: string | null
           failed_login_attempts?: number | null
           failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
@@ -1086,6 +1126,7 @@ export type Database = {
           last_seen?: string | null
           location?: string | null
           lockout_until?: string | null
+          metadata?: Json | null
           name?: string | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
