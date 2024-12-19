@@ -1,10 +1,24 @@
 import { z } from 'zod';
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 import type { Json } from '../core/json';
+>>>>>>> parent of e0107cf (Type Errors fixes)
 import type { ThemeMode, TransitionType } from '../core/enums';
 import type { SecuritySettings } from '../security/types';
 
 // Base Settings Interface
+<<<<<<< HEAD
+export interface Settings extends SecuritySettings {
+=======
+import type { Json } from '../core/json';
+
+// Base settings interface that matches database structure
 export interface Settings {
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
+=======
+export interface Settings {
+>>>>>>> parent of e0107cf (Type Errors fixes)
   id: string;
   site_title: string;
   tagline?: string;
@@ -34,15 +48,27 @@ export interface Settings {
   backdrop_blur: string;
   logo_url?: string;
   favicon_url?: string;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  security_settings?: Json;
+  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  theme_mode?: 'light' | 'dark' | 'system';
+  state_version?: number;
+  last_sync?: string;
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
+=======
   security_settings?: SecuritySettings;
   transition_type?: TransitionType;
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   theme_mode?: ThemeMode;
   state_version?: number;
   last_sync?: string;
+>>>>>>> parent of e0107cf (Type Errors fixes)
 }
 
-// Zod Schema for Form Validation
+// Zod schema for validation
 export const settingsSchema = z.object({
   id: z.string().optional(),
   site_title: z.string().min(1, "Site title is required"),
@@ -83,9 +109,3 @@ export const settingsSchema = z.object({
 
 // Type for form data derived from schema
 export type SettingsFormData = z.infer<typeof settingsSchema>;
-
-// Response type for settings API
-export interface SettingsResponse {
-  data: Settings | null;
-  error: Error | null;
-}
