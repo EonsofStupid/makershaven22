@@ -1,7 +1,7 @@
 import { uploadMedia } from '@/integrations/supabase/supabase-service';
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { toast } from 'sonner';
-import { Settings } from '../../types';
+import { Settings } from '@/lib/types/settings/types';
 
 export const useSettingsUpdateHandlers = () => {
   const { updateSetting } = useSettingsStore();
