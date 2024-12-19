@@ -1,21 +1,29 @@
 import type { Json } from './json';
-import type { UserRole, ContentStatus, ContentType, ThemeMode } from './enums';
+import type { DatabaseEnums } from './enums';
 
 export interface Database {
   public: {
     Tables: DatabaseTables;
-    Views: Record<string, never>;
+    Views: {
+      [key: string]: {
+        Row: Record<string, unknown>;
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+      };
+    };
     Functions: DatabaseFunctions;
     Enums: DatabaseEnums;
   };
 }
 
-export interface DatabaseEnums {
-  user_role: UserRole;
-  content_status: ContentStatus;
-  content_type: ContentType;
-  theme_mode: ThemeMode;
+export interface BaseRow {
+  id: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export * from './functions';
-export * from './tables';
+export interface BaseTable<T extends BaseRow> {
+  Row: T;
+  Insert: Omit<T, 'id' | 'created_at' | 'updated_at'>;
+  Update: Partial<Omit<T, 'id' | 'created_at' | 'updated_at'>>;
+}

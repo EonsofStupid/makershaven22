@@ -25,16 +25,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
 });
 
 // Export utility functions that use the single client instance
-export const uploadMedia = async (file: File) => {
+export const uploadMedia = async (file: File, path = 'uploads') => {
   try {
     const { data, error } = await supabase.storage
       .from('media')
-      .upload(`uploads/${Date.now()}-${file.name}`, file);
+      .upload(`${path}/${file.name}`, file);
 
-    if (error) {
-      console.error('Media upload error:', error);
-      throw error;
-    }
+    if (error) throw error;
 
     const { data: { publicUrl } } = supabase.storage
       .from('media')

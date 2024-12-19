@@ -1,8 +1,8 @@
 import type { Json } from '../core/json';
 import type { WorkflowStageType } from '../core/enums';
+import type { BaseRow, BaseTable } from '../core/base';
 
-export interface WorkflowStage {
-  id: string;
+export interface WorkflowStage extends BaseRow {
   name: string;
   type: WorkflowStageType;
   order: number;
@@ -10,23 +10,13 @@ export interface WorkflowStage {
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowTemplate extends BaseRow {
   name: string;
   description?: string;
   steps: WorkflowStage[];
   stages: WorkflowStage[];
   is_active: boolean;
   created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface WorkflowFormData {
-  name: string;
-  description: string;
-  stages: WorkflowStage[];
-  is_active?: boolean;
 }
 
 export interface WorkflowStageConfig {
@@ -49,7 +39,7 @@ export interface WorkflowStageConfig {
     rules: Array<{
       field: string;
       operator: string;
-      value: any;
+      value: Json;
     }>;
   };
   requiredApprovers?: number;
@@ -59,4 +49,9 @@ export interface WorkflowStageConfig {
     required: boolean;
     options?: string[];
   }>;
+}
+
+export interface WorkflowTables {
+  workflow_templates: BaseTable<WorkflowTemplate>;
+  workflow_stages: BaseTable<WorkflowStage>;
 }
