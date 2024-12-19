@@ -37,6 +37,11 @@ export const useSettingsReset = () => {
         p_line_height_base: DEFAULT_SETTINGS.line_height_base,
         p_letter_spacing: DEFAULT_SETTINGS.letter_spacing,
       });
+interface BaseThemeProperties {
+    theme_mode: "dark" | "light";
+    site_title?: string;  // Add ? to make it optional
+    // ... other properties
+}
 
       if (error) throw error;
       

@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useRevisionStore } from "@/lib/store/revision-store";
 import type { ContentRevision } from "./types/revision";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RevisionHistoryProps {
   contentId: string;

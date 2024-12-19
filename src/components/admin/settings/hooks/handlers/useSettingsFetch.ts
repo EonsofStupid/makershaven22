@@ -19,6 +19,7 @@ export const useSettingsFetch = () => {
       }
 
       const settings: Settings = {
+        id: data.id,
         site_title: data.site_title,
         tagline: data.tagline,
         primary_color: data.primary_color,
