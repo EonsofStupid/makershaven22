@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useWorkflowStore } from '@/lib/store/workflow-store';
 import { toast } from 'sonner';
-import { WorkflowTemplate, parseWorkflowStages, serializeWorkflowStages } from '../types/workflow-types';
+import { WorkflowTemplate } from '@/lib/types/workflow/types';
 
 export const useWorkflowManagement = () => {
   const queryClient = useQueryClient();
@@ -17,12 +17,7 @@ export const useWorkflowManagement = () => {
         .select('*');
 
       if (error) throw error;
-
-      return data.map(workflow => ({
-        ...workflow,
-        stages: parseWorkflowStages(workflow.stages || []),
-        steps: parseWorkflowStages(workflow.steps || [])
-      })) as WorkflowTemplate[];
+      return data as WorkflowTemplate[];
     }
   });
 
@@ -33,8 +28,8 @@ export const useWorkflowManagement = () => {
         .insert({
           name: workflow.name,
           description: workflow.description,
-          stages: serializeWorkflowStages(workflow.stages || []),
-          steps: serializeWorkflowStages(workflow.steps || []),
+          stages: workflow.stages || [],
+          steps: workflow.steps || [],
           is_active: workflow.is_active ?? true
         })
         .select()

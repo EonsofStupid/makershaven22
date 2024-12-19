@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { WorkflowStage } from '@/lib/types/database/tables/workflow';
+import type { WorkflowStage } from '@/lib/types/workflow/types';
 
 interface StagesManagerProps {
   stages: WorkflowStage[];
@@ -18,9 +18,9 @@ export const StagesManager = ({ stages, onChange }: StagesManagerProps) => {
       id: crypto.randomUUID(),
       name: '',
       description: '',
-      type: 'task', // Set a default type
+      type: 'task',
       order: stages.length,
-      config: {} // Add empty config object
+      config: {}
     };
     onChange([...stages, newStage]);
   };
