@@ -18,6 +18,7 @@ export interface AuthStore {
   isLoading: boolean;
   error: Error | null;
   isOffline: boolean;
+  isTransitioning: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;
