@@ -1,7 +1,7 @@
 import React from 'react';
 import { StagesHeader } from './stages/StagesHeader';
 import { StagesList } from './stages/StagesList';
-import type { WorkflowStage } from '@/integrations/supabase/types/workflow/base';
+import type { WorkflowStage } from '@/lib/types/database/tables/workflow';
 
 interface VisualWorkflowBuilderProps {
   stages: WorkflowStage[];

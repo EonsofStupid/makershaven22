@@ -7,7 +7,7 @@ import { Plus, Edit, Trash, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { WorkflowTemplate } from './types';
+import type { WorkflowTemplate } from '@/lib/types/database/tables/workflow';
 
 export const WorkflowTemplateList = () => {
   const { data: templates, isLoading, error } = useQuery({

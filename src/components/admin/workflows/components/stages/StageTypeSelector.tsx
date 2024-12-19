@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { WorkflowStageType } from '../../types';
+import type { WorkflowStageType } from '@/lib/types/database/tables/workflow';
 
 interface StageTypeSelectorProps {
   value: WorkflowStageType;

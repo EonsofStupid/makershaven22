@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { useWorkflowForm } from "./hooks/useWorkflowForm";
+import { useWorkflowForm } from './hooks/useWorkflowForm';
 import { WorkflowBasicFields } from './components/WorkflowBasicFields';
 import { VisualWorkflowBuilder } from './components/VisualWorkflowBuilder';
 import { toast } from "sonner";
-import { WorkflowFormData } from "@/lib/types/workflow";
+import type { WorkflowFormData } from '@/lib/types/database/tables/workflow';
 
 export const WorkflowTemplateForm = () => {
   const { form, isLoading, isSaving, handleWorkflowUpdate } = useWorkflowForm();

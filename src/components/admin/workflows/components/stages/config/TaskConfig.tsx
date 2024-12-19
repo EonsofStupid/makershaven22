@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
-import type { WorkflowStageConfig } from '../../../types';
+import type { WorkflowStageConfig } from '@/lib/types/database/tables/workflow';
 
 interface TaskConfigProps {
   config: WorkflowStageConfig;

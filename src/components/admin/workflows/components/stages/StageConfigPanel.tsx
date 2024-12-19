@@ -3,7 +3,7 @@ import { ApprovalConfig } from './config/ApprovalConfig';
 import { ReviewConfig } from './config/ReviewConfig';
 import { TaskConfig } from './config/TaskConfig';
 import { NotificationConfig } from './config/NotificationConfig';
-import type { WorkflowStage, StageConfigUpdateProps, createStageUpdate } from '../../types';
+import type { WorkflowStage, StageConfigUpdateProps } from '@/lib/types/database/tables/workflow';
 
 export const StageConfigPanel: React.FC<StageConfigUpdateProps> = ({ 
   stage,

@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { WorkflowState } from '@/lib/types/database/tables/workflow';
-import type { WorkflowTemplate } from '@/lib/types/database/tables/workflow';
+import type { WorkflowState, WorkflowTemplate } from '@/lib/types/database/tables/workflow';
 import { supabase } from '@/integrations/supabase/client';
 
 const initialState: WorkflowState = {
