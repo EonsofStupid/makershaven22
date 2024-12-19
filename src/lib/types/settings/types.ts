@@ -38,20 +38,18 @@ export interface Settings {
   security_settings?: Json;
   transition_type?: TransitionType;
   theme_mode?: ThemeMode;
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   state_version?: number;
   last_sync?: string;
 }
 
-export interface UseSettingsFormReturn {
-  settings: Settings | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  isResetting: boolean;
-  logoFile: File | null;
-  faviconFile: File | null;
-  form: any;
-  handleLogoUpload: (file: File) => Promise<void>;
-  handleFaviconUpload: (file: File) => Promise<void>;
-  handleSettingsUpdate: (settings: Settings) => Promise<void>;
-  handleResetToDefault: () => Promise<void>;
+export interface SettingsFormData extends Settings {}
+
+export const settingsSchema = {
+  // ... schema definition will go here
+};
+
+export interface SettingsResponse {
+  data: Settings;
+  error: null | Error;
 }

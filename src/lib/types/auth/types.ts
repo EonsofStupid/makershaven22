@@ -1,29 +1,25 @@
-import { Session, User } from '@supabase/supabase-js';
-import { UserRole } from '../base/enums';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
-export interface AuthUser extends User {
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  avatarUrl?: string;
-}
-
-export interface AuthSession extends Session {
-  user: AuthUser;
-}
-
-export interface AuthStore {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
+export interface Profile {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  role: UserRole | null;
+  bio: string | null;
+  website: string | null;
+  location: string | null;
+  created_at: string;
+  updated_at: string;
+  last_seen: string | null;
+  is_banned: boolean | null;
+  ban_reason: string | null;
+  banned_at: string | null;
+  banned_by: string | null;
+  two_factor_enabled: boolean | null;
+  two_factor_secret: string | null;
+  onboarding_completed: boolean | null;
+  gamification_enabled: boolean | null;
+  visual_editor_enabled: boolean | null;
+  last_login_at: string | null;
 }
