@@ -1,9 +1,16 @@
 import { z } from 'zod';
+<<<<<<< HEAD
 import type { ThemeMode, TransitionType } from '../core/enums';
 import type { SecuritySettings } from '../security/types';
 
 // Base Settings Interface
 export interface Settings extends SecuritySettings {
+=======
+import type { Json } from '../core/json';
+
+// Base settings interface that matches database structure
+export interface Settings {
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
   id: string;
   site_title: string;
   tagline: string;
@@ -35,9 +42,18 @@ export interface Settings extends SecuritySettings {
   neon_purple?: string;
   logo_url?: string;
   favicon_url?: string;
+<<<<<<< HEAD
+=======
+  security_settings?: Json;
+  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  theme_mode?: 'light' | 'dark' | 'system';
+  state_version?: number;
+  last_sync?: string;
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
 }
 
-// Zod Schema for Form Validation
+// Zod schema for validation
 export const settingsSchema = z.object({
   id: z.string().optional(),
   site_title: z.string().min(1, "Site title is required"),
@@ -75,9 +91,3 @@ export const settingsSchema = z.object({
 
 // Type for form data derived from schema
 export type SettingsFormData = z.infer<typeof settingsSchema>;
-
-// Response type for settings API
-export interface SettingsResponse {
-  data: Settings | null;
-  error: Error | null;
-}
