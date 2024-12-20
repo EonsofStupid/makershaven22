@@ -1,37 +1,42 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { WorkflowFormData, WorkflowTemplate } from '@/lib/types/workflow/types';
-import { StagesManager } from './components/StagesManager';
-import { WorkflowFormHeader } from './components/WorkflowFormHeader';
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import type { WorkflowFormData } from "@/components/content/types/workflow";
 
-const WorkflowForm: React.FC<{ workflow?: WorkflowTemplate; onSave: (data: WorkflowFormData) => void }> = ({ workflow, onSave }) => {
-  const { register, handleSubmit, setValue } = useForm<WorkflowFormData>({
-    defaultValues: workflow || {
-      id: '',
-      name: '',
-      description: '',
-      steps: [],
-      stages: [],
-      is_active: true,
-      created_by: '',
-      created_at: '',
-      updated_at: '',
-    },
-  });
+interface WorkflowFormProps {
+  formData: WorkflowFormData;
+  onChange: (data: Partial<WorkflowFormData>) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}
 
-  const onSubmit = (data: WorkflowFormData) => {
-    onSave(data);
-  };
-
+export const WorkflowForm = ({ formData, onChange, onSubmit }: WorkflowFormProps) => {
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <WorkflowFormHeader register={register} />
-      <StagesManager stages={workflow?.stages || []} onChange={(stages) => setValue('stages', stages)} />
-      <button type="submit" className="btn btn-primary">
-        Save Workflow
-      </button>
+    <form onSubmit={onSubmit} className="space-y-6">
+      <div>
+        <label className="block text-white mb-2">Workflow Name</label>
+        <Input
+          value={formData.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          placeholder="Enter workflow name"
+          className="bg-white/5 border-white/10 text-white"
+        />
+      </div>
+
+      <div>
+        <label className="block text-white mb-2">Description</label>
+        <Textarea
+          value={formData.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+          placeholder="Enter workflow description"
+          className="bg-white/5 border-white/10 text-white"
+          rows={4}
+        />
+      </div>
+
+      <div className="border border-white/10 rounded-lg p-6 mt-8">
+        <h2 className="text-xl font-semibold text-white mb-4">Workflow Steps</h2>
+        <p className="text-white/60">Step configuration will be available in the next update.</p>
+      </div>
     </form>
   );
 };
-
-export default WorkflowForm;

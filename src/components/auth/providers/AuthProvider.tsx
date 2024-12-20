@@ -4,10 +4,11 @@ import { useAuthSetup } from '@/hooks/useAuthSetup';
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
-import { authManager } from "@/lib/auth/AuthManager";
+import { sessionManager } from "@/lib/auth/SessionManager";
+import { securityManager } from "@/lib/auth/SecurityManager";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { handleAuthChange } = useAuthSetup();
+  const { handleAuthChange, initialSetupDone } = useAuthSetup();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -25,7 +26,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initSecurity();
+
+    if (initialSetupDone.current) {
+      console.log('Initial setup already done, skipping');
+      return;
+    }
     
+    initialSetupDone.current = true;
     let retryCount = 0;
     const maxRetries = 3;
     const retryDelay = 1000;
@@ -34,12 +41,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize auth manager
+        // Initialize security systems first
         try {
-          await authManager.startSession();
-          console.log('Auth manager initialized');
+          sessionManager.startSession();
+          securityManager.initialize();
+          console.log('Security systems initialized');
         } catch (securityError) {
-          console.error('Error initializing auth manager:', securityError);
+          console.error('Error initializing security systems:', securityError);
+          // Continue with auth setup even if security init fails
         }
 
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -90,7 +99,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
-      authManager.destroy();
+      sessionManager.destroy();
+      securityManager.cleanup();
     };
   }, [handleAuthChange]);
 

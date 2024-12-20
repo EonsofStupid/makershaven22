@@ -7,7 +7,7 @@ import { RevisionContent } from './components/RevisionContent';
 import { RevisionDiff } from './components/RevisionDiff';
 import { RevisionMetadata } from './components/RevisionMetadata';
 import { RollbackConfirmation } from './components/RollbackConfirmation';
-import type { ContentRevision } from '@/lib/types/content';
+import type { ContentRevision } from '@/integrations/supabase/types/content';
 
 interface RevisionCompareProps {
   contentId: string;

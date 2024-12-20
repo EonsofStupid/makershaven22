@@ -13,24 +13,19 @@ export const ImportManager = () => {
       try {
         const { data, error } = await supabase
           .from('import_sessions')
-          .select(`
-            id,
-            user_id,
-            file_name,
-            file_size,
-            row_count,
-            status,
-            error_message,
-            created_at,
-            completed_at,
-            type,
-            metadata
-          `)
+          .select('*')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        setSessions(data as ImportSession[]);
+        // Add default values for type and metadata to match ImportSession interface
+        const processedData = (data || []).map(session => ({
+          ...session,
+          type: session.type || 'unknown',
+          metadata: session.metadata || {}
+        })) as ImportSession[];
+
+        setSessions(processedData);
       } catch (error) {
         console.error('Error fetching import sessions:', error);
         toast.error('Failed to load import sessions');
@@ -59,7 +54,7 @@ export const ImportManager = () => {
               <div>
                 <p className="font-medium">{session.file_name}</p>
                 <p className="text-sm text-gray-400">
-                  Status: {session.status} | Type: {session.type || 'Unknown'}
+                  Status: {session.status} | Type: {session.type}
                 </p>
               </div>
               <div className="text-sm text-gray-400">

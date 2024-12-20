@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import type { WorkflowStageConfig } from '@/lib/types/database/tables/workflow';
+import type { WorkflowStageConfig } from '../../../types';
 
 interface ApprovalConfigProps {
   config: WorkflowStageConfig;

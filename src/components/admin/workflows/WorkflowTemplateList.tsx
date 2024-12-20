@@ -7,7 +7,15 @@ import { Plus, Edit, Trash, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { WorkflowTemplate } from '@/lib/types/database/tables/workflow';
+
+interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string | null;
+  stages: any[];
+  is_active: boolean;
+  created_at: string;
+}
 
 export const WorkflowTemplateList = () => {
   const { data: templates, isLoading, error } = useQuery({
@@ -16,17 +24,7 @@ export const WorkflowTemplateList = () => {
       console.log('Fetching workflow templates...');
       const { data, error } = await supabase
         .from('workflow_templates')
-        .select(`
-          id,
-          name,
-          description,
-          steps,
-          stages,
-          is_active,
-          created_at,
-          created_by,
-          updated_at
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -120,7 +118,7 @@ export const WorkflowTemplateList = () => {
                       </span>
                       <span className="text-white/20">•</span>
                       <span className="text-sm text-white/40">
-                        Created {new Date(template.created_at || '').toLocaleDateString()}
+                        Created {new Date(template.created_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>

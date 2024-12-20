@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { UserRole } from '@/lib/types/auth';
+import type { UserRole } from '@/components/auth/types';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();
@@ -33,7 +33,7 @@ export const useUserManagement = () => {
   const getUserActivity = async (userId: string) => {
     const { data, error } = await supabase
       .from('user_activity')
-      .select('id, name, email, role, updated_at')
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

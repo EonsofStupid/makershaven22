@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, UserCog } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { UserRole } from '@/lib/types/auth';
+import { UserRole } from '@/components/auth/types';
 
 interface RoleActionsProps {
   onRoleChange: (role: UserRole) => void;

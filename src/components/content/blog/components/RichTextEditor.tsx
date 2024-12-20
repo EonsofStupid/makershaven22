@@ -4,7 +4,7 @@ import EditorCore from './editor/EditorCore';
 import EditorTabs from './editor/EditorTabs';
 import SEOSection from './editor/SEOSection';
 import TagsManager from './editor/TagsManager';
-import { Database } from "@/lib/types/database";
+import { Database } from "@/integrations/supabase/types";
 
 type PostCategory = Database["public"]["Enums"]["post_category"];
 

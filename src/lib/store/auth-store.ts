@@ -1,96 +1,82 @@
 import { create } from 'zustand';
-import { AuthSession, AuthUser } from '@/integrations/supabase/types/auth';
-import { AuthState, StoreError } from '@/lib/types/store-types';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { persist } from 'zustand/middleware';
+import type { AuthStore, AuthUser, AuthSession } from '@/lib/auth/types/auth';
+import { supabase } from "@/integrations/supabase/client";
+import { sessionManager } from '@/lib/auth/SessionManager';
+import { securityManager } from '@/lib/auth/SecurityManager';
+import { authLogger } from '@/lib/auth/AuthLogger';
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  session: null,
-  user: null,
-  isLoading: true,
-  error: null,
-  isOffline: false,
-  isTransitioning: false,
-  initialSetupDone: false,
-
-  initialize: async () => {
-    try {
-      set({ isLoading: true });
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) throw error;
-      
-      if (session) {
-        set({
-          session,
-          user: session.user as AuthUser,
-          initialSetupDone: true
-        });
-      }
-    } catch (error) {
-      console.error('Error initializing auth:', error);
-      set({ error: { message: 'Failed to initialize authentication' } });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  setSession: (session) => {
-    set({ 
-      session,
-      user: session?.user as AuthUser || null,
-      isTransitioning: false
-    });
-  },
-
-  setUser: (user) => set({ user }),
-  
-  setLoading: (isLoading) => set({ isLoading }),
-  
-  setError: (error) => set({ error }),
-  
-  setOffline: (isOffline) => set({ isOffline }),
-
-  handleSessionUpdate: (session) => {
-    set({ 
-      session,
-      user: session?.user as AuthUser || null,
-      isTransitioning: false
-    });
-  },
-
-  signOut: async () => {
-    try {
-      set({ isTransitioning: true });
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      set({
-        session: null,
-        user: null,
-        isTransitioning: false
-      });
-      
-      toast.success('Signed out successfully');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      set({ 
-        error: { message: 'Failed to sign out' },
-        isTransitioning: false
-      });
-      toast.error('Failed to sign out');
-    }
-  },
-
-  reset: () => {
-    set({
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
       session: null,
       user: null,
-      isLoading: false,
+      isLoading: true,
       error: null,
-      isOffline: false,
-      isTransitioning: false,
-      initialSetupDone: false
-    });
-  }
-}));
+      isOffline: !navigator.onLine,
+      setSession: (session) => {
+        authLogger.info('Setting session', { userId: session?.user?.id });
+        set({ session });
+      },
+      setUser: (user) => {
+        authLogger.info('Setting user', { userId: user?.id });
+        set({ user });
+      },
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => {
+        if (error) {
+          authLogger.error('Auth error occurred', error);
+        }
+        set({ error });
+      },
+      setOffline: (isOffline) => set({ isOffline }),
+      signOut: async () => {
+        try {
+          authLogger.info('Signing out user', { userId: get().user?.id });
+          set({ isLoading: true, error: null });
+          
+          await sessionManager.handleSignOut();
+          securityManager.clearSecurityData();
+          
+          set({ session: null, user: null });
+        } catch (error) {
+          const authError = error instanceof Error ? error : new Error('Sign out failed');
+          authLogger.error('Sign out error', authError);
+          set({ error: authError });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      reset: () => {
+        authLogger.info('Resetting auth store');
+        set({ 
+          session: null, 
+          user: null, 
+          isLoading: false, 
+          error: null 
+        });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({ 
+        session: state.session,
+        user: state.user 
+      }),
+    }
+  )
+);
+
+// Set up online/offline listeners
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    useAuthStore.getState().setOffline(false);
+    authLogger.info('Application is online');
+  });
+  
+  window.addEventListener('offline', () => {
+    useAuthStore.getState().setOffline(true);
+    authLogger.warn('Application is offline');
+  });
+}

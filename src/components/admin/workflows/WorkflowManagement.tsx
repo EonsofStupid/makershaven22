@@ -1,29 +1,54 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWorkflowStore } from '@/lib/store/workflow-store';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import type { WorkflowTemplate } from '@/lib/types/workflow/types';
+
+interface Workflow {
+  id: string;
+  name: string;
+  description: string;
+  steps: any[];
+  triggers: any[];
+  created_by: string;
+  updated_at: string;
+}
 
 export const WorkflowManagement = () => {
-  const { 
-    workflows,
-    activeWorkflow,
-    isLoading,
-    initialize,
-    setActiveWorkflow
-  } = useWorkflowStore();
+  const { activeWorkflows, setActiveWorkflow, addToHistory } = useWorkflowStore();
 
-  useEffect(() => {
-    initialize();
-  }, [initialize]);
+  const { data: workflows, isLoading } = useQuery({
+    queryKey: ['workflows'],
+    queryFn: async () => {
+      console.log('Fetching workflows...');
+      const { data, error } = await supabase
+        .from('cms_workflows')
+        .select('*')
+        .order('updated_at', { ascending: false });
 
-  const handleActivateWorkflow = async (workflow: any) => {
+      if (error) {
+        console.error('Error fetching workflows:', error);
+        toast.error('Failed to load workflows');
+        throw error;
+      }
+
+      return data as Workflow[];
+    }
+  });
+
+  const handleActivateWorkflow = async (workflow: Workflow) => {
     try {
-      setActiveWorkflow(workflow);
+      console.log('Activating workflow:', workflow.id);
+      setActiveWorkflow(workflow.id, workflow);
+      addToHistory(workflow.id, {
+        action: 'activated',
+        timestamp: new Date().toISOString(),
+      });
       toast.success(`Workflow ${workflow.name} activated`);
     } catch (error) {
       console.error('Error activating workflow:', error);
@@ -50,6 +75,9 @@ export const WorkflowManagement = () => {
             <TabsTrigger value="all" className="data-[state=active]:bg-white/10">
               All Workflows
             </TabsTrigger>
+            <TabsTrigger value="history" className="data-[state=active]:bg-white/10">
+              History
+            </TabsTrigger>
           </TabsList>
           
           <Button className="bg-neon-cyan/20 hover:bg-neon-cyan/30">
@@ -59,28 +87,32 @@ export const WorkflowManagement = () => {
         </div>
 
         <TabsContent value="active" className="space-y-4">
-          {activeWorkflow && (
+          {Object.entries(activeWorkflows).map(([id, workflow]) => (
             <motion.div
+              key={id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-gray-800/50 border border-white/10 rounded-lg p-4"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{activeWorkflow.name}</h3>
-                  <p className="text-sm text-gray-400">{activeWorkflow.description}</p>
+                  <h3 className="text-lg font-semibold text-white">{workflow.name}</h3>
+                  <p className="text-sm text-gray-400">{workflow.description}</p>
                 </div>
                 <Button
                   variant="ghost"
                   className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                  onClick={() => setActiveWorkflow(null)}
+                  onClick={() => {
+                    // Deactivate workflow logic
+                    toast.success(`Workflow ${workflow.name} deactivated`);
+                  }}
                 >
                   Deactivate
                 </Button>
               </div>
             </motion.div>
-          )}
-          {!activeWorkflow && (
+          ))}
+          {Object.keys(activeWorkflows).length === 0 && (
             <div className="text-center py-8 text-gray-400">
               No active workflows
             </div>
@@ -109,6 +141,23 @@ export const WorkflowManagement = () => {
                 </Button>
               </div>
             </motion.div>
+          ))}
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          {Object.entries(useWorkflowStore.getState().workflowHistory).map(([id, history]) => (
+            <div key={id} className="bg-gray-800/50 border border-white/10 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Workflow {workflows?.find(w => w.id === id)?.name || id}
+              </h3>
+              <div className="space-y-2">
+                {history.map((entry, index) => (
+                  <div key={index} className="text-sm text-gray-400">
+                    {entry.action} at {new Date(entry.timestamp).toLocaleString()}
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </TabsContent>
       </Tabs>

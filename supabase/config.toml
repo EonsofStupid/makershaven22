@@ -1,17 +1,1 @@
-project_id = "vvtfumqyznrtzhhqzvgu"
-
-[api]
-enabled = true
-port = 54321
-schemas = ["public", "storage", "graphql_public"]
-
-[db]
-port = 54322
-
-[studio]
-enabled = true
-port = 54323
-
-[[functions]]
-name = "security-headers"
-verify_jwt = false
+project_id = "vcmnomcwbmwqylwnomta"

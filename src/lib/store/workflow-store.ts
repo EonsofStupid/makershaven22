@@ -1,25 +1,45 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
-import { WorkflowState, WorkflowTemplate } from '@/lib/types/workflow/types';
+import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 
-export const useWorkflowStore = create<WorkflowState>((set) => ({
-  workflows: [],
-  activeWorkflow: null,
-  isLoading: false,
-  error: null,
-  initialize: async () => {
-    set({ isLoading: true });
-    try {
-      const { data, error } = await supabase.from('workflows').select('*');
-      if (error) throw error;
-      set({ workflows: data, isLoading: false });
-    } catch (error) {
-      set({ error: error as Error, isLoading: false });
+interface WorkflowState {
+  activeWorkflows: Record<string, any>;
+  workflowHistory: Record<string, any[]>;
+  setActiveWorkflow: (id: string, data: any) => void;
+  addToHistory: (id: string, data: any) => void;
+  clearWorkflowHistory: (id: string) => void;
+  reset: () => void;
+}
+
+export const useWorkflowStore = create<WorkflowState>()(
+  persist(
+    (set, get) => ({
+      activeWorkflows: {},
+      workflowHistory: {},
+      setActiveWorkflow: (id, data) => 
+        set((state) => ({ 
+          activeWorkflows: { ...state.activeWorkflows, [id]: data }
+        })),
+      addToHistory: (id, data) =>
+        set((state) => ({
+          workflowHistory: {
+            ...state.workflowHistory,
+            [id]: [...(state.workflowHistory[id] || []), data]
+          }
+        })),
+      clearWorkflowHistory: (id) =>
+        set((state) => {
+          const { [id]: _, ...rest } = state.workflowHistory;
+          return { workflowHistory: rest };
+        }),
+      reset: () => set({ activeWorkflows: {}, workflowHistory: {} }),
+    }),
+    {
+      name: 'workflow-storage',
+      partialize: (state) => ({ 
+        activeWorkflows: state.activeWorkflows,
+        workflowHistory: state.workflowHistory 
+      }),
     }
-  },
-  setWorkflows: (workflows) => set({ workflows }),
-  setActiveWorkflow: (workflow) => set({ activeWorkflow: workflow }),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error }),
-  reset: () => set({ activeWorkflow: null, error: null }),
-}));
+  )
+);

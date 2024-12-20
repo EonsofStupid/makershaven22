@@ -1,4 +1,4 @@
-import { AuthSession } from '@/lib/types/auth';
+import { AuthSession } from '@/components/auth/types';
 
 const SESSION_STORAGE_KEY = 'auth_session_backup';
 

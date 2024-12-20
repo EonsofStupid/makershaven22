@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import type { WorkflowStage } from '@/lib/types/workflow/types';
+import type { WorkflowStage } from '../../types';
 
 interface StagesHeaderProps {
   onAddStage: () => void;

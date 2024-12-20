@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { WorkflowStage } from '@/lib/types/workflow/types';
+import type { WorkflowStage } from '../types';
 
 interface StagesManagerProps {
   stages: WorkflowStage[];
@@ -17,9 +18,9 @@ export const StagesManager = ({ stages, onChange }: StagesManagerProps) => {
       id: crypto.randomUUID(),
       name: '',
       description: '',
-      type: 'task',
+      type: 'task', // Set a default type
       order: stages.length,
-      config: {}
+      config: {} // Add empty config object
     };
     onChange([...stages, newStage]);
   };
@@ -68,11 +69,12 @@ export const StagesManager = ({ stages, onChange }: StagesManagerProps) => {
                   />
                 </div>
                 <div>
-                  <Input
+                  <Textarea
                     value={stage.description}
                     onChange={(e) => updateStage(stage.id, { description: e.target.value })}
                     placeholder="Stage description (optional)"
                     className="bg-white/5 border-white/10 text-white"
+                    rows={2}
                   />
                 </div>
               </div>

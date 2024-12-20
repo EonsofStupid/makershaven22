@@ -27,7 +27,7 @@ export const useProfiles = () => {
       console.log('Fetching profiles...');
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, name, email, role, updated_at')
+        .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {

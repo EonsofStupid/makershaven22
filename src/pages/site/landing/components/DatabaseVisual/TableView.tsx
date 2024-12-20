@@ -14,7 +14,7 @@ export const TableView = () => {
         console.log('Fetching maker projects...');
         const { data, error } = await supabase
           .from('maker_projects')
-          .select('id, title, category, difficulty_level, estimated_time, parts_count')
+          .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
         

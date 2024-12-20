@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { StageCard } from './StageCard';
-import type { WorkflowStage } from '@/lib/types/database/tables/workflow';
+import type { WorkflowStage } from '../../types';
 
 interface StagesListProps {
   stages: WorkflowStage[];

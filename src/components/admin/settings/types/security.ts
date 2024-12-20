@@ -1,30 +1,30 @@
-export interface IPSecuritySettings {
+import { Json } from '@/integrations/supabase/types';
+
+export interface SecuritySettings extends Record<string, Json> {
   ip_whitelist: string[];
   ip_blacklist: string[];
-  enable_ip_filtering: boolean;
   max_login_attempts: number;
-  lockout_duration: number; // in minutes
-  trusted_proxies?: string[];
+  lockout_duration_minutes: number;
+  session_timeout_minutes: number;
+  rate_limit_requests: number;
+  rate_limit_window_minutes: number;
+  allowed_countries: string[];
 }
 
-export interface SecuritySettings extends IPSecuritySettings {
-  two_factor_auth: boolean;
-  password_expiry_days: number;
-  session_timeout: number; // in minutes
-  require_strong_passwords: boolean;
-  minimum_password_length: number;
+export interface SiteSecuritySettings {
+  security_settings: SecuritySettings;
 }
 
-export const defaultSecuritySettings: SecuritySettings = {
-  ip_whitelist: [],
-  ip_blacklist: [],
-  enable_ip_filtering: false,
-  max_login_attempts: 5,
-  lockout_duration: 30,
-  trusted_proxies: [],
-  two_factor_auth: false,
-  password_expiry_days: 90,
-  session_timeout: 60,
-  require_strong_passwords: true,
-  minimum_password_length: 12
-}; 
+export interface SecurityLog {
+  id: string;
+  event_type: string;
+  ip_address: string | null;
+  user_id: string | null;
+  created_at: string;
+  metadata: Json;
+  user_agent: string | null;
+  profiles?: {
+    username: string | null;
+    display_name: string | null;
+  } | null;
+}

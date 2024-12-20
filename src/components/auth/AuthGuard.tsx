@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/store/auth-store';
-import { authManager } from '@/lib/auth/AuthManager';
+import { sessionManager } from '@/lib/auth/SessionManager';
+import { securityManager } from '@/lib/auth/SecurityManager';
 import { ErrorBoundary } from '@/components/shared/error-handling/ErrorBoundary';
 
 interface AuthGuardProps {
@@ -38,6 +39,7 @@ const AuthGuardContent = ({
           toast.error('Please sign in to continue', {
             description: 'You need to be authenticated to access this page'
           });
+          // Store the current path for deep linking after auth
           sessionStorage.setItem('redirectAfterAuth', window.location.pathname);
           navigate(fallbackPath);
           return;
@@ -45,12 +47,8 @@ const AuthGuardContent = ({
 
         if (session?.user) {
           try {
-            await authManager.startSession();
-            const isValid = await authManager.validateSession(session);
-            
-            if (!isValid) {
-              throw new Error('Invalid session');
-            }
+            await sessionManager.startSession();
+            securityManager.initialize();
 
             if (requiredRole && user) {
               const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
@@ -78,7 +76,8 @@ const AuthGuardContent = ({
 
     return () => {
       if (session?.user) {
-        authManager.destroy();
+        sessionManager.destroy();
+        securityManager.clearSecurityData();
       }
     };
   }, [session, user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
@@ -123,6 +122,7 @@ const AuthGuardContent = ({
   );
 };
 
+// Auth-specific error boundary component
 const AuthErrorFallback = ({ error }: { error: Error }) => {
   const navigate = useNavigate();
 

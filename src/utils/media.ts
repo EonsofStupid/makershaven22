@@ -1,13 +1,18 @@
-import { uploadMedia } from '@/integrations/supabase/supabase-service';
+import { supabase } from "@/integrations/supabase/client";
 
-/**
- * Uploads media file and returns the URL.
- */
-export const handleMediaUpload = async (file) => {
-  try {
-    return await uploadMedia(file, 'media-folder');
-  } catch (error) {
-    console.error('Error uploading media:', error);
-    throw error;
+export const uploadMedia = async (file: File): Promise<string> => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random()}.${fileExt}`;
+  const filePath = `uploads/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('media')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    throw uploadError;
   }
+
+  const { data } = supabase.storage.from('media').getPublicUrl(filePath);
+  return data.publicUrl;
 };

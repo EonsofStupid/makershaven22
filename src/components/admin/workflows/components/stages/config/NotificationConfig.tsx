@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { WorkflowStageConfig } from '@/lib/types/database/tables/workflow';
+import type { WorkflowStageConfig } from '../../../types';
 
 interface NotificationConfigProps {
   config: WorkflowStageConfig;
