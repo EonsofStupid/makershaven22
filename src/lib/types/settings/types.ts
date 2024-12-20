@@ -1,13 +1,19 @@
 import { z } from 'zod';
-import type { Json } from '../core/json';
+<<<<<<< HEAD
 import type { ThemeMode, TransitionType } from '../core/enums';
 import type { SecuritySettings } from '../security/types';
 
 // Base Settings Interface
+export interface Settings extends SecuritySettings {
+=======
+import type { Json } from '../core/json';
+
+// Base settings interface that matches database structure
 export interface Settings {
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
   id: string;
   site_title: string;
-  tagline?: string;
+  tagline: string;
   primary_color: string;
   secondary_color: string;
   accent_color: string;
@@ -15,9 +21,6 @@ export interface Settings {
   text_secondary_color: string;
   text_link_color: string;
   text_heading_color: string;
-  neon_cyan: string;
-  neon_pink: string;
-  neon_purple: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -32,17 +35,25 @@ export interface Settings {
   hover_scale: string;
   box_shadow: string;
   backdrop_blur: string;
+  theme_mode: "light" | "dark" | "system";
+  transition_type: "fade" | "slide" | "scale" | "blur";
+  neon_cyan?: string;
+  neon_pink?: string;
+  neon_purple?: string;
   logo_url?: string;
   favicon_url?: string;
-  security_settings?: SecuritySettings;
-  transition_type?: TransitionType;
+<<<<<<< HEAD
+=======
+  security_settings?: Json;
+  transition_type?: 'fade' | 'slide' | 'scale' | 'blur';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-  theme_mode?: ThemeMode;
+  theme_mode?: 'light' | 'dark' | 'system';
   state_version?: number;
   last_sync?: string;
+>>>>>>> parent of c8ade19 (Consolidate Settings Types and Schema)
 }
 
-// Zod Schema for Form Validation
+// Zod schema for validation
 export const settingsSchema = z.object({
   id: z.string().optional(),
   site_title: z.string().min(1, "Site title is required"),
@@ -54,9 +65,6 @@ export const settingsSchema = z.object({
   text_secondary_color: z.string(),
   text_link_color: z.string(),
   text_heading_color: z.string(),
-  neon_cyan: z.string(),
-  neon_pink: z.string(),
-  neon_purple: z.string(),
   font_family_heading: z.string(),
   font_family_body: z.string(),
   font_size_base: z.string(),
@@ -83,9 +91,3 @@ export const settingsSchema = z.object({
 
 // Type for form data derived from schema
 export type SettingsFormData = z.infer<typeof settingsSchema>;
-
-// Response type for settings API
-export interface SettingsResponse {
-  data: Settings | null;
-  error: Error | null;
-}

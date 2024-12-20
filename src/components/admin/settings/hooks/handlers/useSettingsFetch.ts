@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
-import { Settings } from "../../types";
+import { Settings } from "@/lib/types/settings/types";
 
 export const useSettingsFetch = () => {
   return useQuery({

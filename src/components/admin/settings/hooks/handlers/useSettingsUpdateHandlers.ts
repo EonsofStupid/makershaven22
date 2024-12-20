@@ -1,10 +1,10 @@
-import { uploadMedia } from '@/integrations/supabase/supabase-service';
 import { useSettingsStore } from '@/lib/store/settings-store';
-import { toast } from 'sonner';
 import { Settings } from '@/lib/types/settings/types';
+import { uploadMedia } from '@/integrations/supabase/supabase-service';
+import { toast } from 'sonner';
 
 export const useSettingsUpdateHandlers = () => {
-  const { updateSetting } = useSettingsStore();
+  const { theme, updateSetting } = useSettingsStore();
 
   const handleMediaUpload = async (file: File, key: keyof Settings) => {
     try {
