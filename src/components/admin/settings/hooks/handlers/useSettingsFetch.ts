@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
-import { Settings } from "../../types";
+import { Settings } from "@/lib/types/settings/types";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -19,7 +19,6 @@ export const useSettingsFetch = () => {
       }
 
       const settings: Settings = {
-        id: data.id,
         site_title: data.site_title,
         tagline: data.tagline,
         primary_color: data.primary_color,

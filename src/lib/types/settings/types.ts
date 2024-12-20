@@ -1,13 +1,12 @@
 import { z } from 'zod';
-import type { Json } from '../core/json';
 import type { ThemeMode, TransitionType } from '../core/enums';
 import type { SecuritySettings } from '../security/types';
 
 // Base Settings Interface
-export interface Settings {
+export interface Settings extends SecuritySettings {
   id: string;
   site_title: string;
-  tagline?: string;
+  tagline: string;
   primary_color: string;
   secondary_color: string;
   accent_color: string;
@@ -15,9 +14,6 @@ export interface Settings {
   text_secondary_color: string;
   text_link_color: string;
   text_heading_color: string;
-  neon_cyan: string;
-  neon_pink: string;
-  neon_purple: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -32,14 +28,13 @@ export interface Settings {
   hover_scale: string;
   box_shadow: string;
   backdrop_blur: string;
+  theme_mode: "light" | "dark" | "system";
+  transition_type: "fade" | "slide" | "scale" | "blur";
+  neon_cyan?: string;
+  neon_pink?: string;
+  neon_purple?: string;
   logo_url?: string;
   favicon_url?: string;
-  security_settings?: SecuritySettings;
-  transition_type?: TransitionType;
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-  theme_mode?: ThemeMode;
-  state_version?: number;
-  last_sync?: string;
 }
 
 // Zod Schema for Form Validation
@@ -54,9 +49,6 @@ export const settingsSchema = z.object({
   text_secondary_color: z.string(),
   text_link_color: z.string(),
   text_heading_color: z.string(),
-  neon_cyan: z.string(),
-  neon_pink: z.string(),
-  neon_purple: z.string(),
   font_family_heading: z.string(),
   font_family_body: z.string(),
   font_size_base: z.string(),
