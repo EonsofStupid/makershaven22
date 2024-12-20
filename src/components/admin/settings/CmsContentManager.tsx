@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { supabase } from "../../../integrations/supabase/client";
-import { CmsContent } from "../../../types/shared";
+import { CmsContent } from "@/lib/types/shared/shared";
 
 toast.configure();
 
