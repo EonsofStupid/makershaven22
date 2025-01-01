@@ -1,19 +1,7 @@
 import { Json } from '../core/json';
 
-export interface CmsContent {
-  id: string;
-  title: string;
-  content?: Json;
-  metadata?: Json;
-  status: 'draft' | 'published' | 'archived';
-  created_at?: string;
-  updated_at?: string;
-  created_by: string;
-  updated_by?: string;
-}
-
 export interface SiteSettings {
-  id: string;
+  id?: string;
   site_title: string;
   tagline?: string;
   primary_color: string;
@@ -43,19 +31,17 @@ export interface SiteSettings {
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: 'light' | 'dark' | 'system';
+  security_settings?: SecuritySettings;
   updated_at?: string;
   updated_by?: string;
 }
 
 export interface SecuritySettings {
+  enable_ip_filtering: boolean;
   ip_whitelist: string[];
   ip_blacklist: string[];
   max_login_attempts: number;
-  lockout_duration_minutes: number;
-  session_timeout_minutes: number;
-  rate_limit_requests: number;
-  rate_limit_window_minutes: number;
-  allowed_countries: string[];
+  two_factor_auth: boolean;
   password_requirements: {
     min_length: number;
     require_special: boolean;
@@ -64,25 +50,20 @@ export interface SecuritySettings {
   };
 }
 
-export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    role: string;
+export interface ThemeSettings {
+  mode: 'light' | 'dark' | 'system';
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
+  typography: {
+    fontFamily: string;
+    fontSize: string;
+    lineHeight: string;
   };
 }
 
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
-export type ContentType = 'page' | 'component' | 'template' | 'workflow';
-export type ContentStatus = 'draft' | 'published' | 'archived';
-export type PostCategory = 
-  | 'Guides'
-  | 'Reviews' 
-  | 'Blog'
-  | 'Site Updates'
-  | 'Critical'
-  | '3D Printer'
-  | '3D Printer Hardware';
