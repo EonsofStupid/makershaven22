@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Settings } from '@/integrations/supabase/types/settings';
+import { SiteSettings } from '../types/shared/shared';
 
 interface SettingsState {
-  settings: Partial<Settings>;
-  updateSetting: (key: keyof Settings, value: any) => void;
-  saveTransformationRule: (rule: any) => Promise<void>;
+  settings: Partial<SiteSettings>;
+  updateSetting: (key: keyof SiteSettings, value: any) => void;
+  updateSettings: (settings: Partial<SiteSettings>) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -16,10 +16,10 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({ 
           settings: { ...state.settings, [key]: value } 
         })),
-      saveTransformationRule: async (rule) => {
-        // Implementation for saving transformation rules
-        console.log('Saving transformation rule:', rule);
-      }
+      updateSettings: (newSettings) =>
+        set((state) => ({
+          settings: { ...state.settings, ...newSettings }
+        }))
     }),
     { name: 'settings-store' }
   )

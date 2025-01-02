@@ -1,5 +1,20 @@
 import { Json } from '../core/json';
 
+export interface CmsContent {
+  id: string;
+  title: string;
+  content?: Json;
+  metadata?: Json;
+  slug?: string;
+  status: 'draft' | 'published' | 'archived';
+  type: 'page' | 'component' | 'template' | 'workflow';
+  version?: number;
+  created_by: string;
+  updated_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface SiteSettings {
   id?: string;
   site_title: string;
@@ -50,20 +65,56 @@ export interface SecuritySettings {
   };
 }
 
-export interface ThemeSettings {
-  mode: 'light' | 'dark' | 'system';
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-  };
-  typography: {
-    fontFamily: string;
-    fontSize: string;
-    lineHeight: string;
+export interface AuthError {
+  type: string;
+  code?: string;
+  message: string;
+  stack?: string;
+}
+
+export interface AuthErrorRecoveryState {
+  error: AuthError | null;
+  isRecovering: boolean;
+  recoveryAttempts: number;
+}
+
+export interface RevisionState {
+  revisions: any[];
+  selectedRevision: any | null;
+  compareRevision: any | null;
+  diffMode: 'split' | 'unified';
+  selectedVersions: {
+    left: number;
+    right: number;
   };
 }
 
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+export interface VisualElement {
+  id: string;
+  type: string;
+  props: Record<string, any>;
+}
+
+export interface ElementPreset {
+  id: string;
+  name: string;
+  category: string;
+  element: VisualElement;
+}
+
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: string;
+  order: number;
+  config: Record<string, any>;
+  description?: string;
+}
+
+export interface WorkflowFormData {
+  id?: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
