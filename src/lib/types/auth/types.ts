@@ -1,37 +1,42 @@
+import { User } from "@supabase/supabase-js";
+
+export interface AuthUser extends User {
+  role?: string;
+  username?: string;
+  displayName?: string;
+}
+
 export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    role: string;
-  };
+  user: AuthUser;
+  expires_at?: number;
+  access_token?: string;
+  refresh_token?: string;
 }
 
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
-  loading: boolean;
+  isLoading: boolean;
   error: Error | null;
+  isTransitioning: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  signOut: () => Promise<void>;
+  initialize: () => Promise<void>;
+  handleSessionUpdate: (session: any) => Promise<void>;
 }
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  role: string;
-  profile?: Profile;
+export interface AuthError {
+  type: string;
+  message: string;
+  code?: string;
+  stack?: string;
 }
 
-export interface Profile {
-  id: string;
-  username?: string;
-  display_name?: string;
-  avatar_url?: string;
-  role: string;
-  created_at?: string;
-  updated_at?: string;
+export interface AuthErrorRecoveryState {
+  error: AuthError | null;
+  isRecovering: boolean;
+  recoveryAttempts: number;
 }
-
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

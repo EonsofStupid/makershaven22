@@ -1,75 +1,48 @@
-import { Json } from '../core/json';
-import { BaseEntity, UserOwnedEntity } from '../core/base';
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
-
-export interface WorkflowTemplate extends UserOwnedEntity {
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  steps: WorkflowStage[];
-  is_active?: boolean;
-}
+import { Json } from "../base/json";
 
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: WorkflowStageType;
+  type: string;
   order: number;
-  config: WorkflowStageConfig;
+  config: Json;
   description?: string;
 }
 
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_by: string;
+  updated_at?: string;
 }
 
 export interface WorkflowFormData {
-  id?: string;
   name: string;
-  description?: string;
+  description: string;
   stages: WorkflowStage[];
-  is_active?: boolean;
+  is_active: boolean;
 }
 
-export interface StageConfigUpdateProps {
-  config: WorkflowStageConfig;
-  onConfigUpdate: (config: WorkflowStageConfig) => void;
-}
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+export type WorkflowState = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 
-export type StageUpdateFunction = (stageId: string, updates: Partial<WorkflowStage>) => void;
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => ({
+  id: stage.id,
+  name: stage.name,
+  type: stage.type,
+  order: stage.order,
+  config: stage.config,
+  description: stage.description
+});
 
-export interface WorkflowState {
-  workflows: WorkflowTemplate[];
-  activeWorkflow: WorkflowTemplate | null;
-  isLoading: boolean;
-  error: Error | null;
-}
+export const parseWorkflowStage = (json: Json): WorkflowStage => ({
+  id: json.id as string,
+  name: json.name as string,
+  type: json.type as string,
+  order: json.order as number,
+  config: json.config as Json,
+  description: json.description as string
+});

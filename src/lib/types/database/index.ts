@@ -1,15 +1,16 @@
-export * from './core/json';
-export * from './core/enums';
-export * from './core/base-types';
-export * from './tables';
+import { Settings } from "../settings/types";
 
-// Re-export common types
-export type { Json, JsonObject, JsonArray } from './core/json';
-export type { 
-  UserRole, 
-  ContentStatus, 
-  ContentType, 
-  WorkflowStageType,
-  ThemeMode,
-  TransitionType 
-} from './core/enums';
+export interface Database {
+  public: {
+    Tables: {
+      site_settings: {
+        Row: Settings;
+        Insert: Partial<Settings>;
+        Update: Partial<Settings>;
+      };
+    };
+  };
+}
+
+export type Tables = Database["public"]["Tables"];
+export type TableNames = keyof Tables;
