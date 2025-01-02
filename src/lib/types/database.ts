@@ -1,3 +1,5 @@
+import { Json } from './core/base';
+
 export interface Database {
   public: {
     Tables: {
@@ -5,7 +7,7 @@ export interface Database {
         Row: {
           id: string;
           site_title: string;
-          tagline: string | null;
+          tagline: string;
           primary_color: string;
           secondary_color: string;
           accent_color: string;
@@ -44,6 +46,42 @@ export interface Database {
           [key: string]: any;
         };
       };
+      security_events: {
+        Row: any;
+      };
+      security_audit_logs: {
+        Row: any;
+      };
+      user_activity: {
+        Row: any;
+      };
+      media: {
+        Row: any;
+      };
+      blog_posts: {
+        Row: any;
+      };
+      cms_content: {
+        Row: any;
+      };
+      cms_components: {
+        Row: any;
+      };
+      cms_categories: {
+        Row: any;
+      };
+    };
+    Views: {
+      [key: string]: any;
+    };
+    Functions: {
+      [key: string]: any;
+    };
+    Enums: {
+      [key: string]: any;
     };
   };
 }
+
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];

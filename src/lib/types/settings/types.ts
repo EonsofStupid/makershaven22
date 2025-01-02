@@ -1,4 +1,4 @@
-import { Json } from "../base/json";
+import { Json } from '../core/base';
 
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
@@ -46,9 +46,15 @@ export interface Settings {
   favicon_url?: string;
   security_settings?: SecuritySettings;
   theme_mode?: 'light' | 'dark' | 'system';
+  transition_type?: 'fade' | 'slide' | 'scale';
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   updated_at?: string;
   updated_by?: string;
 }
+
+export type SiteSettings = Settings;
+
+export interface SettingsFormData extends Settings {}
 
 export interface UseSettingsFormReturn {
   form: any;
@@ -57,8 +63,6 @@ export interface UseSettingsFormReturn {
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }
-
-export type SiteSettings = Settings;
 
 export interface SettingsState {
   settings: Partial<Settings>;
