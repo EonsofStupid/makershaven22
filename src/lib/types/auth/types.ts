@@ -24,10 +24,7 @@ export interface AuthUser {
   role?: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: Json | undefined;
-  };
+  user_metadata?: Record<string, any>;
 }
 
 export interface AuthError {
@@ -37,11 +34,23 @@ export interface AuthError {
   stack?: string;
 }
 
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
+export interface SecurityEventSeverity {
+  LOW: 'low';
+  MEDIUM: 'medium';
+  HIGH: 'high';
+  CRITICAL: 'critical';
+}
+
+export interface SecurityEventCategory {
+  AUTH: 'auth';
+  ACCESS: 'access';
+  DATA: 'data';
+  SYSTEM: 'system';
+}
 
 export interface AuthErrorRecoveryState {
-  error: AuthError | null;
-  retryCount: number;
-  maxRetries: number;
+  attempts: number;
+  lastAttempt: number;
+  isLocked: boolean;
+  lockUntil?: number;
 }

@@ -32,11 +32,6 @@ export interface Settings {
   transition_type: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   theme_mode?: 'light' | 'dark' | 'system';
-  security_settings?: {
-    enable_ip_filtering: boolean;
-    two_factor_auth: boolean;
-    max_login_attempts: number;
-  };
   updated_at?: string;
   updated_by?: string;
 }
@@ -62,5 +57,3 @@ export interface UseSettingsFormReturn {
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }
-
-export type SettingsFormData = Settings;
