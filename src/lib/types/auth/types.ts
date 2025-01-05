@@ -26,5 +26,5 @@ export interface AuthSession {
 export interface AuthErrorRecoveryState {
   error: AuthError | null;
   retryCount: number;
-  lastAttempt: Date | null;
+  maxRetries: number;
 }

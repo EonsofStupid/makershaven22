@@ -3,16 +3,10 @@ import { Json } from "../core/json";
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: WorkflowStageType;
+  type: string;
   order: number;
-  config: WorkflowStageConfig;
+  config: Json;
   description?: string;
-}
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
-
-export interface WorkflowStageConfig {
-  [key: string]: Json;
 }
 
 export interface WorkflowTemplate {
@@ -20,13 +14,13 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   stages: WorkflowStage[];
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  created_by: string;
-  email?: string;
   steps: Json;
   triggers?: Json;
+  created_at: string;
+  created_by: string;
+  updated_at?: string;
+  is_active: boolean;
+  email?: string;
 }
 
 export interface WorkflowFormData extends Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'> {
