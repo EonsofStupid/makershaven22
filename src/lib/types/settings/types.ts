@@ -1,7 +1,6 @@
 import { Json } from '../core/json';
 
 export interface Settings {
-  id?: string;
   site_title: string;
   tagline?: string;
   primary_color: string;
@@ -56,4 +55,5 @@ export interface SettingsState {
   settings: Partial<Settings>;
   updateSetting: (key: keyof Settings, value: any) => void;
   updateSettings: (settings: Partial<Settings>) => void;
+  saveTransformationRule: (rule: any) => Promise<void>;
 }

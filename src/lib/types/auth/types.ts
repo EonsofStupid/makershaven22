@@ -18,11 +18,12 @@ export interface AuthSession {
 }
 
 export interface AuthState {
-  user: AuthUser | null;
   session: AuthSession | null;
+  user: AuthUser | null;
   isLoading: boolean;
   hasAccess: boolean;
   error: Error | null;
+  isTransitioning?: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;

@@ -19,4 +19,5 @@ export interface ThemeState {
   setSystemTheme: (theme: 'light' | 'dark') => void;
   setMode: (mode: ThemeMode) => void;
   updateTheme: (settings: Theme) => Promise<void>;
+  themeState: ThemeMode;
 }

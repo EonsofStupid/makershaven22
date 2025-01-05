@@ -1,6 +1,6 @@
+import { Json } from '../core/json';
 export * from '../settings/types';
 export * from '../auth/types';
-export * from '../core/json';
 
 export interface CmsContent {
   id: string;
