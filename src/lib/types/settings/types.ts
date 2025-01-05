@@ -1,3 +1,5 @@
+import { Json } from '../core/json';
+
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -32,6 +34,11 @@ export interface Settings {
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
+  security_settings?: {
+    enable_ip_filtering: boolean;
+    two_factor_auth: boolean;
+    max_login_attempts: number;
+  };
 }
 
 export type SettingsFormData = Settings;
@@ -48,4 +55,12 @@ export interface ThemeState {
   setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
   updateTheme: (settings: Settings) => Promise<void>;
+}
+
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }

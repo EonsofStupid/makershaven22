@@ -17,33 +17,40 @@ export interface AuthUser {
 export interface AuthSession {
   user: AuthUser;
   expires_at?: number;
+  access_token?: string;
+  refresh_token?: string;
 }
 
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  hasAccess: boolean;
-  error: Error | { message: string } | null;
-  isTransitioning?: boolean;
+  error: Error | null;
+  isOffline: boolean;
+  isTransitioning: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
+  setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
-}
-
-export interface AuthError {
-  type: string;
-  message: string;
-  originalError?: unknown;
 }
 
 export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
 
+export interface AuthError {
+  type: string;
+  message: string;
+  code?: string;
+  stack?: string;
+  originalError?: unknown;
+}
+
 export interface AuthErrorRecoveryState {
   error: AuthError | null;
   retryCount: number;
   maxRetries: number;
+  lastAttempt?: Date;
+  lockoutUntil?: Date;
 }
