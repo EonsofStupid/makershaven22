@@ -28,3 +28,6 @@ export interface AuthSession {
   session: Session;
   user: User;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

@@ -16,9 +16,13 @@ export interface CmsContent {
   id: string;
   title: string;
   content: Json;
-  status: 'draft' | 'published' | 'archived';
+  metadata: Json;
   created_at: string;
   updated_at: string;
   created_by: string;
   updated_by: string;
+  version: number;
+  status: 'draft' | 'published' | 'archived';
+  type: 'template' | 'page' | 'component' | 'workflow';
+  slug: string;
 }
