@@ -3,11 +3,13 @@ import { Json } from '../core/json';
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: string;
+  type: WorkflowStageType;
   order: number;
-  config: Record<string, any>;
+  config: WorkflowStageConfig;
   description?: string;
 }
+
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowTemplate {
   id: string;
@@ -23,12 +25,7 @@ export interface WorkflowTemplate {
   triggers?: Json;
 }
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return {
-    ...template,
-    stages: template.stages.map(serializeWorkflowStage)
-  };
-};
+export type WorkflowFormData = Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'>;
 
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
   return {
@@ -38,5 +35,12 @@ export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
     order: stage.order,
     config: stage.config,
     description: stage.description
+  };
+};
+
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
+  return {
+    ...template,
+    stages: template.stages.map(serializeWorkflowStage)
   };
 };

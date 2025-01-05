@@ -43,6 +43,13 @@ export interface SecuritySettings {
   max_login_attempts: number;
 }
 
+export interface SettingsState {
+  settings: Partial<Settings>;
+  updateSetting: (key: keyof Settings, value: any) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+  saveTransformationRule: (rule: any) => Promise<void>;
+}
+
 export type SettingsFormData = Settings;
 
 export interface UseSettingsFormReturn {
@@ -51,4 +58,20 @@ export interface UseSettingsFormReturn {
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
+}
+
+export interface ThemeState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  mode: 'light' | 'dark' | 'system';
+  themeMode: 'light' | 'dark' | 'system';
+  systemTheme: 'light' | 'dark';
+  effectiveTheme: 'light' | 'dark';
+  cssVariables: Record<string, string>;
+  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
+  setSystemTheme: (theme: 'light' | 'dark') => void;
+  setMode: (mode: 'light' | 'dark' | 'system') => void;
+  updateTheme: (settings: Settings) => Promise<void>;
+  themeState: 'light' | 'dark' | 'system';
 }
