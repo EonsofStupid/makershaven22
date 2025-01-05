@@ -1,24 +1,27 @@
 import { Session } from '@supabase/supabase-js';
 import { Json } from '../core/json';
 
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
 export interface AuthState {
   session: Session | null;
   user: AuthUser | null;
   isLoading: boolean;
-  hasAccess: boolean;
-  error: Error | { message: string } | null;
-  isTransitioning?: boolean;
+  error: Error | null;
+  isOffline: boolean;
+  isTransitioning: boolean;
   setSession: (session: Session | null) => void;
   setUser: (user: AuthUser | null) => void;
-  setLoading: (loading: boolean) => void;
+  setLoading: (isLoading: boolean) => void;
   setError: (error: Error | null) => void;
+  setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
 }
 
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: string;
+  role?: UserRole;
   username?: string;
   displayName?: string;
   user_metadata?: {

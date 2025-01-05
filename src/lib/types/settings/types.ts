@@ -52,7 +52,6 @@ export interface ThemeState {
   cssVariables: Record<string, string>;
   setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
-  themeState: 'light' | 'dark' | 'system';
   updateTheme: (settings: Settings) => Promise<void>;
 }
 
