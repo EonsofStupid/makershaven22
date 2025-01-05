@@ -1,4 +1,4 @@
-import { Json } from '../core/json';
+import { Json } from "../core/json";
 
 export interface WorkflowStage {
   id: string;
@@ -11,15 +11,19 @@ export interface WorkflowStage {
 
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
+export interface WorkflowStageConfig {
+  [key: string]: Json;
+}
+
 export interface WorkflowTemplate {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   stages: WorkflowStage[];
   is_active: boolean;
   created_at: string;
-  created_by: string;
   updated_at: string;
+  created_by: string;
   email?: string;
   steps: Json;
   triggers?: Json;

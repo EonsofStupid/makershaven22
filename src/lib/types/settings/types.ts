@@ -1,4 +1,4 @@
-import { Json } from '../core/json';
+import { Json } from "../core/json";
 
 export interface Settings {
   site_title: string;
