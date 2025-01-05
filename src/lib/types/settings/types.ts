@@ -1,18 +1,4 @@
-import { Json } from '../core/base';
-
-export interface SecuritySettings {
-  enable_ip_filtering: boolean;
-  ip_whitelist: string[];
-  ip_blacklist: string[];
-  max_login_attempts: number;
-  two_factor_auth: boolean;
-  password_requirements: {
-    min_length: number;
-    require_special: boolean;
-    require_numbers: boolean;
-    require_uppercase: boolean;
-  };
-}
+import { Json } from '../core/json';
 
 export interface Settings {
   id?: string;
@@ -44,17 +30,15 @@ export interface Settings {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-  security_settings?: SecuritySettings;
-  theme_mode?: 'light' | 'dark' | 'system';
   transition_type?: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
 }
 
 export type SiteSettings = Settings;
-
-export interface SettingsFormData extends Settings {}
+export type SettingsFormData = Settings;
 
 export interface UseSettingsFormReturn {
   form: any;

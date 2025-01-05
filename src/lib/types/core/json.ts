@@ -1,13 +1,3 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
-
-export interface JsonObject {
-  [key: string]: Json;
-}
-
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+export type JsonObject = { [key: string]: Json };
 export type JsonArray = Json[];
