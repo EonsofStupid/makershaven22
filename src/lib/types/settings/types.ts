@@ -34,13 +34,14 @@ export interface Settings {
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
-  security_settings?: SecuritySettings;
 }
 
-export interface SecuritySettings {
-  enable_ip_filtering: boolean;
-  two_factor_auth: boolean;
-  max_login_attempts: number;
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }
 
 export interface SettingsState {
@@ -51,27 +52,3 @@ export interface SettingsState {
 }
 
 export type SettingsFormData = Settings;
-
-export interface UseSettingsFormReturn {
-  form: any;
-  settings: Settings | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  handleSettingsUpdate: (settings: Settings) => Promise<void>;
-}
-
-export interface ThemeState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: 'light' | 'dark' | 'system';
-  themeMode: 'light' | 'dark' | 'system';
-  systemTheme: 'light' | 'dark';
-  effectiveTheme: 'light' | 'dark';
-  cssVariables: Record<string, string>;
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
-  setSystemTheme: (theme: 'light' | 'dark') => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  updateTheme: (settings: Settings) => Promise<void>;
-  themeState: 'light' | 'dark' | 'system';
-}

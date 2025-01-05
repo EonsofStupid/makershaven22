@@ -29,22 +29,17 @@ export interface WorkflowTemplate {
   triggers?: Json;
 }
 
-export type WorkflowFormData = Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'>;
+export interface WorkflowFormData extends Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'> {
+  id?: string;
+}
 
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return {
-    id: stage.id,
-    name: stage.name,
-    type: stage.type,
-    order: stage.order,
-    config: stage.config,
-    description: stage.description
-  };
+  return stage as unknown as Json;
 };
 
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
   return {
     ...template,
-    stages: template.stages.map(serializeWorkflowStage)
-  };
+    stages: template.stages.map(stage => serializeWorkflowStage(stage))
+  } as unknown as Json;
 };

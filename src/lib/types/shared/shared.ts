@@ -1,6 +1,6 @@
-export { Settings } from '../settings/types';
-export { AuthState, AuthError, AuthSession } from '../auth/types';
-export { Json, JsonObject, JsonArray } from '../core/json';
+export type { Settings } from '../settings/types';
+export type { AuthState, AuthError, AuthSession } from '../auth/types';
+export type { Json, JsonObject, JsonArray } from '../core/json';
 
 export interface CmsContent {
   id: string;
