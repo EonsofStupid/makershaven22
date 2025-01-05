@@ -6,4 +6,10 @@ export interface JsonObject {
 
 export type JsonArray = Json[];
 
-export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
+export const isJsonObject = (value: Json): value is JsonObject => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+};
+
+export const isJsonArray = (value: Json): value is JsonArray => {
+  return Array.isArray(value);
+};
