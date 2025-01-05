@@ -1,4 +1,5 @@
 import { Session } from '@supabase/supabase-js';
+import { Json } from '../core/json';
 
 export interface AuthState {
   session: Session | null;
@@ -20,11 +21,10 @@ export interface AuthUser {
   role?: string;
   username?: string;
   displayName?: string;
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: Json | undefined;
+  };
 }
 
 export interface AuthError {
