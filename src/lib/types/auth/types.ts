@@ -36,9 +36,6 @@ export interface AuthState {
   signOut: () => Promise<void>;
 }
 
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
-
 export interface AuthError {
   type: string;
   message: string;
@@ -54,3 +51,6 @@ export interface AuthErrorRecoveryState {
   lastAttempt?: Date;
   lockoutUntil?: Date;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

@@ -2,7 +2,6 @@ export * from '../auth/types';
 export * from '../settings/types';
 export * from '../core/json';
 
-// Content Types
 export interface CmsContent {
   id: string;
   title: string;
@@ -17,7 +16,20 @@ export interface CmsContent {
   version?: number;
 }
 
-// Workflow Types
+export interface ContentWithAuthor extends CmsContent {
+  created_by: {
+    display_name: string;
+  };
+}
+
+export interface RevisionStore {
+  revisions: any[];
+  selectedRevision: string | null;
+  compareRevision: string | null;
+  diffMode: 'unified' | 'split';
+  selectedVersions: string[];
+}
+
 export interface WorkflowStage {
   id: string;
   name: string;
@@ -36,13 +48,4 @@ export interface WorkflowTemplate {
   created_at: string;
   created_by: string;
   updated_at?: string;
-}
-
-// Revision Types
-export interface RevisionStore {
-  revisions: any[];
-  selectedRevision: string | null;
-  compareRevision: string | null;
-  diffMode: 'unified' | 'split';
-  selectedVersions: string[];
 }

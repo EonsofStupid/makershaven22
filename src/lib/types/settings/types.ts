@@ -41,26 +41,17 @@ export interface Settings {
   };
 }
 
-export type SettingsFormData = Settings;
-
-export interface ThemeState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  mode: 'light' | 'dark' | 'system';
-  themeMode: 'light' | 'dark' | 'system';
-  systemTheme: 'light' | 'dark';
-  effectiveTheme: 'light' | 'dark';
-  cssVariables: Record<string, string>;
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
-  setSystemTheme: (theme: 'light' | 'dark') => void;
-  updateTheme: (settings: Settings) => Promise<void>;
-}
-
 export interface UseSettingsFormReturn {
   form: any;
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
+}
+
+export interface SettingsState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  saveTransformationRule?: (rule: any) => Promise<void>;
 }
