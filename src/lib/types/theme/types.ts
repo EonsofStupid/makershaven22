@@ -1,23 +1,33 @@
-import { Settings } from '../settings/types';
+export type ThemeMode = 'light' | 'dark' | 'system';
 
-export interface Theme extends Settings {
+export interface Theme {
+  mode: ThemeMode;
   transition_type: 'fade' | 'slide' | 'scale';
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
+  typography: {
+    fontFamily: string;
+    fontSize: string;
+    lineHeight: string;
+  };
 }
 
 export interface ThemeState {
   settings: Theme | null;
   isLoading: boolean;
   error: Error | null;
-  mode: 'light' | 'dark' | 'system';
-  themeMode: 'light' | 'dark' | 'system';
+  mode: ThemeMode;
+  themeMode: ThemeMode;
   systemTheme: 'light' | 'dark';
   effectiveTheme: 'light' | 'dark';
   cssVariables: Record<string, string>;
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
+  setThemeMode: (mode: ThemeMode) => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
-  setSettings: (settings: Theme) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  updateTheme: (settings: Theme) => Promise<void>;
+  setMode: (mode: ThemeMode) => void;
+  updateTheme: (theme: Theme) => void;
 }

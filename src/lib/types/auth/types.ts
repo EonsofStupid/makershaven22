@@ -16,7 +16,6 @@ export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  hasAccess: boolean;
   error: Error | null;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;

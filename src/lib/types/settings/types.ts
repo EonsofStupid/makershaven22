@@ -30,7 +30,7 @@ export interface Settings {
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-  transition_type?: 'fade' | 'slide' | 'scale';
+  transition_type: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
