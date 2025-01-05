@@ -1,14 +1,21 @@
-import { Session, User } from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
 
-export interface AuthUser extends User {
+export interface AuthUser {
+  id: string;
+  email?: string;
   role?: UserRole;
   displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
 }
 
-export interface AuthSession extends Session {
+export interface AuthSession {
   user: AuthUser;
+  expires_at?: number;
 }
 
 export interface AuthState {
@@ -35,3 +42,6 @@ export interface AuthErrorRecoveryState {
   isRecovering: boolean;
   recoveryAttempts: number;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'session' | 'security' | 'pin' | 'audit';

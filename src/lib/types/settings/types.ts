@@ -68,5 +68,5 @@ export interface SettingsState {
   settings: Partial<Settings>;
   updateSetting: (key: keyof Settings, value: any) => void;
   updateSettings: (settings: Partial<Settings>) => void;
-  saveTransformationRule: (rule: any) => Promise<void>;
+  saveTransformationRule?: (rule: any) => Promise<void>;
 }
