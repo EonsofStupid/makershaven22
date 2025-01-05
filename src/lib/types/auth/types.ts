@@ -1,9 +1,7 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: UserRole;
+  role?: string;
   username?: string;
   displayName?: string;
   user_metadata?: {

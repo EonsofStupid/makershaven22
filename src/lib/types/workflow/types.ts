@@ -60,3 +60,21 @@ export interface WorkflowFormData {
   stages: WorkflowStage[];
   is_active?: boolean;
 }
+
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
+  return {
+    id: stage.id,
+    name: stage.name,
+    type: stage.type,
+    order: stage.order,
+    config: stage.config,
+    description: stage.description
+  } as unknown as Json;
+};
+
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
+  return {
+    ...template,
+    stages: template.stages.map(serializeWorkflowStage)
+  } as unknown as Json;
+};
