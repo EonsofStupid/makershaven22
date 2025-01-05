@@ -1,30 +1,24 @@
+import { Session } from "@supabase/supabase-js";
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: string;
+  role?: UserRole;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
-}
-
-export interface AuthSession {
-  user: AuthUser;
-  expires_at?: number;
+  user_metadata?: Record<string, any>;
 }
 
 export interface AuthState {
-  session: AuthSession | null;
+  session: Session | null;
   user: AuthUser | null;
   isLoading: boolean;
-  hasAccess: boolean;
   error: Error | null;
-  isTransitioning?: boolean;
-  setSession: (session: AuthSession | null) => void;
+  setSession: (session: Session | null) => void;
   setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
+  setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   signOut: () => Promise<void>;
 }
@@ -36,7 +30,7 @@ export interface AuthError extends Error {
 }
 
 export interface AuthErrorRecoveryState {
-  error: AuthError | null;
-  isRecovering: boolean;
-  recoveryAttempts: number;
+  attemptCount: number;
+  lastAttempt?: Date;
+  nextAttemptDelay: number;
 }
