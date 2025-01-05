@@ -33,13 +33,13 @@ export interface Settings {
   transition_type: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   theme_mode?: 'light' | 'dark' | 'system';
-  updated_at?: string;
-  updated_by?: string;
   security_settings?: {
     enable_ip_filtering: boolean;
     two_factor_auth: boolean;
     max_login_attempts: number;
   };
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export type SettingsFormData = Settings;
@@ -50,4 +50,10 @@ export interface UseSettingsFormReturn {
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
+}
+
+export interface SettingsState {
+  settings: Partial<Settings>;
+  updateSetting: (key: keyof Settings, value: any) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
 }

@@ -1,20 +1,9 @@
+import { Settings } from '../settings/types';
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export interface Theme {
-  mode: ThemeMode;
+export interface Theme extends Settings {
   transition_type: 'fade' | 'slide' | 'scale';
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-  };
-  typography: {
-    fontFamily: string;
-    fontSize: string;
-    lineHeight: string;
-  };
 }
 
 export interface ThemeState {
@@ -29,5 +18,5 @@ export interface ThemeState {
   setThemeMode: (mode: ThemeMode) => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
   setMode: (mode: ThemeMode) => void;
-  updateTheme: (theme: Theme) => void;
+  updateTheme: (settings: Theme) => Promise<void>;
 }

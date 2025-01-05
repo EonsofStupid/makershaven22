@@ -1,11 +1,14 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
-export type JsonObject = { [key: string]: Json };
 export type JsonArray = Json[];
+export type JsonObject = { [key: string]: Json };
 
-export const isJsonObject = (value: unknown): value is JsonObject => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-};
+export interface BaseEntity {
+  id: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
-export const isJsonArray = (value: unknown): value is JsonArray => {
-  return Array.isArray(value);
-};
+export interface UserOwnedEntity extends BaseEntity {
+  created_by: string;
+  updated_by?: string;
+}

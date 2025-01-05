@@ -1,7 +1,9 @@
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: string;
+  role?: UserRole;
   username?: string;
   displayName?: string;
   user_metadata?: {
@@ -16,9 +18,10 @@ export interface AuthSession {
 }
 
 export interface AuthState {
-  session: AuthSession | null;
   user: AuthUser | null;
+  session: AuthSession | null;
   isLoading: boolean;
+  hasAccess: boolean;
   error: Error | null;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
