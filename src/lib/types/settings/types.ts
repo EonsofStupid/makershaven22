@@ -1,4 +1,4 @@
-import { Json } from "../core/json";
+import { Json } from '../core/json';
 
 export interface Settings {
   site_title: string;
@@ -32,30 +32,8 @@ export interface Settings {
   transition_type: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
   theme_mode?: 'light' | 'dark' | 'system';
-  security_settings?: {
-    enable_ip_filtering: boolean;
-    two_factor_auth: boolean;
-    max_login_attempts: number;
-  };
   updated_at?: string;
   updated_by?: string;
-}
-
-export interface SettingsState {
-  settings: Partial<Settings>;
-  updateSetting: (key: keyof Settings, value: any) => void;
-  updateSettings: (settings: Partial<Settings>) => void;
-  saveTransformationRule: (rule: any) => Promise<void>;
-}
-
-export type SettingsFormData = Settings;
-
-export interface UseSettingsFormReturn {
-  form: any;
-  settings: Settings | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }
 
 export interface ThemeState {
@@ -69,7 +47,16 @@ export interface ThemeState {
   cssVariables: Record<string, string>;
   setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  updateTheme: (settings: Settings) => Promise<void>;
   themeState: 'light' | 'dark' | 'system';
+  updateTheme: (settings: Settings) => Promise<void>;
 }
+
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  handleSettingsUpdate: (settings: Settings) => Promise<void>;
+}
+
+export type SettingsFormData = Settings;

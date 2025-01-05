@@ -1,14 +1,16 @@
-import { Json } from "../core/json";
+import { Session } from '@supabase/supabase-js';
 
 export interface AuthState {
-  session: AuthSession | null;
+  session: Session | null;
   user: AuthUser | null;
   isLoading: boolean;
-  error: AuthError | null;
-  setSession: (session: AuthSession | null) => void;
+  hasAccess: boolean;
+  error: Error | { message: string } | null;
+  isTransitioning?: boolean;
+  setSession: (session: Session | null) => void;
   setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: AuthError | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
   signOut: () => Promise<void>;
 }
 
@@ -18,31 +20,25 @@ export interface AuthUser {
   role?: string;
   username?: string;
   displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: Json;
-  };
 }
 
 export interface AuthSession {
   user: AuthUser;
   expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
 }
 
 export interface AuthError {
   type: string;
+  message: string;
   code?: string;
   stack?: string;
-  message: string;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
 
 export interface AuthErrorRecoveryState {
   error: AuthError | null;
   retryCount: number;
   maxRetries: number;
 }
-
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
