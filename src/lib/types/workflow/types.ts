@@ -1,47 +1,43 @@
-import { Json, UserOwnedEntity } from '../core/json';
+import { Json } from '../core/json';
 
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
 
 export interface WorkflowStage {
   id: string;
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: WorkflowStageConfig;
+  config: {
+    timeLimit?: number;
+    requiredApprovers?: number;
+    customFields?: {
+      name: string;
+      type: 'text' | 'number' | 'date' | 'select';
+      options?: string[];
+      required?: boolean;
+    }[];
+    [key: string]: any;
+  };
   description?: string;
 }
 
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-}
-
-export interface WorkflowTemplate extends UserOwnedEntity {
+export interface WorkflowTemplate {
+  id: string;
   name: string;
-  description?: string;
+  description: string | null;
   stages: WorkflowStage[];
   is_active: boolean;
-  email?: string;
+  created_at: string;
+  created_by: string;
+  updated_at?: string;
+  steps: Json;
   triggers?: Json;
-  steps: WorkflowStage[];
 }
 
 export interface WorkflowFormData {
-  id?: string;
   name: string;
-  description?: string;
+  description: string;
   stages: WorkflowStage[];
-  is_active?: boolean;
+  is_active: boolean;
+  steps: Json;
 }

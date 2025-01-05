@@ -42,7 +42,6 @@ export interface Settings {
   };
 }
 
-export type SiteSettings = Settings;
 export type SettingsFormData = Settings;
 
 export interface UseSettingsFormReturn {
@@ -51,11 +50,4 @@ export interface UseSettingsFormReturn {
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
-}
-
-export interface SettingsState {
-  settings: Partial<Settings>;
-  updateSetting: (key: keyof Settings, value: any) => void;
-  updateSettings: (settings: Partial<Settings>) => void;
-  saveTransformationRule?: (rule: any) => Promise<void>;
 }
