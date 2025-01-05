@@ -1,26 +1,41 @@
-import { Session, User } from "@supabase/supabase-js";
+import { Json } from "../core/json";
 
 export interface AuthState {
-  session: Session | null;
-  user: User | null;
-  loading: boolean;
-  error: Error | null;
-  setSession: (session: Session | null) => void;
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
+  session: AuthSession | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: AuthError | null;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: AuthError | null) => void;
   signOut: () => Promise<void>;
 }
 
-export interface AuthError extends Error {
-  type: string;
-  code: string;
-  stack?: string;
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: string;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: Json;
+  };
 }
 
 export interface AuthSession {
-  session: Session;
-  user: User;
+  user: AuthUser;
+  expires_at?: number;
+  access_token?: string;
+  refresh_token?: string;
+}
+
+export interface AuthError {
+  type: string;
+  code?: string;
+  stack?: string;
+  message: string;
 }
 
 export interface AuthErrorRecoveryState {
