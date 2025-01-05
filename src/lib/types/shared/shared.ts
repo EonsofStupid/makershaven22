@@ -1,6 +1,6 @@
+import { Settings } from "../settings/types";
+import { AuthState, AuthError, AuthSession } from "../auth/types";
 import { Json, JsonObject, JsonArray } from "../core/json";
-import type { Settings } from "../settings/types";
-import type { AuthState, AuthError, AuthSession } from "../auth/types";
 
 export type { Settings };
 export type { AuthState, AuthError, AuthSession };

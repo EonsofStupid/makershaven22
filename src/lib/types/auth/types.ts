@@ -43,3 +43,6 @@ export interface AuthErrorRecoveryState {
   retryCount: number;
   maxRetries: number;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
