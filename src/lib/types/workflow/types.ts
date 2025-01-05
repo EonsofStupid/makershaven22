@@ -1,11 +1,11 @@
-import { Json } from "../core/json";
+import { Json } from '../core/json';
 
 export interface WorkflowStage {
   id: string;
   name: string;
   type: string;
   order: number;
-  config: Json;
+  config: Record<string, any>;
   description?: string;
 }
 

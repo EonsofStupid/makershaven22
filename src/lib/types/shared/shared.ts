@@ -10,8 +10,11 @@ export interface CmsContent {
   status: 'draft' | 'published' | 'archived';
   created_at: string;
   updated_at: string;
+  created_by: string;
   author_id: string;
   metadata?: Record<string, any>;
+  type: 'page' | 'component' | 'template' | 'workflow';
+  version?: number;
 }
 
 // Workflow Types
