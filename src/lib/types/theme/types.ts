@@ -2,12 +2,8 @@ import { Settings } from '../settings/types';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-export interface Theme extends Settings {
-  transition_type: 'fade' | 'slide' | 'scale';
-}
-
 export interface ThemeState {
-  settings: Theme | null;
+  settings: Settings | null;
   isLoading: boolean;
   error: Error | null;
   mode: ThemeMode;
@@ -18,6 +14,6 @@ export interface ThemeState {
   setThemeMode: (mode: ThemeMode) => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
   setMode: (mode: ThemeMode) => void;
-  updateTheme: (settings: Theme) => Promise<void>;
+  updateTheme: (settings: Settings) => Promise<void>;
   themeState: ThemeMode;
 }

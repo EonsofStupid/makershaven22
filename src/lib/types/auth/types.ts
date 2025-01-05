@@ -33,4 +33,5 @@ export interface AuthErrorRecoveryState {
   error: AuthError | null;
   isRecovering: boolean;
   recoveryAttempts: number;
+  lastRecoveryAttempt: Date | null;
 }
