@@ -1,48 +1,47 @@
-import { Json } from "../base/json";
+import { Json, UserOwnedEntity } from '../core/json';
+
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: string;
+  type: WorkflowStageType;
   order: number;
-  config: Json;
+  config: WorkflowStageConfig;
   description?: string;
 }
 
-export interface WorkflowTemplate {
-  id: string;
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+}
+
+export interface WorkflowTemplate extends UserOwnedEntity {
   name: string;
-  description: string;
+  description?: string;
   stages: WorkflowStage[];
   is_active: boolean;
-  created_by: string;
-  updated_at?: string;
+  email?: string;
+  triggers?: Json;
+  steps: WorkflowStage[];
 }
 
 export interface WorkflowFormData {
+  id?: string;
   name: string;
-  description: string;
+  description?: string;
   stages: WorkflowStage[];
-  is_active: boolean;
+  is_active?: boolean;
 }
-
-export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
-export type WorkflowState = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
-
-export const serializeWorkflowStage = (stage: WorkflowStage): Json => ({
-  id: stage.id,
-  name: stage.name,
-  type: stage.type,
-  order: stage.order,
-  config: stage.config,
-  description: stage.description
-});
-
-export const parseWorkflowStage = (json: Json): WorkflowStage => ({
-  id: json.id as string,
-  name: json.name as string,
-  type: json.type as string,
-  order: json.order as number,
-  config: json.config as Json,
-  description: json.description as string
-});
