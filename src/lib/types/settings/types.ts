@@ -34,6 +34,13 @@ export interface Settings {
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
+  security_settings?: SecuritySettings;
+}
+
+export interface SecuritySettings {
+  enable_ip_filtering: boolean;
+  two_factor_auth: boolean;
+  max_login_attempts: number;
 }
 
 export type SettingsFormData = Settings;
