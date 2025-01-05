@@ -1,36 +1,44 @@
-import { Session, User } from "@supabase/supabase-js";
+import type { Session } from '@supabase/supabase-js';
+
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+}
+
+export interface AuthSession {
+  user: AuthUser;
+  session: Session;
+  expires_at?: number;
+}
 
 export interface AuthState {
-  session: Session | null;
-  user: User | null;
+  session: AuthSession | null;
+  user: AuthUser | null;
   isLoading: boolean;
-  hasAccess: boolean;
-  error: Error | null;
-  isTransitioning?: boolean;
+  error: AuthError | null;
+  isOffline: boolean;
+  isTransitioning: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: AuthError | null) => void;
+  setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
-  setSession: (session: Session | null) => void;
-  setUser: (user: User | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
 }
 
 export interface AuthError {
   type: string;
   code?: string;
-  stack?: string;
   message: string;
-}
-
-export interface AuthSession {
-  session: Session;
-  user: User;
-  expires_at?: number;
-  access_token?: string;
-  refresh_token?: string;
+  stack?: string;
 }
 
 export interface AuthErrorRecoveryState {
-  error: AuthError | null;
   isRecovering: boolean;
   recoveryAttempts: number;
   lastRecoveryAttempt: Date | null;

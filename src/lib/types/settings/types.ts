@@ -43,17 +43,17 @@ export interface Settings {
 
 export type SettingsFormData = Settings;
 
+export interface SettingsState {
+  settings: Partial<Settings>;
+  updateSetting: (key: keyof Settings, value: any) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+  saveTransformationRule: (rule: any) => Promise<void>;
+}
+
 export interface UseSettingsFormReturn {
   form: any;
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
-}
-
-export interface SettingsState {
-  settings: Partial<Settings>;
-  updateSetting: (key: keyof Settings, value: any) => void;
-  updateSettings: (settings: Partial<Settings>) => void;
-  saveTransformationRule: (rule: any) => Promise<void>;
 }

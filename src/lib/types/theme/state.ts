@@ -1,16 +1,19 @@
 import { Settings } from '../settings/types';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export interface ThemeState {
   settings: Settings | null;
-  mode: 'light' | 'dark' | 'system';
-  themeMode: 'light' | 'dark' | 'system';
+  isLoading: boolean;
+  error: Error | null;
+  mode: ThemeMode;
+  themeMode: ThemeMode;
   systemTheme: 'light' | 'dark';
   effectiveTheme: 'light' | 'dark';
   cssVariables: Record<string, string>;
-  isLoading: boolean;
-  error: Error | null;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  setThemeMode: (mode: 'light' | 'dark' | 'system') => void;
+  setThemeMode: (mode: ThemeMode) => void;
   setSystemTheme: (theme: 'light' | 'dark') => void;
-  updateTheme: (settings: Settings) => void;
+  setMode: (mode: ThemeMode) => void;
+  updateTheme: (settings: Settings) => Promise<void>;
+  themeState: ThemeMode;
 }
