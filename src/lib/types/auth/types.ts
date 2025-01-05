@@ -1,23 +1,12 @@
-import { Session } from "@supabase/supabase-js";
-
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
-
-export interface AuthUser {
-  id: string;
-  email?: string | null;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: Record<string, any>;
-}
+import { Session, User } from "@supabase/supabase-js";
 
 export interface AuthState {
   session: Session | null;
-  user: AuthUser | null;
+  user: User | null;
   isLoading: boolean;
   error: Error | null;
   setSession: (session: Session | null) => void;
-  setUser: (user: AuthUser | null) => void;
+  setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   signOut: () => Promise<void>;
@@ -25,12 +14,17 @@ export interface AuthState {
 
 export interface AuthError extends Error {
   type: string;
-  code?: string;
+  code: string;
   stack?: string;
 }
 
+export interface AuthSession {
+  user: User;
+  session: Session;
+}
+
 export interface AuthErrorRecoveryState {
-  attemptCount: number;
-  lastAttempt?: Date;
-  nextAttemptDelay: number;
+  error: AuthError | null;
+  isRecovering: boolean;
+  recoveryAttempts: number;
 }

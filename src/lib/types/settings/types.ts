@@ -34,14 +34,14 @@ export interface Settings {
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
+  security_settings?: {
+    enable_ip_filtering: boolean;
+    two_factor_auth: boolean;
+    max_login_attempts: number;
+  };
 }
 
-export interface SettingsState {
-  settings: Partial<Settings>;
-  updateSetting: (key: keyof Settings, value: any) => void;
-  updateSettings: (settings: Partial<Settings>) => void;
-  saveTransformationRule: (rule: any) => Promise<void>;
-}
+export type SettingsFormData = Settings;
 
 export interface UseSettingsFormReturn {
   form: any;
@@ -51,4 +51,9 @@ export interface UseSettingsFormReturn {
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
 }
 
-export type SettingsFormData = Settings;
+export interface SettingsState {
+  settings: Partial<Settings>;
+  updateSetting: (key: keyof Settings, value: any) => void;
+  updateSettings: (settings: Partial<Settings>) => void;
+  saveTransformationRule: (rule: any) => Promise<void>;
+}
