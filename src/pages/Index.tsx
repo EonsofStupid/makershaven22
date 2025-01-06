@@ -1,16 +1,8 @@
-import { Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
-import { useAuthStore } from '@/lib/store/auth-store';
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 
 const Index = () => {
-  const { user } = useAuthStore();
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   return (
     <Layout>
       {/* Hero Section */}

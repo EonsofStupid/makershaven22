@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_icon: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          icon_color: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          badge_icon?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_color?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          badge_icon?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_color?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       active_2fa_sessions: {
         Row: {
           created_at: string | null
@@ -379,6 +409,7 @@ export type Database = {
           featured_image: string | null
           id: string
           images: string[] | null
+          publication_status: string | null
           published_at: string | null
           rich_content: Json | null
           slug: string
@@ -397,6 +428,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           images?: string[] | null
+          publication_status?: string | null
           published_at?: string | null
           rich_content?: Json | null
           slug: string
@@ -415,6 +447,7 @@ export type Database = {
           featured_image?: string | null
           id?: string
           images?: string[] | null
+          publication_status?: string | null
           published_at?: string | null
           rich_content?: Json | null
           slug?: string
@@ -425,6 +458,20 @@ export type Database = {
           views_count?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "blog_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "blog_posts_category_id_fkey"
             columns: ["category_id"]
@@ -1684,6 +1731,7 @@ export type Database = {
           banned_by: string | null
           bio: string | null
           created_at: string | null
+          current_level: number | null
           display_name: string | null
           email: string | null
           failed_login_attempts: number | null
@@ -1698,11 +1746,14 @@ export type Database = {
           lockout_until: string | null
           metadata: Json | null
           name: string | null
+          next_level_points: number | null
           onboarding_completed: boolean | null
           pin_enabled: boolean | null
           pin_hash: string | null
+          points: number | null
           role: Database["public"]["Enums"]["user_role"] | null
           role_id: number | null
+          total_points: number | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
           updated_at: string | null
@@ -1717,6 +1768,7 @@ export type Database = {
           banned_by?: string | null
           bio?: string | null
           created_at?: string | null
+          current_level?: number | null
           display_name?: string | null
           email?: string | null
           failed_login_attempts?: number | null
@@ -1731,11 +1783,14 @@ export type Database = {
           lockout_until?: string | null
           metadata?: Json | null
           name?: string | null
+          next_level_points?: number | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           pin_hash?: string | null
+          points?: number | null
           role?: Database["public"]["Enums"]["user_role"] | null
           role_id?: number | null
+          total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
@@ -1750,6 +1805,7 @@ export type Database = {
           banned_by?: string | null
           bio?: string | null
           created_at?: string | null
+          current_level?: number | null
           display_name?: string | null
           email?: string | null
           failed_login_attempts?: number | null
@@ -1764,11 +1820,14 @@ export type Database = {
           lockout_until?: string | null
           metadata?: Json | null
           name?: string | null
+          next_level_points?: number | null
           onboarding_completed?: boolean | null
           pin_enabled?: boolean | null
           pin_hash?: string | null
+          points?: number | null
           role?: Database["public"]["Enums"]["user_role"] | null
           role_id?: number | null
+          total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
@@ -3238,6 +3297,52 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string | null
+          completed_at: string | null
+          display_settings: Json | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          achievement_id?: string | null
+          completed_at?: string | null
+          display_settings?: Json | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          achievement_id?: string | null
+          completed_at?: string | null
+          display_settings?: Json | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       user_activity: {
         Row: {
           activity_type: string
@@ -3303,6 +3408,48 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cms_content"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles_view"
+            referencedColumns: ["user_id"]
           },
         ]
       }
