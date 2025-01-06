@@ -1,19 +1,3 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
-
-export interface AuthUser {
-  id: string;
-  email?: string;
-  role?: UserRole;
-  metadata?: Record<string, any>;
-}
-
-export interface AuthSession {
-  access_token: string;
-  expires_at?: number;
-  expires_in?: number;
-  refresh_token?: string;
-}
-
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
@@ -27,21 +11,23 @@ export interface AuthState {
   setError: (error: Error | null) => void;
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
-  reset: () => void;
 }
 
-export interface AuthError {
-  type: string;
-  code?: string;
-  stack?: string;
-  message: string;
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
 }
 
-export interface AuthErrorRecoveryState {
-  error: AuthError | null;
-  isRecovering: boolean;
-  recoveryStep: string | null;
+export interface AuthSession {
+  user: AuthUser;
+  expires_at?: number;
 }
 
-export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';

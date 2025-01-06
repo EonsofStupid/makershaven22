@@ -1,3 +1,5 @@
+import { Json } from '../core/json';
+
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -36,17 +38,17 @@ export interface Settings {
 
 export interface SettingsFormData extends Settings {}
 
-export interface SettingsState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  saveTransformationRule: (rule: any) => Promise<void>;
-}
-
 export interface UseSettingsFormReturn {
   form: any;
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
+}
+
+export interface SettingsState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  saveTransformationRule: (rule: any) => Promise<void>;
 }

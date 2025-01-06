@@ -3,5 +3,5 @@ export type JsonArray = Json[];
 export type JsonObject = { [key: string]: Json };
 export type Json = JsonPrimitive | JsonObject | JsonArray;
 
-// Re-export to resolve ambiguity
-export { Json as default, JsonArray, JsonObject, JsonPrimitive };
+// Re-export with type keyword to fix isolatedModules error
+export type { Json as JsonType, JsonArray as JsonArrayType, JsonObject as JsonObjectType, JsonPrimitive as JsonPrimitiveType };
