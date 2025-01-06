@@ -1,46 +1,50 @@
 import { Json } from '../core/json';
 
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
-
-export interface StageValidationRule {
-  field: string;
-  type: 'required' | 'min' | 'max' | 'pattern' | 'custom';
-  value?: any;
-  message?: string;
+export interface WorkflowStage {
+  id: string;
+  name: string;
+  type: WorkflowStageType;
+  order: number;
+  config: WorkflowStageConfig;
+  description?: string;
 }
 
+export type WorkflowStageType = 'APPROVAL' | 'TASK' | 'CONDITIONAL';
+
 export interface WorkflowStageConfig {
+  assignees?: string[];
   timeLimit?: number;
-  requiredApprovers?: number;
-  customFields?: {
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    options?: string[];
-    required?: boolean;
-  }[];
   autoAssignment?: {
     type: 'user' | 'role' | 'group';
     value: string;
   };
+  priority?: 'low' | 'medium' | 'high';
   notifications?: {
+    email?: boolean;
+    inApp?: boolean;
     onStart?: boolean;
     onComplete?: boolean;
     reminderInterval?: number;
   };
-}
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  description?: string;
-  type: WorkflowStageType;
-  order: number;
-  config: WorkflowStageConfig;
-  validationRules?: StageValidationRule[];
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: any;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
 }
 
 export interface WorkflowTemplate {
-  id?: string;
+  id: string;
   name: string;
   description: string | null;
   stages: WorkflowStage[];
@@ -60,9 +64,12 @@ export interface WorkflowFormData {
 }
 
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return JSON.parse(JSON.stringify(stage));
+  return stage as unknown as Json;
 };
 
 export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return JSON.parse(JSON.stringify(template));
+  return {
+    ...template,
+    stages: template.stages.map(stage => serializeWorkflowStage(stage))
+  } as unknown as Json;
 };

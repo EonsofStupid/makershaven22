@@ -5,7 +5,6 @@ export interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
   error: AuthError | null;
-  isTransitioning: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
