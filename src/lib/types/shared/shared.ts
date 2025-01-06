@@ -1,6 +1,6 @@
-export * from '../auth/types';
-export * from '../settings/types';
-export * from '../core/json';
+import type { Json } from '../core/json';
+import type { AuthUser, UserRole } from '../auth/types';
+import type { Settings } from '../settings/types';
 
 export interface CmsContent {
   id: string;
@@ -16,7 +16,7 @@ export interface CmsContent {
   version?: number;
 }
 
-export interface ContentWithAuthor extends CmsContent {
+export interface ContentWithAuthor extends Omit<CmsContent, 'created_by'> {
   created_by: {
     display_name: string;
   };
@@ -27,7 +27,10 @@ export interface RevisionStore {
   selectedRevision: string | null;
   compareRevision: string | null;
   diffMode: 'unified' | 'split';
-  selectedVersions: string[];
+  selectedVersions: {
+    left: number;
+    right: number;
+  };
 }
 
 export interface WorkflowStage {
@@ -49,3 +52,5 @@ export interface WorkflowTemplate {
   created_by: string;
   updated_at?: string;
 }
+
+export { type Settings };

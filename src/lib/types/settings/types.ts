@@ -1,5 +1,3 @@
-import { Json } from '../core/json';
-
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -53,5 +51,5 @@ export interface SettingsState {
   settings: Settings | null;
   isLoading: boolean;
   error: Error | null;
-  saveTransformationRule?: (rule: any) => Promise<void>;
+  saveTransformationRule: (rule: any) => Promise<void>;
 }

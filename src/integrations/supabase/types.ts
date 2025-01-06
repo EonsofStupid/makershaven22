@@ -1423,6 +1423,7 @@ export type Database = {
         Row: {
           attributes: Json | null
           category: string
+          category_id: string | null
           compatibility: Json | null
           created_at: string | null
           description: string | null
@@ -1439,6 +1440,7 @@ export type Database = {
         Insert: {
           attributes?: Json | null
           category: string
+          category_id?: string | null
           compatibility?: Json | null
           created_at?: string | null
           description?: string | null
@@ -1455,6 +1457,7 @@ export type Database = {
         Update: {
           attributes?: Json | null
           category?: string
+          category_id?: string | null
           compatibility?: Json | null
           created_at?: string | null
           description?: string | null
@@ -1468,7 +1471,15 @@ export type Database = {
           updated_at?: string | null
           value_rating?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "mi3dp_parts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "mi3dp_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mi3dp_taxonomies: {
         Row: {
@@ -3680,7 +3691,13 @@ export type Database = {
         | "configuration"
       audit_severity: "info" | "warn" | "error" | "critical"
       content_status: "draft" | "published" | "archived"
-      content_type: "page" | "component" | "template" | "workflow"
+      content_type:
+        | "page"
+        | "component"
+        | "template"
+        | "workflow"
+        | "hero"
+        | "feature"
       post_category:
         | "Guides"
         | "Reviews"
