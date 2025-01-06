@@ -13,6 +13,11 @@ export interface Settings {
   neon_cyan: string;
   neon_pink: string;
   neon_purple: string;
+  border_radius: string;
+  spacing_unit: string;
+  transition_duration: string;
+  shadow_color: string;
+  hover_scale: string;
   font_family_heading: string;
   font_family_body: string;
   font_size_base: string;
@@ -20,24 +25,18 @@ export interface Settings {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
   box_shadow?: string;
   backdrop_blur?: string;
   logo_url?: string;
   favicon_url?: string;
-  transition_type: 'fade' | 'slide' | 'scale';
   theme_mode?: 'light' | 'dark' | 'system';
-  updated_at?: string;
-  updated_by?: string;
-  security_settings?: {
+  security_settings: {
     enable_ip_filtering: boolean;
     two_factor_auth: boolean;
     max_login_attempts: number;
   };
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export interface UseSettingsFormReturn {
@@ -65,5 +64,3 @@ export interface ThemeState {
   setError: (error: Error | null) => void;
   updateTheme: (settings: Settings) => Promise<void>;
 }
-
-export type SettingsFormData = Settings;

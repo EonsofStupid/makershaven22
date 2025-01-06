@@ -48,19 +48,14 @@ export interface WorkflowTemplate {
   name: string;
   description: string | null;
   stages: WorkflowStage[];
-  steps: WorkflowStage[];
   is_active: boolean;
-  created_at?: string;
   created_by?: string;
+  created_at?: string;
   updated_at?: string;
 }
 
-export interface WorkflowFormData {
-  name: string;
-  description: string;
-  stages: WorkflowStage[];
-  steps: WorkflowStage[];
-  is_active: boolean;
+export interface WorkflowFormData extends Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'> {
+  id?: string;
 }
 
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
