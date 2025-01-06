@@ -4,11 +4,12 @@ export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  error: Error | null;
+  error: AuthError | null;
+  isTransitioning: boolean;
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
+  setError: (error: AuthError | null) => void;
   signOut: () => Promise<void>;
 }
 
