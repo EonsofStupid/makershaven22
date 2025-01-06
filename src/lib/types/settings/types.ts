@@ -65,3 +65,5 @@ export interface ThemeState {
   setError: (error: Error | null) => void;
   updateTheme: (settings: Settings) => Promise<void>;
 }
+
+export type SettingsFormData = Settings;

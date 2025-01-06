@@ -13,18 +13,21 @@ export interface AuthState {
   signOut: () => Promise<void>;
 }
 
-export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_at?: number;
-  user: AuthUser;
-}
-
 export interface AuthUser {
   id: string;
-  email: string;
-  role: UserRole;
-  metadata?: Record<string, any>;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
+}
+
+export interface AuthSession {
+  user: AuthUser;
+  expires_at?: number;
 }
 
 export interface AuthError {

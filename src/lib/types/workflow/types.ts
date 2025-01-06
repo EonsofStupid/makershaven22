@@ -44,6 +44,7 @@ export interface WorkflowTemplate {
   name: string;
   description: string | null;
   stages: WorkflowStage[];
+  steps: WorkflowStage[];
   is_active: boolean;
   created_at?: string;
   created_by?: string;
@@ -54,6 +55,7 @@ export interface WorkflowFormData {
   name: string;
   description: string;
   stages: WorkflowStage[];
+  steps: WorkflowStage[];
   is_active: boolean;
 }
 
