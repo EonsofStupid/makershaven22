@@ -1,18 +1,4 @@
-export interface AuthState {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
-}
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
 
 export interface AuthUser {
   id: string;
@@ -33,7 +19,21 @@ export interface AuthSession {
   refresh_token?: string;
 }
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
+export interface AuthState {
+  session: AuthSession | null;
+  user: AuthUser | null;
+  isLoading: boolean;
+  error: Error | null;
+  isOffline: boolean;
+  isTransitioning: boolean;
+  setSession: (session: AuthSession | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setOffline: (isOffline: boolean) => void;
+  signOut: () => Promise<void>;
+  reset: () => void;
+}
 
 export interface AuthError {
   type: string;

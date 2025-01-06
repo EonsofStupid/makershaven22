@@ -32,11 +32,15 @@ export interface Settings {
   theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
   updated_by?: string;
-  security_settings?: {
-    enable_ip_filtering: boolean;
-    two_factor_auth: boolean;
-    max_login_attempts: number;
-  };
+}
+
+export interface SettingsFormData extends Settings {}
+
+export interface SettingsState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  saveTransformationRule: (rule: any) => Promise<void>;
 }
 
 export interface UseSettingsFormReturn {
@@ -45,11 +49,4 @@ export interface UseSettingsFormReturn {
   isLoading: boolean;
   isSaving: boolean;
   handleSettingsUpdate: (settings: Settings) => Promise<void>;
-}
-
-export interface SettingsState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  saveTransformationRule: (rule: any) => Promise<void>;
 }

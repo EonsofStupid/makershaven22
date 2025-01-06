@@ -10,10 +10,12 @@ export interface CmsContent {
   created_at: string;
   updated_at: string;
   created_by: string;
+  updated_by?: string;
   author_id: string;
   metadata?: Record<string, any>;
   type: 'page' | 'component' | 'template' | 'workflow';
   version?: number;
+  slug?: string;
 }
 
 export interface ContentWithAuthor extends Omit<CmsContent, 'created_by'> {
