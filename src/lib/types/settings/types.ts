@@ -30,6 +30,7 @@ export interface Settings {
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: 'light' | 'dark' | 'system';
+  transition_type: 'fade' | 'slide' | 'scale';
   security_settings: {
     enable_ip_filtering: boolean;
     two_factor_auth: boolean;
@@ -37,15 +38,6 @@ export interface Settings {
   };
   updated_at?: string;
   updated_by?: string;
-}
-
-export interface UseSettingsFormReturn {
-  form: any;
-  settings: Settings | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  handleSettingsUpdate: (settings: Settings) => Promise<void>;
-  saveTransformationRule?: (rule: any) => Promise<void>;
 }
 
 export interface ThemeState {
@@ -64,3 +56,14 @@ export interface ThemeState {
   setError: (error: Error | null) => void;
   updateTheme: (settings: Settings) => Promise<void>;
 }
+
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  handleSettingsUpdate: (settings: Settings) => Promise<void>;
+  saveTransformationRule?: (rule: any) => Promise<void>;
+}
+
+export interface SettingsFormData extends Settings {}
