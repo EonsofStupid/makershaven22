@@ -1,19 +1,20 @@
 import type { Json } from '../core/json';
+import type { Settings } from '../settings/types';
 
 export interface CmsContent {
   id: string;
   title: string;
   content: Json;
+  metadata?: Json;
   status: 'draft' | 'published' | 'archived';
-  created_at: string;
-  updated_at: string;
+  type: 'page' | 'component' | 'template' | 'workflow' | 'hero' | 'feature';
+  slug?: string;
+  version?: number;
   created_by: string;
   updated_by?: string;
+  created_at: string;
+  updated_at: string;
   author_id: string;
-  metadata?: Record<string, any>;
-  type: 'page' | 'component' | 'template' | 'workflow' | 'hero' | 'feature';
-  version?: number;
-  slug?: string;
 }
 
-export { type Settings } from '../settings/types';
+export { type Settings };

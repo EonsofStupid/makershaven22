@@ -1,6 +1,6 @@
 export type JsonPrimitive = string | number | boolean | null;
-export type JsonArray = Json[];
 export type JsonObject = { [key: string]: Json };
+export type JsonArray = Json[];
 export type Json = JsonPrimitive | JsonObject | JsonArray;
 
 // Re-export with type keyword to fix isolatedModules error
