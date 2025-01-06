@@ -3,44 +3,10 @@ import { Json } from '../core/json';
 export interface WorkflowStage {
   id: string;
   name: string;
-  type: WorkflowStageType;
+  type: string;
   order: number;
-  config: WorkflowStageConfig;
+  config: Record<string, any>;
   description?: string;
-}
-
-export type WorkflowStageType = 'APPROVAL' | 'TASK' | 'CONDITIONAL';
-
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
 }
 
 export interface WorkflowTemplate {
@@ -58,13 +24,22 @@ export interface WorkflowFormData extends Omit<WorkflowTemplate, 'id' | 'created
   id?: string;
 }
 
-export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return stage as unknown as Json;
-};
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => ({
+  id: stage.id,
+  name: stage.name,
+  type: stage.type,
+  order: stage.order,
+  config: stage.config,
+  description: stage.description
+});
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return {
-    ...template,
-    stages: template.stages.map(stage => serializeWorkflowStage(stage))
-  } as unknown as Json;
-};
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => ({
+  id: template.id,
+  name: template.name,
+  description: template.description,
+  stages: template.stages.map(serializeWorkflowStage),
+  is_active: template.is_active,
+  created_by: template.created_by,
+  created_at: template.created_at,
+  updated_at: template.updated_at
+});
