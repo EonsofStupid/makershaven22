@@ -1,3 +1,5 @@
+import { Json } from '../core/json';
+
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
@@ -40,3 +42,6 @@ export interface AuthErrorRecoveryState {
   isRecovering: boolean;
   recoveryAttempts: number;
 }
+
+export type SecurityEventSeverity = 'info' | 'warn' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

@@ -27,4 +27,19 @@ export interface WorkflowFormData {
   description?: string;
   stages: WorkflowStage[];
   is_active?: boolean;
+  steps: Json;
+  triggers?: Json;
 }
+
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => ({
+  id: template.id,
+  name: template.name,
+  description: template.description,
+  stages: template.stages,
+  steps: template.steps,
+  triggers: template.triggers,
+  is_active: template.is_active,
+  created_by: template.created_by,
+  created_at: template.created_at,
+  updated_at: template.updated_at
+});
