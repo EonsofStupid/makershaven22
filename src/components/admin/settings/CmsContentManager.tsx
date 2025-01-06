@@ -14,7 +14,14 @@ export function CmsContentManager() {
           .select("*");
         
         if (error) throw error;
-        setContents(data || []);
+        
+        // Map the response to include author_id from created_by
+        const contentsWithAuthor = (data || []).map(item => ({
+          ...item,
+          author_id: item.created_by
+        }));
+        
+        setContents(contentsWithAuthor);
         toast.success("Content loaded successfully");
       } catch (err) {
         console.error("Error fetching contents:", err);

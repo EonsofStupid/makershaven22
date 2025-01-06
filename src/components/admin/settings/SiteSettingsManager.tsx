@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
-import { SiteSettings } from "@/lib/types/shared/shared";
+import { Settings } from "@/lib/types/shared/shared";
 
 export function SiteSettingsManager() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -15,7 +15,7 @@ export function SiteSettingsManager() {
           .single();
 
         if (error) throw error;
-        setSettings(data as SiteSettings);
+        setSettings(data as Settings);
         toast.success("Site settings loaded successfully");
       } catch (err) {
         console.error("Error fetching site settings:", err);
@@ -30,7 +30,7 @@ export function SiteSettingsManager() {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "site_settings" },
           (payload) => {
-            setSettings(payload.new as SiteSettings);
+            setSettings(payload.new as Settings);
             toast.info("Site settings updated");
           }
         )

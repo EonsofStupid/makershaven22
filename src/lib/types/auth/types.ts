@@ -1,4 +1,4 @@
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
+import { UserRole } from '@/components/auth/types';
 
 export interface AuthState {
   session: AuthSession | null;
@@ -28,15 +28,27 @@ export interface AuthUser {
 
 export interface AuthError {
   type: string;
-  code: string;
+  code?: string;
   stack?: string;
   message: string;
 }
 
 export interface SecurityEventSeverity {
-  type: 'low' | 'medium' | 'high' | 'critical';
+  INFO: 'info';
+  WARN: 'warn';
+  ERROR: 'error';
+  CRITICAL: 'critical';
 }
 
 export interface SecurityEventCategory {
-  type: 'auth' | 'data_access' | 'admin' | 'system';
+  AUTH: 'auth';
+  ACCESS: 'access';
+  DATA: 'data';
+  SYSTEM: 'system';
+}
+
+export interface AuthErrorRecoveryState {
+  error: AuthError | null;
+  isRecovering: boolean;
+  recoveryAttempts: number;
 }
