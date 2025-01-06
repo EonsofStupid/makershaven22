@@ -40,6 +40,15 @@ export interface Settings {
   };
 }
 
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  handleSettingsUpdate: (settings: Settings) => Promise<void>;
+  saveTransformationRule?: (rule: any) => Promise<void>;
+}
+
 export interface ThemeState {
   settings: Settings | null;
   isLoading: boolean;
@@ -55,15 +64,4 @@ export interface ThemeState {
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   updateTheme: (settings: Settings) => Promise<void>;
-}
-
-export interface SettingsFormData extends Settings {}
-
-export interface UseSettingsFormReturn {
-  form: any;
-  settings: Settings | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  handleSettingsUpdate: (settings: Settings) => Promise<void>;
-  saveTransformationRule?: (rule: any) => Promise<void>;
 }

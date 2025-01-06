@@ -22,3 +22,8 @@ export interface AuthState {
   setError: (error: AuthError | null) => void;
   signOut: () => Promise<void>;
 }
+
+export interface SettingsState {
+  settings: Settings;
+  saveTransformationRule: (rule: any) => Promise<void>;
+}

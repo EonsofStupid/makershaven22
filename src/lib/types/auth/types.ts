@@ -29,23 +29,9 @@ export interface AuthUser {
 
 export interface AuthError {
   type: string;
-  code?: string;
-  stack?: string;
+  code: string;
   message: string;
-}
-
-export interface SecurityEventSeverity {
-  INFO: 'info';
-  WARN: 'warn';
-  ERROR: 'error';
-  CRITICAL: 'critical';
-}
-
-export interface SecurityEventCategory {
-  AUTH: 'auth';
-  ACCESS: 'access';
-  DATA: 'data';
-  SYSTEM: 'system';
+  stack?: string;
 }
 
 export interface AuthErrorRecoveryState {
@@ -53,3 +39,6 @@ export interface AuthErrorRecoveryState {
   isRecovering: boolean;
   recoveryAttempts: number;
 }
+
+export type SecurityEventSeverity = 'info' | 'warn' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
