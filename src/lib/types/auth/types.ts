@@ -1,3 +1,5 @@
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
+
 export interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
@@ -30,4 +32,17 @@ export interface AuthSession {
   expires_at?: number;
 }
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
+export interface AuthError {
+  type: string;
+  code: string;
+  stack?: string;
+  message: string;
+}
+
+export interface SecurityEventSeverity {
+  type: 'low' | 'medium' | 'high' | 'critical';
+}
+
+export interface SecurityEventCategory {
+  type: 'auth' | 'data_access' | 'admin' | 'system';
+}
