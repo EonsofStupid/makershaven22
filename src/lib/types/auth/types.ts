@@ -2,20 +2,15 @@ export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moder
 
 export interface AuthUser {
   id: string;
-  email?: string | null;
+  email?: string;
   role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  metadata?: Record<string, any>;
 }
 
 export interface AuthSession {
-  user: AuthUser;
+  access_token: string;
   expires_at?: number;
-  access_token?: string;
+  expires_in?: number;
   refresh_token?: string;
 }
 
@@ -37,19 +32,16 @@ export interface AuthState {
 
 export interface AuthError {
   type: string;
-  message: string;
-  code: string;
+  code?: string;
   stack?: string;
-  originalError?: unknown;
+  message: string;
 }
 
 export interface AuthErrorRecoveryState {
   error: AuthError | null;
-  retryCount: number;
-  maxRetries: number;
-  lastAttempt?: Date;
-  lockoutUntil?: Date;
+  isRecovering: boolean;
+  recoveryStep: string | null;
 }
 
 export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';
+export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';

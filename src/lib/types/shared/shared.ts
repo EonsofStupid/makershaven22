@@ -1,11 +1,10 @@
 import type { Json } from '../core/json';
-import type { AuthUser, UserRole } from '../auth/types';
-import type { Settings } from '../settings/types';
+import type { UserRole } from '../auth/types';
 
 export interface CmsContent {
   id: string;
   title: string;
-  content: string;
+  content: Json;
   status: 'draft' | 'published' | 'archived';
   created_at: string;
   updated_at: string;
@@ -13,7 +12,7 @@ export interface CmsContent {
   updated_by?: string;
   author_id: string;
   metadata?: Record<string, any>;
-  type: 'page' | 'component' | 'template' | 'workflow';
+  type: 'page' | 'component' | 'template' | 'workflow' | 'hero' | 'feature';
   version?: number;
   slug?: string;
 }
@@ -24,35 +23,40 @@ export interface ContentWithAuthor extends Omit<CmsContent, 'created_by'> {
   };
 }
 
-export interface RevisionStore {
-  revisions: any[];
-  selectedRevision: string | null;
-  compareRevision: string | null;
-  diffMode: 'unified' | 'split';
-  selectedVersions: {
-    left: number;
-    right: number;
-  };
-}
-
-export interface WorkflowStage {
-  id: string;
-  name: string;
-  type: string;
-  order: number;
-  config: Record<string, any>;
-  description?: string;
-}
-
-export interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description?: string;
-  stages: WorkflowStage[];
-  is_active: boolean;
-  created_at: string;
-  created_by: string;
+export interface Settings {
+  site_title: string;
+  tagline?: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  text_primary_color: string;
+  text_secondary_color: string;
+  text_link_color: string;
+  text_heading_color: string;
+  neon_cyan: string;
+  neon_pink: string;
+  neon_purple: string;
+  font_family_heading: string;
+  font_family_body: string;
+  font_size_base: string;
+  font_weight_normal: string;
+  font_weight_bold: string;
+  line_height_base: string;
+  letter_spacing: string;
+  border_radius: string;
+  spacing_unit: string;
+  transition_duration: string;
+  shadow_color: string;
+  hover_scale: string;
+  box_shadow?: string;
+  backdrop_blur?: string;
+  logo_url?: string;
+  favicon_url?: string;
+  transition_type: 'fade' | 'slide' | 'scale';
+  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
+  theme_mode?: 'light' | 'dark' | 'system';
   updated_at?: string;
+  updated_by?: string;
 }
 
-export { type Settings };
+export type { Settings as SiteSettings };

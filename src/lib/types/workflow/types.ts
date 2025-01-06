@@ -14,26 +14,24 @@ export interface WorkflowTemplate {
   name: string;
   description?: string;
   stages: WorkflowStage[];
-  steps: Json;
-  triggers?: Json;
+  is_active: boolean;
   created_at: string;
   created_by: string;
   updated_at?: string;
-  is_active: boolean;
-  email?: string;
 }
 
-export interface WorkflowFormData extends Omit<WorkflowTemplate, 'id' | 'created_at' | 'updated_at'> {
-  id?: string;
+export interface WorkflowFormData {
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
 }
 
-export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return stage as unknown as Json;
-};
-
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
-  return {
-    ...template,
-    stages: template.stages.map(stage => serializeWorkflowStage(stage))
-  } as unknown as Json;
-};
+export const serializeWorkflowStage = (stage: WorkflowStage): Json => ({
+  id: stage.id,
+  name: stage.name,
+  type: stage.type,
+  order: stage.order,
+  config: stage.config,
+  description: stage.description
+});
