@@ -2689,7 +2689,6 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
-          theme_mode: Database["public"]["Enums"]["theme_mode_type"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -2734,7 +2733,6 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
-          theme_mode?: Database["public"]["Enums"]["theme_mode_type"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -2779,7 +2777,6 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
-          theme_mode?: Database["public"]["Enums"]["theme_mode_type"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -3457,21 +3454,18 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          theme_mode: Database["public"]["Enums"]["theme_mode_type"] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
-          theme_mode?: Database["public"]["Enums"]["theme_mode_type"] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
-          theme_mode?: Database["public"]["Enums"]["theme_mode_type"] | null
           updated_at?: string | null
           user_id?: string
         }
@@ -3794,7 +3788,6 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
-          theme_mode: Database["public"]["Enums"]["theme_mode_type"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -3871,7 +3864,6 @@ export type Database = {
         | "effect"
       theme_inheritance_strategy: "override" | "merge" | "replace"
       theme_mode: "light" | "dark" | "system"
-      theme_mode_type: "light" | "dark" | "system"
       theme_property_type: "mandatory" | "optional"
       transition_type: "fade" | "slide" | "scale" | "blur"
       user_role: "subscriber" | "maker" | "admin" | "super_admin" | "moderator"
