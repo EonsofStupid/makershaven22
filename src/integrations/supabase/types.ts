@@ -861,6 +861,36 @@ export type Database = {
           },
         ]
       }
+      content_migration_log: {
+        Row: {
+          content_type: string
+          id: string
+          metadata: Json | null
+          migrated_at: string | null
+          new_content_id: string
+          original_id: string
+          status: string | null
+        }
+        Insert: {
+          content_type: string
+          id?: string
+          metadata?: Json | null
+          migrated_at?: string | null
+          new_content_id: string
+          original_id: string
+          status?: string | null
+        }
+        Update: {
+          content_type?: string
+          id?: string
+          metadata?: Json | null
+          migrated_at?: string | null
+          new_content_id?: string
+          original_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       content_versions: {
         Row: {
           content: Json
@@ -2689,6 +2719,7 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -2733,6 +2764,7 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -2777,6 +2809,7 @@ export type Database = {
           text_link_color?: string | null
           text_primary_color?: string | null
           text_secondary_color?: string | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -3788,6 +3821,7 @@ export type Database = {
           text_link_color: string | null
           text_primary_color: string | null
           text_secondary_color: string | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -3830,9 +3864,13 @@ export type Database = {
         | "user_action"
         | "configuration"
       audit_severity: "info" | "warn" | "error" | "critical"
+      component_type: "color" | "typography" | "layout" | "animation" | "effect"
       content_status: "draft" | "published" | "archived"
       content_type:
         | "page"
+        | "build"
+        | "guide"
+        | "part"
         | "component"
         | "template"
         | "workflow"
