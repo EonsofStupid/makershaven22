@@ -1,38 +1,34 @@
-export type UserRole = "subscriber" | "maker" | "admin" | "super_admin";
+import { UserRole } from "../core/enums";
 
-export interface AuthError {
-  message: string;
-  status?: number;
-  type: string;
-}
-
-export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
   };
 }
 
-export interface AuthState {
-  session: AuthSession | null;
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-  } | null;
-  loading: boolean;
-  error: AuthError | null;
+export interface AuthSession {
+  user: AuthUser;
+  expires_at?: number;
 }
 
-export type AuthErrorRecoveryState = {
+export interface AuthError {
+  type: string;
+  code?: string;
+  message: string;
+  stack?: string;
+}
+
+export interface AuthErrorRecoveryState {
   error: AuthError | null;
   isRecovering: boolean;
   recoveryStep: string | null;
-};
+}
 
-export type SecurityEventSeverity = "info" | "warning" | "error" | "critical";
-export type SecurityEventCategory = "auth" | "data" | "system";
+export type SecurityEventSeverity = 'info' | 'warning' | 'error' | 'critical';
+export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';

@@ -1,4 +1,5 @@
 import { Json } from "../core/json";
+import { ThemeMode } from "../core/enums";
 
 export interface Settings {
   id?: string;
@@ -32,7 +33,7 @@ export interface Settings {
   menu_animation_type?: "fade" | "slide" | "scale";
   logo_url?: string;
   favicon_url?: string;
-  theme_mode?: "light" | "dark" | "system";
+  theme_mode?: ThemeMode;
   security_settings?: {
     enable_ip_filtering: boolean;
     two_factor_auth: boolean;
@@ -43,4 +44,26 @@ export interface Settings {
   updated_at?: string;
   created_by?: string;
   updated_by?: string;
+}
+
+export interface SettingsFormData extends Settings {}
+
+export interface SettingsResponse {
+  data: Settings;
+  error: null | {
+    message: string;
+  };
+}
+
+export interface UseSettingsFormReturn {
+  form: any;
+  settings: Settings | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  logoFile: File | null;
+  faviconFile: File | null;
+  handleLogoUpload: (file: File) => Promise<void>;
+  handleFaviconUpload: (file: File) => Promise<void>;
+  handleSettingsUpdate: (data: Settings) => Promise<void>;
+  handleResetToDefault: () => Promise<void>;
 }
