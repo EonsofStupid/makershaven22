@@ -1,7 +1,9 @@
+import { UserRole } from './enums';
+
 export interface AuthUser {
   id: string;
   email?: string | null;
-  role?: string;
+  role?: UserRole;
   username?: string;
   displayName?: string;
   user_metadata?: {
@@ -27,31 +29,4 @@ export interface AuthState {
   setError: (error: Error | null) => void;
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
-}
-
-export interface AuthError {
-  type: string;
-  message: string;
-  code?: string;
-  stack?: string;
-}
-
-export interface SecurityEventSeverity {
-  LOW: 'low';
-  MEDIUM: 'medium';
-  HIGH: 'high';
-  CRITICAL: 'critical';
-}
-
-export interface SecurityEventCategory {
-  AUTH: 'auth';
-  ACCESS: 'access';
-  DATA: 'data';
-  SYSTEM: 'system';
-}
-
-export interface AuthErrorRecoveryState {
-  error: AuthError | null;
-  isRecovering: boolean;
-  recoveryAttempts: number;
 }

@@ -1,12 +1,12 @@
-export interface SettingsFormData {
+import { ThemeMode } from './enums';
+import { Json } from './base';
+
+export interface Settings {
   site_title: string;
   tagline?: string;
   primary_color: string;
   secondary_color: string;
   accent_color: string;
-  logo_url?: string;
-  favicon_url?: string;
-  theme_mode?: 'light' | 'dark' | 'system';
   text_primary_color: string;
   text_secondary_color: string;
   text_link_color: string;
@@ -26,20 +26,27 @@ export interface SettingsFormData {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  transition_type: 'fade' | 'slide' | 'scale';
   box_shadow?: string;
   backdrop_blur?: string;
-  menu_animation_type?: 'fade' | 'slide-down' | 'scale' | 'blur';
-}
-
-// Extend SettingsFormData for the full Settings interface
-export interface Settings extends SettingsFormData {
+  logo_url?: string;
+  favicon_url?: string;
+  theme_mode?: ThemeMode;
+  transition_type: 'fade' | 'slide' | 'scale';
+  security_settings: {
+    enable_ip_filtering: boolean;
+    two_factor_auth: boolean;
+    max_login_attempts: number;
+  };
   updated_at?: string;
   updated_by?: string;
 }
 
-// Response type for settings operations
-export interface SettingsResponse {
-  success: boolean;
-  data: Settings;
+export interface ThemeState {
+  settings: Settings | null;
+  isLoading: boolean;
+  error: Error | null;
+  setSettings: (settings: Settings) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  updateSettings: (settings: Settings) => Promise<void>;
 }
