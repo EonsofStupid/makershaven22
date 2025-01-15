@@ -1765,7 +1765,6 @@ export type Database = {
           display_name: string | null
           email: string | null
           failed_login_attempts: number | null
-          failed_pin_attempts: number | null
           gamification_enabled: boolean | null
           id: string
           is_banned: boolean | null
@@ -1778,8 +1777,6 @@ export type Database = {
           name: string | null
           next_level_points: number | null
           onboarding_completed: boolean | null
-          pin_enabled: boolean | null
-          pin_hash: string | null
           points: number | null
           role: Database["public"]["Enums"]["user_role"] | null
           role_id: number | null
@@ -1802,7 +1799,6 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           failed_login_attempts?: number | null
-          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id: string
           is_banned?: boolean | null
@@ -1815,8 +1811,6 @@ export type Database = {
           name?: string | null
           next_level_points?: number | null
           onboarding_completed?: boolean | null
-          pin_enabled?: boolean | null
-          pin_hash?: string | null
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"] | null
           role_id?: number | null
@@ -1839,7 +1833,6 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           failed_login_attempts?: number | null
-          failed_pin_attempts?: number | null
           gamification_enabled?: boolean | null
           id?: string
           is_banned?: boolean | null
@@ -1852,8 +1845,6 @@ export type Database = {
           name?: string | null
           next_level_points?: number | null
           onboarding_completed?: boolean | null
-          pin_enabled?: boolean | null
-          pin_hash?: string | null
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"] | null
           role_id?: number | null
@@ -3235,8 +3226,11 @@ export type Database = {
           device_hash: string
           device_name: string
           expires_at: string
+          failed_pin_attempts: number | null
           id: string
+          last_pin_attempt: string | null
           last_used: string | null
+          pin_hash: string | null
           user_id: string | null
         }
         Insert: {
@@ -3244,8 +3238,11 @@ export type Database = {
           device_hash: string
           device_name: string
           expires_at: string
+          failed_pin_attempts?: number | null
           id?: string
+          last_pin_attempt?: string | null
           last_used?: string | null
+          pin_hash?: string | null
           user_id?: string | null
         }
         Update: {
@@ -3253,8 +3250,11 @@ export type Database = {
           device_hash?: string
           device_name?: string
           expires_at?: string
+          failed_pin_attempts?: number | null
           id?: string
+          last_pin_attempt?: string | null
           last_used?: string | null
+          pin_hash?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -3738,23 +3738,15 @@ export type Database = {
         }
         Returns: Json
       }
-      setup_pin:
-        | {
-            Args: {
-              p_user_id: string
-              p_pin: string
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              p_user_id: string
-              p_pin: string
-              p_ip_address?: string
-              p_user_agent?: string
-            }
-            Returns: Json
-          }
+      setup_pin: {
+        Args: {
+          p_user_id: string
+          p_pin: string
+          p_ip_address?: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
       update_site_settings: {
         Args: {
           p_site_title: string
@@ -3835,23 +3827,23 @@ export type Database = {
         }
         Returns: Json
       }
-      verify_pin_login:
-        | {
-            Args: {
-              p_user_id: string
-              p_pin: string
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              p_user_id: string
-              p_pin: string
-              p_ip_address?: string
-              p_user_agent?: string
-            }
-            Returns: Json
-          }
+      verify_device_pin: {
+        Args: {
+          p_device_id: string
+          p_pin: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      verify_pin_login: {
+        Args: {
+          p_user_id: string
+          p_pin: string
+          p_ip_address?: string
+          p_user_agent?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       audit_category:
