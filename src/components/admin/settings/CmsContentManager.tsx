@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { supabase } from "../../../integrations/supabase/client";
-import { CmsContent } from "@/lib/types/shared/shared";
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { CmsContent } from '@/lib/types';
 
-export function CmsContentManager() {
+export const CmsContentManager = () => {
   const [contents, setContents] = useState<CmsContent[]>([]);
 
   useEffect(() => {
@@ -29,50 +29,7 @@ export function CmsContentManager() {
       }
     };
 
-    const subscribeToUpdates = () => {
-      const subscription = supabase
-        .channel("cms-content-updates")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "cms_content" },
-          (payload) => {
-            switch (payload.eventType) {
-              case "INSERT":
-                setContents((prev) => [...prev, payload.new as CmsContent]);
-                toast.success("New content added");
-                break;
-              case "UPDATE":
-                setContents((prev) =>
-                  prev.map((content) =>
-                    content.id === payload.new.id
-                      ? (payload.new as CmsContent)
-                      : content
-                  )
-                );
-                toast.info("Content updated");
-                break;
-              case "DELETE":
-                setContents((prev) =>
-                  prev.filter((content) => content.id !== payload.old.id)
-                );
-                toast.warning("Content deleted");
-                break;
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(subscription);
-      };
-    };
-
     fetchContents();
-    const unsubscribe = subscribeToUpdates();
-
-    return () => {
-      unsubscribe();
-    };
   }, []);
 
   return (
@@ -85,4 +42,4 @@ export function CmsContentManager() {
       ))}
     </div>
   );
-}
+};

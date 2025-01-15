@@ -1,5 +1,5 @@
-import { Json } from "../core/json";
-import { ThemeMode } from "../core/enums";
+import { Json } from '../core/json';
+import { ThemeMode } from '../core/enums';
 
 export interface Settings {
   id?: string;

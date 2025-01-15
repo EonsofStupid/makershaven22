@@ -1,4 +1,4 @@
-import { UserRole } from "../core/enums";
+import { UserRole } from '../core/enums';
 
 export interface AuthUser {
   id: string;
@@ -27,8 +27,6 @@ export interface AuthError {
 export interface AuthErrorRecoveryState {
   error: AuthError | null;
   isRecovering: boolean;
-  recoveryStep: string | null;
+  recoveryAttempts: number;
+  lastRecoveryAttempt?: Date;
 }
-
-export type SecurityEventSeverity = 'info' | 'warning' | 'error' | 'critical';
-export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';
