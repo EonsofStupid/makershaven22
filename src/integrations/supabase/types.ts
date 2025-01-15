@@ -3884,6 +3884,7 @@ export type Database = {
         | "Critical"
         | "3D Printer"
         | "3D Printer Hardware"
+      setting_category: "theme" | "system" | "user" | "security" | "performance"
       setting_type:
         | "theme"
         | "security"
