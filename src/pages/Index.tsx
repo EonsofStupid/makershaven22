@@ -1,7 +1,6 @@
 import Layout from "../components/Layout";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import type { ContentType } from "@/lib/types/core/content-types";
 
 const Index = () => {
   return (
