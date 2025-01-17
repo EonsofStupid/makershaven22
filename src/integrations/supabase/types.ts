@@ -3868,6 +3868,7 @@ export type Database = {
         | "workflow"
         | "hero"
         | "feature"
+      pin_verification_status: "success" | "failed" | "locked"
       post_category:
         | "Guides"
         | "Reviews"
