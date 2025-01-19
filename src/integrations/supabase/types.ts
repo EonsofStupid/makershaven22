@@ -1778,13 +1778,13 @@ export type Database = {
           next_level_points: number | null
           onboarding_completed: boolean | null
           points: number | null
-          role: Database["public"]["Enums"]["user_role"] | null
+          role: Database["public"]["Enums"]["user_role"]
           role_id: number | null
           total_points: number | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
           updated_at: string | null
-          username: string | null
+          username: string
           visual_editor_enabled: boolean | null
           website: string | null
         }
@@ -1812,13 +1812,13 @@ export type Database = {
           next_level_points?: number | null
           onboarding_completed?: boolean | null
           points?: number | null
-          role?: Database["public"]["Enums"]["user_role"] | null
+          role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null
           total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
-          username?: string | null
+          username: string
           visual_editor_enabled?: boolean | null
           website?: string | null
         }
@@ -1846,13 +1846,13 @@ export type Database = {
           next_level_points?: number | null
           onboarding_completed?: boolean | null
           points?: number | null
-          role?: Database["public"]["Enums"]["user_role"] | null
+          role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null
           total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
           updated_at?: string | null
-          username?: string | null
+          username?: string
           visual_editor_enabled?: boolean | null
           website?: string | null
         }
