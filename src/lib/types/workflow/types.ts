@@ -1,35 +1,11 @@
-import { Json } from "../core/json";
-import { WorkflowStageType } from "../core/enums";
+import { Json } from '../core/json';
 
 export interface WorkflowStep {
   id: string;
   name: string;
-  type: WorkflowStageType;
+  type: string;
   order: number;
-  config: {
-    assignees?: string[];
-    timeLimit?: number;
-    autoAssignment?: {
-      type: 'user' | 'role' | 'group';
-      value: string;
-    };
-    priority?: 'low' | 'medium' | 'high';
-    notifications?: {
-      email?: boolean;
-      inApp?: boolean;
-      onStart?: boolean;
-      onComplete?: boolean;
-      reminderInterval?: number;
-    };
-    conditions?: {
-      type: 'AND' | 'OR';
-      rules: Array<{
-        field: string;
-        operator: string;
-        value: any;
-      }>;
-    };
-  };
+  config: Json;
   description?: string;
 }
 
@@ -40,9 +16,10 @@ export interface WorkflowTemplate {
   steps: WorkflowStep[];
   triggers?: Json;
   created_by?: string;
+  created_at?: string;
   updated_at?: string;
   email?: string;
-  stages?: WorkflowStep[];
+  stages?: Json;
   is_active?: boolean;
 }
 

@@ -1,46 +1,38 @@
 import { Json } from '../core/json';
-import { ContentStatus, ContentType } from '../core/enums';
+import { ContentType, ContentStatus } from '../core/enums';
 
-export interface BaseContent {
+export interface CmsContent {
   id: string;
   title: string;
-  content: Json;
   type: ContentType;
+  content: Json;
+  metadata?: Json;
+  slug?: string;
   status: ContentStatus;
+  version?: number;
   created_by: string;
+  updated_by?: string;
   created_at: string;
   updated_at?: string;
-  metadata?: Json;
-  version?: number;
-  slug?: string;
-  updated_by?: string;
 }
 
-export interface ContentRevision {
+export interface ContentTypeDefinition {
   id: string;
-  content_id: string;
-  content: Json;
-  metadata?: Json;
-  version_number: number;
-  created_by: string;
-  created_at: string;
-  profiles: { display_name: string };
-  change_summary?: string;
-  rollback_metadata?: Json;
+  name: string;
+  description?: string;
+  fields: ContentField[];
+  validations?: ContentValidation[];
 }
 
-export interface SecurityLog {
-  id: string;
-  user_id: string;
-  event_type: string;
-  severity: string;
-  details: Json;
-  metadata: Json;
-  ip_address: string;
-  user_agent: string;
-  created_at: string;
-  profiles?: {
-    username: string;
-    display_name: string;
-  };
+export interface ContentField {
+  name: string;
+  type: string;
+  required: boolean;
+  defaultValue?: any;
+}
+
+export interface ContentValidation {
+  field: string;
+  rule: string;
+  params?: any;
 }
