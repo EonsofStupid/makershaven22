@@ -7,3 +7,6 @@ export interface SecuritySettings {
   lockout_duration_minutes: number;
   rate_limit_window_minutes: number;
 }
+
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system';

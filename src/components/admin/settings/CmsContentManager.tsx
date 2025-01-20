@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { CmsContent } from '@/lib/types';
+import { BaseContent } from '@/lib/types/content/types';
 
 export const CmsContentManager = () => {
-  const [contents, setContents] = useState<CmsContent[]>([]);
+  const [contents, setContents] = useState<BaseContent[]>([]);
 
   useEffect(() => {
     const fetchContents = async () => {

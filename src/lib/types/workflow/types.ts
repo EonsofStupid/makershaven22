@@ -1,26 +1,32 @@
 import { Json } from '../core/json';
 
+export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
+
 export interface WorkflowStep {
   id: string;
   name: string;
-  type: string;
+  type: WorkflowStageType;
   order: number;
-  config: Json;
+  config: Record<string, any>;
   description?: string;
 }
 
 export interface WorkflowTemplate {
-  id: string;
+  id?: string;
+  name: string;
+  description: string | null;
+  steps: WorkflowStep[];
+  stages?: WorkflowStep[];
+  is_active: boolean;
+  created_at?: string;
+  created_by?: string;
+  updated_at?: string;
+}
+
+export interface WorkflowFormData {
   name: string;
   description?: string;
   steps: WorkflowStep[];
-  triggers?: Json;
-  created_by?: string;
-  created_at?: string;
-  updated_at?: string;
-  email?: string;
-  stages?: Json;
+  stages?: WorkflowStep[];
   is_active?: boolean;
 }
-
-export interface WorkflowFormData extends WorkflowTemplate {}
