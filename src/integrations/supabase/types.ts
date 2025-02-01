@@ -1780,6 +1780,7 @@ export type Database = {
           points: number | null
           role: Database["public"]["Enums"]["user_role"]
           role_id: number | null
+          session_data: Json | null
           total_points: number | null
           two_factor_enabled: boolean | null
           two_factor_secret: string | null
@@ -1814,6 +1815,7 @@ export type Database = {
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null
+          session_data?: Json | null
           total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -1848,6 +1850,7 @@ export type Database = {
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null
+          session_data?: Json | null
           total_points?: number | null
           two_factor_enabled?: boolean | null
           two_factor_secret?: string | null
@@ -3675,6 +3678,12 @@ export type Database = {
           user_id: string
         }
         Returns: undefined
+      }
+      is_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
       }
       log_audit_event: {
         Args: {
