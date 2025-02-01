@@ -2714,6 +2714,7 @@ export type Database = {
           text_primary_color: string | null
           text_secondary_color: string | null
           theme_mode: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences: Json | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
@@ -2759,6 +2760,7 @@ export type Database = {
           text_primary_color?: string | null
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences?: Json | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -2804,6 +2806,7 @@ export type Database = {
           text_primary_color?: string | null
           text_secondary_color?: string | null
           theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences?: Json | null
           transition_duration?: string | null
           transition_type?: string | null
           updated_at?: string | null
@@ -3271,6 +3274,8 @@ export type Database = {
           is_encrypted: boolean | null
           key: string
           metadata: Json | null
+          setting_type: Database["public"]["Enums"]["setting_type"] | null
+          theme_scope: string | null
           updated_at: string | null
           updated_by: string | null
           value: Json
@@ -3283,6 +3288,8 @@ export type Database = {
           is_encrypted?: boolean | null
           key: string
           metadata?: Json | null
+          setting_type?: Database["public"]["Enums"]["setting_type"] | null
+          theme_scope?: string | null
           updated_at?: string | null
           updated_by?: string | null
           value?: Json
@@ -3295,6 +3302,8 @@ export type Database = {
           is_encrypted?: boolean | null
           key?: string
           metadata?: Json | null
+          setting_type?: Database["public"]["Enums"]["setting_type"] | null
+          theme_scope?: string | null
           updated_at?: string | null
           updated_by?: string | null
           value?: Json
@@ -3823,6 +3832,7 @@ export type Database = {
           text_primary_color: string | null
           text_secondary_color: string | null
           theme_mode: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences: Json | null
           transition_duration: string | null
           transition_type: string | null
           updated_at: string | null
