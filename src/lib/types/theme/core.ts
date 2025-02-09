@@ -1,3 +1,4 @@
+
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';

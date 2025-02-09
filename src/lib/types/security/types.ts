@@ -1,3 +1,4 @@
+
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
   two_factor_auth: boolean;

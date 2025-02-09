@@ -1,3 +1,4 @@
+
 export interface SiteSettings {
   site_title: string;
   tagline?: string;
