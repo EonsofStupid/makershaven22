@@ -1,17 +1,13 @@
-import { Json } from '../core/json';
 
-export type ContentType = 'template' | 'page' | 'build' | 'guide' | 'part' | 'component' | 'workflow' | 'hero' | 'feature';
-export type ContentStatus = 'draft' | 'published' | 'archived';
+import { Json, BaseEntity } from '../core/json';
+import { ContentType, ContentStatus } from '../core/enums';
 
-export interface BaseContent {
-  id: string;
+export interface BaseContent extends BaseEntity {
   title: string;
   type: ContentType;
   status: ContentStatus;
   content?: Json;
   metadata?: Json;
-  created_at: string;
-  updated_at?: string;
   created_by: string;
   updated_by?: string;
 }

@@ -1,7 +1,5 @@
 
-export type ThemeMode = 'light' | 'dark' | 'system';
-
-export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';
+import { ThemeMode, GlassEffectLevel, TransitionType } from '../core/enums';
 
 export interface ThemePreferences {
   animations_enabled: boolean;
@@ -41,7 +39,7 @@ export interface ThemeEffects {
   hover_scale: string;
   box_shadow: string;
   backdrop_blur: string;
-  transition_type: 'fade' | 'slide' | 'scale';
+  transition_type: TransitionType;
 }
 
 export interface Theme extends ThemeColors, ThemeTypography, ThemeEffects {

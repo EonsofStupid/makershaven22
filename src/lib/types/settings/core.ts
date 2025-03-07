@@ -1,4 +1,7 @@
 
+import { Json } from '../core/json';
+import { ThemeMode } from '../core/enums';
+
 export interface SiteSettings {
   site_title: string;
   tagline?: string;

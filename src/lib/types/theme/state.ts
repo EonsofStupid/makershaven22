@@ -1,5 +1,6 @@
 
-import { Theme, ThemeMode, ThemePreferences } from './core';
+import { Theme, ThemePreferences } from './core';
+import { ThemeMode } from '../core/enums';
 
 export interface ThemeState {
   theme: Theme | null;

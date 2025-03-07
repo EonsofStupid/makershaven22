@@ -1,6 +1,6 @@
-import { Json } from '../core/json';
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
+import { Json } from '../core/json';
+import { UserRole } from '../core/enums';
 
 export interface AuthUser {
   id: string;
