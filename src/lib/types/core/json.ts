@@ -3,17 +3,9 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type JsonObject = { [key: string]: Json };
 export type JsonArray = Json[];
 
-export interface BaseEntity {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
+export interface JsonCompatible {
+  toJSON(): JsonObject;
 }
 
-export interface UserOwnedEntity extends BaseEntity {
-  created_by: string;
-  updated_by?: string;
-}
-
-export interface MetadataEntity extends BaseEntity {
-  metadata?: Json;
-}
+// Helper type for converting JSON to specific types
+export type FromJson<T> = (json: Json) => T;

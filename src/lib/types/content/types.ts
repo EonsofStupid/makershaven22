@@ -1,8 +1,8 @@
 
-import { ContentStatus, ContentType } from '../core/enums';
 import { Json } from '../core/json';
+import { ContentType, ContentStatus } from '../core/enums';
 
-export interface ContentItem {
+export interface BaseContent {
   id: string;
   title: string;
   slug?: string;
@@ -20,40 +20,37 @@ export interface ContentItem {
 export interface ContentRevision {
   id: string;
   content_id: string;
+  revision_number: number;
   content: Json;
-  version_number: number;
-  change_summary?: string;
-  created_by?: string;
-  created_at?: string;
   metadata?: Json;
-  scheduled_publish_at?: string;
-  publish_status?: string;
-}
-
-export interface ContentRelationship {
-  id: string;
-  parent_id: string;
-  child_id: string;
-  relationship_type: string;
-  order_index?: number;
+  created_by: string;
+  created_at: string;
+  change_summary?: string;
 }
 
 export interface ContentFormData {
   title: string;
   slug?: string;
-  type: ContentType;
-  status: ContentStatus;
   content?: Json;
   metadata?: Json;
+  type: ContentType;
+  status: ContentStatus;
 }
 
-export interface ContentCategory {
-  id: string;
+export interface ContentTypeDefinition {
+  type: ContentType;
+  label: string;
+  description: string;
+  icon?: string;
+  fields: ContentFieldDefinition[];
+}
+
+export interface ContentFieldDefinition {
   name: string;
-  slug: string;
-  description?: string;
-  parent_id?: string;
-  metadata?: Json;
-  created_at?: string;
-  updated_at?: string;
+  label: string;
+  type: 'text' | 'textarea' | 'rich-text' | 'number' | 'boolean' | 'date' | 'select' | 'media' | 'relation';
+  required?: boolean;
+  options?: any[];
+  default?: any;
+  validations?: any[];
 }

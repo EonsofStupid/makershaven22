@@ -6,6 +6,12 @@ export interface SecuritySettings {
   enable_ip_filtering: boolean;
   two_factor_auth: boolean;
   max_login_attempts: number;
+  ip_whitelist?: string[];
+  ip_blacklist?: string[];
+  session_timeout_minutes?: number;
+  lockout_duration_minutes?: number;
+  rate_limit_requests?: number;
+  rate_limit_window_minutes?: number;
 }
 
 export interface Settings {
@@ -40,9 +46,9 @@ export interface Settings {
   logo_url?: string;
   favicon_url?: string;
   theme_mode?: ThemeMode;
-  security_settings?: SecuritySettings;
   updated_at?: string;
   updated_by?: string;
+  security_settings?: SecuritySettings;
 }
 
 export interface SiteSettings extends Settings {
@@ -76,6 +82,13 @@ export interface SettingsUpdate {
   p_font_weight_bold: string;
   p_line_height_base: string;
   p_letter_spacing: string;
+  p_box_shadow: string;
+  p_backdrop_blur: string;
+  p_transition_type: string;
+  p_menu_animation_type?: string;
   p_logo_url?: string;
   p_favicon_url?: string;
 }
+
+// Re-export the schema
+export { settingsSchema } from '../../components/admin/settings/types/schema';

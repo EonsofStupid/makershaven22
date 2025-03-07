@@ -1,4 +1,6 @@
 
+import { SecurityEventSeverity, SecurityEventCategory } from '@/lib/types/core/enums';
+
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
   two_factor_auth: boolean;
@@ -24,7 +26,20 @@ export interface SecurityLogEntry {
   ip_address?: string;
   user_id?: string;
   details?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: SecurityEventSeverity;
+  category: SecurityEventCategory;
+}
+
+export interface SecurityLog {
+  id: string;
+  timestamp: string;
+  event_type: string;
+  event_category: SecurityEventCategory;
+  severity: SecurityEventSeverity;
+  user_id?: string;
+  ip_address?: string;
+  details?: string;
+  metadata?: any;
 }
 
 export interface RateLimitConfig {

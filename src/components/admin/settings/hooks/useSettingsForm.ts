@@ -31,7 +31,13 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
     faviconFile,
     handleLogoUpload,
     handleFaviconUpload,
-    handleSettingsUpdate,
-    handleResetToDefault,
+    handleSettingsUpdate: async (data: Settings): Promise<void> => {
+      const result = await handleSettingsUpdate(data);
+      return;
+    },
+    handleResetToDefault: async (): Promise<void> => {
+      const result = await handleResetToDefault();
+      return;
+    },
   };
 };

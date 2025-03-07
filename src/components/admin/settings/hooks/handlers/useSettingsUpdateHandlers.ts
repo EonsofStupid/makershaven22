@@ -39,7 +39,7 @@ export const useSettingsUpdateHandlers = () => {
         console.log("Favicon uploaded successfully:", favicon_url);
       }
 
-      const updateParams: Partial<SettingsUpdate> = {
+      const updateParams: SettingsUpdate = {
         p_site_title: formData.site_title,
         p_tagline: formData.tagline || '',
         p_primary_color: formData.primary_color,
@@ -64,15 +64,19 @@ export const useSettingsUpdateHandlers = () => {
         p_font_weight_bold: formData.font_weight_bold,
         p_line_height_base: formData.line_height_base,
         p_letter_spacing: formData.letter_spacing,
+        p_box_shadow: formData.box_shadow,
+        p_backdrop_blur: formData.backdrop_blur,
+        p_transition_type: formData.transition_type,
+        p_menu_animation_type: formData.menu_animation_type,
       };
 
       // Add logo and favicon if they exist
       if (logo_url) {
-        Object.assign(updateParams, { p_logo_url: logo_url });
+        updateParams.p_logo_url = logo_url;
       }
 
       if (favicon_url) {
-        Object.assign(updateParams, { p_favicon_url: favicon_url });
+        updateParams.p_favicon_url = favicon_url;
       }
 
       const { data, error } = await supabase.rpc('update_site_settings', updateParams);

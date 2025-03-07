@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 export const settingsSchema = z.object({
@@ -28,13 +29,17 @@ export const settingsSchema = z.object({
   box_shadow: z.string(),
   backdrop_blur: z.string(),
   transition_type: z.enum(["fade", "slide", "scale"]),
-  menu_animation_type: z.enum(["fade", "slide", "scale"]),
+  menu_animation_type: z.enum(["fade", "slide", "scale"]).optional(),
   logo_url: z.string().optional(),
   favicon_url: z.string().optional(),
   theme_mode: z.enum(["light", "dark", "system"]).optional(),
+  updated_at: z.string().optional(),
+  updated_by: z.string().optional(),
   security_settings: z.object({
     enable_ip_filtering: z.boolean(),
     two_factor_auth: z.boolean(),
     max_login_attempts: z.number()
   }).optional()
 });
+
+export type SettingsSchema = z.infer<typeof settingsSchema>;

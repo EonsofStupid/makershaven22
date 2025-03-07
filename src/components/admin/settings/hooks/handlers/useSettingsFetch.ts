@@ -2,8 +2,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Settings } from "@/lib/types/settings/core";
+import type { Settings, SecuritySettings } from "@/lib/types/settings/core";
 import { ThemeMode } from "@/lib/types/core/enums";
+import { Json } from "@/lib/types/core/json";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -55,13 +56,30 @@ export const useSettingsFetch = () => {
         box_shadow: data.box_shadow,
         backdrop_blur: data.backdrop_blur,
         updated_at: data.updated_at,
-        updated_by: data.updated_by,
-        security_settings: data.security_settings ? {
-          enable_ip_filtering: data.security_settings.enable_ip_filtering || false,
-          two_factor_auth: data.security_settings.two_factor_auth || false,
-          max_login_attempts: data.security_settings.max_login_attempts || 5
-        } : undefined
+        updated_by: data.updated_by
       };
+
+      // Handle security settings
+      if (data.security_settings) {
+        try {
+          const securityData = typeof data.security_settings === 'string' 
+            ? JSON.parse(data.security_settings) 
+            : data.security_settings;
+          
+          settings.security_settings = {
+            enable_ip_filtering: securityData.enable_ip_filtering || false,
+            two_factor_auth: securityData.two_factor_auth || false,
+            max_login_attempts: securityData.max_login_attempts || 5
+          } as SecuritySettings;
+        } catch (err) {
+          console.error("Error parsing security settings:", err);
+          settings.security_settings = {
+            enable_ip_filtering: false,
+            two_factor_auth: false,
+            max_login_attempts: 5
+          };
+        }
+      }
 
       console.log("Settings fetched successfully:", settings);
       return settings;

@@ -8,7 +8,6 @@ export interface ThemeState {
   systemTheme: ThemeMode;
   effectiveTheme: ThemeMode;
   cssVariables: Record<string, string>;
-  themeState: any;
   isLoading: boolean;
   error: Error | null;
   setSettings: (settings: Settings | null) => void;
