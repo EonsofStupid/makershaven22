@@ -1,5 +1,6 @@
+
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AuthGuard } from "@/lib/auth/AuthGuard";
@@ -12,12 +13,20 @@ import { adminRoutes } from "./admin-routes";
 export const AppRoutes = () => {
   const { session, user, isLoading } = useAuthStore();
   
-  console.log('AppRoutes: Session state:', { 
-    userId: session?.user?.id,
-    role: user?.role,
-    isLoading,
-    hasSession: !!session
-  });
+  useEffect(() => {
+    // Debug logging
+    console.log('AppRoutes: Auth state updated', { 
+      userId: user?.id,
+      role: user?.role,
+      isLoading,
+      hasSession: !!session
+    });
+    
+    // Check if admin role for debugging
+    if (user?.role === 'admin' || user?.role === 'super_admin') {
+      console.log('Admin user detected - should have access to admin routes');
+    }
+  }, [session, user, isLoading]);
 
   if (isLoading) {
     return (

@@ -1,20 +1,17 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './styles/globals.css'
 
-// Create root with error boundary
-const root = ReactDOM.createRoot(document.getElementById('root')!)
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import './index.css';
+import { StoreProvider } from './lib/store/providers/StoreProvider';
 
-// Development error logging
-if (process.env.NODE_ENV === 'development') {
-  window.onerror = (message, source, lineno, colno, error) => {
-    console.error('Global error:', { message, source, lineno, colno, error });
-  };
-}
-
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+    <BrowserRouter>
+      <StoreProvider>
+        <App />
+      </StoreProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
