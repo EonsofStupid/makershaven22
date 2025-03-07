@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { settingsSchema, type SettingsFormData, type Settings } from "./types";
+import { settingsSchema, type Settings } from "@/lib/types/settings/core";
 import { useSettingsForm } from "./hooks/useSettingsForm";
-import { useTheme } from "@/components/theme/ThemeContext";
+import { useThemeContext } from "@/components/theme/ThemeProvider";
 import { SettingsPreview } from "./components/SettingsPreview";
 import { ResetDialog } from "./components/ResetDialog";
 import { SettingsFormHeader } from "./components/SettingsFormHeader";
@@ -26,7 +27,7 @@ export const SettingsForm = () => {
   const [resetConfirmation, setResetConfirmation] = useState("");
   const [confirmCheckbox, setConfirmCheckbox] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const { theme, updateTheme } = useTheme();
+  const { updateTheme } = useThemeContext();
 
   const {
     settings,
@@ -40,7 +41,7 @@ export const SettingsForm = () => {
     handleResetToDefault,
   } = useSettingsForm();
 
-  const form = useForm<SettingsFormData>({
+  const form = useForm<Settings>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       site_title: settings?.site_title || "MakersImpulse",
@@ -76,6 +77,10 @@ export const SettingsForm = () => {
 
   // Watch all form fields for changes
   React.useEffect(() => {
+    if (!settings) return;
+    
+    form.reset(settings);
+
     const subscription = form.watch((value, { name, type }) => {
       if (type === "change") {
         const formValues = form.getValues();
@@ -84,7 +89,7 @@ export const SettingsForm = () => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch, handleSettingsUpdate, updateTheme]);
+  }, [form.watch, settings, handleSettingsUpdate, updateTheme]);
 
   const handleReset = async () => {
     if (resetConfirmation.toUpperCase() !== "IMPULSE" || !confirmCheckbox) {
@@ -160,12 +165,7 @@ export const SettingsForm = () => {
         <Card className="p-6 bg-gray-800/50 border border-white/10 backdrop-blur-sm sticky top-4">
           <h3 className="text-lg font-medium text-white mb-4">Preview</h3>
           <SettingsPreview
-            settings={{
-              ...settings,
-              ...form.watch(),
-              logo_url: logoFile ? URL.createObjectURL(logoFile) : settings?.logo_url,
-              favicon_url: faviconFile ? URL.createObjectURL(faviconFile) : settings?.favicon_url,
-            }}
+            settings={form.watch()}
           />
         </Card>
       </motion.div>

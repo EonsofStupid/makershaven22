@@ -1,18 +1,20 @@
 
-import { Theme, ThemePreferences } from './core';
+import { Settings } from '../settings/core';
 import { ThemeMode } from '../core/enums';
 
 export interface ThemeState {
-  theme: Theme | null;
-  mode: ThemeMode;
-  preferences: ThemePreferences;
+  settings: Settings | null;
+  themeMode: ThemeMode;
+  systemTheme: ThemeMode;
+  effectiveTheme: ThemeMode;
+  cssVariables: Record<string, string>;
+  themeState: any;
   isLoading: boolean;
-  error: string | null;
+  error: Error | null;
+  setSettings: (settings: Settings | null) => void;
+  setThemeMode: (mode: ThemeMode) => void;
+  setSystemTheme: (mode: ThemeMode) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  updateTheme: (settings: Settings) => void;
 }
-
-export type ThemeAction = 
-  | { type: 'SET_THEME'; payload: Theme }
-  | { type: 'SET_MODE'; payload: ThemeMode }
-  | { type: 'SET_PREFERENCES'; payload: ThemePreferences }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };

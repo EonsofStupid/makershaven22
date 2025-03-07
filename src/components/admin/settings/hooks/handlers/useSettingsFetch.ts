@@ -1,7 +1,9 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Settings } from "../../types";
+import type { Settings } from "@/lib/types/settings/core";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -29,7 +31,7 @@ export const useSettingsFetch = () => {
         accent_color: data.accent_color,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        theme_mode: data.theme_mode,
+        theme_mode: data.theme_mode as ThemeMode,
         text_primary_color: data.text_primary_color,
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,
@@ -53,7 +55,12 @@ export const useSettingsFetch = () => {
         box_shadow: data.box_shadow,
         backdrop_blur: data.backdrop_blur,
         updated_at: data.updated_at,
-        updated_by: data.updated_by
+        updated_by: data.updated_by,
+        security_settings: data.security_settings ? {
+          enable_ip_filtering: data.security_settings.enable_ip_filtering || false,
+          two_factor_auth: data.security_settings.two_factor_auth || false,
+          max_login_attempts: data.security_settings.max_login_attempts || 5
+        } : undefined
       };
 
       console.log("Settings fetched successfully:", settings);

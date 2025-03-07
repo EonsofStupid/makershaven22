@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
-import { Settings, SettingsResponse } from "../../types";
+import { Settings, SettingsUpdate } from "@/lib/types/settings/core";
 
 export const useSettingsUpdateHandlers = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -38,21 +39,19 @@ export const useSettingsUpdateHandlers = () => {
         console.log("Favicon uploaded successfully:", favicon_url);
       }
 
-      const { data, error } = await supabase.rpc('update_site_settings', {
+      const updateParams: Partial<SettingsUpdate> = {
         p_site_title: formData.site_title,
-        p_tagline: formData.tagline,
+        p_tagline: formData.tagline || '',
         p_primary_color: formData.primary_color,
         p_secondary_color: formData.secondary_color,
         p_accent_color: formData.accent_color,
-        p_logo_url: logo_url,
-        p_favicon_url: favicon_url,
         p_text_primary_color: formData.text_primary_color,
         p_text_secondary_color: formData.text_secondary_color,
         p_text_link_color: formData.text_link_color,
         p_text_heading_color: formData.text_heading_color,
-        p_neon_cyan: formData.neon_cyan,
-        p_neon_pink: formData.neon_pink,
-        p_neon_purple: formData.neon_purple,
+        p_neon_cyan: formData.neon_cyan || '#41f0db',
+        p_neon_pink: formData.neon_pink || '#ff0abe',
+        p_neon_purple: formData.neon_purple || '#8000ff',
         p_border_radius: formData.border_radius,
         p_spacing_unit: formData.spacing_unit,
         p_transition_duration: formData.transition_duration,
@@ -65,14 +64,25 @@ export const useSettingsUpdateHandlers = () => {
         p_font_weight_bold: formData.font_weight_bold,
         p_line_height_base: formData.line_height_base,
         p_letter_spacing: formData.letter_spacing,
-      });
+      };
+
+      // Add logo and favicon if they exist
+      if (logo_url) {
+        Object.assign(updateParams, { p_logo_url: logo_url });
+      }
+
+      if (favicon_url) {
+        Object.assign(updateParams, { p_favicon_url: favicon_url });
+      }
+
+      const { data, error } = await supabase.rpc('update_site_settings', updateParams);
 
       if (error) throw error;
 
-      const response = data as unknown as SettingsResponse;
-      console.log("Settings updated successfully:", response);
+      console.log("Settings updated successfully:", data);
       toast.success("Settings updated successfully");
-      return response.data;
+      
+      return formData;
     } catch (error) {
       console.error("Error in handleSettingsUpdate:", error);
       toast.error("Failed to update settings");

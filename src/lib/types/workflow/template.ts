@@ -1,49 +1,71 @@
+
 import { Json } from '../core/json';
-import { WorkflowStage, parseWorkflowStage } from './stage';
+import { WorkflowStage, serializeWorkflowStage } from './stage';
 
 export interface WorkflowTemplate {
-  id: string;
+  id?: string;
   name: string;
-  description?: string | null;
-  steps: WorkflowStage[];
-  is_active?: boolean | null;
-  created_by?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-  profile?: {
-    id: string;
-    username: string;
-    display_name: string;
-    avatar_url: string;
-  };
+  description: string | null;
+  stages: WorkflowStage[];
+  is_active: boolean;
+  created_at?: string;
+  created_by?: string;
+  updated_at?: string;
 }
 
-export const parseWorkflowTemplate = (data: Json): WorkflowTemplate => {
-  if (typeof data !== 'object' || !data) {
-    throw new Error('Invalid workflow template data');
-  }
+export interface WorkflowFormData {
+  name: string;
+  description: string;
+  stages: WorkflowStage[];
+  is_active: boolean;
+}
 
-  const template = data as Record<string, Json>;
-  const steps = Array.isArray(template.steps) 
-    ? template.steps.map(step => parseWorkflowStage(step))
-    : [];
-
+// Functions to help with serialization/deserialization for DB
+export const serializeWorkflowTemplate = (template: WorkflowTemplate): { 
+  id?: string;
+  name: string; 
+  description: string | null;
+  stages: Json;
+  is_active: boolean;
+  created_at?: string;
+  created_by?: string;
+  updated_at?: string;
+} => {
   return {
-    id: String(template.id || ''),
-    name: String(template.name || ''),
-    description: template.description ? String(template.description) : null,
-    steps,
-    is_active: Boolean(template.is_active),
-    created_by: template.created_by ? String(template.created_by) : null,
-    created_at: template.created_at ? String(template.created_at) : null,
-    updated_at: template.updated_at ? String(template.updated_at) : null,
-    profile: template.profile as WorkflowTemplate['profile']
+    ...template,
+    stages: JSON.parse(JSON.stringify(template.stages))
   };
 };
 
-export const serializeWorkflowTemplate = (template: WorkflowTemplate): Json => {
+export const parseWorkflowTemplate = (data: any): WorkflowTemplate => {
+  if (!data) return {
+    name: '',
+    description: '',
+    stages: [],
+    is_active: true
+  };
+
+  let stages: WorkflowStage[] = [];
+  if (data.stages && Array.isArray(data.stages)) {
+    stages = data.stages.map((stage: any) => ({
+      id: stage.id || crypto.randomUUID(),
+      name: stage.name || '',
+      description: stage.description || '',
+      type: stage.type || 'task',
+      order: stage.order || 0,
+      config: stage.config || {},
+      validationRules: stage.validationRules || []
+    }));
+  }
+
   return {
-    ...template,
-    steps: template.steps.map(step => serializeWorkflowStage(step))
-  } as unknown as Json;
+    id: data.id,
+    name: data.name || '',
+    description: data.description || '',
+    stages,
+    is_active: data.is_active ?? true,
+    created_at: data.created_at,
+    created_by: data.created_by,
+    updated_at: data.updated_at
+  };
 };

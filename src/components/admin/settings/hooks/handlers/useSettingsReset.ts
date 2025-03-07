@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Settings, SettingsResponse } from "../../types";
+import { Settings } from "@/lib/types/settings/core";
 import { DEFAULT_SETTINGS } from "../useSettingsDefaults";
 
 export const useSettingsReset = () => {
@@ -29,13 +30,19 @@ export const useSettingsReset = () => {
         p_transition_duration: DEFAULT_SETTINGS.transition_duration,
         p_shadow_color: DEFAULT_SETTINGS.shadow_color,
         p_hover_scale: DEFAULT_SETTINGS.hover_scale,
+        p_font_family_heading: DEFAULT_SETTINGS.font_family_heading,
+        p_font_family_body: DEFAULT_SETTINGS.font_family_body,
+        p_font_size_base: DEFAULT_SETTINGS.font_size_base,
+        p_font_weight_normal: DEFAULT_SETTINGS.font_weight_normal,
+        p_font_weight_bold: DEFAULT_SETTINGS.font_weight_bold,
+        p_line_height_base: DEFAULT_SETTINGS.line_height_base,
+        p_letter_spacing: DEFAULT_SETTINGS.letter_spacing
       });
 
       if (error) throw error;
       
-      const response = data as unknown as SettingsResponse;
-      console.log("Settings reset successfully:", response);
-      return response;
+      console.log("Settings reset successfully:", data);
+      return data as Settings;
     } catch (error) {
       console.error("Error resetting settings:", error);
       throw error;
