@@ -88,7 +88,8 @@ export interface SettingsUpdate {
   p_menu_animation_type?: string;
   p_logo_url?: string;
   p_favicon_url?: string;
+  p_security_settings?: SecuritySettings;
 }
 
-// Re-export the schema
-export { settingsSchema } from '../../components/admin/settings/types/schema';
+// Re-export the schema from our local path to ensure consistency
+export { settingsSchema, securitySettingsSchema } from '../../components/admin/settings/types/schema';

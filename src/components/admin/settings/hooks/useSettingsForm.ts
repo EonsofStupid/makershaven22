@@ -5,6 +5,9 @@ import { useSettingsUpdateHandlers } from "./handlers/useSettingsUpdateHandlers"
 import { useSettingsReset } from "./handlers/useSettingsReset";
 import { Settings } from "@/lib/types/settings/core";
 import { UseSettingsFormReturn } from "../types/settings";
+import { UseFormReturn, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { settingsSchema } from "../types/schema";
 
 export const useSettingsForm = (): UseSettingsFormReturn => {
   const { data: settings, isLoading } = useSettingsFetch();
@@ -32,12 +35,10 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
     handleLogoUpload,
     handleFaviconUpload,
     handleSettingsUpdate: async (data: Settings): Promise<void> => {
-      const result = await handleSettingsUpdate(data);
-      return;
+      await handleSettingsUpdate(data);
     },
     handleResetToDefault: async (): Promise<void> => {
-      const result = await handleResetToDefault();
-      return;
+      await handleResetToDefault();
     },
   };
 };

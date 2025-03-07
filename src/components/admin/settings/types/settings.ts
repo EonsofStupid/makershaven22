@@ -1,8 +1,9 @@
+
 import { z } from "zod";
 import { settingsSchema } from "./schema";
+import { Settings } from "@/lib/types/settings/core";
 
-export type Settings = z.infer<typeof settingsSchema>;
-export type SettingsFormData = Settings;
+export type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export interface SettingsResponse {
   data: Settings;

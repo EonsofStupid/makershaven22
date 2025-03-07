@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Settings, SecuritySettings } from "@/lib/types/settings/core";
 import { ThemeMode } from "@/lib/types/core/enums";
-import { Json } from "@/lib/types/core/json";
+import { Json, isJsonObject, safeJsonParse } from "@/lib/types/core/json";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -53,8 +53,8 @@ export const useSettingsFetch = () => {
         line_height_base: data.line_height_base,
         letter_spacing: data.letter_spacing,
         transition_type: (data.transition_type as 'fade' | 'slide' | 'scale') || 'fade',
-        box_shadow: data.box_shadow,
-        backdrop_blur: data.backdrop_blur,
+        box_shadow: data.box_shadow || 'none',
+        backdrop_blur: data.backdrop_blur || '0',
         updated_at: data.updated_at,
         updated_by: data.updated_by
       };
@@ -62,21 +62,46 @@ export const useSettingsFetch = () => {
       // Handle security settings
       if (data.security_settings) {
         try {
-          const securityData = typeof data.security_settings === 'string' 
-            ? JSON.parse(data.security_settings) 
-            : data.security_settings;
+          // Parse security settings properly
+          let securityData: SecuritySettings;
           
+          if (typeof data.security_settings === 'string') {
+            securityData = safeJsonParse(data.security_settings, {
+              enable_ip_filtering: false,
+              two_factor_auth: false,
+              max_login_attempts: 5
+            });
+          } else if (isJsonObject(data.security_settings)) {
+            securityData = data.security_settings as SecuritySettings;
+          } else {
+            securityData = {
+              enable_ip_filtering: false,
+              two_factor_auth: false,
+              max_login_attempts: 5
+            };
+          }
+          
+          // Ensure required fields exist
           settings.security_settings = {
-            enable_ip_filtering: securityData.enable_ip_filtering || false,
-            two_factor_auth: securityData.two_factor_auth || false,
-            max_login_attempts: securityData.max_login_attempts || 5
-          } as SecuritySettings;
+            enable_ip_filtering: securityData.enable_ip_filtering ?? false,
+            two_factor_auth: securityData.two_factor_auth ?? false,
+            max_login_attempts: securityData.max_login_attempts ?? 5,
+            ip_whitelist: Array.isArray(securityData.ip_whitelist) ? securityData.ip_whitelist : [],
+            ip_blacklist: Array.isArray(securityData.ip_blacklist) ? securityData.ip_blacklist : [],
+            session_timeout_minutes: securityData.session_timeout_minutes,
+            lockout_duration_minutes: securityData.lockout_duration_minutes,
+            rate_limit_requests: securityData.rate_limit_requests,
+            rate_limit_window_minutes: securityData.rate_limit_window_minutes
+          };
         } catch (err) {
           console.error("Error parsing security settings:", err);
+          // Provide default security settings if parsing fails
           settings.security_settings = {
             enable_ip_filtering: false,
             two_factor_auth: false,
-            max_login_attempts: 5
+            max_login_attempts: 5,
+            ip_whitelist: [],
+            ip_blacklist: []
           };
         }
       }

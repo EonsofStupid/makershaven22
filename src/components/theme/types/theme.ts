@@ -47,3 +47,17 @@ export interface ThemeConfig {
   mode: ThemeMode;
   settings: Settings;
 }
+
+// Export interface for the Theme context to be used by ThemeProvider
+export interface ThemeContextType {
+  settings: Settings | null;
+  themeMode: ThemeMode;
+  systemTheme: ThemeMode;
+  effectiveTheme: ThemeMode;
+  cssVariables: Record<string, string>;
+  isLoading: boolean;
+  error: Error | null;
+  setSettings: (settings: Settings | null) => void;
+  setThemeMode: (mode: ThemeMode) => void;
+  updateTheme: (settings: Settings) => void;
+}

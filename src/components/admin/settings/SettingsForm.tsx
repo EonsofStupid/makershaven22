@@ -6,7 +6,8 @@ import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { settingsSchema, type Settings } from "@/lib/types/settings/core";
+import { Settings } from "@/lib/types/settings/core";
+import { settingsSchema } from "./types/schema";
 import { useSettingsForm } from "./hooks/useSettingsForm";
 import { useThemeContext } from "@/components/theme/ThemeProvider";
 import { SettingsPreview } from "./components/SettingsPreview";
@@ -72,6 +73,11 @@ export const SettingsForm = () => {
       backdrop_blur: settings?.backdrop_blur || "0",
       transition_type: settings?.transition_type || "fade",
       menu_animation_type: settings?.menu_animation_type || "fade",
+      security_settings: settings?.security_settings || {
+        enable_ip_filtering: false,
+        two_factor_auth: false,
+        max_login_attempts: 5
+      }
     },
   });
 
@@ -84,12 +90,12 @@ export const SettingsForm = () => {
     const subscription = form.watch((value, { name, type }) => {
       if (type === "change") {
         const formValues = form.getValues();
-        handleSettingsUpdate(formValues as Settings);
-        updateTheme(formValues as Settings);
+        handleSettingsUpdate(formValues);
+        updateTheme(formValues);
       }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch, settings, handleSettingsUpdate, updateTheme]);
+  }, [form, settings, handleSettingsUpdate, updateTheme]);
 
   const handleReset = async () => {
     if (resetConfirmation.toUpperCase() !== "IMPULSE" || !confirmCheckbox) {
