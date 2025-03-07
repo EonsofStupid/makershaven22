@@ -62,7 +62,7 @@ export const useSettingsFetch = () => {
       // Handle security settings
       if (data.security_settings) {
         try {
-          // Parse security settings properly
+          // Parse security settings properly based on what type they are
           let securityData: SecuritySettings;
           
           if (typeof data.security_settings === 'string') {
@@ -72,7 +72,19 @@ export const useSettingsFetch = () => {
               max_login_attempts: 5
             });
           } else if (isJsonObject(data.security_settings)) {
-            securityData = data.security_settings as SecuritySettings;
+            // Need to create a proper SecuritySettings object from the JSON object
+            const secJson = data.security_settings as Record<string, Json>;
+            securityData = {
+              enable_ip_filtering: secJson.enable_ip_filtering === true,
+              two_factor_auth: secJson.two_factor_auth === true,
+              max_login_attempts: typeof secJson.max_login_attempts === 'number' ? secJson.max_login_attempts : 5,
+              ip_whitelist: Array.isArray(secJson.ip_whitelist) ? secJson.ip_whitelist.map(ip => String(ip)) : [],
+              ip_blacklist: Array.isArray(secJson.ip_blacklist) ? secJson.ip_blacklist.map(ip => String(ip)) : [],
+              session_timeout_minutes: typeof secJson.session_timeout_minutes === 'number' ? secJson.session_timeout_minutes : undefined,
+              lockout_duration_minutes: typeof secJson.lockout_duration_minutes === 'number' ? secJson.lockout_duration_minutes : undefined,
+              rate_limit_requests: typeof secJson.rate_limit_requests === 'number' ? secJson.rate_limit_requests : undefined,
+              rate_limit_window_minutes: typeof secJson.rate_limit_window_minutes === 'number' ? secJson.rate_limit_window_minutes : undefined
+            };
           } else {
             securityData = {
               enable_ip_filtering: false,
@@ -81,18 +93,7 @@ export const useSettingsFetch = () => {
             };
           }
           
-          // Ensure required fields exist
-          settings.security_settings = {
-            enable_ip_filtering: securityData.enable_ip_filtering ?? false,
-            two_factor_auth: securityData.two_factor_auth ?? false,
-            max_login_attempts: securityData.max_login_attempts ?? 5,
-            ip_whitelist: Array.isArray(securityData.ip_whitelist) ? securityData.ip_whitelist : [],
-            ip_blacklist: Array.isArray(securityData.ip_blacklist) ? securityData.ip_blacklist : [],
-            session_timeout_minutes: securityData.session_timeout_minutes,
-            lockout_duration_minutes: securityData.lockout_duration_minutes,
-            rate_limit_requests: securityData.rate_limit_requests,
-            rate_limit_window_minutes: securityData.rate_limit_window_minutes
-          };
+          settings.security_settings = securityData;
         } catch (err) {
           console.error("Error parsing security settings:", err);
           // Provide default security settings if parsing fails

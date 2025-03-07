@@ -91,5 +91,5 @@ export interface SettingsUpdate {
   p_security_settings?: SecuritySettings;
 }
 
-// Re-export the schema from our local path to ensure consistency
-export { settingsSchema, securitySettingsSchema } from '../../components/admin/settings/types/schema';
+// Export the schema reference
+export { settingsSchema, securitySettingsSchema } from '@/components/admin/settings/types/schema';

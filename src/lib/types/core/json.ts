@@ -28,6 +28,25 @@ export const isJsonArray = (value: unknown): value is JsonArray => {
   return Array.isArray(value);
 };
 
+// Helper to safely convert security settings JSON to SecuritySettings type
+export const parseJsonToObject = <T>(json: unknown, fallback: T): T => {
+  if (typeof json === 'string') {
+    try {
+      return JSON.parse(json) as T;
+    } catch (e) {
+      console.error('Error parsing JSON string:', e);
+      return fallback;
+    }
+  }
+  
+  if (isJsonObject(json)) {
+    // Convert the JSON object to the target type
+    return json as unknown as T;
+  }
+  
+  return fallback;
+};
+
 // Type guard for checking if a value is Json
 export const isJson = (value: unknown): value is Json => {
   if (value === null) return true;

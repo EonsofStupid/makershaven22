@@ -3,6 +3,8 @@ import { z } from "zod";
 import { settingsSchema } from "./schema";
 import { Settings } from "@/lib/types/settings/core";
 
+// Export the inferred type from the schema
+// This ensures form data and Settings type are aligned
 export type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export interface SettingsResponse {
@@ -12,6 +14,7 @@ export interface SettingsResponse {
   };
 }
 
+// Update this interface to use SettingsFormData for form-related properties
 export interface UseSettingsFormReturn {
   form: any;
   settings: Settings | null;

@@ -8,7 +8,7 @@ import { DEFAULT_SETTINGS } from "../useSettingsDefaults";
 export const useSettingsReset = () => {
   const [isResetting, setIsResetting] = useState(false);
 
-  const handleResetToDefault = async () => {
+  const handleResetToDefault = async (): Promise<Settings> => {
     console.log("Resetting settings to default...");
     setIsResetting(true);
     try {
