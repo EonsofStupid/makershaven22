@@ -5,9 +5,6 @@ import { useSettingsUpdateHandlers } from "./handlers/useSettingsUpdateHandlers"
 import { useSettingsReset } from "./handlers/useSettingsReset";
 import { Settings } from "@/lib/types/settings/core";
 import { UseSettingsFormReturn } from "../types/settings";
-import { UseFormReturn, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { settingsSchema } from "../types/schema";
 
 export const useSettingsForm = (): UseSettingsFormReturn => {
   const { data: settings, isLoading } = useSettingsFetch();

@@ -14,9 +14,9 @@ export interface SettingsResponse {
   };
 }
 
-// Update this interface to use SettingsFormData for form-related properties
+// Updated interface to use SettingsFormData for form-related properties
 export interface UseSettingsFormReturn {
-  form: any;
+  form: any; // This will be properly typed with the consuming component
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;

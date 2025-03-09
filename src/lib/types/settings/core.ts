@@ -1,19 +1,8 @@
 
 import { ThemeMode } from '../core/enums';
-import { Json } from '../core/json';
+import { SecuritySettings } from './security';
 
-export interface SecuritySettings {
-  enable_ip_filtering: boolean;
-  two_factor_auth: boolean;
-  max_login_attempts: number;
-  ip_whitelist?: string[];
-  ip_blacklist?: string[];
-  session_timeout_minutes?: number;
-  lockout_duration_minutes?: number;
-  rate_limit_requests?: number;
-  rate_limit_window_minutes?: number;
-}
-
+// Core Settings interface aligned with Supabase database schema
 export interface Settings {
   site_title: string;
   tagline?: string;
