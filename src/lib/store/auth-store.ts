@@ -48,6 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         if (profileError) {
           console.error('Error fetching profile:', profileError);
+          throw profileError;
         }
 
         // Log the user role for debugging
@@ -89,6 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         if (profileError) {
           console.error('Error fetching profile during session update:', profileError);
+          throw profileError;
         }
 
         console.log('Session update - User role:', profile?.role);

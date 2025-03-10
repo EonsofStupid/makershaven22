@@ -20,11 +20,6 @@ export const AppRoutes = () => {
       isLoading,
       hasSession: !!session
     });
-    
-    // Check if admin role for debugging
-    if (user?.role === 'admin' || user?.role === 'super_admin') {
-      console.log('Admin user detected - should have access to admin routes');
-    }
   }, [session, user, isLoading]);
 
   if (isLoading) {
