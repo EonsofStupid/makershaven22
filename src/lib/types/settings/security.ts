@@ -29,3 +29,28 @@ export interface SecurityEvent {
   details?: string;
   metadata?: any;
 }
+
+// Security log type
+export interface SecurityLog {
+  id: string;
+  timestamp: string;
+  event_type: string;
+  event_category: string;
+  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  details?: any;
+  metadata?: any;
+}
+
+// Security event severity enum
+export type SecurityEventSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
+
+// Security event category enum
+export type SecurityEventCategory = 
+  'authentication' | 
+  'authorization' | 
+  'data_access' | 
+  'system' | 
+  'configuration';
