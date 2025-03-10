@@ -1,8 +1,5 @@
+
 import { lazy } from "react";
-import { AdminNav } from "@/components/admin/dashboard/AdminNav";
-import { AdminSidebar } from "@/components/admin/dashboard/sidebar/AdminSidebar";
-import { StatsCards } from "@/components/admin/dashboard/stats/StatsCards";
-import { cn } from "@/lib/utils";
 
 const Posts = lazy(() => import("@/pages/admin/posts"));
 const Users = lazy(() => import("@/pages/admin/users"));

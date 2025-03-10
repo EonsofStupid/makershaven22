@@ -24,7 +24,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               await handleSessionUpdate(session as AuthSession);
             } catch (error) {
               console.error('Error handling auth change:', error);
-              toast.error('Authentication error occurred');
+              // Don't toast here, as it could be disruptive
+              // Continue with app flow, potentially with limited permissions
             }
           }
         );

@@ -33,6 +33,7 @@ const AuthGuardContent = ({
     });
 
     if (!isLoading) {
+      // Check if authentication is required but user is not authenticated
       if (requireAuth && !session) {
         console.log('AuthGuard: No session, redirecting to', fallbackPath);
         toast.error('Please sign in to continue', {
@@ -44,10 +45,12 @@ const AuthGuardContent = ({
         return;
       }
 
+      // Check if specific role is required
       if (requiredRole && user?.role) {
         const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        
         if (!roles.includes(user.role as UserRole)) {
-          console.log('AuthGuard: Insufficient permissions');
+          console.log('AuthGuard: Insufficient permissions, user has role:', user.role);
           toast.error('Access Denied', {
             description: 'You do not have permission to access this page'
           });

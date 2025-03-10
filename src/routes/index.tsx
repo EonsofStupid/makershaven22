@@ -60,21 +60,35 @@ export const AppRoutes = () => {
           ))}
 
           {/* Admin Routes - Restricted to admin/super_admin */}
-          {adminRoutes.map((route) => (
+          <Route path="/admin">
             <Route
-              key={route.path}
-              path={`/admin/${route.path}`}
+              index
               element={
-                <AuthGuard 
+                <AuthGuard
                   requireAuth={true}
                   requiredRole={["admin", "super_admin"]}
                   fallbackPath="/"
                 >
-                  {route.element}
+                  <Navigate to="/admin/dashboard" replace />
                 </AuthGuard>
               }
             />
-          ))}
+            {adminRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <AuthGuard 
+                    requireAuth={true}
+                    requiredRole={["admin", "super_admin"]}
+                    fallbackPath="/"
+                  >
+                    {route.element}
+                  </AuthGuard>
+                }
+              />
+            ))}
+          </Route>
 
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
