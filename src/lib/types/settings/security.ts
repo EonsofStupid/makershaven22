@@ -12,12 +12,6 @@ export interface SecuritySettings {
   rate_limit_window_minutes?: number;
 }
 
-// Extended security settings interface with logs and metadata
-export interface SecuritySettingsWithAudit extends SecuritySettings {
-  last_updated?: string;
-  updated_by?: string;
-}
-
 // Security event types
 export interface SecurityEvent {
   id: string;

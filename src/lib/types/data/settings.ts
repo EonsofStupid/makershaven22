@@ -29,8 +29,8 @@ export interface SettingsRecord {
   font_weight_bold: string;
   line_height_base: string;
   letter_spacing: string;
-  box_shadow?: string;
-  backdrop_blur?: string;
+  box_shadow: string;
+  backdrop_blur: string;
   transition_type?: 'fade' | 'slide' | 'scale';
   menu_animation_type?: 'fade' | 'slide' | 'scale';
   updated_at?: string;

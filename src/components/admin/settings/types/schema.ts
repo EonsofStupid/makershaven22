@@ -15,7 +15,6 @@ export const securitySettingsSchema = z.object({
 });
 
 // Ensure the schema aligns with the Settings interface
-// Make required fields have .min(1) to ensure they're required
 export const settingsSchema = z.object({
   site_title: z.string().min(1),
   tagline: z.string().optional(),

@@ -85,7 +85,8 @@ export const useSettings = () => {
         throw error;
       }
 
-      return transformSettingsRecord(data as SettingsRecord);
+      // Type assertion to handle the transformation safely
+      return transformSettingsRecord(data as unknown as SettingsRecord);
     },
   });
 };

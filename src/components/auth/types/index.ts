@@ -1,26 +1,42 @@
 
-// Re-export from auth types
-export { 
-  type AuthSession, 
-  type AuthUser, 
-  type AuthError,
-  type UserRole,
-  type AuthState, 
-  type AuthErrorRecoveryState 
-} from '@/lib/types/auth/types';
+import { UserRole as CoreUserRole } from '@/lib/types/core/enums';
+import { Session } from '@supabase/supabase-js';
 
-// Component specific types
-export interface AuthProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-  loading?: React.ReactNode;
+export interface AuthState {
+  session: Session | null;
+  user: UserProfile | null;
+  isLoading: boolean;
+  isTransitioning: boolean;
+  hasAccess: boolean;
+  error: AuthError | null;
 }
 
-// Auth guard props
-export interface AuthGuardProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requiredRole?: UserRole | UserRole[];
-  fallbackPath?: string;
-  loading?: React.ReactNode;
+export interface UserProfile {
+  id: string;
+  email?: string;
+  username?: string;
+  display_name?: string;
+  avatar_url?: string;
+  role?: UserRole;
+  is_banned?: boolean;
+  last_seen?: string;
+}
+
+// Extend the core UserRole type to include 'moderator'
+export type UserRole = CoreUserRole | 'moderator';
+
+export interface AuthError {
+  message: string;
+  type: 'auth' | 'permission' | 'network' | 'unknown';
+  details?: Record<string, any>;
+  recoverable?: boolean;
+  retryAfter?: number;
+}
+
+export interface AuthErrorRecoveryState {
+  attemptCount: number;
+  recoveryAvailable: boolean;
+  isRecovering: boolean;
+  recoveryMethod?: 'retry' | 'refresh' | 'redirect';
+  recoveryTarget?: string;
 }

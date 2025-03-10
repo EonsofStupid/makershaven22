@@ -46,7 +46,7 @@ export const SettingsForm = () => {
     if (!settings || !form) return;
     
     const subscription = form.watch((value) => {
-      const formValues = form.getValues();
+      const formValues = form.getValues() as SettingsFormData;
       handleSettingsUpdate(formValues);
       updateTheme(formValues);
     });
