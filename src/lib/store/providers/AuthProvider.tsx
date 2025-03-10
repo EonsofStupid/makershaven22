@@ -11,32 +11,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { initialize, handleSessionUpdate, setLoading, isLoading } = useAuthStore();
 
   useEffect(() => {
-    console.log('AuthProvider: Initializing authentication state');
-    
-    // Initialize auth state from session
-    initialize().catch(error => {
-      console.error('Failed to initialize auth state:', error);
-      toast.error('Failed to initialize authentication');
-    });
+    const initAuth = async () => {
+      try {
+        console.log('AuthProvider: Initializing authentication state');
+        await initialize();
+        
+        // Set up auth change listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            console.log('Auth state changed:', event, session?.user?.id);
+            try {
+              await handleSessionUpdate(session as AuthSession);
+            } catch (error) {
+              console.error('Error handling auth change:', error);
+              toast.error('Authentication error occurred');
+            }
+          }
+        );
 
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        try {
-          await handleSessionUpdate(session as AuthSession);
-        } catch (error) {
-          console.error('Error handling auth change:', error);
-          toast.error('Authentication error occurred');
-        }
+        return () => {
+          console.log('AuthProvider: Cleaning up subscription');
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Failed to initialize auth state:', error);
+        setLoading(false);
+        toast.error('Failed to initialize authentication');
       }
-    );
-
-    return () => {
-      console.log('AuthProvider: Cleaning up subscription');
-      subscription.unsubscribe();
     };
-  }, [initialize, handleSessionUpdate]);
+
+    initAuth();
+  }, [initialize, handleSessionUpdate, setLoading]);
 
   if (isLoading) {
     return (

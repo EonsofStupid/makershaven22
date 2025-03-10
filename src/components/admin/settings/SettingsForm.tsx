@@ -22,6 +22,7 @@ import { AdvancedEffectsSection } from "./sections/AdvancedEffectsSection";
 import { TransitionConfigSection } from "./sections/TransitionConfigSection";
 import { ThemeImportSection } from "./sections/ThemeImportSection";
 import { toast } from "sonner";
+import { SecuritySection } from "./sections/SecuritySection";
 
 export const SettingsForm = () => {
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -76,7 +77,13 @@ export const SettingsForm = () => {
       security_settings: settings?.security_settings || {
         enable_ip_filtering: false,
         two_factor_auth: false,
-        max_login_attempts: 5
+        max_login_attempts: 5,
+        ip_whitelist: [],
+        ip_blacklist: [],
+        session_timeout_minutes: 60,
+        lockout_duration_minutes: 30,
+        rate_limit_requests: 100,
+        rate_limit_window_minutes: 5
       }
     },
   });
@@ -157,6 +164,7 @@ export const SettingsForm = () => {
               <TransitionConfigSection form={form} />
               <AnimationsSection form={form} />
               <AdvancedEffectsSection form={form} />
+              <SecuritySection form={form} />
             </Accordion>
           </form>
         </Card>

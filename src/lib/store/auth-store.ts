@@ -48,7 +48,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         if (profileError) {
           console.error('Error fetching profile:', profileError);
-          // Continue with session but without role info
         }
 
         // Log the user role for debugging
@@ -73,7 +72,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         session: null,
         user: null
       });
-      toast.error('Failed to initialize authentication');
     }
   },
 
@@ -109,7 +107,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error('Error handling session update:', error);
       set({ error: error as AuthError });
-      toast.error('Failed to update session');
     } finally {
       set({ isTransitioning: false });
     }

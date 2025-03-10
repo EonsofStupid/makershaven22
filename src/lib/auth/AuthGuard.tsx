@@ -1,10 +1,11 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/lib/store/auth-store';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/lib/store/auth-store';
+import { ErrorBoundary } from '@/components/shared/error-handling/ErrorBoundary';
 import { UserRole } from '@/lib/types/core/enums';
 
 interface AuthGuardProps {
@@ -14,76 +15,117 @@ interface AuthGuardProps {
   fallbackPath?: string;
 }
 
-export const AuthGuard = ({ 
+const AuthGuardContent = ({ 
   children, 
-  requireAuth = false,
+  requireAuth = true,
   requiredRole,
   fallbackPath = '/login'
 }: AuthGuardProps) => {
   const navigate = useNavigate();
   const { session, user, isLoading } = useAuthStore();
-  const [hasAccess, setHasAccess] = useState(false);
-  const [checkingAccess, setCheckingAccess] = useState(true);
 
   useEffect(() => {
-    const checkAccess = () => {
-      console.log('AuthGuard: Checking access', {
-        requireAuth,
-        requiredRole,
-        hasSession: !!session,
-        userRole: user?.role,
-        userId: user?.id
-      });
+    console.log('AuthGuard: Checking access', {
+      requireAuth,
+      requiredRole,
+      hasSession: !!session,
+      userRole: user?.role
+    });
 
-      // Not loading anymore, make access checks
-      if (!isLoading) {
-        // Check if auth is required but user is not authenticated
-        if (requireAuth && !session) {
-          console.log('AuthGuard: No session, redirecting to', fallbackPath);
-          toast.error('Please sign in to continue');
-          navigate(fallbackPath);
-          return false;
-        }
-
-        // Check if specific role is required and user has that role
-        if (requiredRole && user) {
-          const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-          
-          if (!user.role || !roles.includes(user.role as UserRole)) {
-            console.log('AuthGuard: Insufficient permissions', {
-              userRole: user.role,
-              requiredRoles: roles
-            });
-            toast.error('You do not have permission to access this page');
-            navigate(fallbackPath);
-            return false;
-          }
-        }
-        
-        return true;
+    if (!isLoading) {
+      if (requireAuth && !session) {
+        console.log('AuthGuard: No session, redirecting to', fallbackPath);
+        toast.error('Please sign in to continue', {
+          description: 'You need to be authenticated to access this page'
+        });
+        // Store the current path for deep linking after auth
+        sessionStorage.setItem('redirectAfterAuth', window.location.pathname);
+        navigate(fallbackPath);
+        return;
       }
-      
-      return false;
-    };
 
-    setCheckingAccess(true);
-    const access = checkAccess();
-    setHasAccess(access);
-    setCheckingAccess(false);
+      if (requiredRole && user?.role) {
+        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        if (!roles.includes(user.role as UserRole)) {
+          console.log('AuthGuard: Insufficient permissions');
+          toast.error('Access Denied', {
+            description: 'You do not have permission to access this page'
+          });
+          navigate(fallbackPath);
+          return;
+        }
+      }
+    }
   }, [session, user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (isLoading || checkingAccess) {
+  if (isLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex items-center justify-center min-h-screen"
+        className="flex items-center justify-center min-h-screen bg-black/50 backdrop-blur-sm"
       >
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 260,
+            damping: 20
+          }}
+          className="flex flex-col items-center gap-4 p-8 rounded-lg bg-black/40 border border-white/10"
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-[#41f0db]" />
+          <p className="text-white/80 text-sm">Verifying access...</p>
+        </motion.div>
       </motion.div>
     );
   }
 
-  return <>{children}</>;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// Auth-specific error boundary component
+const AuthErrorFallback = ({ error }: { error: Error }) => {
+  const navigate = useNavigate();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+    >
+      <div className="max-w-md w-full p-6 bg-black/40 border border-white/10 rounded-lg shadow-xl">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <ShieldAlert className="h-12 w-12 text-red-500" />
+          <h2 className="text-xl font-semibold text-white">Authentication Error</h2>
+          <p className="text-white/80">{error.message}</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-4 py-2 bg-[#41f0db]/10 hover:bg-[#41f0db]/20 text-[#41f0db] rounded-lg transition-colors"
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export const AuthGuard = (props: AuthGuardProps) => {
+  return (
+    <ErrorBoundary fallback={AuthErrorFallback}>
+      <AuthGuardContent {...props} />
+    </ErrorBoundary>
+  );
 };
