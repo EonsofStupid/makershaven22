@@ -1,5 +1,6 @@
 
 import { Settings as UISettings } from '../settings/core';
+import { SecuritySettings } from '../settings/security';
 
 // Database record type (matches Supabase schema)
 export interface SettingsRecord {
@@ -42,4 +43,3 @@ export type Settings = UISettings;
 
 // Form data type (used by react-hook-form)
 export type SettingsFormData = Settings;
-

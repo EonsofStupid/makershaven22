@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { settingsSchema } from "./schema";
 import { Settings } from "@/lib/types/settings/core";
+import { UseFormReturn } from "react-hook-form";
 
 // Export the inferred type from the schema
 // This ensures form data and Settings type are aligned
@@ -16,7 +17,7 @@ export interface SettingsResponse {
 
 // Updated interface to use SettingsFormData for form-related properties
 export interface UseSettingsFormReturn {
-  form: any; // This will be properly typed with the consuming component
+  form: UseFormReturn<SettingsFormData>; // Properly typed with SettingsFormData
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;
@@ -24,6 +25,6 @@ export interface UseSettingsFormReturn {
   faviconFile: File | null;
   handleLogoUpload: (file: File) => Promise<void>;
   handleFaviconUpload: (file: File) => Promise<void>;
-  handleSettingsUpdate: (data: Settings) => Promise<void>;
-  handleResetToDefault: () => Promise<void>;
+  handleSettingsUpdate: (data: SettingsFormData) => Promise<void>;
+  handleResetToDefault: () => Promise<Settings>;
 }

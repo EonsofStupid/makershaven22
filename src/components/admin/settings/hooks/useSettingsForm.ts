@@ -1,16 +1,32 @@
+
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSettings, useUpdateSettings } from "@/lib/query/settings";
-import { Settings } from "@/lib/types/data/settings";
-import { UseSettingsFormReturn } from "../types/settings";
+import { Settings } from "@/lib/types/settings/core";
+import { UseSettingsFormReturn, SettingsFormData } from "../types/settings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DEFAULT_SETTINGS } from "./useSettingsDefaults";
+import { settingsSchema } from "../types/schema";
 
 export const useSettingsForm = (): UseSettingsFormReturn => {
   const { data: settings, isLoading } = useSettings();
   const { mutate: updateSettings, isPending: isSaving } = useUpdateSettings();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
+
+  // Initialize the form with react-hook-form and Zod validation
+  const form = useForm<SettingsFormData>({
+    resolver: zodResolver(settingsSchema),
+    defaultValues: settings || DEFAULT_SETTINGS,
+    mode: "onChange"
+  });
+
+  // Update form values when settings are loaded
+  if (settings && !form.formState.isDirty) {
+    form.reset(settings);
+  }
 
   const handleLogoUpload = async (file: File) => {
     setLogoFile(file);
@@ -20,7 +36,7 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
     setFaviconFile(file);
   };
 
-  const handleSettingsUpdate = async (data: Settings) => {
+  const handleSettingsUpdate = async (data: SettingsFormData) => {
     updateSettings(data);
   };
 
@@ -60,38 +76,10 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
       
       console.log("Settings reset successfully:", data);
       
-      // Convert the data to Settings type
-      const settings: Settings = {
-        site_title: DEFAULT_SETTINGS.site_title,
-        tagline: DEFAULT_SETTINGS.tagline,
-        primary_color: DEFAULT_SETTINGS.primary_color,
-        secondary_color: DEFAULT_SETTINGS.secondary_color,
-        accent_color: DEFAULT_SETTINGS.accent_color,
-        text_primary_color: DEFAULT_SETTINGS.text_primary_color,
-        text_secondary_color: DEFAULT_SETTINGS.text_secondary_color,
-        text_link_color: DEFAULT_SETTINGS.text_link_color,
-        text_heading_color: DEFAULT_SETTINGS.text_heading_color,
-        neon_cyan: DEFAULT_SETTINGS.neon_cyan,
-        neon_pink: DEFAULT_SETTINGS.neon_pink,
-        neon_purple: DEFAULT_SETTINGS.neon_purple,
-        border_radius: DEFAULT_SETTINGS.border_radius,
-        spacing_unit: DEFAULT_SETTINGS.spacing_unit,
-        transition_duration: DEFAULT_SETTINGS.transition_duration,
-        shadow_color: DEFAULT_SETTINGS.shadow_color,
-        hover_scale: DEFAULT_SETTINGS.hover_scale,
-        font_family_heading: DEFAULT_SETTINGS.font_family_heading,
-        font_family_body: DEFAULT_SETTINGS.font_family_body,
-        font_size_base: DEFAULT_SETTINGS.font_size_base,
-        font_weight_normal: DEFAULT_SETTINGS.font_weight_normal,
-        font_weight_bold: DEFAULT_SETTINGS.font_weight_bold,
-        line_height_base: DEFAULT_SETTINGS.line_height_base,
-        letter_spacing: DEFAULT_SETTINGS.letter_spacing,
-        box_shadow: DEFAULT_SETTINGS.box_shadow || 'none',
-        backdrop_blur: DEFAULT_SETTINGS.backdrop_blur || '0',
-        transition_type: DEFAULT_SETTINGS.transition_type,
-      };
+      // Update the form with the reset settings
+      form.reset(DEFAULT_SETTINGS);
       
-      return settings;
+      return DEFAULT_SETTINGS;
     } catch (error) {
       console.error("Error resetting settings:", error);
       throw error;
@@ -99,7 +87,7 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
   };
 
   return {
-    form: null, // Form is provided by the component that uses this hook
+    form,
     settings,
     isLoading,
     isSaving,
