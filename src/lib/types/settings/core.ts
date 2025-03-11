@@ -1,5 +1,5 @@
 
-// Core settings types
+// Core settings type without security settings
 export interface Settings {
   site_title: string;
   tagline?: string;
@@ -33,12 +33,4 @@ export interface Settings {
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
-  theme_mode?: 'light' | 'dark' | 'system';
-  security_settings?: SecuritySettings;
 }
-
-// Import SecuritySettings from security.ts to avoid circular dependencies
-import { SecuritySettings } from './security';
-
-// Export the SecuritySettings type from here too for convenience
-export type { SecuritySettings };

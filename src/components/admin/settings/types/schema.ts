@@ -46,9 +46,6 @@ export const settingsSchema = z.object({
   menu_animation_type: z.enum(["fade", "slide", "scale"]).optional(),
   logo_url: z.string().optional(),
   favicon_url: z.string().optional(),
-  theme_mode: z.enum(["light", "dark", "system"]).optional(),
-  updated_at: z.string().optional(),
-  updated_by: z.string().optional(),
   security_settings: securitySettingsSchema.optional()
 });
 
