@@ -2,9 +2,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { queryKeys } from './keys';
-import type { Settings, SettingsRecord } from '../types/data/settings';
+import type { Settings } from '@/lib/types/settings/core';
+import type { SettingsRecord } from '../types/data/settings';
 import { toast } from 'sonner';
-import { SettingsFormData } from '@/components/admin/settings/types/settings';
 
 // Transform database record to UI settings
 const transformSettingsRecord = (record: SettingsRecord): Settings => ({
@@ -36,11 +36,13 @@ const transformSettingsRecord = (record: SettingsRecord): Settings => ({
   backdrop_blur: record.backdrop_blur,
   transition_type: record.transition_type,
   menu_animation_type: record.menu_animation_type,
+  updated_at: record.updated_at,
+  updated_by: record.updated_by,
   security_settings: record.security_settings
 });
 
 // Transform UI settings to update parameters
-const transformSettingsToUpdateParams = (settings: SettingsFormData) => ({
+const transformSettingsToUpdateParams = (settings: Settings) => ({
   p_site_title: settings.site_title,
   p_tagline: settings.tagline || '',
   p_primary_color: settings.primary_color,
@@ -95,7 +97,7 @@ export const useUpdateSettings = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (settings: SettingsFormData) => {
+    mutationFn: async (settings: Settings) => {
       const updateParams = transformSettingsToUpdateParams(settings);
       const { error } = await supabase.rpc('update_site_settings', updateParams);
 

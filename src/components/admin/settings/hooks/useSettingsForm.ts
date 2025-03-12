@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSettings, useUpdateSettings } from "@/lib/query/settings";
 import { Settings } from "@/lib/types/settings/core";
-import { UseSettingsFormReturn, SettingsFormData } from "../types/settings";
+import { UseSettingsFormReturn } from "../types/settings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DEFAULT_SETTINGS } from "./useSettingsDefaults";
@@ -17,7 +17,7 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
 
   // Initialize the form with react-hook-form and Zod validation
-  const form = useForm<SettingsFormData>({
+  const form = useForm<Settings>({
     resolver: zodResolver(settingsSchema),
     defaultValues: settings || DEFAULT_SETTINGS,
     mode: "onChange"
@@ -36,7 +36,7 @@ export const useSettingsForm = (): UseSettingsFormReturn => {
     setFaviconFile(file);
   };
 
-  const handleSettingsUpdate = async (data: SettingsFormData) => {
+  const handleSettingsUpdate = async (data: Settings) => {
     updateSettings(data);
   };
 

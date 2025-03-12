@@ -1,6 +1,8 @@
 
+import { Settings } from "@/lib/types/settings/core";
+
 // Ensure this aligns with the Settings interface
-export const DEFAULT_SETTINGS = {
+export const DEFAULT_SETTINGS: Settings = {
   site_title: "MakersImpulse",
   tagline: "Create, Share, Inspire",
   primary_color: "#7FFFD4",

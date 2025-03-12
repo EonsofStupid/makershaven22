@@ -33,4 +33,8 @@ export interface Settings {
   favicon_url?: string;
   updated_at?: string;
   updated_by?: string;
+  security_settings?: SecuritySettings;
 }
+
+// Import SecuritySettings from security.ts
+import { SecuritySettings } from './security';

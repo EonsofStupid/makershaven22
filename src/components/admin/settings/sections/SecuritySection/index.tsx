@@ -9,14 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UseFormReturn } from "react-hook-form";
 import { Settings } from "@/lib/types/settings/core";
-import { SecuritySettings } from "@/lib/types/settings/security";
 
 interface SecuritySectionProps {
   form: UseFormReturn<Settings>;
 }
 
 export const SecuritySection = ({ form }: SecuritySectionProps) => {
-  const securitySettings = form.watch("security_settings") as SecuritySettings;
+  const securitySettings = form.watch("security_settings");
 
   return (
     <AccordionItem value="security">
@@ -90,14 +89,14 @@ export const SecuritySection = ({ form }: SecuritySectionProps) => {
                 <FormControl>
                   <div className="flex items-center gap-4">
                     <Slider
-                      value={[field.value]}
+                      value={[field.value || 5]}
                       min={1}
                       max={10}
                       step={1}
                       onValueChange={(value) => field.onChange(value[0])}
                       className="flex-1"
                     />
-                    <span className="w-12 text-center">{field.value}</span>
+                    <span className="w-12 text-center">{field.value || 5}</span>
                   </div>
                 </FormControl>
               </FormItem>
@@ -117,7 +116,7 @@ export const SecuritySection = ({ form }: SecuritySectionProps) => {
                   <Input
                     type="number"
                     value={field.value || 30}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 30)}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 30)}
                     min={5}
                     max={1440}
                     className="bg-gray-800/50 border-gray-700"
@@ -144,7 +143,7 @@ export const SecuritySection = ({ form }: SecuritySectionProps) => {
                   <Input
                     type="number"
                     value={field.value || 100}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 100)}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 100)}
                     min={10}
                     max={1000}
                     className="bg-gray-800/50 border-gray-700"
@@ -167,7 +166,7 @@ export const SecuritySection = ({ form }: SecuritySectionProps) => {
                   <Input
                     type="number"
                     value={field.value || 5}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 5)}
                     min={1}
                     max={60}
                     className="bg-gray-800/50 border-gray-700"
@@ -190,7 +189,7 @@ export const SecuritySection = ({ form }: SecuritySectionProps) => {
                   <Input
                     type="number"
                     value={field.value || 60}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 60)}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 60)}
                     min={5}
                     max={1440}
                     className="bg-gray-800/50 border-gray-700"

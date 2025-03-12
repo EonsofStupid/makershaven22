@@ -21,6 +21,7 @@ import { ThemeImportSection } from "./sections/ThemeImportSection";
 import { toast } from "sonner";
 import { SecuritySection } from "./sections/SecuritySection";
 import { SettingsFormData } from "./types/settings";
+import { Settings } from "@/lib/types/settings/core";
 
 export const SettingsForm = () => {
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -46,7 +47,7 @@ export const SettingsForm = () => {
     if (!settings || !form) return;
     
     const subscription = form.watch((value) => {
-      const formValues = form.getValues() as SettingsFormData;
+      const formValues = form.getValues() as Settings;
       handleSettingsUpdate(formValues);
       updateTheme(formValues);
     });
@@ -130,7 +131,7 @@ export const SettingsForm = () => {
         <Card className="p-6 bg-gray-800/50 border border-white/10 backdrop-blur-sm sticky top-4">
           <h3 className="text-lg font-medium text-white mb-4">Preview</h3>
           <SettingsPreview
-            settings={form.watch() as SettingsFormData}
+            settings={form.watch() as Settings}
           />
         </Card>
       </motion.div>
