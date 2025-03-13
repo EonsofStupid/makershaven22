@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -27,6 +28,7 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        card: "hsl(var(--card))", // Added card color with hsl format for opacity support
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--text-primary)",
