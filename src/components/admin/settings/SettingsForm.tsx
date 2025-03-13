@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { FlattenedSettings } from "@/lib/types/settings/core";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 import { useSettingsForm } from "./hooks/useSettingsForm";
 import { useTheme } from "@/components/theme/ThemeContext";
 import { SettingsPreview } from "./components/SettingsPreview";
@@ -20,6 +20,7 @@ import { AnimationsSection } from "./sections/AnimationsSection";
 import { AdvancedEffectsSection } from "./sections/AdvancedEffectsSection";
 import { TransitionConfigSection } from "./sections/TransitionConfigSection";
 import { ThemeImportSection } from "./sections/ThemeImportSection";
+import { SecuritySection } from "./sections/SecuritySection";
 import { toast } from "sonner";
 import { flattenedSettingsSchema } from "@/lib/types/settings/schema";
 
@@ -174,6 +175,7 @@ export const SettingsForm = () => {
               <ColorSection form={form} />
               <TextStylesSection form={form} />
               <LayoutSection form={form} />
+              <SecuritySection form={form} />
               <TransitionConfigSection form={form} />
               <AnimationsSection form={form} />
               <AdvancedEffectsSection form={form} />

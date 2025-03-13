@@ -1,12 +1,13 @@
+
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormReturn } from "react-hook-form";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type SettingsFormData } from "@/lib/types/settings/types";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 
 interface SecuritySectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export function SecuritySection({ form }: SecuritySectionProps) {
@@ -19,8 +20,9 @@ export function SecuritySection({ form }: SecuritySectionProps) {
             <Label htmlFor="enable_ip_filtering">Enable IP Filtering</Label>
             <Switch 
               id="enable_ip_filtering"
-              checked={form.watch("security_settings.enable_ip_filtering")}
-              onCheckedChange={(checked) => form.setValue("security_settings.enable_ip_filtering", checked)}
+              checked={form.watch("security_settings.enable_ip_filtering") || false}
+              onCheckedChange={(checked) => 
+                form.setValue("security_settings.enable_ip_filtering", checked, { shouldDirty: true })}
             />
           </div>
 
@@ -28,8 +30,9 @@ export function SecuritySection({ form }: SecuritySectionProps) {
             <Label htmlFor="two_factor_auth">Two Factor Authentication</Label>
             <Switch 
               id="two_factor_auth"
-              checked={form.watch("security_settings.two_factor_auth")}
-              onCheckedChange={(checked) => form.setValue("security_settings.two_factor_auth", checked)}
+              checked={form.watch("security_settings.two_factor_auth") || false}
+              onCheckedChange={(checked) => 
+                form.setValue("security_settings.two_factor_auth", checked, { shouldDirty: true })}
             />
           </div>
 
@@ -38,11 +41,16 @@ export function SecuritySection({ form }: SecuritySectionProps) {
             <Input
               id="max_login_attempts"
               type="number"
-              {...form.register("security_settings.max_login_attempts")}
+              min={1}
+              max={10}
+              defaultValue={form.watch("security_settings.max_login_attempts") || 5}
+              onChange={(e) => 
+                form.setValue("security_settings.max_login_attempts", 
+                  parseInt(e.target.value), { shouldDirty: true })}
             />
           </div>
         </div>
       </AccordionContent>
     </AccordionItem>
   );
-} 
+}

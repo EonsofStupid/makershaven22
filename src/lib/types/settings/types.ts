@@ -1,5 +1,6 @@
 
-import { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings } from './core';
+import { Settings, FlattenedSettings, SiteSettings, ThemeSettings, UserSettings } from './core';
+import { SecuritySettings } from '../security/types';
 
 // Export core types for external use
 export type { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings };

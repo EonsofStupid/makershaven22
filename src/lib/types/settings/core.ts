@@ -67,8 +67,9 @@ export interface Settings {
 
 // Flattened interface for compatibility with current implementation
 export interface FlattenedSettings extends 
-  SiteSettings, 
+  Omit<SiteSettings, 'metadata'>, 
   ThemeSettings, 
   Omit<Settings, 'site' | 'theme' | 'security' | 'user'> {
   security_settings: SecuritySettings;
+  metadata?: Record<string, unknown>;
 }
