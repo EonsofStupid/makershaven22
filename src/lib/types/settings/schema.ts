@@ -110,7 +110,7 @@ export const flattenedSettingsSchema = z.object({
   logo_url: z.string().optional(),
   favicon_url: z.string().optional(),
   theme_mode: z.enum(["light", "dark", "system"]).optional(),
-  security_settings: securitySettingsSchema.optional(),
+  security_settings: securitySettingsSchema,
   id: z.string().uuid().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

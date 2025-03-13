@@ -2,7 +2,7 @@
 import { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings } from './core';
 
 // Export core types for external use
-export { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings };
+export type { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings };
 
 // Type for form data
 export type SettingsFormData = FlattenedSettings;

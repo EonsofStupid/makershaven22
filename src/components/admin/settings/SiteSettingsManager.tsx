@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
 import { FlattenedSettings } from "@/lib/types/settings/core";
-import { unflattenSettings } from "@/lib/types/settings";
 
 export function SiteSettingsManager() {
   const [settings, setSettings] = useState<FlattenedSettings | null>(null);
@@ -18,8 +17,16 @@ export function SiteSettingsManager() {
 
         if (error) throw error;
         
-        // Convert to the proper type
-        const flattenedSettings = data as FlattenedSettings;
+        // Convert the raw data to our FlattenedSettings type with the proper security_settings
+        const flattenedSettings: FlattenedSettings = {
+          ...data,
+          security_settings: data.security_settings || {
+            enable_ip_filtering: false,
+            two_factor_auth: false,
+            max_login_attempts: 5
+          }
+        };
+        
         setSettings(flattenedSettings);
         toast.success("Site settings loaded successfully");
       } catch (err) {
@@ -35,7 +42,17 @@ export function SiteSettingsManager() {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "site_settings" },
           (payload) => {
-            setSettings(payload.new as FlattenedSettings);
+            const newData = payload.new as any;
+            const flattenedSettings: FlattenedSettings = {
+              ...newData,
+              security_settings: newData.security_settings || {
+                enable_ip_filtering: false,
+                two_factor_auth: false,
+                max_login_attempts: 5
+              }
+            };
+            
+            setSettings(flattenedSettings);
             toast.info("Site settings updated");
           }
         )

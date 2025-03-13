@@ -1,6 +1,7 @@
 
 import { Json } from '../core/json';
 import { ThemeMode } from '../core/enums';
+import { SecuritySettings } from '../security/types';
 
 // Core site settings interface - the foundation of our settings system
 export interface SiteSettings {
@@ -42,19 +43,6 @@ export interface ThemeSettings {
   menu_animation_type?: "fade" | "slide" | "scale";
 }
 
-// Security settings
-export interface SecuritySettings {
-  enable_ip_filtering: boolean;
-  ip_blacklist?: string[];
-  ip_whitelist?: string[];
-  two_factor_auth: boolean;
-  max_login_attempts: number;
-  rate_limit_requests?: number;
-  session_timeout_minutes?: number;
-  lockout_duration_minutes?: number;
-  rate_limit_window_minutes?: number;
-}
-
 // User preferences
 export interface UserSettings {
   visual_editor_enabled?: boolean;
@@ -82,5 +70,5 @@ export interface FlattenedSettings extends
   SiteSettings, 
   ThemeSettings, 
   Omit<Settings, 'site' | 'theme' | 'security' | 'user'> {
-  security_settings?: SecuritySettings;
+  security_settings: SecuritySettings;
 }

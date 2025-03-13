@@ -6,7 +6,6 @@ import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { settingsSchema } from "./types";
 import { FlattenedSettings } from "@/lib/types/settings/core";
 import { useSettingsForm } from "./hooks/useSettingsForm";
 import { useTheme } from "@/components/theme/ThemeContext";
@@ -22,6 +21,7 @@ import { AdvancedEffectsSection } from "./sections/AdvancedEffectsSection";
 import { TransitionConfigSection } from "./sections/TransitionConfigSection";
 import { ThemeImportSection } from "./sections/ThemeImportSection";
 import { toast } from "sonner";
+import { flattenedSettingsSchema } from "@/lib/types/settings/schema";
 
 export const SettingsForm = () => {
   const [showResetDialog, setShowResetDialog] = useState(false);
@@ -43,7 +43,7 @@ export const SettingsForm = () => {
   } = useSettingsForm();
 
   const form = useForm<FlattenedSettings>({
-    resolver: zodResolver(settingsSchema),
+    resolver: zodResolver(flattenedSettingsSchema),
     defaultValues: {
       site_title: settings?.site_title || "MakersImpulse",
       tagline: settings?.tagline || "Create, Share, Inspire",
@@ -73,6 +73,11 @@ export const SettingsForm = () => {
       backdrop_blur: settings?.backdrop_blur || "0",
       transition_type: settings?.transition_type || "fade",
       menu_animation_type: settings?.menu_animation_type || "fade",
+      security_settings: settings?.security_settings || {
+        enable_ip_filtering: false,
+        two_factor_auth: false,
+        max_login_attempts: 5
+      }
     },
   });
 
@@ -127,8 +132,7 @@ export const SettingsForm = () => {
 
   // Prepare the preview settings with proper type
   const previewSettings: FlattenedSettings = {
-    ...settings,
-    ...form.watch(),
+    ...form.getValues(),
     site_title: form.watch("site_title") || "MakersImpulse", // Ensure required fields
     primary_color: form.watch("primary_color") || "#7FFFD4",
     secondary_color: form.watch("secondary_color") || "#FFB6C1",
@@ -142,6 +146,11 @@ export const SettingsForm = () => {
     neon_purple: form.watch("neon_purple") || "#8000ff",
     logo_url: logoFile ? URL.createObjectURL(logoFile) : settings?.logo_url,
     favicon_url: faviconFile ? URL.createObjectURL(faviconFile) : settings?.favicon_url,
+    security_settings: {
+      enable_ip_filtering: form.watch("security_settings.enable_ip_filtering") || false,
+      two_factor_auth: form.watch("security_settings.two_factor_auth") || false,
+      max_login_attempts: form.watch("security_settings.max_login_attempts") || 5
+    }
   };
 
   return (
