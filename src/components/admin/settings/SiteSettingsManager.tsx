@@ -27,28 +27,39 @@ export function SiteSettingsManager() {
         
         // Safely handle the security_settings field from the database
         let securitySettings: SecuritySettings;
-        if (data.security_settings && typeof data.security_settings === 'object') {
-          // Type assertion after runtime check
+        
+        // First check if security_settings exists and is an object (not an array)
+        if (data.security_settings && 
+            typeof data.security_settings === 'object' && 
+            !Array.isArray(data.security_settings)) {
+          
+          // Type assert as Record<string, Json> to access properties safely
+          const securityObj = data.security_settings as Record<string, any>;
+          
           securitySettings = {
-            enable_ip_filtering: Boolean(data.security_settings.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
-            two_factor_auth: Boolean(data.security_settings.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
-            max_login_attempts: Number(data.security_settings.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
-            // Handle optional properties safely
-            ip_blacklist: Array.isArray(data.security_settings.ip_blacklist) ? data.security_settings.ip_blacklist : undefined,
-            ip_whitelist: Array.isArray(data.security_settings.ip_whitelist) ? data.security_settings.ip_whitelist : undefined,
-            rate_limit_requests: typeof data.security_settings.rate_limit_requests === 'number' ? data.security_settings.rate_limit_requests : undefined,
-            session_timeout_minutes: typeof data.security_settings.session_timeout_minutes === 'number' ? data.security_settings.session_timeout_minutes : undefined,
-            lockout_duration_minutes: typeof data.security_settings.lockout_duration_minutes === 'number' ? data.security_settings.lockout_duration_minutes : undefined,
-            rate_limit_window_minutes: typeof data.security_settings.rate_limit_window_minutes === 'number' ? data.security_settings.rate_limit_window_minutes : undefined
+            enable_ip_filtering: Boolean(securityObj.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
+            two_factor_auth: Boolean(securityObj.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
+            max_login_attempts: Number(securityObj.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
+            
+            // Safely handle optional properties
+            ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? securityObj.ip_blacklist : undefined,
+            ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? securityObj.ip_whitelist : undefined,
+            rate_limit_requests: typeof securityObj.rate_limit_requests === 'number' ? securityObj.rate_limit_requests : undefined,
+            session_timeout_minutes: typeof securityObj.session_timeout_minutes === 'number' ? securityObj.session_timeout_minutes : undefined,
+            lockout_duration_minutes: typeof securityObj.lockout_duration_minutes === 'number' ? securityObj.lockout_duration_minutes : undefined,
+            rate_limit_window_minutes: typeof securityObj.rate_limit_window_minutes === 'number' ? securityObj.rate_limit_window_minutes : undefined
           };
         } else {
           securitySettings = defaultSecuritySettings;
         }
         
         // Process the metadata field to ensure it's a proper record
-        const metadata = data.metadata ? 
-          (typeof data.metadata === 'object' ? data.metadata : {}) : 
-          {};
+        let metadata: Record<string, unknown> = {};
+        if (data.metadata) {
+          if (typeof data.metadata === 'object' && !Array.isArray(data.metadata)) {
+            metadata = data.metadata as Record<string, unknown>;
+          }
+        }
         
         // Convert the raw data to our FlattenedSettings type with proper types
         const flattenedSettings: FlattenedSettings = {
@@ -79,9 +90,9 @@ export function SiteSettingsManager() {
           letter_spacing: data.letter_spacing || "normal",
           box_shadow: data.box_shadow || "none",
           backdrop_blur: data.backdrop_blur || "0",
-          transition_type: data.transition_type || "fade",
+          transition_type: (data.transition_type as "fade" | "slide" | "scale") || "fade",
           security_settings: securitySettings,
-          metadata: metadata as Record<string, unknown>
+          metadata: metadata
         };
         
         setSettings(flattenedSettings);
@@ -110,27 +121,39 @@ export function SiteSettingsManager() {
             
             // Safely handle the security_settings field
             let securitySettings: SecuritySettings;
-            if (newData.security_settings && typeof newData.security_settings === 'object') {
+            
+            // First check if security_settings exists and is an object (not an array)
+            if (newData.security_settings && 
+                typeof newData.security_settings === 'object' && 
+                !Array.isArray(newData.security_settings)) {
+              
+              // Type assert as Record<string, Json> to access properties safely
+              const securityObj = newData.security_settings as Record<string, any>;
+              
               securitySettings = {
-                enable_ip_filtering: Boolean(newData.security_settings.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
-                two_factor_auth: Boolean(newData.security_settings.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
-                max_login_attempts: Number(newData.security_settings.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
-                // Handle optional properties safely
-                ip_blacklist: Array.isArray(newData.security_settings.ip_blacklist) ? newData.security_settings.ip_blacklist : undefined,
-                ip_whitelist: Array.isArray(newData.security_settings.ip_whitelist) ? newData.security_settings.ip_whitelist : undefined,
-                rate_limit_requests: typeof newData.security_settings.rate_limit_requests === 'number' ? newData.security_settings.rate_limit_requests : undefined,
-                session_timeout_minutes: typeof newData.security_settings.session_timeout_minutes === 'number' ? newData.security_settings.session_timeout_minutes : undefined,
-                lockout_duration_minutes: typeof newData.security_settings.lockout_duration_minutes === 'number' ? newData.security_settings.lockout_duration_minutes : undefined,
-                rate_limit_window_minutes: typeof newData.security_settings.rate_limit_window_minutes === 'number' ? newData.security_settings.rate_limit_window_minutes : undefined
+                enable_ip_filtering: Boolean(securityObj.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
+                two_factor_auth: Boolean(securityObj.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
+                max_login_attempts: Number(securityObj.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
+                
+                // Safely handle optional properties
+                ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? securityObj.ip_blacklist : undefined,
+                ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? securityObj.ip_whitelist : undefined,
+                rate_limit_requests: typeof securityObj.rate_limit_requests === 'number' ? securityObj.rate_limit_requests : undefined,
+                session_timeout_minutes: typeof securityObj.session_timeout_minutes === 'number' ? securityObj.session_timeout_minutes : undefined,
+                lockout_duration_minutes: typeof securityObj.lockout_duration_minutes === 'number' ? securityObj.lockout_duration_minutes : undefined,
+                rate_limit_window_minutes: typeof securityObj.rate_limit_window_minutes === 'number' ? securityObj.rate_limit_window_minutes : undefined
               };
             } else {
               securitySettings = defaultSecuritySettings;
             }
             
             // Process the metadata field
-            const metadata = newData.metadata ? 
-              (typeof newData.metadata === 'object' ? newData.metadata : {}) : 
-              {};
+            let metadata: Record<string, unknown> = {};
+            if (newData.metadata) {
+              if (typeof newData.metadata === 'object' && !Array.isArray(newData.metadata)) {
+                metadata = newData.metadata as Record<string, unknown>;
+              }
+            }
             
             // Convert the data with proper types
             const flattenedSettings: FlattenedSettings = {
@@ -161,9 +184,9 @@ export function SiteSettingsManager() {
               letter_spacing: newData.letter_spacing || "normal",
               box_shadow: newData.box_shadow || "none",
               backdrop_blur: newData.backdrop_blur || "0",
-              transition_type: newData.transition_type || "fade",
+              transition_type: (newData.transition_type as "fade" | "slide" | "scale") || "fade",
               security_settings: securitySettings,
-              metadata: metadata as Record<string, unknown>
+              metadata: metadata
             };
             
             setSettings(flattenedSettings);
