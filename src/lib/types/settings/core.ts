@@ -2,6 +2,7 @@
 import { Json } from '../core/json';
 import { ThemeMode } from '../core/enums';
 
+// Core site settings interface - the foundation of our settings system
 export interface SiteSettings {
   site_title: string;
   tagline?: string;
@@ -21,6 +22,7 @@ export interface SiteSettings {
   metadata?: Record<string, unknown>;
 }
 
+// Theme-specific settings
 export interface ThemeSettings {
   border_radius: string;
   spacing_unit: string;
@@ -40,6 +42,7 @@ export interface ThemeSettings {
   menu_animation_type?: "fade" | "slide" | "scale";
 }
 
+// Security settings
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
   ip_blacklist?: string[];
@@ -52,6 +55,7 @@ export interface SecuritySettings {
   rate_limit_window_minutes?: number;
 }
 
+// User preferences
 export interface UserSettings {
   visual_editor_enabled?: boolean;
   gamification_enabled?: boolean;
@@ -60,6 +64,7 @@ export interface UserSettings {
   display_preferences?: Record<string, unknown>;
 }
 
+// Complete settings model
 export interface Settings {
   id?: string;
   site: SiteSettings;
@@ -72,7 +77,7 @@ export interface Settings {
   updated_by?: string;
 }
 
-// Flat interface for compatibility with current implementation
+// Flattened interface for compatibility with current implementation
 export interface FlattenedSettings extends 
   SiteSettings, 
   ThemeSettings, 

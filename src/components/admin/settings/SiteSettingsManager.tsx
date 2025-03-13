@@ -1,10 +1,12 @@
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
-import { Settings } from "@/lib/types/shared/shared";
+import { FlattenedSettings } from "@/lib/types/settings/core";
+import { unflattenSettings } from "@/lib/types/settings";
 
 export function SiteSettingsManager() {
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [settings, setSettings] = useState<FlattenedSettings | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -15,7 +17,10 @@ export function SiteSettingsManager() {
           .single();
 
         if (error) throw error;
-        setSettings(data as Settings);
+        
+        // Convert to the proper type
+        const flattenedSettings = data as FlattenedSettings;
+        setSettings(flattenedSettings);
         toast.success("Site settings loaded successfully");
       } catch (err) {
         console.error("Error fetching site settings:", err);
@@ -30,7 +35,7 @@ export function SiteSettingsManager() {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "site_settings" },
           (payload) => {
-            setSettings(payload.new as Settings);
+            setSettings(payload.new as FlattenedSettings);
             toast.info("Site settings updated");
           }
         )

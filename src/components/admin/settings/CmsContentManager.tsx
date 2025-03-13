@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +20,7 @@ export const CmsContentManager = () => {
         const contentsWithAuthor = (data || []).map(item => ({
           ...item,
           author_id: item.created_by
-        }));
+        })) as BaseContent[];
         
         setContents(contentsWithAuthor);
         toast.success("Content loaded successfully");

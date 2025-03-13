@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,7 +6,8 @@ import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { settingsSchema, type SettingsFormData, type Settings } from "./types";
+import { settingsSchema } from "./types";
+import { FlattenedSettings } from "@/lib/types/settings/core";
 import { useSettingsForm } from "./hooks/useSettingsForm";
 import { useTheme } from "@/components/theme/ThemeContext";
 import { SettingsPreview } from "./components/SettingsPreview";
@@ -40,7 +42,7 @@ export const SettingsForm = () => {
     handleResetToDefault,
   } = useSettingsForm();
 
-  const form = useForm<SettingsFormData>({
+  const form = useForm<FlattenedSettings>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       site_title: settings?.site_title || "MakersImpulse",
@@ -79,8 +81,8 @@ export const SettingsForm = () => {
     const subscription = form.watch((value, { name, type }) => {
       if (type === "change") {
         const formValues = form.getValues();
-        handleSettingsUpdate(formValues as Settings);
-        updateTheme(formValues as Settings);
+        handleSettingsUpdate(formValues as FlattenedSettings);
+        updateTheme(formValues as FlattenedSettings);
       }
     });
     return () => subscription.unsubscribe();
@@ -123,6 +125,25 @@ export const SettingsForm = () => {
     );
   }
 
+  // Prepare the preview settings with proper type
+  const previewSettings: FlattenedSettings = {
+    ...settings,
+    ...form.watch(),
+    site_title: form.watch("site_title") || "MakersImpulse", // Ensure required fields
+    primary_color: form.watch("primary_color") || "#7FFFD4",
+    secondary_color: form.watch("secondary_color") || "#FFB6C1",
+    accent_color: form.watch("accent_color") || "#E6E6FA",
+    text_primary_color: form.watch("text_primary_color") || "#FFFFFF",
+    text_secondary_color: form.watch("text_secondary_color") || "#A1A1AA",
+    text_link_color: form.watch("text_link_color") || "#3B82F6",
+    text_heading_color: form.watch("text_heading_color") || "#FFFFFF",
+    neon_cyan: form.watch("neon_cyan") || "#41f0db",
+    neon_pink: form.watch("neon_pink") || "#ff0abe",
+    neon_purple: form.watch("neon_purple") || "#8000ff",
+    logo_url: logoFile ? URL.createObjectURL(logoFile) : settings?.logo_url,
+    favicon_url: faviconFile ? URL.createObjectURL(faviconFile) : settings?.favicon_url,
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-[5%] min-h-[calc(100vh-4rem)]">
       <motion.div
@@ -160,12 +181,7 @@ export const SettingsForm = () => {
         <Card className="p-6 bg-gray-800/50 border border-white/10 backdrop-blur-sm sticky top-4">
           <h3 className="text-lg font-medium text-white mb-4">Preview</h3>
           <SettingsPreview
-            settings={{
-              ...settings,
-              ...form.watch(),
-              logo_url: logoFile ? URL.createObjectURL(logoFile) : settings?.logo_url,
-              favicon_url: faviconFile ? URL.createObjectURL(faviconFile) : settings?.favicon_url,
-            }}
+            settings={previewSettings}
           />
         </Card>
       </motion.div>
