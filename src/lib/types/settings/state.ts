@@ -1,34 +1,58 @@
 
-import { Settings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings } from './core';
+import { ThemeMode } from '../core/enums';
+import { SiteSettings, ThemeSettings, UserSettings } from './core';
+import { SecuritySettings } from '../security/types';
 
 export interface SettingsState {
-  settings: Settings | null;
+  settings: {
+    site_title?: string;
+    tagline?: string;
+    primary_color?: string;
+    secondary_color?: string;
+    accent_color?: string;
+    text_primary_color?: string;
+    text_secondary_color?: string;
+    text_link_color?: string;
+    text_heading_color?: string;
+    neon_cyan?: string;
+    neon_pink?: string;
+    neon_purple?: string;
+    border_radius?: string;
+    spacing_unit?: string;
+    transition_duration?: string;
+    shadow_color?: string;
+    hover_scale?: string;
+    font_family_heading?: string;
+    font_family_body?: string;
+    font_size_base?: string;
+    font_weight_normal?: string;
+    font_weight_bold?: string;
+    line_height_base?: string;
+    letter_spacing?: string;
+    box_shadow?: string;
+    backdrop_blur?: string;
+    transition_type?: string;
+    menu_animation_type?: string;
+    security_settings?: SecuritySettings;
+  };
   isLoading: boolean;
   error: string | null;
-  lastUpdated?: Date;
+  updateSettings: (settings: Partial<SiteSettings>) => void;
 }
 
-export type SettingsAction =
-  | { type: 'SET_SETTINGS'; payload: Settings }
-  | { type: 'UPDATE_SITE_SETTINGS'; payload: Partial<SiteSettings> }
-  | { type: 'UPDATE_THEME_SETTINGS'; payload: Partial<ThemeSettings> }
-  | { type: 'UPDATE_SECURITY_SETTINGS'; payload: Partial<SecuritySettings> }
-  | { type: 'UPDATE_USER_SETTINGS'; payload: Partial<UserSettings> }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };
-
-export interface SettingsStoreState {
-  settings: Settings | null;
+export interface ThemeState {
+  settings: {
+    site: SiteSettings;
+    theme: ThemeSettings;
+    security: SecuritySettings;
+    user: UserSettings;
+  } | null;
   isLoading: boolean;
   error: string | null;
-  lastUpdated?: Date;
-  setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  updateSiteSettings: (settings: Partial<SiteSettings>) => void;
-  updateThemeSettings: (settings: Partial<ThemeSettings>) => void;
-  updateSecuritySettings: (settings: Partial<SecuritySettings>) => void;
-  updateUserSettings: (settings: Partial<UserSettings>) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
-  resetSettings: () => void;
-  fetchSettings: () => Promise<void>;
+  updateSettings: (settings: Partial<{ 
+    site: Partial<SiteSettings>; 
+    theme: Partial<ThemeSettings>;
+    security: Partial<SecuritySettings>;
+    user: Partial<UserSettings>;
+  }>) => void;
 }
