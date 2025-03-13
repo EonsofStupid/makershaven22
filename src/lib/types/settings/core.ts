@@ -37,7 +37,7 @@ export interface Settings {
   theme_mode?: string;
 }
 
-// Export SecuritySettings for use in other modules
+// Security settings interface
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
   two_factor_auth: boolean;
@@ -83,3 +83,6 @@ export interface SettingsUpdate {
   p_logo_url?: string;
   p_favicon_url?: string;
 }
+
+// Export SecuritySettings type
+export { SecuritySettings as SecuritySettings };

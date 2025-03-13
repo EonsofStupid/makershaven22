@@ -1,4 +1,6 @@
+
 import { Theme, DatabaseSettingsRow } from "../types/theme";
+import { SecuritySettings } from "@/lib/types/settings/core";
 
 export const DEFAULT_THEME_SETTINGS: Theme = {
   site_title: 'MakersImpulse',
@@ -27,12 +29,34 @@ export const DEFAULT_THEME_SETTINGS: Theme = {
   box_shadow: 'none',
   backdrop_blur: '0',
   transition_type: 'fade',
+  security_settings: {
+    enable_ip_filtering: false,
+    two_factor_auth: false,
+    max_login_attempts: 5,
+    ip_whitelist: [],
+    ip_blacklist: []
+  }
 };
 
 export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): Theme => {
   if (!settings) {
     console.log("Using default theme settings");
     return DEFAULT_THEME_SETTINGS;
+  }
+
+  // Parse security settings from JSON if needed
+  let securitySettings: SecuritySettings = DEFAULT_THEME_SETTINGS.security_settings;
+  
+  if (settings.security_settings) {
+    try {
+      if (typeof settings.security_settings === 'string') {
+        securitySettings = JSON.parse(settings.security_settings);
+      } else if (typeof settings.security_settings === 'object') {
+        securitySettings = settings.security_settings as unknown as SecuritySettings;
+      }
+    } catch (e) {
+      console.error("Error parsing security settings:", e);
+    }
   }
 
   return {
@@ -54,14 +78,15 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
     font_weight_bold: settings.font_weight_bold || DEFAULT_THEME_SETTINGS.font_weight_bold,
     line_height_base: settings.line_height_base || DEFAULT_THEME_SETTINGS.line_height_base,
     letter_spacing: settings.letter_spacing || DEFAULT_THEME_SETTINGS.letter_spacing,
-    border_radius: DEFAULT_THEME_SETTINGS.border_radius,
-    spacing_unit: DEFAULT_THEME_SETTINGS.spacing_unit,
-    transition_duration: DEFAULT_THEME_SETTINGS.transition_duration,
-    shadow_color: DEFAULT_THEME_SETTINGS.shadow_color,
-    hover_scale: DEFAULT_THEME_SETTINGS.hover_scale,
-    box_shadow: DEFAULT_THEME_SETTINGS.box_shadow,
-    backdrop_blur: DEFAULT_THEME_SETTINGS.backdrop_blur,
-    transition_type: DEFAULT_THEME_SETTINGS.transition_type,
+    border_radius: settings.border_radius || DEFAULT_THEME_SETTINGS.border_radius,
+    spacing_unit: settings.spacing_unit || DEFAULT_THEME_SETTINGS.spacing_unit,
+    transition_duration: settings.transition_duration || DEFAULT_THEME_SETTINGS.transition_duration,
+    shadow_color: settings.shadow_color || DEFAULT_THEME_SETTINGS.shadow_color,
+    hover_scale: settings.hover_scale || DEFAULT_THEME_SETTINGS.hover_scale,
+    box_shadow: settings.box_shadow || DEFAULT_THEME_SETTINGS.box_shadow,
+    backdrop_blur: settings.backdrop_blur || DEFAULT_THEME_SETTINGS.backdrop_blur,
+    transition_type: settings.transition_type || DEFAULT_THEME_SETTINGS.transition_type,
+    security_settings: securitySettings
   };
 };
 

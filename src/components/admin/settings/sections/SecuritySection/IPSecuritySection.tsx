@@ -1,113 +1,117 @@
 
-import React, { useState, useEffect } from 'react';
-import { useSettingsQuery } from '@/hooks/useSettings';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import React from 'react';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { SecuritySettings } from '@/lib/types/settings/core';
-import { Json } from '@/lib/types/core/json';
+import { useSettings } from '@/hooks/useSettings';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, Trash2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const IPSecuritySection = () => {
-  const { data: settings, isLoading, refetch } = useSettingsQuery();
-  const [ipWhitelist, setIpWhitelist] = useState<string>('');
-  const [ipBlacklist, setIpBlacklist] = useState<string>('');
-  const [enableIpFiltering, setEnableIpFiltering] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const { settings, isLoading, updateSettings } = useSettings();
+  const [newIP, setNewIP] = React.useState('');
 
-  useEffect(() => {
-    if (settings && settings.security_settings) {
-      // Convert security settings to expected format
-      const securitySettings = typeof settings.security_settings === 'string' 
-        ? JSON.parse(settings.security_settings as string) as SecuritySettings
-        : settings.security_settings as SecuritySettings;
-      
-      setEnableIpFiltering(securitySettings.enable_ip_filtering || false);
-      setIpWhitelist((securitySettings.ip_whitelist || []).join(', '));
-      setIpBlacklist((securitySettings.ip_blacklist || []).join(', '));
-    }
-  }, [settings]);
+  if (isLoading || !settings) {
+    return <div>Loading IP security settings...</div>;
+  }
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const securitySettings: SecuritySettings = {
-        ...((settings?.security_settings as SecuritySettings) || {
-          two_factor_auth: false,
-          max_login_attempts: 5
-        }),
-        enable_ip_filtering: enableIpFiltering,
-        ip_whitelist: ipWhitelist.split(',').map(ip => ip.trim()).filter(Boolean),
-        ip_blacklist: ipBlacklist.split(',').map(ip => ip.trim()).filter(Boolean)
-      };
+  const handleToggleIPFiltering = (enabled: boolean) => {
+    updateSettings({
+      ...settings,
+      security_settings: {
+        ...settings.security_settings,
+        enable_ip_filtering: enabled
+      }
+    });
+  };
 
-      const { error } = await supabase.from('site_settings')
-        .update({ security_settings: securitySettings as unknown as Json })
-        .eq('id', 1);
+  const handleAddToWhitelist = () => {
+    if (!newIP) return;
+    const whitelist = [...(settings.security_settings.ip_whitelist || [])];
+    whitelist.push(newIP);
+    
+    updateSettings({
+      ...settings,
+      security_settings: {
+        ...settings.security_settings,
+        ip_whitelist: whitelist
+      }
+    });
+    
+    setNewIP('');
+  };
 
-      if (error) throw error;
-      
-      toast.success('IP security settings updated');
-      refetch();
-    } catch (error) {
-      console.error('Error saving IP settings:', error);
-      toast.error('Failed to update IP security settings');
-    } finally {
-      setIsSaving(false);
-    }
+  const handleRemoveFromWhitelist = (index: number) => {
+    const whitelist = [...(settings.security_settings.ip_whitelist || [])];
+    whitelist.splice(index, 1);
+    
+    updateSettings({
+      ...settings,
+      security_settings: {
+        ...settings.security_settings,
+        ip_whitelist: whitelist
+      }
+    });
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-medium">IP Address Filtering</h3>
-          <p className="text-sm text-gray-400">Control access based on IP addresses</p>
-        </div>
-        <Switch 
-          checked={enableIpFiltering} 
-          onCheckedChange={setEnableIpFiltering}
-        />
-      </div>
-
-      <Separator />
-
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="ip-whitelist">Allowed IP Addresses (comma separated)</Label>
-          <Input 
-            id="ip-whitelist"
-            placeholder="e.g. 192.168.1.1, 10.0.0.1"
-            value={ipWhitelist}
-            onChange={(e) => setIpWhitelist(e.target.value)}
-            disabled={!enableIpFiltering}
+    <Card>
+      <CardHeader>
+        <CardTitle>IP Address Filtering</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Switch 
+            checked={settings.security_settings.enable_ip_filtering}
+            onCheckedChange={handleToggleIPFiltering}
+            id="ip-filtering"
           />
-          <p className="text-xs text-gray-400">IPs that are allowed access regardless of other settings</p>
+          <Label htmlFor="ip-filtering">Enable IP address filtering</Label>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="ip-blacklist">Blocked IP Addresses (comma separated)</Label>
-          <Input 
-            id="ip-blacklist"
-            placeholder="e.g. 192.168.1.2, 10.0.0.2"
-            value={ipBlacklist}
-            onChange={(e) => setIpBlacklist(e.target.value)}
-            disabled={!enableIpFiltering}
-          />
-          <p className="text-xs text-gray-400">IPs that are always blocked from accessing the site</p>
-        </div>
-
-        <Button 
-          onClick={handleSave} 
-          disabled={isSaving || !enableIpFiltering}
-          className="mt-2"
-        >
-          {isSaving ? 'Saving...' : 'Save IP Settings'}
-        </Button>
-      </div>
-    </div>
+        
+        {settings.security_settings.enable_ip_filtering && (
+          <div className="space-y-4 mt-4">
+            <div className="flex gap-2">
+              <Input 
+                value={newIP}
+                onChange={(e) => setNewIP(e.target.value)}
+                placeholder="Enter IP address"
+              />
+              <Button 
+                size="sm" 
+                onClick={handleAddToWhitelist}
+                disabled={!newIP}
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add
+              </Button>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Whitelisted IPs</h4>
+              {(settings.security_settings.ip_whitelist?.length || 0) === 0 ? (
+                <p className="text-sm text-gray-500">No IPs in whitelist</p>
+              ) : (
+                <div className="space-y-2">
+                  {settings.security_settings.ip_whitelist?.map((ip, index) => (
+                    <div key={ip} className="flex items-center justify-between bg-secondary/10 p-2 rounded">
+                      <span>{ip}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleRemoveFromWhitelist(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };

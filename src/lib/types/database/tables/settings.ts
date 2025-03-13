@@ -1,5 +1,7 @@
 
-import { SecuritySettings } from '../../settings/security';
+import { SecuritySettings } from '../../settings/core';
+import { Settings } from '../../settings/core';
+import { parseJsonToObject } from '../../core/json';
 
 /**
  * Database record type matching exactly what Supabase returns
@@ -38,7 +40,7 @@ export interface SettingsRecord {
   favicon_url?: string | null;
   updated_at?: string | null;
   updated_by?: string | null;
-  security_settings?: SecuritySettings | null;
+  security_settings?: any | null;
   theme_mode?: string | null;
 }
 
@@ -46,9 +48,18 @@ export interface SettingsRecord {
  * Transform database record to Settings type with defaults
  */
 export function transformDatabaseToSettings(record: SettingsRecord): Settings {
+  // Parse security settings properly
+  const securitySettings = parseJsonToObject<SecuritySettings>(record.security_settings, {
+    enable_ip_filtering: false,
+    two_factor_auth: false,
+    max_login_attempts: 5,
+    ip_whitelist: [],
+    ip_blacklist: []
+  });
+
   return {
     site_title: record.site_title ?? 'MakersImpulse',
-    tagline: record.tagline,
+    tagline: record.tagline || undefined,
     primary_color: record.primary_color ?? '#7FFFD4',
     secondary_color: record.secondary_color ?? '#FFB6C1',
     accent_color: record.accent_color ?? '#E6E6FA',
@@ -75,17 +86,11 @@ export function transformDatabaseToSettings(record: SettingsRecord): Settings {
     backdrop_blur: record.backdrop_blur ?? '0',
     transition_type: record.transition_type ?? 'fade',
     menu_animation_type: record.menu_animation_type ?? 'fade',
-    logo_url: record.logo_url,
-    favicon_url: record.favicon_url,
-    updated_at: record.updated_at,
-    updated_by: record.updated_by,
-    security_settings: record.security_settings ?? {
-      enable_ip_filtering: false,
-      two_factor_auth: false,
-      max_login_attempts: 5,
-      ip_whitelist: [],
-      ip_blacklist: []
-    },
-    theme_mode: record.theme_mode
+    logo_url: record.logo_url || undefined,
+    favicon_url: record.favicon_url || undefined,
+    updated_at: record.updated_at || undefined,
+    updated_by: record.updated_by || undefined,
+    security_settings: securitySettings,
+    theme_mode: record.theme_mode || undefined
   };
 }

@@ -1,9 +1,10 @@
 
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
-import { Settings } from '@/lib/types/settings/core';
+import { Settings, SecuritySettings } from '@/lib/types/settings/core';
 import { SettingsState } from '@/lib/types/settings/state';
 import { SettingsUpdate } from '@/lib/types/settings/core';
+import { parseJsonToObject } from '@/lib/types/core/json';
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   settings: null,
@@ -47,6 +48,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         p_font_weight_bold: settingsUpdate.font_weight_bold || currentSettings.font_weight_bold,
         p_line_height_base: settingsUpdate.line_height_base || currentSettings.line_height_base,
         p_letter_spacing: settingsUpdate.letter_spacing || currentSettings.letter_spacing,
+        p_transition_type: settingsUpdate.transition_type || currentSettings.transition_type,
       };
 
       // Add logo and favicon if they exist
@@ -62,6 +64,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
       if (error) throw error;
 
+      // Merge the updated settings with current settings
       const updatedSettings = {
         ...currentSettings,
         ...settingsUpdate,
@@ -83,9 +86,55 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
       if (error) throw error;
       
-      set({ settings: data as Settings });
+      // Parse security settings if needed
+      let settingsData = data as Settings;
+      if (typeof data.security_settings !== 'object') {
+        settingsData = {
+          ...data,
+          security_settings: parseJsonToObject<SecuritySettings>(
+            data.security_settings,
+            {
+              enable_ip_filtering: false,
+              two_factor_auth: false,
+              max_login_attempts: 5,
+              ip_whitelist: [],
+              ip_blacklist: []
+            }
+          )
+        };
+      }
+      
+      set({ settings: settingsData });
     } catch (error) {
       set({ error: error as Error });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  
+  // Add a function for TransformationRuleEditor
+  saveTransformationRule: async (rule: any) => {
+    try {
+      set({ isLoading: true });
+      
+      // Implementation would depend on your API
+      console.log("Saving transformation rule:", rule);
+      
+      // After saving, you might want to update settings
+      const currentSettings = get().settings;
+      if (currentSettings) {
+        set({ 
+          settings: {
+            ...currentSettings,
+            // Update any relevant settings here
+          } 
+        });
+      }
+      
+      return rule;
+    } catch (error) {
+      set({ error: error as Error });
+      throw error;
     } finally {
       set({ isLoading: false });
     }
