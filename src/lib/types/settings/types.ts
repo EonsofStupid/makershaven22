@@ -1,3 +1,4 @@
+
 import { Json } from '../core/json';
 import { ThemeMode } from '../core/enums';
 
@@ -39,14 +40,13 @@ export interface Settings {
     two_factor_auth: boolean;
     max_login_attempts: number;
   };
-  metadata?: Json;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
   updated_by?: string;
 }
 
-export interface SettingsFormData extends Settings {}
+export type SettingsFormData = Settings;
 
 export interface SettingsResponse {
   data: Settings;
