@@ -1,69 +1,62 @@
 
-import { Json } from '../core/json';
-import { ThemeMode } from '../core/enums';
+import { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings } from './core';
 
-export interface Settings {
-  id?: string;
-  site_title: string;
-  tagline?: string;
-  primary_color: string;
-  secondary_color: string;
-  accent_color: string;
-  text_primary_color: string;
-  text_secondary_color: string;
-  text_link_color: string;
-  text_heading_color: string;
-  neon_cyan: string;
-  neon_pink: string;
-  neon_purple: string;
-  border_radius: string;
-  spacing_unit: string;
-  transition_duration: string;
-  shadow_color: string;
-  hover_scale: string;
-  font_family_heading: string;
-  font_family_body: string;
-  font_size_base: string;
-  font_weight_normal: string;
-  font_weight_bold: string;
-  line_height_base: string;
-  letter_spacing: string;
-  box_shadow: string;
-  backdrop_blur: string;
-  transition_type: "fade" | "slide" | "scale";
-  menu_animation_type?: "fade" | "slide" | "scale";
-  logo_url?: string;
-  favicon_url?: string;
-  theme_mode?: ThemeMode;
-  security_settings?: {
-    enable_ip_filtering: boolean;
-    two_factor_auth: boolean;
-    max_login_attempts: number;
-  };
-  created_at?: string;
-  updated_at?: string;
-  created_by?: string;
-  updated_by?: string;
-}
+// Type for form data
+export type SettingsFormData = FlattenedSettings;
 
-export type SettingsFormData = Settings;
-
+// Type for API responses
 export interface SettingsResponse {
-  data: Settings;
+  data: FlattenedSettings;
   error: null | {
     message: string;
   };
 }
 
+// Interfaces for different settings contexts
+export interface SiteSettingsContext {
+  settings: SiteSettings | null;
+  isLoading: boolean;
+  error: string | null;
+  updateSettings: (settings: Partial<SiteSettings>) => Promise<void>;
+}
+
+export interface ThemeSettingsContext {
+  settings: ThemeSettings | null;
+  isLoading: boolean;
+  error: string | null;
+  updateSettings: (settings: Partial<ThemeSettings>) => Promise<void>;
+}
+
+export interface SecuritySettingsContext {
+  settings: SecuritySettings | null;
+  isLoading: boolean;
+  error: string | null;
+  updateSettings: (settings: Partial<SecuritySettings>) => Promise<void>;
+}
+
+export interface UserSettingsContext {
+  settings: UserSettings | null;
+  isLoading: boolean;
+  error: string | null;
+  updateSettings: (settings: Partial<UserSettings>) => Promise<void>;
+}
+
+// Comprehensive settings form hook return type
 export interface UseSettingsFormReturn {
-  form: any;
-  settings: Settings | null;
+  form: any; // This will be the return type of useForm, could be more specific with RHF types
+  settings: FlattenedSettings | null;
   isLoading: boolean;
   isSaving: boolean;
   logoFile: File | null;
   faviconFile: File | null;
   handleLogoUpload: (file: File) => Promise<void>;
   handleFaviconUpload: (file: File) => Promise<void>;
-  handleSettingsUpdate: (data: Settings) => Promise<void>;
+  handleSettingsUpdate: (data: FlattenedSettings) => Promise<void>;
   handleResetToDefault: () => Promise<void>;
+}
+
+// Type for settings transformations
+export interface SettingsConverters {
+  flattenSettings: (settings: Settings) => FlattenedSettings;
+  unflattenSettings: (settings: FlattenedSettings) => Settings;
 }
