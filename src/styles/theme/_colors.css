@@ -5,6 +5,7 @@
     --primary: 65 240 219; /* #41f0db in RGB */
     --secondary: 255 10 190; /* #ff0abe in RGB */
     --accent: 128 0 255; /* #8000ff in RGB */
+    --card: 59 59 68; /* RGB value for card background */
 
     /* Neon Effects */
     --neon-cyan: 65 240 219; /* #41f0db in RGB */

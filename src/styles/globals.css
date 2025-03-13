@@ -19,6 +19,7 @@
     --neon-cyan: 65 240 219; /* #41f0db in RGB */
     --neon-pink: 255 10 190; /* #ff0abe in RGB */
     --neon-purple: 128 0 255; /* #8000ff in RGB */
+    --card: 59 59 68; /* RGB values for card background */
 
     /* Layout */
     --border-radius: 0.5rem;

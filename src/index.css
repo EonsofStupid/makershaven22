@@ -9,7 +9,7 @@
   :root {
     --background: 231 25% 14%;
     --foreground: 210 40% 98%;
-    --card: 231 25% 18%;
+    --card: 59 59 68; /* RGB value for the card background */
     --border: 231 25% 24%;
     --input: 231 25% 24%;
     --ring: 231 25% 24%;
