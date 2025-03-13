@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { queryKeys } from './keys';
 import type { Settings } from '@/lib/types/settings/core';
-import type { SettingsRecord, transformDatabaseToSettings } from '@/lib/types/database/tables/settings';
+import { SettingsRecord, transformDatabaseToSettings } from '@/lib/types/database/tables/settings';
 import { toast } from 'sonner';
 
 // Transform UI settings to update parameters
@@ -53,7 +53,8 @@ export const useSettings = () => {
       }
 
       // Transform database record to UI Settings
-      return transformDatabaseToSettings(data as SettingsRecord);
+      const settingsRecord = data as unknown as SettingsRecord;
+      return transformDatabaseToSettings(settingsRecord);
     },
   });
 };

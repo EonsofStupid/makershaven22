@@ -49,9 +49,9 @@ export const useSettingsUpdateHandlers = () => {
         p_text_secondary_color: formData.text_secondary_color,
         p_text_link_color: formData.text_link_color,
         p_text_heading_color: formData.text_heading_color,
-        p_neon_cyan: formData.neon_cyan || '#41f0db',
-        p_neon_pink: formData.neon_pink || '#ff0abe',
-        p_neon_purple: formData.neon_purple || '#8000ff',
+        p_neon_cyan: formData.neon_cyan,
+        p_neon_pink: formData.neon_pink,
+        p_neon_purple: formData.neon_purple,
         p_border_radius: formData.border_radius,
         p_spacing_unit: formData.spacing_unit,
         p_transition_duration: formData.transition_duration,
@@ -67,7 +67,7 @@ export const useSettingsUpdateHandlers = () => {
         p_box_shadow: formData.box_shadow,
         p_backdrop_blur: formData.backdrop_blur,
         p_transition_type: formData.transition_type,
-        p_menu_animation_type: formData.menu_animation_type,
+        p_menu_animation_type: formData.menu_animation_type || 'fade'
       };
 
       // Add logo and favicon if they exist

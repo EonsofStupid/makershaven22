@@ -37,8 +37,8 @@ export const useSettingsReset = () => {
         p_font_weight_bold: DEFAULT_SETTINGS.font_weight_bold,
         p_line_height_base: DEFAULT_SETTINGS.line_height_base,
         p_letter_spacing: DEFAULT_SETTINGS.letter_spacing,
-        p_box_shadow: DEFAULT_SETTINGS.box_shadow || 'none',
-        p_backdrop_blur: DEFAULT_SETTINGS.backdrop_blur || '0',
+        p_box_shadow: DEFAULT_SETTINGS.box_shadow,
+        p_backdrop_blur: DEFAULT_SETTINGS.backdrop_blur,
         p_transition_type: DEFAULT_SETTINGS.transition_type
       });
 
@@ -72,9 +72,10 @@ export const useSettingsReset = () => {
         font_weight_bold: DEFAULT_SETTINGS.font_weight_bold,
         line_height_base: DEFAULT_SETTINGS.line_height_base,
         letter_spacing: DEFAULT_SETTINGS.letter_spacing,
-        box_shadow: DEFAULT_SETTINGS.box_shadow || 'none',
-        backdrop_blur: DEFAULT_SETTINGS.backdrop_blur || '0',
+        box_shadow: DEFAULT_SETTINGS.box_shadow,
+        backdrop_blur: DEFAULT_SETTINGS.backdrop_blur,
         transition_type: DEFAULT_SETTINGS.transition_type,
+        security_settings: DEFAULT_SETTINGS.security_settings
       };
       
       return settings;

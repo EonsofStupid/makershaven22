@@ -45,7 +45,7 @@ export interface SettingsRecord {
 /**
  * Transform database record to Settings type with defaults
  */
-export function transformDatabaseToSettings(record: SettingsRecord) {
+export function transformDatabaseToSettings(record: SettingsRecord): Settings {
   return {
     site_title: record.site_title ?? 'MakersImpulse',
     tagline: record.tagline,
@@ -85,6 +85,7 @@ export function transformDatabaseToSettings(record: SettingsRecord) {
       max_login_attempts: 5,
       ip_whitelist: [],
       ip_blacklist: []
-    }
+    },
+    theme_mode: record.theme_mode
   };
 }
