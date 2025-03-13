@@ -1,19 +1,20 @@
+
 @layer base {
   :root {
-    /* Brand Colors */
-    --primary: #41f0db;
-    --secondary: #ff0abe;
-    --accent: #8000ff;
+    /* Brand Colors - in RGB format for opacity support */
+    --primary: 65 240 219; /* #41f0db in RGB */
+    --secondary: 255 10 190; /* #ff0abe in RGB */
+    --accent: 128 0 255; /* #8000ff in RGB */
 
     /* Neon Effects */
-    --neon-cyan: #41f0db;
-    --neon-pink: #ff0abe;
-    --neon-purple: #8000ff;
+    --neon-cyan: 65 240 219; /* #41f0db in RGB */
+    --neon-pink: 255 10 190; /* #ff0abe in RGB */
+    --neon-purple: 128 0 255; /* #8000ff in RGB */
 
     /* Text Colors */
-    --text-primary: #FFFFFF;
-    --text-secondary: #A1A1AA;
-    --text-link: #3B82F6;
-    --text-heading: #FFFFFF;
+    --text-primary: 255 255 255; /* #FFFFFF in RGB */
+    --text-secondary: 161 161 170; /* #A1A1AA in RGB */
+    --text-link: 59 130 246; /* #3B82F6 in RGB */
+    --text-heading: 255 255 255; /* #FFFFFF in RGB */
   }
 }

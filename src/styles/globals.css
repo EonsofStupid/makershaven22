@@ -1,3 +1,4 @@
+
 @import './admin/layout.css';
 @import './admin/components.css';
 
@@ -7,17 +8,17 @@
 
 @layer base {
   :root {
-    /* Theme Variables */
-    --primary: #7FFFD4;
-    --secondary: #FFB6C1;
-    --accent: #E6E6FA;
-    --text-primary: #FFFFFF;
-    --text-secondary: #A1A1AA;
-    --text-link: #3B82F6;
-    --text-heading: #FFFFFF;
-    --neon-cyan: #41f0db;
-    --neon-pink: #ff0abe;
-    --neon-purple: #8000ff;
+    /* Theme Variables - in RGB format for opacity support */
+    --primary: 127 255 212; /* #7FFFD4 in RGB */
+    --secondary: 255 182 193; /* #FFB6C1 in RGB */
+    --accent: 230 230 250; /* #E6E6FA in RGB */
+    --text-primary: 255 255 255; /* #FFFFFF in RGB */
+    --text-secondary: 161 161 170; /* #A1A1AA in RGB */
+    --text-link: 59 130 246; /* #3B82F6 in RGB */
+    --text-heading: 255 255 255; /* #FFFFFF in RGB */
+    --neon-cyan: 65 240 219; /* #41f0db in RGB */
+    --neon-pink: 255 10 190; /* #ff0abe in RGB */
+    --neon-purple: 128 0 255; /* #8000ff in RGB */
 
     /* Layout */
     --border-radius: 0.5rem;
@@ -35,19 +36,19 @@
 
 /* Utility classes */
 .neon-text-cyan {
-  color: var(--neon-cyan);
+  color: rgb(var(--neon-cyan));
   text-shadow: 
-    0 0 7px var(--neon-cyan),
-    0 0 10px var(--neon-cyan),
-    0 0 21px var(--neon-cyan),
+    0 0 7px rgb(var(--neon-cyan)),
+    0 0 10px rgb(var(--neon-cyan)),
+    0 0 21px rgb(var(--neon-cyan)),
     0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .neon-text-pink {
-  color: var(--neon-pink);
+  color: rgb(var(--neon-pink));
   text-shadow: 
-    0 0 7px var(--neon-pink),
-    0 0 10px var(--neon-pink),
-    0 0 21px var(--neon-pink),
+    0 0 7px rgb(var(--neon-pink)),
+    0 0 10px rgb(var(--neon-pink)),
+    0 0 21px rgb(var(--neon-pink)),
     0 2px 4px rgba(0, 0, 0, 0.5);
 }

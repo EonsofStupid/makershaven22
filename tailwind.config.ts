@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -28,21 +29,21 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--text-primary)",
+          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
+          foreground: "rgb(var(--text-primary) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--text-secondary)",
+          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
+          foreground: "rgb(var(--text-secondary) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--text-heading)",
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          foreground: "rgb(var(--text-heading) / <alpha-value>)",
         },
         neon: {
-          cyan: "var(--neon-cyan)",
-          pink: "var(--neon-pink)",
-          purple: "var(--neon-purple)",
+          cyan: "rgb(var(--neon-cyan) / <alpha-value>)",
+          pink: "rgb(var(--neon-pink) / <alpha-value>)",
+          purple: "rgb(var(--neon-purple) / <alpha-value>)",
         },
         brand: {
           purple: "#4d00b3",

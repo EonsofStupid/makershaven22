@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -13,6 +14,11 @@
     --input: 231 25% 24%;
     --ring: 231 25% 24%;
     --radius: 0.75rem;
+    
+    /* Add these RGB color variables */
+    --primary: 127 255 212; /* #7FFFD4 in RGB */
+    --secondary: 255 182 193; /* #FFB6C1 in RGB */
+    --accent: 230 230 250; /* #E6E6FA in RGB */
   }
 
   * {
