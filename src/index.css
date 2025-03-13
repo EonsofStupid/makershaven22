@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -9,23 +8,11 @@
   :root {
     --background: 231 25% 14%;
     --foreground: 210 40% 98%;
-    --card: 59 59 68; /* RGB value for the card background */
+    --card: 231 25% 18%;
     --border: 231 25% 24%;
     --input: 231 25% 24%;
     --ring: 231 25% 24%;
     --radius: 0.75rem;
-    
-    /* Add these RGB color variables */
-    --primary: 127 255 212; /* #7FFFD4 in RGB */
-    --secondary: 255 182 193; /* #FFB6C1 in RGB */
-    --accent: 230 230 250; /* #E6E6FA in RGB */
-    --text-primary: 255 255 255; /* #FFFFFF in RGB */
-    --text-secondary: 161 161 170; /* #A1A1AA in RGB */
-    --text-link: 59 130 246; /* #3B82F6 in RGB */
-    --text-heading: 255 255 255; /* #FFFFFF in RGB */
-    --neon-cyan: 65 240 219; /* #41f0db in RGB */
-    --neon-pink: 255 10 190; /* #ff0abe in RGB */
-    --neon-purple: 128 0 255; /* #8000ff in RGB */
   }
 
   * {

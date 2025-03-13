@@ -1,24 +1,28 @@
+export enum AuthErrorType {
+  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  SERVER_ERROR = 'SERVER_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  SESSION_EXPIRED = 'SESSION_EXPIRED',
+  INVALID_TOKEN = 'INVALID_TOKEN'
+}
 
 export interface AuthError {
-  type: string;
-  code?: string;
+  type: AuthErrorType;
   message: string;
-  stack?: string;
+  originalError?: unknown;
 }
 
-export interface AuthErrorRecoveryState {
-  isRecovering: boolean;
-  error: AuthError | null;
-  attemptCount: number;
-  maxAttempts: number;
-  recoveryStrategy?: string;
-  nextRetryTime?: Date;
+export interface SecurityEventSeverity {
+  LOW: 'low';
+  MEDIUM: 'medium';
+  HIGH: 'high';
+  CRITICAL: 'critical';
 }
 
-export type ErrorRecoveryStrategy = 'retry' | 'refresh-token' | 'logout' | 'clear-storage' | 'none';
-
-export interface ErrorRecoveryOptions {
-  maxAttempts?: number;
-  retryDelay?: number;
-  errorTypes?: Record<string, ErrorRecoveryStrategy>;
+export interface SecurityEventCategory {
+  AUTH: 'auth';
+  ACCESS: 'access';
+  DATA: 'data';
+  SYSTEM: 'system';
 }

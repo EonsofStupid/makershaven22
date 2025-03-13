@@ -6,6 +6,3 @@ export type ContentType = 'template' | 'page' | 'build' | 'guide' | 'part' | 'co
 export type ContentStatus = 'draft' | 'published' | 'archived';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';
-export type WorkflowStageType = 'approval' | 'review' | 'task' | 'notification' | 'conditional';
-export type SecurityEventSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
-export type SecurityEventCategory = 'auth' | 'access' | 'data' | 'system' | 'admin';

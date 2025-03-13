@@ -1,8 +1,8 @@
-
 import { create } from 'zustand';
+import { AuthError } from '../types/shared/shared';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { AuthSession, AuthUser, AuthError } from '@/lib/types/auth/types';
+import type { AuthSession, AuthUser } from '@/lib/types/auth/types';
 
 interface AuthState {
   session: AuthSession | null;
@@ -39,56 +39,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (error) throw error;
       
       if (session) {
-        try {
-          // Fetch user profile to get role information
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-          if (profileError) {
-            console.error('Error fetching profile:', profileError);
-            // Just set the session without profile info instead of throwing
-            set({ 
-              session: session as AuthSession,
-              user: { ...session.user } as AuthUser,
-              isLoading: false 
-            });
-            return;
-          }
+        if (profileError) throw profileError;
 
-          // Log the user role for debugging
-          console.log('User authenticated with role:', profile?.role);
-          
-          set({ 
-            session: session as AuthSession,
-            user: { 
-              ...session.user, 
-              role: profile?.role 
-            } as AuthUser,
-            isLoading: false 
-          });
-        } catch (profileError) {
-          console.error('Error handling profile:', profileError);
-          // Fallback to just the session
-          set({ 
-            session: session as AuthSession,
-            user: { ...session.user } as AuthUser,
-            isLoading: false 
-          });
-        }
+        set({ 
+          session: session as AuthSession,
+          user: { ...session.user, role: profile?.role } as AuthUser,
+          isLoading: false 
+        });
       } else {
         set({ session: null, user: null, isLoading: false });
       }
     } catch (error) {
       console.error('Error initializing auth:', error);
-      set({ 
-        error: error as AuthError, 
-        isLoading: false,
-        session: null,
-        user: null
-      });
+      set({ error: error as AuthError, isLoading: false });
+      toast.error('Failed to initialize authentication');
     }
   },
 
@@ -97,50 +67,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isTransitioning: true });
       
       if (session?.user) {
-        try {
-          // Fetch profile to get role
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
 
-          if (profileError) {
-            console.error('Error fetching profile during session update:', profileError);
-            // Continue with just the session data
-            set({ 
-              session: session as AuthSession,
-              user: { ...session.user } as AuthUser, 
-              error: null 
-            });
-            return;
-          }
+        if (profileError) throw profileError;
 
-          console.log('Session update - User role:', profile?.role);
-          
-          set({ 
-            session: session as AuthSession,
-            user: { 
-              ...session.user, 
-              role: profile?.role 
-            } as AuthUser,
-            error: null 
-          });
-        } catch (profileError) {
-          console.error('Error handling profile during session update:', profileError);
-          // Fallback to just the session
-          set({ 
-            session: session as AuthSession,
-            user: { ...session.user } as AuthUser, 
-            error: null 
-          });
-        }
+        set({ 
+          session: session as AuthSession,
+          user: { ...session.user, role: profile?.role } as AuthUser,
+          error: null 
+        });
       } else {
         set({ session: null, user: null });
       }
     } catch (error) {
       console.error('Error handling session update:', error);
       set({ error: error as AuthError });
+      toast.error('Failed to update session');
     } finally {
       set({ isTransitioning: false });
     }

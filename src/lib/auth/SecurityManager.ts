@@ -1,70 +1,119 @@
-
+import { SessionManager } from './SessionManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { SecuritySettings } from '@/lib/types/settings/security';
+
+interface SecurityConfig {
+  maxConcurrentSessions?: number;
+  maxLoginAttempts?: number;
+  lockoutDuration?: number; // in minutes
+}
 
 class SecurityManager {
-  private securitySettings: SecuritySettings | null = null;
+  private sessionManager: SessionManager;
+  private config: SecurityConfig;
   private initialized: boolean = false;
 
-  constructor() {
-    this.loadSecuritySettings();
+  constructor(config: SecurityConfig = {}) {
+    this.sessionManager = SessionManager.getInstance();
+    this.config = {
+      maxConcurrentSessions: 3,
+      maxLoginAttempts: 5,
+      lockoutDuration: 30,
+      ...config
+    };
   }
 
-  private async loadSecuritySettings(): Promise<void> {
-    try {
-      const { data, error } = await supabase
-        .from('security_settings')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (error) throw error;
-      
-      this.securitySettings = data?.settings as SecuritySettings;
-      this.initialized = true;
-      console.log('Security settings loaded:', this.securitySettings);
-    } catch (error) {
-      console.error('Failed to load security settings:', error);
-      // Use reasonable defaults
-      this.securitySettings = {
-        enable_ip_filtering: false,
-        two_factor_auth: false,
-        max_login_attempts: 5,
-        session_timeout_minutes: 60,
-        lockout_duration_minutes: 30
-      };
-    }
-  }
-
-  public async logSecurityEvent(
-    eventType: string, 
-    severity: 'info' | 'low' | 'medium' | 'high' | 'critical', 
-    details: any = {}
+  private async handleSecurityEvent(
+    userId: string,
+    eventType: string,
+    severity: 'low' | 'medium' | 'high',
+    details: Record<string, any> = {}
   ): Promise<void> {
     try {
       const { error } = await supabase
-        .from('security_logs')
+        .from('security_events')
         .insert({
+          user_id: userId,
           event_type: eventType,
-          severity: severity,
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          details: details
+          severity,
+          details,
+          ip_address: null // In a real app, you'd get this from the request
         });
 
       if (error) throw error;
+      
+      console.log('Security event logged:', { eventType, severity, details });
     } catch (error) {
       console.error('Failed to log security event:', error);
     }
   }
 
-  public async handleFailedLogin(userId: string): Promise<void> {
-    if (!this.securitySettings) await this.loadSecuritySettings();
-    
+  private async checkConcurrentSessions(userId: string): Promise<boolean> {
     try {
-      if (!userId) return;
-      
+      const { data: sessions, error } = await supabase
+        .from('active_2fa_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      return (sessions?.length || 0) < this.config.maxConcurrentSessions!;
+    } catch (error) {
+      console.error('Error checking concurrent sessions:', error);
+      return true; // Fail open to prevent lockouts
+    }
+  }
+
+  public async validateSession(session: any): Promise<boolean> {
+    if (!session?.user?.id) {
+      throw new Error('Invalid session');
+    }
+
+    try {
+      // Check if user is banned
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('is_banned')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) throw error;
+      if (profile?.is_banned) {
+        await this.handleSecurityEvent(
+          session.user.id,
+          'banned_user_access_attempt',
+          'high'
+        );
+        throw new Error('Account is banned');
+      }
+
+      // Check concurrent sessions
+      const canCreateSession = await this.checkConcurrentSessions(session.user.id);
+      if (!canCreateSession) {
+        await this.handleSecurityEvent(
+          session.user.id,
+          'max_concurrent_sessions_exceeded',
+          'medium'
+        );
+        throw new Error('Maximum number of concurrent sessions reached');
+      }
+
+      await this.handleSecurityEvent(
+        session.user.id,
+        'successful_session_validation',
+        'low'
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Session validation error:', error);
+      throw error;
+    }
+  }
+
+  public async handleFailedLogin(userId: string): Promise<void> {
+    try {
       const { data, error } = await supabase
         .from('profiles')
         .select('failed_login_attempts, lockout_until')
@@ -76,21 +125,20 @@ class SecurityManager {
       const attempts = (data?.failed_login_attempts || 0) + 1;
       const updates: any = { failed_login_attempts: attempts };
 
-      const maxAttempts = this.securitySettings?.max_login_attempts || 5;
-      if (attempts >= maxAttempts) {
-        const lockoutMinutes = this.securitySettings?.lockout_duration_minutes || 30;
+      if (attempts >= this.config.maxLoginAttempts!) {
         updates.lockout_until = new Date(
-          Date.now() + lockoutMinutes * 60000
+          Date.now() + this.config.lockoutDuration! * 60000
         ).toISOString();
         
-        this.logSecurityEvent(
+        await this.handleSecurityEvent(
+          userId,
           'account_locked',
           'high',
-          { attempts, lockout_duration: lockoutMinutes }
+          { attempts, lockout_duration: this.config.lockoutDuration }
         );
 
         toast.error('Account locked', {
-          description: `Too many failed attempts. Please try again in ${lockoutMinutes} minutes.`
+          description: `Too many failed attempts. Please try again in ${this.config.lockoutDuration} minutes.`
         });
       }
 
@@ -98,8 +146,23 @@ class SecurityManager {
         .from('profiles')
         .update(updates)
         .eq('id', userId);
+
     } catch (error) {
       console.error('Error handling failed login:', error);
+    }
+  }
+
+  public async resetLoginAttempts(userId: string): Promise<void> {
+    try {
+      await supabase
+        .from('profiles')
+        .update({
+          failed_login_attempts: 0,
+          lockout_until: null
+        })
+        .eq('id', userId);
+    } catch (error) {
+      console.error('Error resetting login attempts:', error);
     }
   }
 
@@ -109,18 +172,26 @@ class SecurityManager {
       return;
     }
 
-    this.loadSecuritySettings();
-    console.log('Security manager initialized');
-  }
-
-  public getSettings(): SecuritySettings | null {
-    return this.securitySettings;
+    try {
+      console.log('Initializing security manager');
+      this.sessionManager.startSession();
+      this.initialized = true;
+      console.log('Security manager initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize security manager:', error);
+      throw error;
+    }
   }
 
   public clearSecurityData(): void {
-    this.securitySettings = null;
+    console.log('Clearing security data');
     this.initialized = false;
-    console.log('Security data cleared');
+  }
+
+  public cleanup(): void {
+    console.log('Cleaning up security manager');
+    this.sessionManager.destroy();
+    this.initialized = false;
   }
 }
 

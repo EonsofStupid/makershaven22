@@ -1,6 +1,3 @@
-
-import { SecurityEventSeverity, SecurityEventCategory } from '@/lib/types/core/enums';
-
 export interface SessionConfig {
   refreshInterval: number;
   sessionTimeout: number;
@@ -54,23 +51,4 @@ export interface AuthStore {
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
-}
-
-export interface SecurityEvent {
-  id?: string;
-  timestamp: Date | string;
-  event_type: string;
-  severity: SecurityEventSeverity;
-  category: SecurityEventCategory;
-  user_id?: string;
-  ip_address?: string;
-  details?: string;
-  metadata?: any;
-}
-
-export interface SecurityEventOptions {
-  logToConsole?: boolean;
-  storeInDatabase?: boolean;
-  notifyAdmin?: boolean;
-  includeMetadata?: boolean;
 }

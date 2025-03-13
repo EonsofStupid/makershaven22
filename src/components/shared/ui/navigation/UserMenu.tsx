@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { toast } from "sonner";
@@ -16,8 +15,9 @@ export const UserMenu = ({ onClose }: { onClose: () => void }) => {
   const { user, signOut } = useAuthStore();
 
   const handleNavigation = (path: string) => {
-    onClose();
     navigate(path);
+    onClose();
+    toast.success(`Navigating to ${path.split('/').pop()?.toUpperCase() || 'Home'}`);
   };
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
@@ -100,10 +100,12 @@ export const UserMenu = ({ onClose }: { onClose: () => void }) => {
             try {
               await signOut();
               toast.success("Signed out successfully");
-              handleNavigation("/");
+              navigate("/");
             } catch (error) {
               console.error("Sign out error:", error);
               toast.error("Failed to sign out");
+            } finally {
+              onClose();
             }
           }}
         />

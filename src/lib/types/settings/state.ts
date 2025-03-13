@@ -1,13 +1,17 @@
 
-import { Settings } from './core';
+import { Settings, SiteSettings, SecuritySettings, UserSettings } from './core';
 
 export interface SettingsState {
   settings: Settings | null;
   isLoading: boolean;
-  error: Error | null;
-  setSettings: (settings: Settings | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  updateSettings: (settings: Partial<Settings>) => Promise<void>;
-  resetSettings: () => Promise<void>;
+  error: string | null;
+  lastUpdated?: Date;
 }
+
+export type SettingsAction =
+  | { type: 'SET_SETTINGS'; payload: Settings }
+  | { type: 'UPDATE_SITE_SETTINGS'; payload: Partial<SiteSettings> }
+  | { type: 'UPDATE_SECURITY_SETTINGS'; payload: Partial<SecuritySettings> }
+  | { type: 'UPDATE_USER_SETTINGS'; payload: Partial<UserSettings> }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null };

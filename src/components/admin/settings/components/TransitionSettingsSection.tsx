@@ -1,134 +1,122 @@
-
-import React, { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { useSettingsQuery } from '@/hooks/useSettings';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { CSSEffectsControl } from "./CSSEffectsControl";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const TransitionSettingsSection = () => {
-  const { data: settings, isLoading, refetch } = useSettingsQuery();
-  const [transitionDuration, setTransitionDuration] = useState(settings?.transition_duration || '0.3s');
-  const [hoverScale, setHoverScale] = useState(settings?.hover_scale || '1.05');
-  const [isSaving, setIsSaving] = useState(false);
+  const [settings, setSettings] = useState({
+    pageTransition: 0.3,
+    transitionType: "ease-out",
+    hoverScale: 1.05,
+    animationPreset: "fade"
+  });
 
-  const handleSave = async () => {
-    setIsSaving(true);
+  const handleSettingChange = async (key: string, value: number | string) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+    
     try {
-      // We need to provide all required parameters when calling the RPC function
-      const updateParams = {
-        p_site_title: settings?.site_title || '',
-        p_tagline: settings?.tagline || '',
-        p_primary_color: settings?.primary_color || '#7FFFD4',
-        p_secondary_color: settings?.secondary_color || '#FFB6C1',
-        p_accent_color: settings?.accent_color || '#E6E6FA',
-        p_text_primary_color: settings?.text_primary_color || '#FFFFFF',
-        p_text_secondary_color: settings?.text_secondary_color || '#A1A1AA',
-        p_text_link_color: settings?.text_link_color || '#3B82F6',
-        p_text_heading_color: settings?.text_heading_color || '#FFFFFF',
-        p_neon_cyan: settings?.neon_cyan || '#41f0db',
-        p_neon_pink: settings?.neon_pink || '#ff0abe',
-        p_neon_purple: settings?.neon_purple || '#8000ff',
-        p_border_radius: settings?.border_radius || '0.5rem',
-        p_spacing_unit: settings?.spacing_unit || '1rem',
-        p_transition_duration: transitionDuration,
-        p_shadow_color: settings?.shadow_color || '#000000',
-        p_hover_scale: hoverScale,
-        p_font_family_heading: settings?.font_family_heading || 'Inter',
-        p_font_family_body: settings?.font_family_body || 'Inter',
-        p_font_size_base: settings?.font_size_base || '16px',
-        p_font_weight_normal: settings?.font_weight_normal || '400',
-        p_font_weight_bold: settings?.font_weight_bold || '700',
-        p_line_height_base: settings?.line_height_base || '1.5',
-        p_letter_spacing: settings?.letter_spacing || 'normal',
-        p_box_shadow: settings?.box_shadow || 'none',
-        p_backdrop_blur: settings?.backdrop_blur || '0',
-        p_transition_type: settings?.transition_type || 'fade'
-      };
-      
-      const { data, error } = await supabase.rpc('update_site_settings', updateParams);
-      
+      const { data, error } = await supabase.rpc('update_site_settings', {
+        p_transition_duration: `${value}s`,
+        p_hover_scale: value.toString()
+      });
+
       if (error) throw error;
       
-      toast.success('Transition settings updated successfully');
-      refetch();
+      toast.success("Transition settings updated");
     } catch (error) {
-      console.error('Error updating transition settings:', error);
-      toast.error('Failed to update transition settings');
-    } finally {
-      setIsSaving(false);
+      console.error("Failed to update settings:", error);
+      toast.error("Failed to update settings");
     }
   };
 
-  if (isLoading) {
-    return <div>Loading transition settings...</div>;
-  }
-
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-medium">Transition Settings</h3>
-        <p className="text-sm text-gray-400">Customize animation and transition effects</p>
-      </div>
-
-      <Separator />
-
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="transition-duration">Transition Duration</Label>
-          <div className="flex items-center gap-4">
-            <Slider
-              id="transition-duration-slider"
-              value={[parseFloat(transitionDuration.replace('s', '')) * 100]}
-              min={0}
-              max={200}
-              step={5}
-              onValueChange={(values) => setTransitionDuration((values[0] / 100).toFixed(2) + 's')}
-              className="flex-1"
-            />
-            <Input
-              id="transition-duration"
-              value={transitionDuration}
-              onChange={(e) => setTransitionDuration(e.target.value)}
-              className="w-24"
-            />
-          </div>
-          <p className="text-xs text-gray-400">Time it takes for animations to complete (in seconds)</p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="hover-scale">Hover Scale</Label>
-          <div className="flex items-center gap-4">
-            <Slider
-              id="hover-scale-slider"
-              value={[parseFloat(hoverScale) * 100 - 100]}
-              min={0}
-              max={30}
-              step={1}
-              onValueChange={(values) => setHoverScale(((values[0] / 100) + 1).toFixed(2))}
-              className="flex-1"
-            />
-            <Input
-              id="hover-scale"
-              value={hoverScale}
-              onChange={(e) => setHoverScale(e.target.value)}
-              className="w-24"
-            />
-          </div>
-          <p className="text-xs text-gray-400">Scale factor applied to elements on hover</p>
-        </div>
-
-        <Button 
-          onClick={handleSave}
-          disabled={isSaving}
+    <AccordionItem value="transition-settings">
+      <AccordionTrigger className="text-lg font-semibold text-white">
+        <motion.div
+          initial={{ opacity: 0.8 }}
+          whileHover={{ opacity: 1, scale: 1.02 }}
+          className="flex items-center gap-2"
         >
-          {isSaving ? 'Saving...' : 'Save Transition Settings'}
-        </Button>
-      </div>
-    </div>
+          Transitions & Motion
+        </motion.div>
+      </AccordionTrigger>
+      <AccordionContent className="space-y-6 pt-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <CSSEffectsControl
+            label="Page Transition Duration"
+            type="slider"
+            value={settings.pageTransition}
+            min={0.1}
+            max={1}
+            step={0.1}
+            onChange={(value) => handleSettingChange('pageTransition', value)}
+            description="Duration of page transition animations"
+            previewClass="animate-fade-in"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <CSSEffectsControl
+            label="Element Transition Type"
+            type="select"
+            value={settings.transitionType}
+            options={[
+              { label: "Ease Out", value: "ease-out" },
+              { label: "Ease In", value: "ease-in" },
+              { label: "Linear", value: "linear" }
+            ]}
+            onChange={(value) => handleSettingChange('transitionType', value)}
+            description="Default transition timing function"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <CSSEffectsControl
+            label="Hover Scale Factor"
+            type="slider"
+            value={settings.hoverScale}
+            min={1}
+            max={1.2}
+            step={0.01}
+            onChange={(value) => handleSettingChange('hoverScale', value)}
+            description="Scale factor for hover animations"
+            previewClass="hover:scale-110"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+        >
+          <CSSEffectsControl
+            label="Animation Preset"
+            type="select"
+            value={settings.animationPreset}
+            options={[
+              { label: "Fade", value: "fade" },
+              { label: "Slide", value: "slide" },
+              { label: "Scale", value: "scale" }
+            ]}
+            onChange={(value) => handleSettingChange('animationPreset', value)}
+            description="Default animation preset for elements"
+          />
+        </motion.div>
+      </AccordionContent>
+    </AccordionItem>
   );
 };

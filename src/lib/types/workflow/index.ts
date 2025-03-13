@@ -1,62 +1,95 @@
-
-export * from './stage';
-export * from './template';
-export * from './types';
-
+import { BaseEntity, UserOwnedEntity } from '../core/base';
 import { Json } from '../core/json';
-import { WorkflowStageType } from '../core/enums';
 
-export interface WorkflowStageValidationRule {
-  field: string;
-  type: 'required' | 'min' | 'max' | 'pattern' | 'custom';
-  value?: any;
-  message?: string;
+export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
+
+export interface WorkflowTemplate extends UserOwnedEntity {
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  steps: WorkflowStage[];
+  is_active?: boolean;
 }
 
-export interface WorkflowStageConfig {
-  timeLimit?: number;
-  requiredApprovers?: number;
-  customFields?: {
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    options?: string[];
-    required?: boolean;
-  }[];
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  notifications?: {
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-}
-
-export interface WorkflowStep {
+export interface WorkflowStage {
   id: string;
   name: string;
   type: WorkflowStageType;
   order: number;
   config: WorkflowStageConfig;
   description?: string;
-  validationRules?: WorkflowStageValidationRule[];
 }
 
-export const parseWorkflowSteps = (data: Json): WorkflowStep[] => {
-  if (!Array.isArray(data)) return [];
+export interface WorkflowStageConfig {
+  assignees?: string[];
+  timeLimit?: number;
+  autoAssignment?: {
+    type: 'user' | 'role' | 'group';
+    value: string;
+  };
+  priority?: 'low' | 'medium' | 'high';
+  notifications?: {
+    email?: boolean;
+    inApp?: boolean;
+    onStart?: boolean;
+    onComplete?: boolean;
+    reminderInterval?: number;
+  };
+  conditions?: {
+    type: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: string;
+      value: any;
+    }>;
+  };
+  requiredApprovers?: number;
+  customFields?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'date' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
+}
 
-  return data.map((item: any) => ({
-    id: item.id || crypto.randomUUID(),
-    name: item.name || '',
-    type: item.type || 'task',
-    order: item.order || 0,
-    config: item.config || {},
-    description: item.description || '',
-    validationRules: item.validationRules || []
+export interface WorkflowFormData {
+  id?: string;
+  name: string;
+  description?: string;
+  stages: WorkflowStage[];
+  is_active?: boolean;
+}
+
+export interface WorkflowState {
+  workflows: WorkflowTemplate[];
+  activeWorkflow: WorkflowTemplate | null;
+  isLoading: boolean;
+  error: Error | null;
+  initialize: () => Promise<void>;
+  setActiveWorkflow: (workflow: WorkflowTemplate | null) => void;
+  handleWorkflowUpdate: (workflow: WorkflowTemplate) => Promise<void>;
+  setError: (error: Error | null) => void;
+}
+
+export const parseWorkflowStages = (data: Json[]): WorkflowStage[] => {
+  if (!Array.isArray(data)) return [];
+  
+  return data.map(stage => ({
+    id: String(stage.id || crypto.randomUUID()),
+    name: String(stage.name || ''),
+    type: (stage.type as WorkflowStageType) || 'TASK',
+    order: Number(stage.order || 0),
+    config: stage.config as WorkflowStageConfig || {},
+    description: stage.description ? String(stage.description) : undefined
   }));
 };
 
-export const serializeWorkflowSteps = (steps: WorkflowStep[]): Json => {
-  return JSON.parse(JSON.stringify(steps)) as Json;
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => ({
+    ...stage,
+    id: stage.id.toString(),
+    type: stage.type.toString(),
+    order: Number(stage.order),
+    config: stage.config || {}
+  })) as unknown as Json;
 };

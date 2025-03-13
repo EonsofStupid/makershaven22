@@ -1,117 +1,147 @@
-
 import React from 'react';
-import { Switch } from '@/components/ui/switch';
-import { useSettings } from '@/hooks/useSettings';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Plus, X } from 'lucide-react';
+import { SecuritySettings } from '../../types/security';
 
 export const IPSecuritySection = () => {
-  const { settings, isLoading, updateSettings } = useSettings();
   const [newIP, setNewIP] = React.useState('');
+  const queryClient = useQueryClient();
 
-  if (isLoading || !settings) {
-    return <div>Loading IP security settings...</div>;
-  }
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('security_settings')
+        .single();
 
-  const handleToggleIPFiltering = (enabled: boolean) => {
-    updateSettings({
-      ...settings,
-      security_settings: {
-        ...settings.security_settings,
-        enable_ip_filtering: enabled
-      }
-    });
-  };
+      if (error) throw error;
+      return data.security_settings as SecuritySettings;
+    }
+  });
 
-  const handleAddToWhitelist = () => {
-    if (!newIP) return;
-    const whitelist = [...(settings.security_settings.ip_whitelist || [])];
-    whitelist.push(newIP);
+  const updateSettings = useMutation({
+    mutationFn: async (newSettings: SecuritySettings) => {
+      const { data: settingsData } = await supabase
+        .from('site_settings')
+        .select('id')
+        .single();
+
+      if (!settingsData?.id) throw new Error('Settings not found');
+
+      const { data, error } = await supabase
+        .from('site_settings')
+        .update({ security_settings: newSettings })
+        .eq('id', settingsData.id);
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
+      toast.success('Security settings updated successfully');
+    },
+    onError: (error) => {
+      console.error('Error updating security settings:', error);
+      toast.error('Failed to update security settings');
+    }
+  });
+
+  const addToList = (list: 'ip_whitelist' | 'ip_blacklist') => {
+    if (!newIP || !settings) return;
     
-    updateSettings({
+    const updatedSettings = {
       ...settings,
-      security_settings: {
-        ...settings.security_settings,
-        ip_whitelist: whitelist
-      }
-    });
+      [list]: [...(settings[list] || []), newIP]
+    };
     
+    updateSettings.mutate(updatedSettings);
     setNewIP('');
   };
 
-  const handleRemoveFromWhitelist = (index: number) => {
-    const whitelist = [...(settings.security_settings.ip_whitelist || [])];
-    whitelist.splice(index, 1);
-    
-    updateSettings({
+  const removeFromList = (list: 'ip_whitelist' | 'ip_blacklist', ip: string) => {
+    if (!settings) return;
+
+    const updatedSettings = {
       ...settings,
-      security_settings: {
-        ...settings.security_settings,
-        ip_whitelist: whitelist
-      }
-    });
+      [list]: settings[list].filter((item: string) => item !== ip)
+    };
+    
+    updateSettings.mutate(updatedSettings);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>IP Address Filtering</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Switch 
-            checked={settings.security_settings.enable_ip_filtering}
-            onCheckedChange={handleToggleIPFiltering}
-            id="ip-filtering"
-          />
-          <Label htmlFor="ip-filtering">Enable IP address filtering</Label>
-        </div>
-        
-        {settings.security_settings.enable_ip_filtering && (
-          <div className="space-y-4 mt-4">
-            <div className="flex gap-2">
-              <Input 
-                value={newIP}
-                onChange={(e) => setNewIP(e.target.value)}
-                placeholder="Enter IP address"
-              />
-              <Button 
-                size="sm" 
-                onClick={handleAddToWhitelist}
-                disabled={!newIP}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Add
-              </Button>
-            </div>
-            
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Whitelisted IPs</h4>
-              {(settings.security_settings.ip_whitelist?.length || 0) === 0 ? (
-                <p className="text-sm text-gray-500">No IPs in whitelist</p>
-              ) : (
-                <div className="space-y-2">
-                  {settings.security_settings.ip_whitelist?.map((ip, index) => (
-                    <div key={ip} className="flex items-center justify-between bg-secondary/10 p-2 rounded">
-                      <span>{ip}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleRemoveFromWhitelist(index)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className="space-y-6">
+      <Card className="p-6 bg-gray-800/50 border border-white/10">
+        <h3 className="text-lg font-semibold mb-4">IP Whitelist</h3>
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter IP address"
+              value={newIP}
+              onChange={(e) => setNewIP(e.target.value)}
+            />
+            <Button onClick={() => addToList('ip_whitelist')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add IP
+            </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <div className="grid gap-2">
+            {settings?.ip_whitelist?.map((ip: string) => (
+              <div key={ip} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
+                <span>{ip}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeFromList('ip_whitelist', ip)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 bg-gray-800/50 border border-white/10">
+        <h3 className="text-lg font-semibold mb-4">IP Blacklist</h3>
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter IP address"
+              value={newIP}
+              onChange={(e) => setNewIP(e.target.value)}
+            />
+            <Button onClick={() => addToList('ip_blacklist')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add IP
+            </Button>
+          </div>
+          <div className="grid gap-2">
+            {settings?.ip_blacklist?.map((ip: string) => (
+              <div key={ip} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
+                <span>{ip}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeFromList('ip_blacklist', ip)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 };

@@ -1,10 +1,7 @@
-
 import { z } from "zod";
 import { settingsSchema } from "./schema";
-import { Settings } from "@/lib/types/settings/core";
-import { UseFormReturn } from "react-hook-form";
 
-// Use the inferred type from the schema to ensure form data and Settings type are aligned
+export type Settings = z.infer<typeof settingsSchema>;
 export type SettingsFormData = Settings;
 
 export interface SettingsResponse {
@@ -14,9 +11,8 @@ export interface SettingsResponse {
   };
 }
 
-// Update interface to use Settings for form-related properties
 export interface UseSettingsFormReturn {
-  form: UseFormReturn<Settings>;
+  form: any;
   settings: Settings | null;
   isLoading: boolean;
   isSaving: boolean;
@@ -25,5 +21,5 @@ export interface UseSettingsFormReturn {
   handleLogoUpload: (file: File) => Promise<void>;
   handleFaviconUpload: (file: File) => Promise<void>;
   handleSettingsUpdate: (data: Settings) => Promise<void>;
-  handleResetToDefault: () => Promise<Settings>;
+  handleResetToDefault: () => Promise<void>;
 }

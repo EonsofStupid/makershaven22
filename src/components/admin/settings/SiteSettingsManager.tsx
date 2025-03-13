@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
-import { Settings, SecuritySettings } from "@/lib/types/settings/core";
-import { Json, parseJsonToObject } from "@/lib/types/core/json";
+import { Settings } from "@/lib/types/shared/shared";
 
 export function SiteSettingsManager() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -17,21 +15,7 @@ export function SiteSettingsManager() {
           .single();
 
         if (error) throw error;
-        
-        // Transform the data to ensure it matches the Settings type
-        const transformedData: Settings = {
-          ...data,
-          // Ensure security_settings is properly parsed
-          security_settings: parseJsonToObject<SecuritySettings>(data.security_settings, {
-            enable_ip_filtering: false,
-            two_factor_auth: false,
-            max_login_attempts: 5,
-            ip_whitelist: [],
-            ip_blacklist: []
-          })
-        };
-        
-        setSettings(transformedData);
+        setSettings(data as Settings);
         toast.success("Site settings loaded successfully");
       } catch (err) {
         console.error("Error fetching site settings:", err);
@@ -46,20 +30,7 @@ export function SiteSettingsManager() {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "site_settings" },
           (payload) => {
-            const newData = payload.new as any;
-            // Transform the update data to ensure it matches the Settings type
-            const transformedData: Settings = {
-              ...newData,
-              security_settings: parseJsonToObject<SecuritySettings>(newData.security_settings, {
-                enable_ip_filtering: false,
-                two_factor_auth: false,
-                max_login_attempts: 5,
-                ip_whitelist: [],
-                ip_blacklist: []
-              })
-            };
-            
-            setSettings(transformedData);
+            setSettings(payload.new as Settings);
             toast.info("Site settings updated");
           }
         )

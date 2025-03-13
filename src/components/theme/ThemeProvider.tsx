@@ -1,32 +1,37 @@
+import React from 'react';
+import { useThemeStore } from '@/lib/store/theme-store';
+import { applyThemeToDocument } from './utils/themeUtils';
 
-import React, { createContext, useContext, useEffect } from 'react';
-import { useTheme } from '@/lib/store/hooks/useTheme';
-import { Settings } from '@/lib/types/settings/core';
-
-interface ThemeContextType {
-  theme: Settings | null;
-  mode: string;
-  updateTheme: (theme: Settings) => void;
-  setMode: (mode: 'light' | 'dark' | 'system') => void;
-  isLoading: boolean;
+interface ThemeProviderProps {
+  children: React.ReactNode;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const { settings, mode, setMode, updateTheme } = useThemeStore();
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { theme, mode, setMode, updateTheme, isLoading } = useTheme();
+  // Handle system theme changes
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (mode === 'system') {
+        setMode(e.matches ? 'dark' : 'light');
+      }
+    };
 
-  return (
-    <ThemeContext.Provider value={{ theme, mode, updateTheme, setMode, isLoading }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+    if (mode === 'system') {
+      setMode(mediaQuery.matches ? 'dark' : 'light');
+    }
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [mode, setMode]);
 
-export const useThemeContext = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useThemeContext must be used within a ThemeProvider');
-  }
-  return context;
+  // Apply theme settings to document
+  React.useEffect(() => {
+    if (settings) {
+      applyThemeToDocument(settings);
+      document.documentElement.classList.toggle('dark', mode === 'dark');
+    }
+  }, [settings, mode]);
+
+  return <>{children}</>;
 };

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -28,23 +27,22 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        card: "rgb(var(--card) / <alpha-value>)",
         primary: {
-          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
-          foreground: "rgb(var(--text-primary) / <alpha-value>)",
+          DEFAULT: "var(--primary)",
+          foreground: "var(--text-primary)",
         },
         secondary: {
-          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
-          foreground: "rgb(var(--text-secondary) / <alpha-value>)",
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--text-secondary)",
         },
         accent: {
-          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
-          foreground: "rgb(var(--text-heading) / <alpha-value>)",
+          DEFAULT: "var(--accent)",
+          foreground: "var(--text-heading)",
         },
         neon: {
-          cyan: "rgb(var(--neon-cyan) / <alpha-value>)",
-          pink: "rgb(var(--neon-pink) / <alpha-value>)",
-          purple: "rgb(var(--neon-purple) / <alpha-value>)",
+          cyan: "var(--neon-cyan)",
+          pink: "var(--neon-pink)",
+          purple: "var(--neon-purple)",
         },
         brand: {
           purple: "#4d00b3",
