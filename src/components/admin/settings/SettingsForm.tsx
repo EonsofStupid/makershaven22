@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
@@ -20,7 +19,6 @@ import { TransitionConfigSection } from "./sections/TransitionConfigSection";
 import { ThemeImportSection } from "./sections/ThemeImportSection";
 import { toast } from "sonner";
 import { SecuritySection } from "./sections/SecuritySection";
-import { SettingsFormData } from "./types/settings";
 import { Settings } from "@/lib/types/settings/core";
 
 export const SettingsForm = () => {

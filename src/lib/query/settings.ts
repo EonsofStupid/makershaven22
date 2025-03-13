@@ -3,73 +3,38 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { queryKeys } from './keys';
 import type { Settings } from '@/lib/types/settings/core';
-import type { SettingsRecord } from '../types/data/settings';
+import type { SettingsRecord, transformDatabaseToSettings } from '@/lib/types/database/tables/settings';
 import { toast } from 'sonner';
-
-// Transform database record to UI settings
-const transformSettingsRecord = (record: SettingsRecord): Settings => ({
-  site_title: record.site_title,
-  tagline: record.tagline,
-  primary_color: record.primary_color,
-  secondary_color: record.secondary_color,
-  accent_color: record.accent_color,
-  text_primary_color: record.text_primary_color,
-  text_secondary_color: record.text_secondary_color,
-  text_link_color: record.text_link_color,
-  text_heading_color: record.text_heading_color,
-  neon_cyan: record.neon_cyan,
-  neon_pink: record.neon_pink,
-  neon_purple: record.neon_purple,
-  border_radius: record.border_radius,
-  spacing_unit: record.spacing_unit,
-  transition_duration: record.transition_duration,
-  shadow_color: record.shadow_color,
-  hover_scale: record.hover_scale,
-  font_family_heading: record.font_family_heading,
-  font_family_body: record.font_family_body,
-  font_size_base: record.font_size_base,
-  font_weight_normal: record.font_weight_normal,
-  font_weight_bold: record.font_weight_bold,
-  line_height_base: record.line_height_base,
-  letter_spacing: record.letter_spacing,
-  box_shadow: record.box_shadow,
-  backdrop_blur: record.backdrop_blur,
-  transition_type: record.transition_type,
-  menu_animation_type: record.menu_animation_type,
-  updated_at: record.updated_at,
-  updated_by: record.updated_by,
-  security_settings: record.security_settings
-});
 
 // Transform UI settings to update parameters
 const transformSettingsToUpdateParams = (settings: Settings) => ({
-  p_site_title: settings.site_title,
+  p_site_title: settings.site_title || '',
   p_tagline: settings.tagline || '',
-  p_primary_color: settings.primary_color,
-  p_secondary_color: settings.secondary_color,
-  p_accent_color: settings.accent_color,
-  p_text_primary_color: settings.text_primary_color,
-  p_text_secondary_color: settings.text_secondary_color,
-  p_text_link_color: settings.text_link_color,
-  p_text_heading_color: settings.text_heading_color,
-  p_neon_cyan: settings.neon_cyan || '',
-  p_neon_pink: settings.neon_pink || '',
-  p_neon_purple: settings.neon_purple || '',
-  p_border_radius: settings.border_radius,
-  p_spacing_unit: settings.spacing_unit,
-  p_transition_duration: settings.transition_duration,
-  p_shadow_color: settings.shadow_color,
-  p_hover_scale: settings.hover_scale,
-  p_font_family_heading: settings.font_family_heading,
-  p_font_family_body: settings.font_family_body,
-  p_font_size_base: settings.font_size_base,
-  p_font_weight_normal: settings.font_weight_normal,
-  p_font_weight_bold: settings.font_weight_bold,
-  p_line_height_base: settings.line_height_base,
-  p_letter_spacing: settings.letter_spacing,
-  p_box_shadow: settings.box_shadow,
-  p_backdrop_blur: settings.backdrop_blur,
-  p_transition_type: settings.transition_type
+  p_primary_color: settings.primary_color || '#7FFFD4',
+  p_secondary_color: settings.secondary_color || '#FFB6C1',
+  p_accent_color: settings.accent_color || '#E6E6FA',
+  p_text_primary_color: settings.text_primary_color || '#FFFFFF',
+  p_text_secondary_color: settings.text_secondary_color || '#A1A1AA',
+  p_text_link_color: settings.text_link_color || '#3B82F6',
+  p_text_heading_color: settings.text_heading_color || '#FFFFFF',
+  p_neon_cyan: settings.neon_cyan || '#41f0db',
+  p_neon_pink: settings.neon_pink || '#ff0abe',
+  p_neon_purple: settings.neon_purple || '#8000ff',
+  p_border_radius: settings.border_radius || '0.5rem',
+  p_spacing_unit: settings.spacing_unit || '1rem',
+  p_transition_duration: settings.transition_duration || '0.3s',
+  p_shadow_color: settings.shadow_color || '#000000',
+  p_hover_scale: settings.hover_scale || '1.05',
+  p_font_family_heading: settings.font_family_heading || 'Inter',
+  p_font_family_body: settings.font_family_body || 'Inter',
+  p_font_size_base: settings.font_size_base || '16px',
+  p_font_weight_normal: settings.font_weight_normal || '400',
+  p_font_weight_bold: settings.font_weight_bold || '700',
+  p_line_height_base: settings.line_height_base || '1.5',
+  p_letter_spacing: settings.letter_spacing || 'normal',
+  p_box_shadow: settings.box_shadow || 'none',
+  p_backdrop_blur: settings.backdrop_blur || '0',
+  p_transition_type: settings.transition_type || 'fade'
 });
 
 export const useSettings = () => {
@@ -87,8 +52,8 @@ export const useSettings = () => {
         throw error;
       }
 
-      // Type assertion to handle the transformation safely
-      return transformSettingsRecord(data as unknown as SettingsRecord);
+      // Transform database record to UI Settings
+      return transformDatabaseToSettings(data as SettingsRecord);
     },
   });
 };
