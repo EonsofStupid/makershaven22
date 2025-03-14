@@ -1,9 +1,12 @@
 
 import { z } from "zod";
 import { settingsSchema } from "./schema";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 
-export type Settings = z.infer<typeof settingsSchema>;
-export type SettingsFormData = Settings;
+// Use the global FlattenedSettings type as our source of truth
+export type Settings = FlattenedSettings;
+// For backward compatibility, point SettingsFormData to FlattenedSettings
+export type SettingsFormData = FlattenedSettings;
 
 export interface SettingsResponse {
   data: Settings;

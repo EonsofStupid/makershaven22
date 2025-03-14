@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSettingsForm } from "./useSettingsForm";
@@ -58,7 +57,6 @@ export const useSettingsFormState = () => {
     },
   });
 
-  // Watch all form fields for changes
   const setupFormWatcher = () => {
     const subscription = form.watch((value, { name, type }) => {
       if (type === "change") {
@@ -99,7 +97,6 @@ export const useSettingsFormState = () => {
     }
   };
 
-  // Get preview settings with all required fields
   const getPreviewSettings = (): FlattenedSettings => {
     return {
       ...form.getValues(),

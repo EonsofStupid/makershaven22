@@ -1,11 +1,12 @@
+
 import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../../types";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 import { ColorPicker } from "../../components/ColorPicker";
 
 interface ColorSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export const ColorSection: React.FC<ColorSectionProps> = ({ form }) => {

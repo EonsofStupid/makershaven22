@@ -1,13 +1,10 @@
 import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../../types";
-import { CSSEffectsControl } from "../../components/CSSEffectsControl";
-import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 
 interface AnimationsSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export const AnimationsSection: React.FC<AnimationsSectionProps> = ({ form }) => {

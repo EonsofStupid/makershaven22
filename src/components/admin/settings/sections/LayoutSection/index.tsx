@@ -1,11 +1,12 @@
+
 import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../../types";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 import { CSSEffectsControl } from "../../components/CSSEffectsControl";
 
 interface LayoutSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export const LayoutSection: React.FC<LayoutSectionProps> = ({ form }) => {

@@ -2,8 +2,14 @@ import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ColorPicker } from "./ColorPicker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UseFormReturn } from "react-hook-form";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 
-export const FontColorSettingsSection = ({ form }: { form: any }) => {
+interface FontColorSettingsSectionProps {
+  form: UseFormReturn<FlattenedSettings>;
+}
+
+export const FontColorSettingsSection: React.FC<FontColorSettingsSectionProps> = ({ form }) => {
   return (
     <AccordionItem value="font-colors">
       <AccordionTrigger className="text-lg font-semibold text-white">

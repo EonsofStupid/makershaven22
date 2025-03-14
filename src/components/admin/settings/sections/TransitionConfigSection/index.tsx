@@ -1,14 +1,10 @@
 import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../../types";
-import { CSSEffectsControl } from "../../components/CSSEffectsControl";
-import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 
 interface TransitionConfigSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export const TransitionConfigSection: React.FC<TransitionConfigSectionProps> = ({ form }) => {

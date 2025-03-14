@@ -2,7 +2,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
-import { Settings, SettingsResponse } from "../../types";
+import { FlattenedSettings } from "@/lib/types/settings/types";
+import { SettingsResponse } from "../../types";
 
 export const useSettingsUpdateHandlers = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -19,7 +20,7 @@ export const useSettingsUpdateHandlers = () => {
     setFaviconFile(file);
   };
 
-  const handleSettingsUpdate = async (formData: Settings) => {
+  const handleSettingsUpdate = async (formData: FlattenedSettings) => {
     console.log("Starting settings update with formData:", formData);
     setIsSaving(true);
     try {
