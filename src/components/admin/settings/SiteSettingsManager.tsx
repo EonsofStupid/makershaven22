@@ -5,6 +5,7 @@ import { supabase } from "../../../integrations/supabase/client";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SecuritySettings } from "@/lib/types/security/types";
 import { isJsonObject, safeBoolean, safeNumber, safeStringArray } from "@/lib/utils/type-utils";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export function SiteSettingsManager() {
   const [settings, setSettings] = useState<FlattenedSettings | null>(null);
@@ -58,6 +59,15 @@ export function SiteSettingsManager() {
           }
         }
         
+        // Ensure theme_mode is a valid ThemeMode value
+        const validThemeModes: ThemeMode[] = ['light', 'dark', 'system'];
+        const themeMode: ThemeMode = 
+          data.theme_mode && 
+          typeof data.theme_mode === 'string' && 
+          validThemeModes.includes(data.theme_mode as ThemeMode) 
+            ? (data.theme_mode as ThemeMode) 
+            : 'system';
+        
         // Convert the raw data to our FlattenedSettings type with proper types
         const flattenedSettings: FlattenedSettings = {
           ...data,
@@ -88,6 +98,7 @@ export function SiteSettingsManager() {
           box_shadow: data.box_shadow || "none",
           backdrop_blur: data.backdrop_blur || "0",
           transition_type: (data.transition_type as "fade" | "slide" | "scale") || "fade",
+          theme_mode: themeMode, // Use validated theme_mode
           security_settings: securitySettings,
           metadata: metadata
         };
@@ -148,6 +159,15 @@ export function SiteSettingsManager() {
               }
             }
             
+            // Ensure theme_mode is a valid ThemeMode value
+            const validThemeModes: ThemeMode[] = ['light', 'dark', 'system'];
+            const themeMode: ThemeMode = 
+              newData.theme_mode && 
+              typeof newData.theme_mode === 'string' && 
+              validThemeModes.includes(newData.theme_mode as ThemeMode) 
+                ? (newData.theme_mode as ThemeMode) 
+                : 'system';
+            
             // Convert the data with proper types
             const flattenedSettings: FlattenedSettings = {
               ...newData,
@@ -178,6 +198,7 @@ export function SiteSettingsManager() {
               box_shadow: newData.box_shadow || "none",
               backdrop_blur: newData.backdrop_blur || "0",
               transition_type: (newData.transition_type as "fade" | "slide" | "scale") || "fade",
+              theme_mode: themeMode, // Use validated theme_mode
               security_settings: securitySettings,
               metadata: metadata
             };
