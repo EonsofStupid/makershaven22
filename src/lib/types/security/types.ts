@@ -1,19 +1,28 @@
 
+import { z } from "zod";
 import { Json } from "../core/json";
 
-// Security settings interfaces
+/**
+ * Security settings interface - defines all security configuration options
+ */
 export interface SecuritySettings {
+  // Core security settings
   enable_ip_filtering: boolean;
-  ip_blacklist?: string[];
-  ip_whitelist?: string[];
   two_factor_auth: boolean;
   max_login_attempts: number;
+  
+  // Optional security settings
+  ip_blacklist?: string[];
+  ip_whitelist?: string[];
   rate_limit_requests?: number;
   session_timeout_minutes?: number;
   lockout_duration_minutes?: number;
   rate_limit_window_minutes?: number;
 }
 
+/**
+ * Security event interface for tracking security-related events
+ */
 export interface SecurityEvent {
   id: string;
   user_id?: string;
@@ -25,6 +34,9 @@ export interface SecurityEvent {
   created_at: string;
 }
 
+/**
+ * Security log interface for detailed security audit logging
+ */
 export interface SecurityLog {
   id: string;
   user_id?: string;
@@ -37,7 +49,24 @@ export interface SecurityLog {
   created_at: string;
 }
 
-// Type guards for security settings
+/**
+ * Zod schema for validating security settings
+ */
+export const securitySettingsSchema = z.object({
+  enable_ip_filtering: z.boolean(),
+  two_factor_auth: z.boolean(),
+  max_login_attempts: z.number().min(1).max(10),
+  ip_blacklist: z.array(z.string()).optional(),
+  ip_whitelist: z.array(z.string()).optional(),
+  rate_limit_requests: z.number().min(1).optional(),
+  session_timeout_minutes: z.number().min(1).optional(),
+  lockout_duration_minutes: z.number().min(1).optional(),
+  rate_limit_window_minutes: z.number().min(1).optional()
+});
+
+/**
+ * Type guard to check if a value matches the SecuritySettings interface
+ */
 export function isSecuritySettings(value: unknown): value is SecuritySettings {
   if (!value || typeof value !== 'object') return false;
   const sec = value as Partial<SecuritySettings>;
@@ -49,32 +78,37 @@ export function isSecuritySettings(value: unknown): value is SecuritySettings {
   );
 }
 
-// Convert from database JSON to SecuritySettings
+/**
+ * Default security settings to use when none are provided
+ */
+export const DEFAULT_SECURITY_SETTINGS: SecuritySettings = {
+  enable_ip_filtering: false,
+  two_factor_auth: false,
+  max_login_attempts: 5
+};
+
+/**
+ * Safely parses JSON data into a SecuritySettings object
+ */
 export function parseSecuritySettings(value: Json | null | undefined): SecuritySettings {
-  const defaultSettings: SecuritySettings = {
-    enable_ip_filtering: false,
-    two_factor_auth: false,
-    max_login_attempts: 5
-  };
-  
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return defaultSettings;
+    return { ...DEFAULT_SECURITY_SETTINGS };
   }
   
   const secObj = value as Record<string, any>;
   
   const result: SecuritySettings = {
     enable_ip_filtering: typeof secObj.enable_ip_filtering === 'boolean' ? 
-      secObj.enable_ip_filtering : defaultSettings.enable_ip_filtering,
+      secObj.enable_ip_filtering : DEFAULT_SECURITY_SETTINGS.enable_ip_filtering,
       
     two_factor_auth: typeof secObj.two_factor_auth === 'boolean' ? 
-      secObj.two_factor_auth : defaultSettings.two_factor_auth,
+      secObj.two_factor_auth : DEFAULT_SECURITY_SETTINGS.two_factor_auth,
       
     max_login_attempts: typeof secObj.max_login_attempts === 'number' ? 
-      secObj.max_login_attempts : defaultSettings.max_login_attempts
+      secObj.max_login_attempts : DEFAULT_SECURITY_SETTINGS.max_login_attempts
   };
   
-  // Optional properties
+  // Handle optional properties
   if (Array.isArray(secObj.ip_blacklist)) {
     result.ip_blacklist = secObj.ip_blacklist.filter((ip: any) => typeof ip === 'string');
   }
@@ -100,4 +134,21 @@ export function parseSecuritySettings(value: Json | null | undefined): SecurityS
   }
   
   return result;
+}
+
+/**
+ * Prepares security settings for database storage
+ */
+export function prepareSecuritySettingsForDb(settings: SecuritySettings): Record<string, any> {
+  return {
+    enable_ip_filtering: settings.enable_ip_filtering,
+    two_factor_auth: settings.two_factor_auth,
+    max_login_attempts: settings.max_login_attempts,
+    ip_blacklist: settings.ip_blacklist || [],
+    ip_whitelist: settings.ip_whitelist || [],
+    rate_limit_requests: settings.rate_limit_requests,
+    session_timeout_minutes: settings.session_timeout_minutes,
+    lockout_duration_minutes: settings.lockout_duration_minutes,
+    rate_limit_window_minutes: settings.rate_limit_window_minutes
+  };
 }
