@@ -1,13 +1,14 @@
+
 import React from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { ColorPicker } from "./ColorPicker";
 import { UseFormReturn } from "react-hook-form";
-import { SettingsFormData } from "../types";
+import { FlattenedSettings } from "@/lib/types/settings/types";
 import { CSSEffectsControl } from "./CSSEffectsControl";
 
 interface AdvancedCSSSectionProps {
-  form: UseFormReturn<SettingsFormData>;
+  form: UseFormReturn<FlattenedSettings>;
 }
 
 export const AdvancedCSSSection: React.FC<AdvancedCSSSectionProps> = ({ form }) => {

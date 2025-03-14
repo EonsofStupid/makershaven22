@@ -5,7 +5,7 @@ import { SecuritySettings } from '../security/types';
 // Export core types for external use
 export type { Settings, FlattenedSettings, SiteSettings, ThemeSettings, SecuritySettings, UserSettings };
 
-// Type for form data
+// Type for form data - used consistently across all settings forms
 export type SettingsFormData = FlattenedSettings;
 
 // Type for API responses
