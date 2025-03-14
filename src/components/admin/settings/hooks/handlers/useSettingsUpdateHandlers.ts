@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
 import { FlattenedSettings } from "@/lib/types/settings/types";
-import { SettingsResponse } from "../../types";
-import { isJsonObject, safeRecord } from "@/lib/utils/type-utils";
-import { SecuritySettings } from "@/lib/types/security/types";
+import { safeRecord } from "@/lib/utils/type-utils";
+import { parseSecuritySettings } from "@/lib/types/security/types";
+import { safeThemeMode } from "@/lib/utils/type-utils";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useSettingsUpdateHandlers = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -23,7 +24,7 @@ export const useSettingsUpdateHandlers = () => {
     setFaviconFile(file);
   };
 
-  const handleSettingsUpdate = async (formData: FlattenedSettings) => {
+  const handleSettingsUpdate = async (formData: FlattenedSettings): Promise<FlattenedSettings> => {
     console.log("Starting settings update with formData:", formData);
     setIsSaving(true);
     try {
@@ -42,8 +43,8 @@ export const useSettingsUpdateHandlers = () => {
         console.log("Favicon uploaded successfully:", favicon_url);
       }
 
-      // Create a properly structured database object from our typed data
-      // Handle metadata and security_settings which need special treatment
+      // Create a structured database object removing any complex types that
+      // aren't directly supported by the database
       const databaseData = {
         site_title: formData.site_title,
         tagline: formData.tagline,
@@ -74,6 +75,7 @@ export const useSettingsUpdateHandlers = () => {
         box_shadow: formData.box_shadow,
         backdrop_blur: formData.backdrop_blur,
         transition_type: formData.transition_type,
+        theme_mode: formData.theme_mode,
         metadata: formData.metadata || {},
         security_settings: formData.security_settings
       };
@@ -89,47 +91,25 @@ export const useSettingsUpdateHandlers = () => {
       if (error) throw error;
 
       console.log("Settings updated successfully:", data);
-      toast.success("Settings updated successfully");
       
-      // Process and convert the response data to match our FlattenedSettings type
-      // Create default security settings
-      const defaultSecuritySettings: SecuritySettings = {
-        enable_ip_filtering: false,
-        two_factor_auth: false,
-        max_login_attempts: 5
-      };
-      
-      // Process security_settings from JSON to SecuritySettings type
-      let securitySettings: SecuritySettings;
-      if (data.security_settings && isJsonObject(data.security_settings)) {
-        const secObj = data.security_settings as Record<string, any>;
-        
-        securitySettings = {
-          enable_ip_filtering: typeof secObj.enable_ip_filtering === 'boolean' ? secObj.enable_ip_filtering : defaultSecuritySettings.enable_ip_filtering,
-          two_factor_auth: typeof secObj.two_factor_auth === 'boolean' ? secObj.two_factor_auth : defaultSecuritySettings.two_factor_auth,
-          max_login_attempts: typeof secObj.max_login_attempts === 'number' ? secObj.max_login_attempts : defaultSecuritySettings.max_login_attempts,
-          
-          // Optional properties - only add if they exist in the data
-          ...(Array.isArray(secObj.ip_blacklist) && { ip_blacklist: secObj.ip_blacklist.filter((ip: any) => typeof ip === 'string') }),
-          ...(Array.isArray(secObj.ip_whitelist) && { ip_whitelist: secObj.ip_whitelist.filter((ip: any) => typeof ip === 'string') }),
-          ...(typeof secObj.rate_limit_requests === 'number' && { rate_limit_requests: secObj.rate_limit_requests }),
-          ...(typeof secObj.session_timeout_minutes === 'number' && { session_timeout_minutes: secObj.session_timeout_minutes }),
-          ...(typeof secObj.lockout_duration_minutes === 'number' && { lockout_duration_minutes: secObj.lockout_duration_minutes }),
-          ...(typeof secObj.rate_limit_window_minutes === 'number' && { rate_limit_window_minutes: secObj.rate_limit_window_minutes })
-        };
-      } else {
-        securitySettings = defaultSecuritySettings;
-      }
+      // Process security settings from JSON to SecuritySettings type
+      const securitySettings = parseSecuritySettings(data.security_settings);
       
       // Process metadata
       const metadata = safeRecord(data.metadata);
       
-      // Create a properly typed FlattenedSettings object
+      // Ensure theme_mode is a valid ThemeMode
+      const themeMode = safeThemeMode(data.theme_mode);
+      
+      // Create a properly typed FlattenedSettings object with explicit type casting
       const settingsResult: FlattenedSettings = {
         ...data,
+        theme_mode: themeMode as ThemeMode,
         security_settings: securitySettings,
         metadata: metadata
       };
+      
+      toast.success("Settings updated successfully");
       
       return settingsResult;
     } catch (error) {

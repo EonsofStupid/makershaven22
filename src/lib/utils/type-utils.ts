@@ -1,4 +1,7 @@
 
+import { Json, JsonObject, isJsonObject } from "../types/core/json";
+import { ThemeMode } from "../types/core/enums";
+
 /**
  * Checks if a value is a non-array object that can be used as a JSON object
  */
@@ -35,4 +38,15 @@ export function safeRecord(value: any): Record<string, unknown> {
     return value as Record<string, unknown>;
   }
   return {};
+}
+
+/**
+ * Safely converts a value to a ThemeMode enum value
+ */
+export function safeThemeMode(value: unknown): ThemeMode {
+  if (typeof value === 'string' && 
+      (value === 'light' || value === 'dark' || value === 'system')) {
+    return value as ThemeMode;
+  }
+  return 'system';
 }

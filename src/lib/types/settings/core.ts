@@ -1,6 +1,6 @@
 
-import { Json } from '../core/json';
-import { ThemeMode } from '../core/enums';
+import { Json, JsonObject } from '../core/json';
+import { ThemeMode, GlassEffectLevel, TransitionType } from '../core/enums';
 import { SecuritySettings } from '../security/types';
 
 // Core site settings interface - the foundation of our settings system
@@ -39,8 +39,8 @@ export interface ThemeSettings {
   letter_spacing: string;
   box_shadow: string;
   backdrop_blur: string;
-  transition_type: "fade" | "slide" | "scale";
-  menu_animation_type?: "fade" | "slide" | "scale";
+  transition_type: TransitionType;
+  menu_animation_type?: TransitionType;
 }
 
 // User preferences
@@ -52,6 +52,14 @@ export interface UserSettings {
   display_preferences?: Record<string, unknown>;
 }
 
+// Theme preferences settings
+export interface ThemePreferences {
+  animations_enabled: boolean;
+  real_time_updates: boolean;
+  glass_effect_level: GlassEffectLevel;
+  update_debounce_ms: number;
+}
+
 // Complete settings model
 export interface Settings {
   id?: string;
@@ -59,6 +67,16 @@ export interface Settings {
   theme: ThemeSettings;
   security: SecuritySettings;
   user: UserSettings;
+  theme_preferences?: ThemePreferences;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+// Base entity model for all settings types
+export interface BaseEntity {
+  id?: string;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -67,9 +85,10 @@ export interface Settings {
 
 // Flattened interface for compatibility with current implementation
 export interface FlattenedSettings extends 
+  BaseEntity,
   Omit<SiteSettings, 'metadata'>, 
-  ThemeSettings, 
-  Omit<Settings, 'site' | 'theme' | 'security' | 'user'> {
+  ThemeSettings {
   security_settings: SecuritySettings;
   metadata?: Record<string, unknown>;
+  theme_mode: ThemeMode;
 }

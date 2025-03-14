@@ -2,6 +2,19 @@
 import { z } from "zod";
 import { ThemeMode } from "../core/enums";
 
+// Define the security settings schema
+const securitySettingsSchema = z.object({
+  enable_ip_filtering: z.boolean(),
+  two_factor_auth: z.boolean(),
+  max_login_attempts: z.number(),
+  ip_blacklist: z.array(z.string()).optional(),
+  ip_whitelist: z.array(z.string()).optional(),
+  rate_limit_requests: z.number().optional(),
+  session_timeout_minutes: z.number().optional(),
+  lockout_duration_minutes: z.number().optional(),
+  rate_limit_window_minutes: z.number().optional()
+});
+
 // Zod schema for flattened settings - matches the FlattenedSettings type
 export const flattenedSettingsSchema = z.object({
   // Site settings
@@ -19,7 +32,7 @@ export const flattenedSettingsSchema = z.object({
   neon_purple: z.string(),
   logo_url: z.string().optional(),
   favicon_url: z.string().optional(),
-  theme_mode: z.enum(["light", "dark", "system"] as const).optional(),
+  theme_mode: z.enum(["light", "dark", "system"] as const).default("system"),
   
   // Theme settings
   border_radius: z.string(),
@@ -40,17 +53,7 @@ export const flattenedSettingsSchema = z.object({
   menu_animation_type: z.enum(["fade", "slide", "scale"] as const).optional(),
   
   // Security settings
-  security_settings: z.object({
-    enable_ip_filtering: z.boolean(),
-    two_factor_auth: z.boolean(),
-    max_login_attempts: z.number(),
-    ip_blacklist: z.array(z.string()).optional(),
-    ip_whitelist: z.array(z.string()).optional(),
-    rate_limit_requests: z.number().optional(),
-    session_timeout_minutes: z.number().optional(),
-    lockout_duration_minutes: z.number().optional(),
-    rate_limit_window_minutes: z.number().optional()
-  }),
+  security_settings: securitySettingsSchema,
   
   // Metadata (optional)
   metadata: z.record(z.unknown()).optional(),

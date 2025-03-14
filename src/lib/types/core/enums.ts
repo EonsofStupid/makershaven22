@@ -6,6 +6,7 @@ export type ContentType = 'page' | 'component' | 'template' | 'workflow' | 'hero
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';
 export type PostCategory = 
   | 'Guides'
   | 'Reviews' 
