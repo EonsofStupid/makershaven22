@@ -1,122 +1,94 @@
 
-import React from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { UseFormReturn } from "react-hook-form";
-import { FlattenedSettings } from "@/lib/types/settings/types";
+import { motion } from "framer-motion";
+
+interface ControlOption {
+  label: string;
+  value: string;
+}
 
 interface CSSEffectsControlProps {
   label: string;
-  type: "slider" | "select" | "input";
+  type: 'slider' | 'select';
   value: number | string;
-  options?: { label: string; value: string }[];
   min?: number;
   max?: number;
   step?: number;
+  options?: ControlOption[];
   onChange: (value: any) => void;
-  className?: string;
-  previewClass?: string;
   description?: string;
-  form?: UseFormReturn<FlattenedSettings>;
-  name?: keyof FlattenedSettings;
+  previewClass?: string;
 }
 
 export const CSSEffectsControl: React.FC<CSSEffectsControlProps> = ({
   label,
   type,
   value,
-  options,
   min = 0,
   max = 100,
   step = 1,
+  options = [],
   onChange,
-  className,
-  previewClass,
   description,
-  form,
-  name
+  previewClass
 }) => {
-  const handleInputChange = (newValue: number | string) => {
-    if (form && name) {
-      form.setValue(name, newValue.toString());
-    } else {
-      onChange(newValue);
-    }
-  };
-
-  const renderControl = () => {
-    switch (type) {
-      case "slider":
-        return (
-          <div className="flex items-center gap-4">
-            <Slider
-              value={[typeof value === 'number' ? value : 0]}
-              min={min}
-              max={max}
-              step={step}
-              onValueChange={(values) => handleInputChange(values[0])}
-              className="flex-1"
-            />
-            <Input
-              type="number"
-              value={value}
-              onChange={(e) => handleInputChange(Number(e.target.value))}
-              className="w-20 bg-gray-700/50 border-gray-600 text-white"
-              min={min}
-              max={max}
-              step={step}
-            />
-          </div>
-        );
-      case "select":
-        return (
-          <Select 
-            value={value.toString()} 
-            onValueChange={handleInputChange}
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <label className="text-sm font-medium">{label}</label>
+        {type === 'slider' && (
+          <span className="text-xs text-gray-400">{value}</span>
+        )}
+      </div>
+      
+      {description && (
+        <p className="text-xs text-gray-400">{description}</p>
+      )}
+      
+      <div className="mt-2">
+        {type === 'slider' && (
+          <Slider
+            value={[typeof value === 'number' ? value : parseFloat(value.toString()) || 0]}
+            min={min}
+            max={max}
+            step={step}
+            onValueChange={(values) => onChange(values[0])}
+            className="w-full"
+          />
+        )}
+        
+        {type === 'select' && (
+          <Select
+            value={value?.toString()}
+            onValueChange={(val) => onChange(val)}
           >
-            <SelectTrigger className="w-full bg-gray-700/50 border-gray-600 text-white">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select option" />
             </SelectTrigger>
             <SelectContent>
-              {options?.map((option) => (
+              {options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        );
-      case "input":
-        return (
-          <Input
-            type="text"
-            value={value}
-            onChange={(e) => handleInputChange(e.target.value)}
-            className="w-full bg-gray-700/50 border-gray-600 text-white"
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex justify-between items-center">
-        <Label className="text-sm text-gray-300">{label}</Label>
-        {previewClass && (
-          <div className={cn("text-sm px-2 py-1 rounded bg-gray-800/50", previewClass)}>
-            Preview
-          </div>
         )}
       </div>
-      {description && (
-        <p className="text-xs text-gray-400">{description}</p>
+      
+      {previewClass && (
+        <div className="mt-3 p-2 bg-gray-800/50 rounded-md">
+          <motion.div 
+            className={`p-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded text-center ${previewClass}`}
+            whileHover={{ scale: typeof value === 'number' ? value : 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            Preview Effect
+          </motion.div>
+        </div>
       )}
-      {renderControl()}
     </div>
   );
 };

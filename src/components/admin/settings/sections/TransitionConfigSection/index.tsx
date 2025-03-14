@@ -1,100 +1,116 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { UseFormReturn } from "react-hook-form";
-import { FlattenedSettings } from "@/lib/types/settings/types";
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
+import { useSettingsStore } from "@/lib/store/settings-store";
+import { CSSEffectsControl } from "../../components/CSSEffectsControl";
 
-interface TransitionConfigSectionProps {
-  form: UseFormReturn<FlattenedSettings>;
-}
+export const TransitionConfigSection = ({ form }) => {
+  const { updateSettings } = useSettingsStore();
+  const [isUpdating, setIsUpdating] = useState(false);
 
-export const TransitionConfigSection: React.FC<TransitionConfigSectionProps> = ({ form }) => {
-  const [previewKey, setPreviewKey] = React.useState(0);
-
-  const handleTransitionChange = (value: any) => {
-    setPreviewKey(prev => prev + 1);
-    toast.success("Transition updated", {
-      description: "Your changes have been applied"
-    });
+  const handleValueChange = async (key, value) => {
+    setIsUpdating(true);
+    try {
+      // Update form value
+      form.setValue(key, value);
+      
+      // Create an update object with just the changed value
+      const update = { [key]: value };
+      
+      // Update settings in the store
+      await updateSettings(update);
+      
+      toast.success("Setting updated successfully");
+    } catch (error) {
+      console.error("Failed to update setting:", error);
+      toast.error("Failed to update setting");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
     <AccordionItem value="transition-config">
       <AccordionTrigger className="text-lg font-semibold text-white">
-        Transition Configuration
+        <motion.div
+          initial={{ opacity: 0.8 }}
+          whileHover={{ opacity: 1, scale: 1.02 }}
+          className="flex items-center gap-2"
+        >
+          Transitions & Motion
+        </motion.div>
       </AccordionTrigger>
       <AccordionContent className="space-y-6 pt-4">
-        <div className="grid gap-6">
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-white">Global Transitions</h3>
-            <CSSEffectsControl
-              label="Default Transition Type"
-              type="select"
-              value={form.watch("transition_type")}
-              options={[
-                { label: "Fade", value: "fade" },
-                { label: "Slide", value: "slide" },
-                { label: "Scale", value: "scale" },
-                { label: "Blur", value: "blur" }
-              ]}
-              onChange={(value) => {
-                form.setValue("transition_type", value);
-                handleTransitionChange(value);
-              }}
-              description="Select the default transition style for page changes"
-            />
-            <CSSEffectsControl
-              label="Transition Duration"
-              type="slider"
-              value={parseFloat(form.watch("transition_duration"))}
-              min={0.1}
-              max={1}
-              step={0.1}
-              onChange={(value) => {
-                form.setValue("transition_duration", value.toString());
-                handleTransitionChange(value);
-              }}
-              description="Adjust the duration of transitions in seconds"
-            />
-          </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <CSSEffectsControl
+            label="Transition Duration"
+            type="slider"
+            value={parseFloat(form.watch("transition_duration")?.replace('s', '') || '0.3')}
+            min={0.1}
+            max={1}
+            step={0.1}
+            onChange={(value) => handleValueChange("transition_duration", `${value}s`)}
+            description="Duration of transition animations"
+          />
+        </motion.div>
 
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-white">Menu Transitions</h3>
-            <CSSEffectsControl
-              label="Menu Animation Style"
-              type="select"
-              value={form.watch("menu_animation_type") || "fade"}
-              options={[
-                { label: "Fade", value: "fade" },
-                { label: "Slide Down", value: "slide-down" },
-                { label: "Scale", value: "scale" },
-                { label: "Blur", value: "blur" }
-              ]}
-              onChange={(value) => {
-                form.setValue("menu_animation_type", value);
-                handleTransitionChange(value);
-              }}
-              description="Select how menus and dropdowns animate"
-            />
-          </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <CSSEffectsControl
+            label="Hover Scale"
+            type="slider"
+            value={parseFloat(form.watch("hover_scale") || '1.05')}
+            min={1}
+            max={1.2}
+            step={0.01}
+            onChange={(value) => handleValueChange("hover_scale", value.toString())}
+            description="Scale factor for hover animations"
+          />
+        </motion.div>
 
-          <Card className="p-4 bg-gray-800/50 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-4">Preview</h3>
-            <div className="grid gap-4">
-              <motion.div
-                key={`preview-${previewKey}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ 
-                  duration: parseFloat(form.watch("transition_duration")),
-                  ease: "easeOut"
-                }}
-                className="bg-primary/10 p-4 rounded-lg"
-              >
-                <p className="text-primary">Transition Preview</p>
-              </motion.div>
-            </div>
-          </Card>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <CSSEffectsControl
+            label="Transition Type"
+            type="select"
+            value={form.watch("transition_type") || 'fade'}
+            options={[
+              { label: "Fade", value: "fade" },
+              { label: "Slide", value: "slide" },
+              { label: "Scale", value: "scale" }
+            ]}
+            onChange={(value) => handleValueChange("transition_type", value)}
+            description="Type of transition animation"
+          />
+        </motion.div>
+
+        <Card className="p-4 bg-gray-800/50 border border-gray-700">
+          <h3 className="text-sm font-medium mb-2">Preview</h3>
+          <motion.div
+            className="bg-gray-700/50 p-4 rounded-md flex items-center justify-center text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ 
+              duration: parseFloat(form.watch("transition_duration")?.replace('s', '') || '0.3'),
+              ease: form.watch("transition_type") === "linear" ? "linear" : "easeOut"
+            }}
+          >
+            Hover over me
+          </motion.div>
+        </Card>
       </AccordionContent>
     </AccordionItem>
   );

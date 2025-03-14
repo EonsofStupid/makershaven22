@@ -1,28 +1,42 @@
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CSSEffectsControl } from "./CSSEffectsControl";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useSettingsStore } from "@/lib/store/settings-store";
 
 export const TransitionSettingsSection = () => {
-  const [settings, setSettings] = useState({
-    pageTransition: 0.3,
-    transitionType: "ease-out",
-    hoverScale: 1.05,
-    animationPreset: "fade"
+  const { settings, updateSettings } = useSettingsStore();
+  const [localSettings, setLocalSettings] = useState({
+    pageTransition: parseFloat(settings?.transition_duration?.replace('s', '') || '0.3'),
+    transitionType: settings?.transition_type || "ease-out",
+    hoverScale: parseFloat(settings?.hover_scale || '1.05'),
+    animationPreset: settings?.transition_type || "fade"
   });
 
   const handleSettingChange = async (key: string, value: number | string) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    // Update local state first for immediate feedback
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
     
     try {
-      const { data, error } = await supabase.rpc('update_site_settings', {
-        p_transition_duration: `${value}s`,
-        p_hover_scale: value.toString()
-      });
-
-      if (error) throw error;
+      // Map local settings keys to the actual settings properties
+      let settingsUpdate: Record<string, any> = {};
+      
+      if (key === 'pageTransition') {
+        settingsUpdate.transition_duration = `${value}s`;
+      } else if (key === 'hoverScale') {
+        settingsUpdate.hover_scale = value.toString();
+      } else if (key === 'transitionType') {
+        settingsUpdate.transition_type = value as string;
+      } else if (key === 'animationPreset') {
+        // This might map to a different property if needed
+        settingsUpdate.transition_type = value as string;
+      }
+      
+      // Use the settings store to update settings
+      await updateSettings(settingsUpdate);
       
       toast.success("Transition settings updated");
     } catch (error) {
@@ -51,7 +65,7 @@ export const TransitionSettingsSection = () => {
           <CSSEffectsControl
             label="Page Transition Duration"
             type="slider"
-            value={settings.pageTransition}
+            value={localSettings.pageTransition}
             min={0.1}
             max={1}
             step={0.1}
@@ -69,7 +83,7 @@ export const TransitionSettingsSection = () => {
           <CSSEffectsControl
             label="Element Transition Type"
             type="select"
-            value={settings.transitionType}
+            value={localSettings.transitionType}
             options={[
               { label: "Ease Out", value: "ease-out" },
               { label: "Ease In", value: "ease-in" },
@@ -88,7 +102,7 @@ export const TransitionSettingsSection = () => {
           <CSSEffectsControl
             label="Hover Scale Factor"
             type="slider"
-            value={settings.hoverScale}
+            value={localSettings.hoverScale}
             min={1}
             max={1.2}
             step={0.01}
@@ -106,7 +120,7 @@ export const TransitionSettingsSection = () => {
           <CSSEffectsControl
             label="Animation Preset"
             type="select"
-            value={settings.animationPreset}
+            value={localSettings.animationPreset}
             options={[
               { label: "Fade", value: "fade" },
               { label: "Slide", value: "slide" },
