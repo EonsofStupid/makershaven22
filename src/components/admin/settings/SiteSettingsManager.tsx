@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SecuritySettings } from "@/lib/types/security/types";
+import { isJsonObject, safeBoolean, safeNumber, safeStringArray } from "@/lib/utils/type-utils";
 
 export function SiteSettingsManager() {
   const [settings, setSettings] = useState<FlattenedSettings | null>(null);
@@ -28,22 +29,18 @@ export function SiteSettingsManager() {
         // Safely handle the security_settings field from the database
         let securitySettings: SecuritySettings;
         
-        // First check if security_settings exists and is an object (not an array)
-        if (data.security_settings && 
-            typeof data.security_settings === 'object' && 
-            !Array.isArray(data.security_settings)) {
-          
-          // Type assert as Record<string, Json> to access properties safely
+        // Safely process the security_settings object
+        if (data.security_settings && isJsonObject(data.security_settings)) {
           const securityObj = data.security_settings as Record<string, any>;
           
           securitySettings = {
-            enable_ip_filtering: Boolean(securityObj.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
-            two_factor_auth: Boolean(securityObj.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
-            max_login_attempts: Number(securityObj.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
+            enable_ip_filtering: safeBoolean(securityObj.enable_ip_filtering, defaultSecuritySettings.enable_ip_filtering),
+            two_factor_auth: safeBoolean(securityObj.two_factor_auth, defaultSecuritySettings.two_factor_auth),
+            max_login_attempts: safeNumber(securityObj.max_login_attempts, defaultSecuritySettings.max_login_attempts),
             
             // Safely handle optional properties
-            ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? securityObj.ip_blacklist : undefined,
-            ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? securityObj.ip_whitelist : undefined,
+            ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? safeStringArray(securityObj.ip_blacklist) : undefined,
+            ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? safeStringArray(securityObj.ip_whitelist) : undefined,
             rate_limit_requests: typeof securityObj.rate_limit_requests === 'number' ? securityObj.rate_limit_requests : undefined,
             session_timeout_minutes: typeof securityObj.session_timeout_minutes === 'number' ? securityObj.session_timeout_minutes : undefined,
             lockout_duration_minutes: typeof securityObj.lockout_duration_minutes === 'number' ? securityObj.lockout_duration_minutes : undefined,
@@ -122,22 +119,18 @@ export function SiteSettingsManager() {
             // Safely handle the security_settings field
             let securitySettings: SecuritySettings;
             
-            // First check if security_settings exists and is an object (not an array)
-            if (newData.security_settings && 
-                typeof newData.security_settings === 'object' && 
-                !Array.isArray(newData.security_settings)) {
-              
-              // Type assert as Record<string, Json> to access properties safely
+            // Safely process the security_settings object
+            if (newData.security_settings && isJsonObject(newData.security_settings)) {
               const securityObj = newData.security_settings as Record<string, any>;
               
               securitySettings = {
-                enable_ip_filtering: Boolean(securityObj.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering),
-                two_factor_auth: Boolean(securityObj.two_factor_auth ?? defaultSecuritySettings.two_factor_auth),
-                max_login_attempts: Number(securityObj.max_login_attempts ?? defaultSecuritySettings.max_login_attempts),
+                enable_ip_filtering: safeBoolean(securityObj.enable_ip_filtering, defaultSecuritySettings.enable_ip_filtering),
+                two_factor_auth: safeBoolean(securityObj.two_factor_auth, defaultSecuritySettings.two_factor_auth),
+                max_login_attempts: safeNumber(securityObj.max_login_attempts, defaultSecuritySettings.max_login_attempts),
                 
                 // Safely handle optional properties
-                ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? securityObj.ip_blacklist : undefined,
-                ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? securityObj.ip_whitelist : undefined,
+                ip_blacklist: Array.isArray(securityObj.ip_blacklist) ? safeStringArray(securityObj.ip_blacklist) : undefined,
+                ip_whitelist: Array.isArray(securityObj.ip_whitelist) ? safeStringArray(securityObj.ip_whitelist) : undefined,
                 rate_limit_requests: typeof securityObj.rate_limit_requests === 'number' ? securityObj.rate_limit_requests : undefined,
                 session_timeout_minutes: typeof securityObj.session_timeout_minutes === 'number' ? securityObj.session_timeout_minutes : undefined,
                 lockout_duration_minutes: typeof securityObj.lockout_duration_minutes === 'number' ? securityObj.lockout_duration_minutes : undefined,
