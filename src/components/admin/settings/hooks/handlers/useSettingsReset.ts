@@ -44,6 +44,7 @@ export const useSettingsReset = () => {
           box_shadow: DEFAULT_SETTINGS.box_shadow,
           backdrop_blur: DEFAULT_SETTINGS.backdrop_blur,
           transition_type: DEFAULT_SETTINGS.transition_type,
+          security_settings: DEFAULT_SETTINGS.security_settings
         })
         .eq('id', 1)
         .select()

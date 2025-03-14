@@ -1,3 +1,4 @@
+
 export const DEFAULT_SETTINGS = {
   site_title: "MakersImpulse",
   tagline: "Create, Share, Inspire",
@@ -23,5 +24,12 @@ export const DEFAULT_SETTINGS = {
   font_weight_bold: "700",
   line_height_base: "1.5",
   letter_spacing: "normal",
+  box_shadow: "none",
+  backdrop_blur: "0",
   transition_type: "fade" as const,
+  security_settings: {
+    enable_ip_filtering: false,
+    two_factor_auth: false,
+    max_login_attempts: 5
+  }
 };

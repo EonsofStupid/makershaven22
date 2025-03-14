@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Settings } from "../../types";
 import { ThemeMode } from "@/lib/types/core/enums";
+import { SecuritySettings } from "@/lib/types/security/types";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -28,6 +29,31 @@ export const useSettingsFetch = () => {
         (themeModeValue === 'light' || themeModeValue === 'dark' || themeModeValue === 'system') 
           ? themeModeValue as ThemeMode 
           : 'system';
+
+      // Create default security settings if none exist
+      const defaultSecuritySettings: SecuritySettings = {
+        enable_ip_filtering: false,
+        two_factor_auth: false,
+        max_login_attempts: 5
+      };
+
+      // Parse security_settings or use default
+      let securitySettings: SecuritySettings;
+      if (data.security_settings && typeof data.security_settings === 'object') {
+        securitySettings = {
+          enable_ip_filtering: data.security_settings.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering,
+          two_factor_auth: data.security_settings.two_factor_auth ?? defaultSecuritySettings.two_factor_auth,
+          max_login_attempts: data.security_settings.max_login_attempts ?? defaultSecuritySettings.max_login_attempts,
+          ip_blacklist: Array.isArray(data.security_settings.ip_blacklist) ? data.security_settings.ip_blacklist : undefined,
+          ip_whitelist: Array.isArray(data.security_settings.ip_whitelist) ? data.security_settings.ip_whitelist : undefined,
+          rate_limit_requests: typeof data.security_settings.rate_limit_requests === 'number' ? data.security_settings.rate_limit_requests : undefined,
+          session_timeout_minutes: typeof data.security_settings.session_timeout_minutes === 'number' ? data.security_settings.session_timeout_minutes : undefined,
+          lockout_duration_minutes: typeof data.security_settings.lockout_duration_minutes === 'number' ? data.security_settings.lockout_duration_minutes : undefined,
+          rate_limit_window_minutes: typeof data.security_settings.rate_limit_window_minutes === 'number' ? data.security_settings.rate_limit_window_minutes : undefined
+        };
+      } else {
+        securitySettings = defaultSecuritySettings;
+      }
 
       // Transform the data to match Settings type
       const settings: Settings = {
@@ -59,8 +85,9 @@ export const useSettingsFetch = () => {
         line_height_base: data.line_height_base,
         letter_spacing: data.letter_spacing,
         transition_type: (data.transition_type as 'fade' | 'slide' | 'scale') || 'fade',
-        box_shadow: data.box_shadow,
-        backdrop_blur: data.backdrop_blur,
+        box_shadow: data.box_shadow || 'none',
+        backdrop_blur: data.backdrop_blur || '0',
+        security_settings: securitySettings,
         updated_at: data.updated_at,
         updated_by: data.updated_by
       };
