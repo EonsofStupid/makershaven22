@@ -20,17 +20,25 @@ const TransformationRuleEditor = () => {
 
     try {
       setIsSaving(true);
-      // Instead of using a non-existent method, we'll use updateSettings
-      // to store the transformation rule in the settings metadata
+      // Get the current metadata or initialize an empty object
+      const currentMetadata = settingsStore.settings.metadata || {};
+      
+      // Get the current transformation rules array or initialize an empty array
+      const currentRules = Array.isArray(currentMetadata.transformationRules) 
+        ? [...currentMetadata.transformationRules] 
+        : [];
+      
+      // Add the new rule
+      const updatedRules = [...currentRules, rule];
+      
+      // Update settings with the new metadata
       await settingsStore.updateSettings({
         metadata: {
-          ...(settingsStore.settings.metadata || {}),
-          transformationRules: [
-            ...(settingsStore.settings.metadata?.transformationRules || []),
-            rule
-          ]
+          ...currentMetadata,
+          transformationRules: updatedRules
         }
       });
+      
       toast.success('Transformation rule saved successfully.');
       setRule({ name: '', type: '', config: '' });
     } catch (error) {

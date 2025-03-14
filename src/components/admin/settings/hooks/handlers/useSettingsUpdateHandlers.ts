@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -39,41 +40,51 @@ export const useSettingsUpdateHandlers = () => {
         console.log("Favicon uploaded successfully:", favicon_url);
       }
 
-      const { data, error } = await supabase.rpc('update_site_settings', {
-        p_site_title: formData.site_title,
-        p_tagline: formData.tagline,
-        p_primary_color: formData.primary_color,
-        p_secondary_color: formData.secondary_color,
-        p_accent_color: formData.accent_color,
-        p_logo_url: logo_url,
-        p_favicon_url: favicon_url,
-        p_text_primary_color: formData.text_primary_color,
-        p_text_secondary_color: formData.text_secondary_color,
-        p_text_link_color: formData.text_link_color,
-        p_text_heading_color: formData.text_heading_color,
-        p_neon_cyan: formData.neon_cyan,
-        p_neon_pink: formData.neon_pink,
-        p_neon_purple: formData.neon_purple,
-        p_border_radius: formData.border_radius,
-        p_spacing_unit: formData.spacing_unit,
-        p_transition_duration: formData.transition_duration,
-        p_shadow_color: formData.shadow_color,
-        p_hover_scale: formData.hover_scale,
-        p_font_family_heading: formData.font_family_heading,
-        p_font_family_body: formData.font_family_body,
-        p_font_size_base: formData.font_size_base,
-        p_font_weight_normal: formData.font_weight_normal,
-        p_font_weight_bold: formData.font_weight_bold,
-        p_line_height_base: formData.line_height_base,
-        p_letter_spacing: formData.letter_spacing,
-      });
+      // Use Supabase update directly instead of RPC
+      const { data, error } = await supabase
+        .from('site_settings')
+        .update({
+          site_title: formData.site_title,
+          tagline: formData.tagline,
+          primary_color: formData.primary_color,
+          secondary_color: formData.secondary_color,
+          accent_color: formData.accent_color,
+          logo_url: logo_url,
+          favicon_url: favicon_url,
+          text_primary_color: formData.text_primary_color,
+          text_secondary_color: formData.text_secondary_color,
+          text_link_color: formData.text_link_color,
+          text_heading_color: formData.text_heading_color,
+          neon_cyan: formData.neon_cyan,
+          neon_pink: formData.neon_pink,
+          neon_purple: formData.neon_purple,
+          border_radius: formData.border_radius,
+          spacing_unit: formData.spacing_unit,
+          transition_duration: formData.transition_duration,
+          shadow_color: formData.shadow_color,
+          hover_scale: formData.hover_scale,
+          font_family_heading: formData.font_family_heading,
+          font_family_body: formData.font_family_body,
+          font_size_base: formData.font_size_base,
+          font_weight_normal: formData.font_weight_normal,
+          font_weight_bold: formData.font_weight_bold,
+          line_height_base: formData.line_height_base,
+          letter_spacing: formData.letter_spacing,
+          box_shadow: formData.box_shadow,
+          backdrop_blur: formData.backdrop_blur,
+          transition_type: formData.transition_type,
+          metadata: formData.metadata,
+          security_settings: formData.security_settings
+        })
+        .eq('id', 1)
+        .select()
+        .single();
 
       if (error) throw error;
 
-      const response = data as unknown as SettingsResponse;
-      console.log("Settings updated successfully:", response);
+      console.log("Settings updated successfully:", data);
       toast.success("Settings updated successfully");
-      return response.data;
+      return data as FlattenedSettings;
     } catch (error) {
       console.error("Error in handleSettingsUpdate:", error);
       toast.error("Failed to update settings");

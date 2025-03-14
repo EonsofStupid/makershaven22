@@ -1,7 +1,9 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Settings } from "../../types";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -20,6 +22,13 @@ export const useSettingsFetch = () => {
         throw error;
       }
 
+      // Make sure theme_mode is a valid ThemeMode value
+      const themeModeValue = data.theme_mode || 'system';
+      const validThemeMode: ThemeMode = 
+        (themeModeValue === 'light' || themeModeValue === 'dark' || themeModeValue === 'system') 
+          ? themeModeValue as ThemeMode 
+          : 'system';
+
       // Transform the data to match Settings type
       const settings: Settings = {
         site_title: data.site_title,
@@ -29,7 +38,7 @@ export const useSettingsFetch = () => {
         accent_color: data.accent_color,
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
-        theme_mode: data.theme_mode,
+        theme_mode: validThemeMode,
         text_primary_color: data.text_primary_color,
         text_secondary_color: data.text_secondary_color,
         text_link_color: data.text_link_color,

@@ -3,6 +3,7 @@ import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
 
 interface ControlOption {
   label: string;
@@ -11,7 +12,7 @@ interface ControlOption {
 
 interface CSSEffectsControlProps {
   label: string;
-  type: 'slider' | 'select';
+  type: 'slider' | 'select' | 'input';
   value: number | string;
   min?: number;
   max?: number;
@@ -75,6 +76,14 @@ export const CSSEffectsControl: React.FC<CSSEffectsControlProps> = ({
               ))}
             </SelectContent>
           </Select>
+        )}
+
+        {type === 'input' && (
+          <Input
+            value={value?.toString()}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full"
+          />
         )}
       </div>
       
