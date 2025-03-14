@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { Settings } from "../../types";
 import { ThemeMode } from "@/lib/types/core/enums";
 import { SecuritySettings } from "@/lib/types/security/types";
+import { isJsonObject } from "@/lib/utils/type-utils";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -39,17 +40,23 @@ export const useSettingsFetch = () => {
 
       // Parse security_settings or use default
       let securitySettings: SecuritySettings;
-      if (data.security_settings && typeof data.security_settings === 'object') {
+      
+      // Safely parse security_settings with proper type checking
+      if (data.security_settings && isJsonObject(data.security_settings)) {
+        const secObj = data.security_settings as Record<string, any>;
+        
         securitySettings = {
-          enable_ip_filtering: data.security_settings.enable_ip_filtering ?? defaultSecuritySettings.enable_ip_filtering,
-          two_factor_auth: data.security_settings.two_factor_auth ?? defaultSecuritySettings.two_factor_auth,
-          max_login_attempts: data.security_settings.max_login_attempts ?? defaultSecuritySettings.max_login_attempts,
-          ip_blacklist: Array.isArray(data.security_settings.ip_blacklist) ? data.security_settings.ip_blacklist : undefined,
-          ip_whitelist: Array.isArray(data.security_settings.ip_whitelist) ? data.security_settings.ip_whitelist : undefined,
-          rate_limit_requests: typeof data.security_settings.rate_limit_requests === 'number' ? data.security_settings.rate_limit_requests : undefined,
-          session_timeout_minutes: typeof data.security_settings.session_timeout_minutes === 'number' ? data.security_settings.session_timeout_minutes : undefined,
-          lockout_duration_minutes: typeof data.security_settings.lockout_duration_minutes === 'number' ? data.security_settings.lockout_duration_minutes : undefined,
-          rate_limit_window_minutes: typeof data.security_settings.rate_limit_window_minutes === 'number' ? data.security_settings.rate_limit_window_minutes : undefined
+          enable_ip_filtering: typeof secObj.enable_ip_filtering === 'boolean' ? secObj.enable_ip_filtering : defaultSecuritySettings.enable_ip_filtering,
+          two_factor_auth: typeof secObj.two_factor_auth === 'boolean' ? secObj.two_factor_auth : defaultSecuritySettings.two_factor_auth,
+          max_login_attempts: typeof secObj.max_login_attempts === 'number' ? secObj.max_login_attempts : defaultSecuritySettings.max_login_attempts,
+          
+          // Optional properties - only add if they exist in the data
+          ...(Array.isArray(secObj.ip_blacklist) && { ip_blacklist: secObj.ip_blacklist.filter((ip: any) => typeof ip === 'string') }),
+          ...(Array.isArray(secObj.ip_whitelist) && { ip_whitelist: secObj.ip_whitelist.filter((ip: any) => typeof ip === 'string') }),
+          ...(typeof secObj.rate_limit_requests === 'number' && { rate_limit_requests: secObj.rate_limit_requests }),
+          ...(typeof secObj.session_timeout_minutes === 'number' && { session_timeout_minutes: secObj.session_timeout_minutes }),
+          ...(typeof secObj.lockout_duration_minutes === 'number' && { lockout_duration_minutes: secObj.lockout_duration_minutes }),
+          ...(typeof secObj.rate_limit_window_minutes === 'number' && { rate_limit_window_minutes: secObj.rate_limit_window_minutes })
         };
       } else {
         securitySettings = defaultSecuritySettings;
@@ -57,39 +64,40 @@ export const useSettingsFetch = () => {
 
       // Transform the data to match Settings type
       const settings: Settings = {
-        site_title: data.site_title,
-        tagline: data.tagline,
-        primary_color: data.primary_color,
-        secondary_color: data.secondary_color,
-        accent_color: data.accent_color,
+        site_title: data.site_title || "MakersImpulse",
+        tagline: data.tagline || "Create, Share, Inspire",
+        primary_color: data.primary_color || "#7FFFD4",
+        secondary_color: data.secondary_color || "#FFB6C1",
+        accent_color: data.accent_color || "#E6E6FA",
         logo_url: data.logo_url,
         favicon_url: data.favicon_url,
         theme_mode: validThemeMode,
-        text_primary_color: data.text_primary_color,
-        text_secondary_color: data.text_secondary_color,
-        text_link_color: data.text_link_color,
-        text_heading_color: data.text_heading_color,
+        text_primary_color: data.text_primary_color || "#FFFFFF",
+        text_secondary_color: data.text_secondary_color || "#A1A1AA",
+        text_link_color: data.text_link_color || "#3B82F6",
+        text_heading_color: data.text_heading_color || "#FFFFFF",
         neon_cyan: data.neon_cyan || '#41f0db',
         neon_pink: data.neon_pink || '#ff0abe',
         neon_purple: data.neon_purple || '#8000ff',
-        border_radius: data.border_radius,
-        spacing_unit: data.spacing_unit,
-        transition_duration: data.transition_duration,
-        shadow_color: data.shadow_color,
-        hover_scale: data.hover_scale,
-        font_family_heading: data.font_family_heading,
-        font_family_body: data.font_family_body,
-        font_size_base: data.font_size_base,
-        font_weight_normal: data.font_weight_normal,
-        font_weight_bold: data.font_weight_bold,
-        line_height_base: data.line_height_base,
-        letter_spacing: data.letter_spacing,
+        border_radius: data.border_radius || "0.5rem",
+        spacing_unit: data.spacing_unit || "1rem",
+        transition_duration: data.transition_duration || "0.3s",
+        shadow_color: data.shadow_color || "#000000",
+        hover_scale: data.hover_scale || "1.05",
+        font_family_heading: data.font_family_heading || "Inter",
+        font_family_body: data.font_family_body || "Inter",
+        font_size_base: data.font_size_base || "16px",
+        font_weight_normal: data.font_weight_normal || "400",
+        font_weight_bold: data.font_weight_bold || "700",
+        line_height_base: data.line_height_base || "1.5",
+        letter_spacing: data.letter_spacing || "normal",
+        box_shadow: data.box_shadow || "none",
+        backdrop_blur: data.backdrop_blur || "0",
         transition_type: (data.transition_type as 'fade' | 'slide' | 'scale') || 'fade',
-        box_shadow: data.box_shadow || 'none',
-        backdrop_blur: data.backdrop_blur || '0',
         security_settings: securitySettings,
         updated_at: data.updated_at,
-        updated_by: data.updated_by
+        updated_by: data.updated_by,
+        metadata: data.metadata || {}
       };
 
       console.log("Settings fetched successfully:", settings);

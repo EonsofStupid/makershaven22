@@ -7,17 +7,35 @@ import { Card } from "@/components/ui/card";
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { toast } from 'sonner';
 
+interface TransformationRule {
+  from: string;
+  to: string;
+}
+
 export const TransformationRuleEditor = () => {
   const { settings, updateSettings } = useSettingsStore();
-  const [rules, setRules] = useState<Array<{ from: string; to: string }>>([]);
-  const [newRule, setNewRule] = useState({ from: '', to: '' });
+  const [rules, setRules] = useState<TransformationRule[]>([]);
+  const [newRule, setNewRule] = useState<TransformationRule>({ from: '', to: '' });
 
   // Initialize from stored settings metadata
   useEffect(() => {
     if (settings.metadata?.transformationRules) {
-      const storedRules = settings.metadata.transformationRules;
-      if (Array.isArray(storedRules)) {
-        setRules(storedRules as { from: string; to: string }[]);
+      try {
+        const storedRules = settings.metadata.transformationRules;
+        if (Array.isArray(storedRules)) {
+          // Validate that each rule has from and to properties
+          const validRules = storedRules.filter(
+            (rule): rule is TransformationRule => 
+              typeof rule === 'object' && 
+              rule !== null &&
+              typeof (rule as any).from === 'string' && 
+              typeof (rule as any).to === 'string'
+          );
+          setRules(validRules);
+        }
+      } catch (e) {
+        console.error("Error parsing transformation rules:", e);
+        setRules([]);
       }
     }
   }, [settings.metadata]);
