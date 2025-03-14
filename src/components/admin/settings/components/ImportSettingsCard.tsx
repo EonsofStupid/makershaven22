@@ -1,13 +1,13 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Json } from '@/lib/types/core/json';
-import { Settings } from '@/lib/types/settings';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettingsStore } from '@/lib/store/settings-store';
+import { FlattenedSettings } from '@/lib/types/settings/types';
 
 export const ImportSettingsCard = () => {
   const { updateSettings } = useSettingsStore();
@@ -18,7 +18,7 @@ export const ImportSettingsCard = () => {
 
     try {
       const text = await file.text();
-      const settings: Settings = JSON.parse(text);
+      const settings: FlattenedSettings = JSON.parse(text);
       
       await updateSettings(settings);
       toast.success('Settings imported successfully');

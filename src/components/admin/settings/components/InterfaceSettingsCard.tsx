@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Json } from '@/lib/types/core/json';
-import { Settings } from '@/lib/types/settings';
+import { FlattenedSettings } from '@/lib/types/settings/types';
 
-const InterfaceSettingsCard: React.FC<{ settings: Settings; onChange: (updatedSettings: Settings) => void }> = ({ settings, onChange }) => {
-  const handleSettingChange = (key: keyof Settings, value: any) => {
+const InterfaceSettingsCard: React.FC<{ 
+  settings: FlattenedSettings; 
+  onChange: (updatedSettings: FlattenedSettings) => void 
+}> = ({ settings, onChange }) => {
+  const handleSettingChange = (key: keyof FlattenedSettings, value: any) => {
     onChange({ ...settings, [key]: value });
   };
 
