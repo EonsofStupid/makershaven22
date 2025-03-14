@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import type { Settings } from "../../types";
 import { ThemeMode } from "@/lib/types/core/enums";
 import { SecuritySettings } from "@/lib/types/security/types";
-import { isJsonObject } from "@/lib/utils/type-utils";
+import { isJsonObject, safeRecord } from "@/lib/utils/type-utils";
 
 export const useSettingsFetch = () => {
   return useQuery({
@@ -62,6 +62,9 @@ export const useSettingsFetch = () => {
         securitySettings = defaultSecuritySettings;
       }
 
+      // Safely convert metadata to Record<string, unknown>
+      const metadata = safeRecord(data.metadata);
+
       // Transform the data to match Settings type
       const settings: Settings = {
         site_title: data.site_title || "MakersImpulse",
@@ -97,7 +100,7 @@ export const useSettingsFetch = () => {
         security_settings: securitySettings,
         updated_at: data.updated_at,
         updated_by: data.updated_by,
-        metadata: data.metadata || {}
+        metadata: metadata
       };
 
       console.log("Settings fetched successfully:", settings);

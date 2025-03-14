@@ -1,3 +1,4 @@
+
 /**
  * Checks if a value is a non-array object that can be used as a JSON object
  */
@@ -24,4 +25,14 @@ export function safeNumber(value: any, defaultValue: number): number {
  */
 export function safeStringArray(arr: any[]): string[] {
   return arr.filter(item => typeof item === 'string');
+}
+
+/**
+ * Safely converts a JSON value to a Record<string, unknown>
+ */
+export function safeRecord(value: any): Record<string, unknown> {
+  if (isJsonObject(value)) {
+    return value as Record<string, unknown>;
+  }
+  return {};
 }
