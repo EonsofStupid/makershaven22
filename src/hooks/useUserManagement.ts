@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfiles, Profile } from './useProfiles';
 import { UserRole } from '@/lib/types/enums';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UpdateProfileParams {
   id: string;
@@ -14,9 +15,15 @@ interface UpdateProfileParams {
   [key: string]: any;
 }
 
+interface UpdateRoleParams {
+  userId: string;
+  newRole: UserRole;
+}
+
 export const useUserManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: profiles, refetch } = useProfiles();
+  const { data: profiles, refetch, isLoading: isProfilesLoading, error } = useProfiles();
+  const queryClient = useQueryClient();
 
   const getProfile = async (userId: string) => {
     try {
@@ -63,6 +70,27 @@ export const useUserManagement = () => {
     }
   };
 
+  const updateRole = useMutation({
+    mutationFn: async ({ userId, newRole }: UpdateRoleParams) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId)
+        .select();
+
+      if (error) throw error;
+      return data[0] as Profile;
+    },
+    onSuccess: () => {
+      toast.success('User role updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
+    },
+    onError: (error) => {
+      console.error('Error updating role:', error);
+      toast.error('Failed to update user role');
+    }
+  });
+
   const changeRole = async (userId: string, newRole: UserRole) => {
     return await updateProfile({ id: userId, role: newRole });
   };
@@ -98,13 +126,51 @@ export const useUserManagement = () => {
       banned_by: null
     });
   };
+
+  const getUserActivity = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_activity')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching user activity:', error);
+      throw error;
+    }
+  };
+
+  const getUserCMSActivity = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_activity_cms')
+        .select('*, cms_content:content_id(title, type)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching user CMS activity:', error);
+      throw error;
+    }
+  };
   
   return {
-    isLoading,
+    users: profiles,
+    isLoading: isLoading || isProfilesLoading,
+    error,
+    refetch,
     getProfile,
     updateProfile,
+    updateRole,
     changeRole,
     banUser,
-    unbanUser
+    unbanUser,
+    getUserActivity,
+    getUserCMSActivity
   };
 };

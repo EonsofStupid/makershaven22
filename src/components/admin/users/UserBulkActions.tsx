@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,12 @@ export const UserBulkActions = () => {
 
   const handleExportUsers = () => {
     try {
-      const exportData = users?.map(user => ({
+      if (!users || users.length === 0) {
+        toast.error('No users to export');
+        return;
+      }
+
+      const exportData = users.map(user => ({
         username: user.username,
         display_name: user.display_name,
         role: user.role,
