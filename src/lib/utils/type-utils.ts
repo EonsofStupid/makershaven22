@@ -1,5 +1,5 @@
 
-import { Json, JsonObject, isJsonObject } from "../types/core/json";
+import { Json, JsonObject, isJsonObject, jsonToRecord, recordToJson } from "../types/core/json";
 import { ThemeMode, TransitionType, isValidTransitionType, isValidThemeMode } from "../types/core/enums";
 
 /**
@@ -35,7 +35,7 @@ export function safeStringArray(arr: any[]): string[] {
  */
 export function safeRecord(value: unknown): Record<string, unknown> {
   if (isJsonObject(value)) {
-    return value as Record<string, unknown>;
+    return jsonToRecord(value);
   }
   return {};
 }
@@ -97,15 +97,21 @@ export function safeCssMeasurement(value: unknown, fallback: string): string {
 /**
  * Convert a Record to Json safely
  */
-export function recordToJson(record: Record<string, unknown>): Json {
-  return record as unknown as Json;
+export function recordToJsonSafe(record: Record<string, unknown>): Json {
+  return recordToJson(record);
 }
 
 /**
  * Ensure a value is a Json compliant value
  */
 export function ensureJson(value: unknown): Json {
-  // If it's a primitive, it's already Json compatible
+  return valueToJson(value);
+}
+
+/**
+ * Convert any value to Json
+ */
+function valueToJson(value: unknown): Json {
   if (value === null || 
       typeof value === 'string' || 
       typeof value === 'number' || 
@@ -113,17 +119,15 @@ export function ensureJson(value: unknown): Json {
     return value as Json;
   }
   
-  // Handle arrays
   if (Array.isArray(value)) {
-    return value.map(item => ensureJson(item)) as Json;
+    return value.map(valueToJson) as Json[];
   }
   
-  // Handle objects
   if (typeof value === 'object' && value !== null) {
     const result: Record<string, Json> = {};
     
     for (const [key, val] of Object.entries(value)) {
-      result[key] = ensureJson(val);
+      result[key] = valueToJson(val);
     }
     
     return result as Json;
@@ -136,4 +140,4 @@ export function ensureJson(value: unknown): Json {
 /**
  * Export isJsonObject from core/json for backward compatibility
  */
-export { isJsonObject };
+export { isJsonObject, jsonToRecord };

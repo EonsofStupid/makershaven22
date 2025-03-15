@@ -1,4 +1,3 @@
-
 import { FlattenedSettings } from "../types/settings/core";
 import { SecuritySettings, parseSecuritySettings } from "../types/security/types";
 import { 
@@ -8,11 +7,9 @@ import {
   safeCssMeasurement, 
   safeString, 
   safeTransitionType,
-  recordToJson,
   ensureJson
 } from "./type-utils";
 import { ThemeMode, TransitionType } from "../types/core/enums";
-import { Json } from "../types/core/json";
 import { DEFAULT_SETTINGS } from "../types/settings/core";
 
 /**

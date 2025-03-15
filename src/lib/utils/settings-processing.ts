@@ -3,7 +3,7 @@ import { FlattenedSettings } from "../types/settings/core";
 import { SecuritySettings } from "../types/security/types";
 import { Json } from "../types/core/json";
 import { ThemeMode, TransitionType } from "../types/core/enums";
-import { safeThemeMode, safeTransitionType, ensureJson } from "./type-utils";
+import { safeThemeMode, safeTransitionType, ensureJson, jsonToRecord } from "./type-utils";
 
 /**
  * Processes a database record into a properly typed FlattenedSettings object.

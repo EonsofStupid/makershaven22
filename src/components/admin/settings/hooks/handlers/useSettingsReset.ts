@@ -59,8 +59,8 @@ export const useSettingsReset = () => {
       // Process security settings from JSON to SecuritySettings type
       const securitySettings = parseSecuritySettings(data.security_settings);
       
-      // Process metadata
-      const metadata = safeRecord(data.metadata);
+      // Process metadata - using safeRecord instead of directly assigning
+      const metadataRecord = safeRecord(data.metadata);
       
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
@@ -74,7 +74,7 @@ export const useSettingsReset = () => {
         theme_mode: themeMode,
         transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: ensureJson(metadata)
+        metadata: ensureJson(metadataRecord) // Convert metadata to ensure it's Json compatible
       };
       
       toast.success("Settings reset to defaults");

@@ -4,9 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
 import { FlattenedSettings } from "@/lib/types/settings/types";
-import { safeRecord, safeThemeMode, safeTransitionType, recordToJson, ensureJson } from "@/lib/utils/type-utils";
+import { safeRecord, safeThemeMode, safeTransitionType, ensureJson } from "@/lib/utils/type-utils";
 import { parseSecuritySettings } from "@/lib/types/security/types";
-import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
 
 export const useSettingsUpdateHandlers = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -75,7 +74,7 @@ export const useSettingsUpdateHandlers = () => {
         transition_type: formData.transition_type,
         theme_mode: formData.theme_mode,
         // Convert complex objects to Json-compatible types
-        metadata: ensureJson(formData.metadata || {}),
+        metadata: formData.metadata ? ensureJson(formData.metadata) : null,
         security_settings: ensureJson(formData.security_settings)
       };
 
@@ -94,8 +93,8 @@ export const useSettingsUpdateHandlers = () => {
       // Process security settings from JSON to SecuritySettings type
       const securitySettings = parseSecuritySettings(data.security_settings);
       
-      // Process metadata
-      const metadata = safeRecord(data.metadata);
+      // Process metadata - using safeRecord to convert to Record<string, unknown> 
+      const metadataRecord = safeRecord(data.metadata);
       
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
@@ -109,7 +108,7 @@ export const useSettingsUpdateHandlers = () => {
         theme_mode: themeMode,
         transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: ensureJson(metadata)
+        metadata: ensureJson(metadataRecord) // Convert back to Json format
       };
       
       toast.success("Settings updated successfully");

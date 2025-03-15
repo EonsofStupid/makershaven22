@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../../../integrations/supabase/client";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SecuritySettings } from "@/lib/types/security/types";
-import { safeBoolean, safeNumber, safeStringArray, safeThemeMode, safeTransitionType, isJsonObject, ensureJson } from "@/lib/utils/type-utils";
+import { safeBoolean, safeNumber, safeStringArray, safeThemeMode, safeTransitionType, isJsonObject, ensureJson, jsonToRecord } from "@/lib/utils/type-utils";
 import { ThemeMode } from "@/lib/types/core/enums";
 
 export function SiteSettingsManager() {
@@ -51,11 +52,10 @@ export function SiteSettingsManager() {
         }
         
         // Process the metadata field to ensure it's a proper record
-        let metadata: Record<string, unknown> = {};
+        // Use jsonToRecord to safely convert Json to Record<string, unknown>
+        let metadataRecord: Record<string, unknown> = {};
         if (data.metadata) {
-          if (typeof data.metadata === 'object' && !Array.isArray(data.metadata)) {
-            metadata = data.metadata as Record<string, unknown>;
-          }
+          metadataRecord = jsonToRecord(data.metadata);
         }
         
         // Ensure theme_mode is a valid ThemeMode value
@@ -96,7 +96,7 @@ export function SiteSettingsManager() {
           transition_type: transitionType,
           theme_mode: themeMode,
           security_settings: securitySettings,
-          metadata: ensureJson(metadata)
+          metadata: ensureJson(metadataRecord) // Convert metadata to ensure it's Json compatible
         };
         
         setSettings(flattenedSettings);
