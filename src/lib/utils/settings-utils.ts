@@ -8,7 +8,8 @@ import {
   safeCssMeasurement, 
   safeString, 
   safeTransitionType,
-  ensureJson
+  ensureJson,
+  jsonToRecord
 } from "./type-utils";
 import { ThemeMode, TransitionType } from "../types/core/enums";
 import { DEFAULT_SETTINGS } from "../types/settings/core";
@@ -25,8 +26,8 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
   // Process security settings from JSON to SecuritySettings type
   const securitySettings = parseSecuritySettings(data.security_settings);
   
-  // Process metadata
-  const metadata = safeRecord(data.metadata);
+  // Process metadata using jsonToRecord to ensure we get a Record<string, unknown>
+  const metadata = data.metadata ? jsonToRecord(data.metadata) : {};
   
   // Ensure theme_mode is a valid ThemeMode
   const themeMode = safeThemeMode(data.theme_mode);
@@ -78,7 +79,7 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
     
     // Complex objects
     security_settings: securitySettings,
-    metadata: ensureJson(metadata), // Ensure metadata is valid Json type
+    metadata: metadata, // Now properly typed as Record<string, unknown>
     
     // Metadata fields
     id: typeof data.id === 'string' ? data.id : undefined,
@@ -99,8 +100,8 @@ export function prepareDatabaseSettings(settings: FlattenedSettings): Record<str
   return {
     ...settings,
     // Ensure all fields have the correct type for database storage
-    security_settings: settings.security_settings,
-    metadata: settings.metadata || {},
+    security_settings: ensureJson(settings.security_settings),
+    metadata: settings.metadata ? ensureJson(settings.metadata) : null,
   };
 }
 

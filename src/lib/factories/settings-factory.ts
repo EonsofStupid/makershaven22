@@ -1,8 +1,9 @@
+
 import { FlattenedSettings, Settings, ThemeSettings, SiteSettings } from "../types/settings/core";
 import { SecuritySettings } from "../types/security/types";
 import { ThemeMode, TransitionType } from "../types/core/enums";
 import { Json } from "../types/core/json";
-import { ensureJson } from "../utils/type-utils";
+import { ensureJson, jsonToRecord } from "../utils/type-utils";
 
 /**
  * Factory class for creating, validating, and transforming settings objects.
@@ -156,8 +157,8 @@ export class SettingsFactory {
       security_settings: settings.security,
       theme_preferences: settings.theme_preferences,
       
-      // Metadata
-      metadata: settings.site.metadata ? ensureJson(settings.site.metadata) : null,
+      // Metadata - use jsonToRecord to ensure we get a Record<string, unknown>
+      metadata: settings.site.metadata ? jsonToRecord(settings.site.metadata) : {},
       
       // Audit fields
       created_at: settings.created_at,

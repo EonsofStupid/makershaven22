@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SettingsResponse } from "../../types";
 import { DEFAULT_SETTINGS } from "@/lib/types/settings/core";
-import { safeRecord, safeThemeMode, safeTransitionType, ensureJson } from "@/lib/utils/type-utils";
+import { safeRecord, safeThemeMode, safeTransitionType, ensureJson, jsonToRecord } from "@/lib/utils/type-utils";
 import { SecuritySettings, parseSecuritySettings } from "@/lib/types/security/types";
 
 export const useSettingsReset = () => {
@@ -59,8 +59,10 @@ export const useSettingsReset = () => {
       // Process security settings from JSON to SecuritySettings type
       const securitySettings = parseSecuritySettings(data.security_settings);
       
-      // Process metadata - using safeRecord instead of directly assigning
-      const metadataRecord = safeRecord(data.metadata);
+      // Process metadata - using jsonToRecord to ensure we get a Record<string, unknown>
+      const metadata = data.metadata 
+        ? jsonToRecord(data.metadata) 
+        : {};
       
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
@@ -74,7 +76,7 @@ export const useSettingsReset = () => {
         theme_mode: themeMode,
         transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: ensureJson(metadataRecord) // Convert metadata to ensure it's Json compatible
+        metadata: metadata // Now properly typed as Record<string, unknown>
       };
       
       toast.success("Settings reset to defaults");

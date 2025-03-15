@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
 import { FlattenedSettings } from "@/lib/types/settings/types";
-import { safeRecord, safeThemeMode, safeTransitionType, ensureJson } from "@/lib/utils/type-utils";
+import { safeRecord, safeThemeMode, safeTransitionType, ensureJson, jsonToRecord } from "@/lib/utils/type-utils";
 import { parseSecuritySettings } from "@/lib/types/security/types";
 
 export const useSettingsUpdateHandlers = () => {
@@ -93,8 +93,10 @@ export const useSettingsUpdateHandlers = () => {
       // Process security settings from JSON to SecuritySettings type
       const securitySettings = parseSecuritySettings(data.security_settings);
       
-      // Process metadata - using safeRecord to convert to Record<string, unknown> 
-      const metadataRecord = safeRecord(data.metadata);
+      // Process metadata - using jsonToRecord to ensure we get a Record<string, unknown>
+      const metadata = data.metadata 
+        ? jsonToRecord(data.metadata) 
+        : {};
       
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
@@ -108,7 +110,7 @@ export const useSettingsUpdateHandlers = () => {
         theme_mode: themeMode,
         transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: ensureJson(metadataRecord) // Convert back to Json format
+        metadata: metadata // Now properly typed as Record<string, unknown>
       };
       
       toast.success("Settings updated successfully");
