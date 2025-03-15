@@ -1,6 +1,11 @@
-
 import { ContentType } from '@/lib/types/enums';
-import { getSchemaByType, contentTypeRelationships } from '../types/contentTypes';
+import { ContentCreate, ContentUpdate } from '@/lib/types/content/types';
+import { 
+  getSchemaByType, 
+  contentTypeRelationships, 
+  contentCreateSchema, 
+  contentUpdateSchema 
+} from '../types/contentTypeSchema';
 import { z } from 'zod';
 
 /**
@@ -29,15 +34,14 @@ export const validateContentData = (type: ContentType, data: any) => {
 };
 
 /**
- * Same as validateContentData but additionally returns sanitized data
+ * Validate content for creation operation
  * @param type ContentType to validate against
  * @param data Content data to validate
  * @returns Validation result with success status, optional errors, and sanitized data
  */
-export const validateContent = (type: ContentType, data: any) => {
-  const schema = getSchemaByType(type);
+export const validateContentCreate = (data: ContentCreate) => {
   try {
-    const validatedData = schema.parse(data);
+    const validatedData = contentCreateSchema.parse(data);
     return { 
       success: true,
       data: validatedData
@@ -51,9 +55,51 @@ export const validateContent = (type: ContentType, data: any) => {
     }
     return {
       success: false,
-      errors: [{ message: 'Unknown validation error' }]
+      errors: [{ message: 'Unknown validation error during content creation' }]
     };
   }
+};
+
+/**
+ * Validate content for update operation
+ * @param data Content data to validate
+ * @returns Validation result with success status, optional errors, and sanitized data
+ */
+export const validateContentUpdate = (data: ContentUpdate) => {
+  try {
+    const validatedData = contentUpdateSchema.parse(data);
+    return { 
+      success: true,
+      data: validatedData
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        errors: error.errors
+      };
+    }
+    return {
+      success: false,
+      errors: [{ message: 'Unknown validation error during content update' }]
+    };
+  }
+};
+
+/**
+ * General validation function that chooses the appropriate validator based on operation type
+ * @param type ContentType to validate against
+ * @param data Content data to validate
+ * @returns Validation result with success status, optional errors, and sanitized data
+ */
+export const validateContent = (type: ContentType, data: any) => {
+  // Check if it's a content update (has id and updated_by)
+  if (data.id && data.updated_by) {
+    return validateContentUpdate(data as ContentUpdate);
+  }
+  
+  // Otherwise treat as content creation
+  return validateContentCreate({...data, type} as ContentCreate);
 };
 
 /**

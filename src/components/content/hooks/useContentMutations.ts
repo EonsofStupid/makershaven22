@@ -1,36 +1,26 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ContentType } from "@/lib/types/enums";
-import { validateContent } from "../utils/contentTypeValidation";
+import { validateContentCreate, validateContentUpdate } from "../utils/contentTypeValidation";
 import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
 
   const createContent = useMutation({
-    mutationFn: async ({ type, title, ...data }: { type: ContentType; title: string } & Record<string, any>) => {
-      console.log("Creating content:", { type, title, data });
+    mutationFn: async (contentData: ContentCreate) => {
+      console.log("Creating content:", contentData);
       
-      // Get the current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      
-      const contentData: ContentCreate = {
-        type,
-        title,
-        created_by: user.id, // Use the authenticated user's ID
-        ...data,
-      };
-      
-      const validation = await validateContent(type, contentData);
+      // Validate the content data
+      const validation = validateContentCreate(contentData);
       if (!validation.success) {
-        throw new Error("Content validation failed");
+        const errorMessage = validation.errors?.[0]?.message || "Content validation failed";
+        console.error("Validation error:", validation.errors);
+        throw new Error(errorMessage);
       }
 
+      // Insert the validated data
       const { data: result, error } = await supabase
         .from("cms_content")
         .insert(validation.data)
@@ -50,37 +40,27 @@ export const useContentMutations = () => {
     },
     onError: (error) => {
       console.error("Error in content creation:", error);
-      toast.error("Failed to create content");
+      toast.error(error instanceof Error ? error.message : "Failed to create content");
     },
   });
 
   const updateContent = useMutation({
-    mutationFn: async ({ id, type, title, ...data }: { id: string; type: ContentType; title: string } & Record<string, any>) => {
-      console.log("Updating content:", { id, type, title, data });
+    mutationFn: async (contentData: ContentUpdate) => {
+      console.log("Updating content:", contentData);
       
-      // Get the current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-      
-      const contentData: ContentUpdate = {
-        id,
-        type,
-        title,
-        updated_by: user.id, // Use the authenticated user's ID for tracking updates
-        ...data
-      };
-      
-      const validation = await validateContent(type, contentData);
+      // Validate the content data
+      const validation = validateContentUpdate(contentData);
       if (!validation.success) {
-        throw new Error("Content validation failed");
+        const errorMessage = validation.errors?.[0]?.message || "Content validation failed";
+        console.error("Validation error:", validation.errors);
+        throw new Error(errorMessage);
       }
 
+      // Update with validated data
       const { data: result, error } = await supabase
         .from("cms_content")
         .update(validation.data)
-        .eq("id", id)
+        .eq("id", contentData.id)
         .select()
         .single();
 
@@ -97,12 +77,42 @@ export const useContentMutations = () => {
     },
     onError: (error) => {
       console.error("Error in content update:", error);
-      toast.error("Failed to update content");
+      toast.error(error instanceof Error ? error.message : "Failed to update content");
     },
   });
+
+  // Helper function to prepare content data with the current user
+  const prepareContentWithUser = async <T extends object>(data: T): Promise<T & { created_by: string } | T & { updated_by: string }> => {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // If we have an id, it's an update operation
+    if ('id' in data) {
+      return { ...data, updated_by: user.id } as T & { updated_by: string };
+    }
+    
+    // Otherwise it's a create operation
+    return { ...data, created_by: user.id } as T & { created_by: string };
+  };
+
+  // Convenience wrappers for common use cases
+  const createContentWithUser = async (data: Omit<ContentCreate, 'created_by'>) => {
+    const contentData = await prepareContentWithUser(data) as ContentCreate;
+    return createContent.mutateAsync(contentData);
+  };
+
+  const updateContentWithUser = async (data: Omit<ContentUpdate, 'updated_by'>) => {
+    const contentData = await prepareContentWithUser(data) as ContentUpdate;
+    return updateContent.mutateAsync(contentData);
+  };
 
   return {
     createContent,
     updateContent,
+    createContentWithUser,
+    updateContentWithUser
   };
 };

@@ -12,7 +12,7 @@ export const baseContentSchema = z.object({
   metadata: z.any().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
-  created_by: z.string().optional(),
+  created_by: z.string().min(1, "Creator ID is required"),  // Making this required
   updated_by: z.string().optional(),
   version: z.number().optional()
 });
@@ -35,6 +35,24 @@ export const componentContentSchema = baseContentSchema.extend({
     styles: z.record(z.string()).optional()
   }).optional()
 });
+
+// Create specific schemas for content creation and updates
+export const contentCreateSchema = baseContentSchema
+  .omit({ id: true, created_at: true, updated_at: true, updated_by: true, version: true })
+  .extend({
+    title: z.string().min(1, "Title is required"),
+    type: z.enum(['template', 'page', 'build', 'guide', 'part', 'component', 'workflow', 'hero', 'feature']),
+    created_by: z.string().min(1, "Creator ID is required")
+  });
+
+export const contentUpdateSchema = baseContentSchema
+  .omit({ created_at: true, created_by: true, version: true })
+  .extend({
+    id: z.string().uuid("Valid ID is required"),
+    updated_by: z.string().min(1, "Updater ID is required"),
+    title: z.string().min(1, "Title is required").optional(),
+    type: z.enum(['template', 'page', 'build', 'guide', 'part', 'component', 'workflow', 'hero', 'feature']).optional()
+  });
 
 export const getSchemaByType = (type: ContentType) => {
   switch (type) {

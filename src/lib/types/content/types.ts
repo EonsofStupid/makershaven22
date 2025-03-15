@@ -39,7 +39,7 @@ export interface ContentUpdate {
 }
 
 export interface PageContent extends BaseContent {
-  type: ContentType;
+  type: ContentType.Page;
   content?: {
     body?: string;
     seo?: {
@@ -51,7 +51,7 @@ export interface PageContent extends BaseContent {
 }
 
 export interface ComponentContent extends BaseContent {
-  type: ContentType;
+  type: ContentType.Component;
   content?: {
     template?: string;
     props?: Record<string, any>;
