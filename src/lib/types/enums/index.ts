@@ -1,5 +1,5 @@
 
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
 export type ContentStatus = 'draft' | 'published' | 'archived';
 export type ContentType = 'page' | 'component' | 'template' | 'workflow';
 export type WorkflowStageType = 'APPROVAL' | 'REVIEW' | 'TASK' | 'NOTIFICATION' | 'CONDITIONAL';
@@ -19,5 +19,5 @@ export type PostCategory =
  */
 export function isValidUserRole(value: unknown): value is UserRole {
   return typeof value === 'string' && 
-         ['subscriber', 'maker', 'admin', 'super_admin'].includes(value as string);
+         ['subscriber', 'maker', 'admin', 'super_admin', 'moderator'].includes(value as string);
 }

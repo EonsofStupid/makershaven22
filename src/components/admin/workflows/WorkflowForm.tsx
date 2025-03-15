@@ -1,7 +1,8 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { WorkflowFormData } from "@/components/content/types/workflow";
+import { WorkflowFormData } from "@/lib/types/workflow/types";
 
 interface WorkflowFormProps {
   formData: WorkflowFormData;
@@ -25,7 +26,7 @@ export const WorkflowForm = ({ formData, onChange, onSubmit }: WorkflowFormProps
       <div>
         <label className="block text-white mb-2">Description</label>
         <Textarea
-          value={formData.description}
+          value={formData.description || ''}
           onChange={(e) => onChange({ description: e.target.value })}
           placeholder="Enter workflow description"
           className="bg-white/5 border-white/10 text-white"

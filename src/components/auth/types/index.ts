@@ -38,4 +38,5 @@ export type AuthErrorRecoveryState = {
   nextAttemptDelay: number;
 };
 
+// Re-export the UserRole type to maintain backward compatibility
 export { UserRole };
