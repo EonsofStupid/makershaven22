@@ -1,7 +1,8 @@
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { ContentType } from "../types/contentTypes";
+import { ContentType } from "@/lib/types/enums";
 import { validateContent } from "../utils/contentTypeValidation";
 
 export const useContentMutations = () => {

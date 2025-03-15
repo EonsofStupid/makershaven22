@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { ContentType } from '../types/contentTypes';
+import { ContentType } from '@/lib/types/enums';
 
 interface ContentTypeSelectorProps {
   value: ContentType;
@@ -18,6 +19,11 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({ value, onChan
         <SelectItem value="component">Component</SelectItem>
         <SelectItem value="template">Template</SelectItem>
         <SelectItem value="workflow">Workflow</SelectItem>
+        <SelectItem value="build">Build</SelectItem>
+        <SelectItem value="guide">Guide</SelectItem>
+        <SelectItem value="part">Part</SelectItem>
+        <SelectItem value="hero">Hero</SelectItem>
+        <SelectItem value="feature">Feature</SelectItem>
       </SelectContent>
     </Select>
   );

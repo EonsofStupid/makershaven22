@@ -7,73 +7,80 @@ export interface WorkflowStage {
   name: string;
   type: WorkflowStageType;
   order: number;
-  config: WorkflowStageConfig;
+  config: Record<string, any>;
   description?: string;
-  validationRules?: WorkflowValidationRule[];
+  validationRules?: Record<string, any>;
 }
 
-export interface WorkflowValidationRule {
-  field: string;
-  rule: string;
-  errorMessage: string;
-}
-
-export interface WorkflowStageConfig {
-  assignees?: string[];
-  timeLimit?: number;
-  autoAssignment?: {
-    type: 'user' | 'role' | 'group';
-    value: string;
-  };
-  priority?: 'low' | 'medium' | 'high';
-  notifications?: {
-    email?: boolean;
-    inApp?: boolean;
-    onStart?: boolean;
-    onComplete?: boolean;
-    reminderInterval?: number;
-  };
-  conditions?: {
-    type: 'AND' | 'OR';
-    rules: Array<{
-      field: string;
-      operator: string;
-      value: any;
-    }>;
-  };
-  requiredApprovers?: number;
-  customFields?: Array<{
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select';
-    required: boolean;
-    options?: string[];
-  }>;
-}
-
-/**
- * Parses a JSON object from the database into a typed WorkflowStage object
- */
-export const parseWorkflowStage = (data: Json): WorkflowStage => {
-  if (typeof data !== 'object' || !data) {
-    throw new Error('Invalid workflow stage data');
+export const parseWorkflowStage = (stageData: Json): WorkflowStage => {
+  if (typeof stageData === 'string') {
+    try {
+      stageData = JSON.parse(stageData);
+    } catch (e) {
+      console.error('Failed to parse workflow stage string:', e);
+      return createEmptyStage();
+    }
   }
 
-  const stage = data as Record<string, any>;
+  if (!stageData || typeof stageData !== 'object') {
+    return createEmptyStage();
+  }
+
+  const stage = stageData as Record<string, any>;
   
   return {
-    id: String(stage.id || ''),
-    name: String(stage.name || ''),
+    id: stage.id || `stage-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    name: stage.name || 'Untitled Stage',
     type: (stage.type as WorkflowStageType) || 'TASK',
-    order: Number(stage.order || 0),
-    config: stage.config as WorkflowStageConfig || {},
-    description: stage.description ? String(stage.description) : undefined,
-    validationRules: stage.validationRules as WorkflowValidationRule[] || []
+    order: typeof stage.order === 'number' ? stage.order : 0,
+    config: stage.config || {},
+    description: stage.description || '',
+    validationRules: stage.validationRules || {}
   };
 };
 
-/**
- * Converts a WorkflowStage object to a JSON format suitable for database storage
- */
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
-  return stage as unknown as Json;
+  return {
+    id: stage.id,
+    name: stage.name,
+    type: stage.type,
+    order: stage.order,
+    config: stage.config,
+    description: stage.description || '',
+    validationRules: stage.validationRules || {}
+  };
+};
+
+export const createEmptyStage = (): WorkflowStage => ({
+  id: `stage-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  name: 'Untitled Stage',
+  type: 'TASK',
+  order: 0,
+  config: {},
+  description: '',
+  validationRules: {}
+});
+
+export const parseWorkflowStages = (stagesData: Json | null): WorkflowStage[] => {
+  if (!stagesData) return [];
+  
+  if (!Array.isArray(stagesData)) {
+    try {
+      if (typeof stagesData === 'string') {
+        stagesData = JSON.parse(stagesData);
+      }
+      if (!Array.isArray(stagesData)) {
+        return [];
+      }
+    } catch (e) {
+      console.error('Failed to parse workflow stages:', e);
+      return [];
+    }
+  }
+  
+  return stagesData.map(stage => parseWorkflowStage(stage));
+};
+
+export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
+  return stages.map(stage => serializeWorkflowStage(stage));
 };

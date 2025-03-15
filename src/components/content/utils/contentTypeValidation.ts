@@ -29,6 +29,34 @@ export const validateContentData = (type: ContentType, data: any) => {
 };
 
 /**
+ * Same as validateContentData but additionally returns sanitized data
+ * @param type ContentType to validate against
+ * @param data Content data to validate
+ * @returns Validation result with success status, optional errors, and sanitized data
+ */
+export const validateContent = (type: ContentType, data: any) => {
+  const schema = getSchemaByType(type);
+  try {
+    const validatedData = schema.parse(data);
+    return { 
+      success: true,
+      data: validatedData
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        errors: error.errors
+      };
+    }
+    return {
+      success: false,
+      errors: [{ message: 'Unknown validation error' }]
+    };
+  }
+};
+
+/**
  * Check if a content type can be related to another
  * @param sourceType Source content type
  * @param targetType Target content type

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,9 +64,11 @@ export const useWorkflowManagement = () => {
       // Ensure stages is serialized as JSON
       let serializedStages: Json = [];
       if (Array.isArray(template.stages)) {
-        serializedStages = template.stages.map(stage => 
-          typeof stage === 'object' ? serializeWorkflowStage(stage as WorkflowStage) : stage
-        );
+        // Cast as WorkflowStage[] then serialize
+        serializedStages = template.stages.map(stage => {
+          // Safely convert each stage to WorkflowStage before serialization
+          return serializeWorkflowStage(stage as unknown as WorkflowStage);
+        });
       }
 
       const { data, error } = await supabase
@@ -106,9 +107,11 @@ export const useWorkflowManagement = () => {
       // Ensure stages is serialized as JSON
       let serializedStages: Json = [];
       if (Array.isArray(template.stages)) {
-        serializedStages = template.stages.map(stage => 
-          typeof stage === 'object' ? serializeWorkflowStage(stage as WorkflowStage) : stage
-        );
+        // Cast as WorkflowStage[] then serialize
+        serializedStages = template.stages.map(stage => {
+          // Safely convert each stage to WorkflowStage before serialization
+          return serializeWorkflowStage(stage as unknown as WorkflowStage);
+        });
       }
 
       const { data, error } = await supabase
@@ -179,7 +182,9 @@ export const useWorkflowManagement = () => {
       let parsedTemplate = { ...data };
       if (data.stages) {
         try {
+          // No need to parse JSON strings here as Supabase already does that for JSONB fields
           if (Array.isArray(data.stages)) {
+            // Just keep reference to original array
             parsedTemplate.stages = data.stages;
           }
         } catch (parseError) {

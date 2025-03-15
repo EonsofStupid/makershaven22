@@ -1,121 +1,50 @@
 
-import { useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/store/auth-store';
-import { toast } from "sonner";
-import { useSessionManagement } from './auth/useSessionManagement';
-import { useAuthValidation } from './auth/useAuthValidation';
-import { handleSecurityEvent, handleSessionTimeout } from '@/utils/auth/securityHandlers';
-import { supabase } from "@/integrations/supabase/client";
-import { attachCSRFToken, clearCSRFToken } from '@/utils/auth/csrfProtection';
-import { sessionManager } from '@/lib/auth/SessionManager';
-import { securityManager } from '@/lib/auth/SecurityManager';
-import { AuthError } from '@/lib/auth/types/errors';
+import { toast } from 'sonner';
 
 export const useAuthSetup = () => {
-  const { setLoading, setError } = useAuthStore();
-  const initialSetupDone = useCallback(() => false, []);
-  const sessionTimeoutRef = { current: undefined as NodeJS.Timeout | undefined };
-  const retryAttempts = { current: 0 };
-  const MAX_RETRY_ATTEMPTS = 3;
-  
-  const { handleSessionUpdate } = useSessionManagement();
-  const { validateAuthAttempt } = useAuthValidation();
-  
-  const handleAuthChange = useCallback(async (session) => {
-    console.log('Handling auth change:', session?.user?.id);
-    setLoading(true);
-    setError(null);
-    
+  const [isLoading, setIsLoading] = useState(true);
+  const { setSession, setUser, setIsSignedIn } = useAuthStore();
+  const initialSetupDone = useRef(false);
+
+  const handleAuthChange = useCallback(async (session: Session | null) => {
+    setIsLoading(true);
     try {
-      if (sessionTimeoutRef.current) {
-        clearTimeout(sessionTimeoutRef.current);
-      }
+      console.log('handleAuthChange called with session:', session?.user?.id || 'No session');
 
-      if (session?.user) {
-        const loadingToast = toast.loading('Authenticating...');
-
-        try {
-          await attachCSRFToken();
-          await validateAuthAttempt(session);
-          
-          // Initialize security managers
-          await sessionManager.startSession();
-          securityManager.initialize();
-          
-        } catch (validationError) {
-          console.error('Auth validation failed:', validationError);
-          clearCSRFToken();
-          sessionManager.destroy();
-          securityManager.clearSecurityData();
-          await supabase.auth.signOut();
-          throw validationError;
-        }
-
-        sessionTimeoutRef.current = handleSessionTimeout(async () => {
-          console.log('Session timeout - attempting refresh');
-          try {
-            const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
-            
-            if (refreshError || !refreshResult.session) {
-              throw new Error(refreshError?.message || 'Session refresh failed');
-            }
-          } catch (refreshError) {
-            console.error('Session refresh failed:', refreshError);
-            clearCSRFToken();
-            sessionManager.destroy();
-            securityManager.clearSecurityData();
-            await supabase.auth.signOut();
-            toast.error('Session expired. Please sign in again.');
-          }
-        });
-
-        await handleSessionUpdate(session);
+      if (session) {
+        const { user } = session;
+        console.log('Setting authenticated user:', user.id);
         
-        toast.dismiss(loadingToast);
-        toast.success('Successfully authenticated');
-        retryAttempts.current = 0;
+        setSession(session);
+        setUser({
+          id: user.id,
+          email: user.email,
+          username: user.user_metadata?.username,
+          displayName: user.user_metadata?.display_name || user.user_metadata?.username,
+          user_metadata: user.user_metadata
+        });
+        setIsSignedIn(true);
       } else {
-        clearCSRFToken();
-        sessionManager.destroy();
-        securityManager.clearSecurityData();
-        await handleSessionUpdate(session);
-        toast.success('Signed out successfully');
+        console.log('No active session, clearing auth state');
+        setSession(null);
+        setUser(null);
+        setIsSignedIn(false);
       }
     } catch (error) {
-      console.error('Error in auth change handler:', error);
-      
-      const authError: AuthError = {
-        type: 'authentication',
-        message: error instanceof Error ? error.message : 'An unexpected error occurred',
-        code: 'AUTH_ERROR',
-        stack: error instanceof Error ? error.stack : undefined
-      };
-      
-      setError(authError);
-      
-      if (session?.user) {
-        await handleSecurityEvent(
-          session.user.id,
-          'auth_error',
-          'high',
-          { error: error instanceof Error ? error.message : 'Unknown error' }
-        );
-
-        if (retryAttempts.current < MAX_RETRY_ATTEMPTS) {
-          retryAttempts.current++;
-          console.log(`Retrying auth setup (${retryAttempts.current}/${MAX_RETRY_ATTEMPTS})`);
-          setTimeout(() => handleAuthChange(session), 1000 * retryAttempts.current);
-          return;
-        }
-      }
-      
-      toast.error('Authentication error', {
-        description: error instanceof Error ? error.message : 'An unexpected error occurred'
-      });
+      console.error('Error in handleAuthChange:', error);
+      toast.error('Authentication error');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [setLoading, setError, handleSessionUpdate, validateAuthAttempt]);
+  }, [setSession, setUser, setIsSignedIn]);
 
-  return { handleAuthChange, initialSetupDone };
+  return {
+    isLoading,
+    handleAuthChange,
+    initialSetupDone
+  };
 };
