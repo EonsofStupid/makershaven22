@@ -39,4 +39,4 @@ export type AuthErrorRecoveryState = {
 };
 
 // Re-export the UserRole type to maintain backward compatibility
-export { UserRole };
+export type { UserRole };

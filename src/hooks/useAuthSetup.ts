@@ -1,4 +1,5 @@
-import { useCallback, useRef } from 'react';
+
+import { useCallback } from 'react';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from "sonner";
 import { useSessionManagement } from './auth/useSessionManagement';
@@ -8,12 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { attachCSRFToken, clearCSRFToken } from '@/utils/auth/csrfProtection';
 import { sessionManager } from '@/lib/auth/SessionManager';
 import { securityManager } from '@/lib/auth/SecurityManager';
+import { AuthError } from '@/lib/auth/types/errors';
 
 export const useAuthSetup = () => {
   const { setLoading, setError } = useAuthStore();
-  const initialSetupDone = useRef(false);
-  const sessionTimeoutRef = useRef<NodeJS.Timeout>();
-  const retryAttempts = useRef(0);
+  const initialSetupDone = useCallback(() => false, []);
+  const sessionTimeoutRef = { current: undefined as NodeJS.Timeout | undefined };
+  const retryAttempts = { current: 0 };
   const MAX_RETRY_ATTEMPTS = 3;
   
   const { handleSessionUpdate } = useSessionManagement();
@@ -81,7 +83,15 @@ export const useAuthSetup = () => {
       }
     } catch (error) {
       console.error('Error in auth change handler:', error);
-      setError(error instanceof Error ? error : new Error('An unexpected error occurred'));
+      
+      const authError: AuthError = {
+        type: 'authentication',
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        code: 'AUTH_ERROR',
+        stack: error instanceof Error ? error.stack : undefined
+      };
+      
+      setError(authError);
       
       if (session?.user) {
         await handleSecurityEvent(

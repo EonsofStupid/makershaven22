@@ -1,76 +1,74 @@
-import { useState, useCallback } from 'react';
-import { AuthError, AuthErrorRecoveryState } from '@/lib/auth/types/errors';
-import { supabase } from '@/integrations/supabase/client';
 
-interface ErrorRecoveryConfig {
-  maxAttempts?: number;
-  initialDelay?: number;
-  onMaxAttemptsReached?: () => void;
+import { useState } from 'react';
+import { AuthError } from '@/lib/auth/types/errors';
+
+interface AuthErrorRecoveryState {
+  attemptCount: number;
+  lastAttempt?: Date;
+  nextAttemptDelay: number;
 }
 
-export const useErrorRecovery = (config: ErrorRecoveryConfig = {}) => {
-  const {
-    maxAttempts = 3,
-    initialDelay = 1000,
-    onMaxAttemptsReached
-  } = config;
-
+export const useErrorRecovery = () => {
   const [recoveryState, setRecoveryState] = useState<AuthErrorRecoveryState>({
     attemptCount: 0,
     lastAttempt: undefined,
-    nextAttemptDelay: initialDelay,
+    nextAttemptDelay: 2000 // 2 seconds initial delay
   });
 
-  const logError = useCallback(async (error: AuthError) => {
-    try {
-      const { error: logError } = await supabase
-        .from('auth_error_logs')
-        .insert({
-          error_type: error.code || 'auth/internal-error',
-          error_message: error.message,
-          stack_trace: error.stack,
-          metadata: {
-            recoveryAttempts: recoveryState.attemptCount,
-            lastAttempt: recoveryState.lastAttempt?.toISOString(),
-          },
-        });
-
-      if (logError) throw logError;
-    } catch (e) {
-      console.error('Failed to log error:', e);
-    }
-  }, [recoveryState]);
-
-  const handleError = useCallback(async (error: AuthError) => {
-    await logError(error);
-    
-    if (recoveryState.attemptCount >= maxAttempts) {
-      onMaxAttemptsReached?.();
-      return false;
-    }
-
-    setRecoveryState(prev => ({
-      ...prev,
-      attemptCount: prev.attemptCount + 1,
+  const handleErrorRecovery = (error: AuthError) => {
+    // Update recovery state with exponential backoff
+    const newRecoveryState = {
+      attemptCount: recoveryState.attemptCount + 1,
       lastAttempt: new Date(),
-      nextAttemptDelay: prev.nextAttemptDelay ? prev.nextAttemptDelay * 2 : initialDelay,
-    }));
+      nextAttemptDelay: Math.min(recoveryState.attemptCount === 0 ? 2000 : recoveryState.nextAttemptDelay * 2, 30000)
+    };
+    
+    setRecoveryState(newRecoveryState);
+    
+    // Log detailed error info for debugging
+    console.error('Auth Error:', {
+      type: error.type,
+      code: error.code || 'NO_CODE',
+      message: error.message,
+      stack: error.stack || 'NO_STACK',
+      recoveryState: newRecoveryState
+    });
+    
+    return newRecoveryState;
+  };
 
-    return true;
-  }, [recoveryState, maxAttempts, initialDelay, onMaxAttemptsReached, logError]);
-
-  const resetRecovery = useCallback(() => {
+  const resetRecoveryState = () => {
     setRecoveryState({
       attemptCount: 0,
       lastAttempt: undefined,
-      nextAttemptDelay: initialDelay,
+      nextAttemptDelay: 2000
     });
-  }, [initialDelay]);
+  };
+
+  const shouldDelayNextAttempt = () => {
+    if (!recoveryState.lastAttempt) return false;
+    
+    const now = new Date();
+    const timeSinceLastAttempt = now.getTime() - recoveryState.lastAttempt.getTime();
+    
+    return timeSinceLastAttempt < recoveryState.nextAttemptDelay;
+  };
+
+  const getTimeUntilNextAttempt = () => {
+    if (!recoveryState.lastAttempt) return 0;
+    
+    const now = new Date();
+    const timeSinceLastAttempt = now.getTime() - recoveryState.lastAttempt.getTime();
+    const remaining = recoveryState.nextAttemptDelay - timeSinceLastAttempt;
+    
+    return Math.max(0, Math.ceil(remaining / 1000));
+  };
 
   return {
     recoveryState,
-    handleError,
-    resetRecovery,
-    canRetry: recoveryState.attemptCount < maxAttempts,
+    handleErrorRecovery,
+    resetRecoveryState,
+    shouldDelayNextAttempt,
+    getTimeUntilNextAttempt
   };
 };

@@ -1,6 +1,7 @@
 
 import { Json } from '../core/json';
 import { UserRole } from '../enums';
+import { AuthErrorType } from '../../auth/types/errors';
 
 export interface AuthUser {
   id: string;
@@ -20,7 +21,7 @@ export interface AuthSession {
 }
 
 export interface AuthError {
-  type: string;
+  type: AuthErrorType;
   code?: string;
   message: string;
   stack?: string;

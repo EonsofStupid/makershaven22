@@ -1,134 +1,127 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { toast } from 'sonner';
-import { AuthError, AuthErrorRecoveryState } from '@/lib/auth/types/errors';
-import { supabase } from '@/integrations/supabase/client';
+import { motion } from 'framer-motion';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AuthError } from '@/lib/auth/types/errors';
 
 interface ErrorRecoveryHandlerProps {
   error: AuthError;
-  onRetry?: () => Promise<void>;
-  onReset?: () => void;
-  maxAttempts?: number;
-  initialDelay?: number;
+  resetError: () => void;
 }
 
-export const ErrorRecoveryHandler: React.FC<ErrorRecoveryHandlerProps> = ({
-  error,
-  onRetry,
-  onReset,
-  maxAttempts = 3,
-  initialDelay = 1000,
+interface AuthErrorRecoveryState {
+  attemptCount: number;
+  lastAttempt?: Date;
+  nextAttemptDelay: number;
+}
+
+const initialRecoveryState: AuthErrorRecoveryState = {
+  attemptCount: 0,
+  lastAttempt: undefined,
+  nextAttemptDelay: 2000 // 2 seconds initial delay
+};
+
+export const ErrorRecoveryHandler: React.FC<ErrorRecoveryHandlerProps> = ({ 
+  error, 
+  resetError 
 }) => {
-  const [recoveryState, setRecoveryState] = useState<AuthErrorRecoveryState>({
-    attemptCount: 0,
-    lastAttempt: new Date(),
-    nextAttemptDelay: initialDelay,
-  });
-
-  const logError = useCallback(async () => {
-    try {
-      const { error: logError } = await supabase
-        .from('auth_error_logs')
-        .insert({
-          error_type: error.code || 'auth/internal-error',
-          error_message: error.message,
-          stack_trace: error.stack,
-          metadata: {
-            recoveryAttempts: recoveryState.attemptCount,
-            lastAttempt: recoveryState.lastAttempt?.toISOString(),
-          },
-        });
-
-      if (logError) {
-        console.error('Failed to log error:', logError);
-      }
-    } catch (e) {
-      console.error('Error logging failed:', e);
-    }
-  }, [error, recoveryState]);
+  const [recoveryState, setRecoveryState] = useState<AuthErrorRecoveryState>(initialRecoveryState);
+  const [countdown, setCountdown] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    logError();
-  }, [logError]);
+    // Handle countdown timer if there's a delay before next attempt
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const handleRetry = async () => {
-    if (!onRetry || recoveryState.attemptCount >= maxAttempts) {
-      toast.error('Maximum retry attempts reached', {
-        description: 'Please try resetting or contact support'
-      });
+    setIsLoading(true);
+    
+    // Update recovery state
+    const newRecoveryState = {
+      attemptCount: recoveryState.attemptCount + 1,
+      lastAttempt: new Date(),
+      nextAttemptDelay: Math.min(recoveryState.nextAttemptDelay * 2, 30000) // Exponential backoff, max 30s
+    };
+    
+    setRecoveryState(newRecoveryState);
+    
+    // Simulating network delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // If too many attempts, enforce a countdown
+    if (newRecoveryState.attemptCount > 3) {
+      const waitSeconds = Math.floor(newRecoveryState.nextAttemptDelay / 1000);
+      setCountdown(waitSeconds);
+      setIsLoading(false);
       return;
     }
-
-    setRecoveryState(prev => ({
-      ...prev,
-      attemptCount: prev.attemptCount + 1,
-      lastAttempt: new Date(),
-      nextAttemptDelay: prev.nextAttemptDelay ? prev.nextAttemptDelay * 2 : initialDelay,
-    }));
-
-    try {
-      await onRetry();
-    } catch (retryError) {
-      toast.error('Retry failed', {
-        description: 'Please try again later'
-      });
-    }
+    
+    setIsLoading(false);
+    resetError();
   };
 
-  const handleReset = () => {
-    setRecoveryState({
-      attemptCount: 0,
-      lastAttempt: new Date(),
-      nextAttemptDelay: initialDelay,
-    });
-    onReset?.();
+  // Determine if we should show specific guidance based on error type
+  const getErrorGuidance = () => {
+    switch (error.type) {
+      case 'authentication':
+        return "Please check your credentials and try again.";
+      case 'authorization':
+        return "You don't have permission to access this resource.";
+      case 'network':
+        return "Please check your internet connection and try again.";
+      case 'server':
+        return "There was a problem with our servers. Please try again later.";
+      default:
+        return "An unexpected error occurred. Please try again.";
+    }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="w-full max-w-md mx-auto p-4"
+      className="rounded-lg bg-destructive/5 p-6 border border-destructive/20 flex flex-col items-center justify-center space-y-4 text-center max-w-md mx-auto my-8"
     >
-      <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
-        <AlertTriangle className="h-5 w-5" />
-        <AlertTitle>Authentication Error</AlertTitle>
-        <AlertDescription className="mt-2">
-          <div className="text-sm text-destructive/90 mb-4">
-            {error.message}
-            {recoveryState.attemptCount > 0 && (
-              <div className="text-xs mt-1">
-                Attempt {recoveryState.attemptCount} of {maxAttempts}
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2">
-            {recoveryState.attemptCount < maxAttempts && onRetry && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRetry}
-                className="bg-background/50 hover:bg-background/80"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Retry
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReset}
-              className="bg-background/50 hover:bg-background/80"
-            >
-              Reset
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
+      <AlertCircle className="h-12 w-12 text-destructive" />
+      
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold text-destructive">Authentication Error</h2>
+        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <p className="text-xs text-muted-foreground">{getErrorGuidance()}</p>
+      </div>
+      
+      {countdown > 0 ? (
+        <div className="text-sm text-muted-foreground">
+          <p>Too many retry attempts. Please wait {countdown} seconds before trying again.</p>
+        </div>
+      ) : (
+        <Button 
+          onClick={handleRetry} 
+          disabled={isLoading || countdown > 0}
+          className="w-full"
+          variant="outline"
+        >
+          {isLoading ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Retrying...
+            </>
+          ) : (
+            'Try Again'
+          )}
+        </Button>
+      )}
+      
+      <p className="text-xs text-muted-foreground">
+        If this issue persists, please contact support.
+      </p>
     </motion.div>
   );
 };

@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { PinLoginForm } from "./pin/PinLoginForm";
 
+interface ProfileWithPin {
+  id: string;
+  pin_enabled?: boolean;
+  last_password_login?: string | null;
+  [key: string]: any;
+}
+
 export const PinLogin = ({ onSwitchToPassword }: { onSwitchToPassword: () => void }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState("");
@@ -36,16 +43,18 @@ export const PinLogin = ({ onSwitchToPassword }: { onSwitchToPassword: () => voi
           return;
         }
 
+        const typedProfile = profile as ProfileWithPin;
+
         // Check if pin_enabled field exists and is true
-        if (!profile || !profile.pin_enabled) {
+        if (!typedProfile || !typedProfile.pin_enabled) {
           toast.error("PIN login not set up. Please log in with password first.");
           onSwitchToPassword();
           return;
         }
 
         // Check if last password login exists and is within the last month
-        if (profile.last_password_login) {
-          const lastPasswordLogin = new Date(profile.last_password_login);
+        if (typedProfile.last_password_login) {
+          const lastPasswordLogin = new Date(typedProfile.last_password_login);
           const oneMonthAgo = new Date();
           oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 

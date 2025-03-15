@@ -1,13 +1,15 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { UserRole } from "@/lib/types/enums";
 
 export interface Profile {
   id: string;
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
-  role: 'subscriber' | 'maker' | 'admin' | 'super_admin' | null;
+  role: UserRole | null;
   bio: string | null;
   website: string | null;
   location: string | null;
@@ -18,6 +20,8 @@ export interface Profile {
   ban_reason: string | null;
   banned_at: string | null;
   banned_by: string | null;
+  pin_enabled?: boolean;
+  last_password_login?: string | null;
 }
 
 export const useProfiles = () => {
@@ -37,7 +41,7 @@ export const useProfiles = () => {
       }
 
       console.log('Profiles fetched:', data);
-      return data;
+      return data as Profile[];
     },
   });
 };

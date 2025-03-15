@@ -1,32 +1,40 @@
-import { toast } from "sonner";
-import type { ContentType } from "../types/contentTypes";
-import { getSchemaByType } from "../types/contentTypes";
 
-export const validateContent = async (type: ContentType, data: unknown) => {
+import { ContentType } from '@/lib/types/enums';
+import { getSchemaByType, contentTypeRelationships } from '../types/contentTypes';
+import { z } from 'zod';
+
+/**
+ * Validate content data against its schema based on content type
+ * @param type ContentType to validate against
+ * @param data Content data to validate
+ * @returns Validation result with success status and optional errors
+ */
+export const validateContentData = (type: ContentType, data: any) => {
+  const schema = getSchemaByType(type);
   try {
-    const schema = getSchemaByType(type);
-    const validatedData = await schema.parseAsync(data);
-    return { success: true, data: validatedData };
+    schema.parse(data);
+    return { success: true };
   } catch (error) {
-    console.error("Content validation error:", error);
-    toast.error("Content validation failed");
-    return { success: false, error };
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        errors: error.errors
+      };
+    }
+    return {
+      success: false,
+      errors: [{ message: 'Unknown validation error' }]
+    };
   }
 };
 
-export const validateContentRelationship = (parentType: ContentType, childType: ContentType) => {
-  // Define allowed relationships between content types
-  const allowedRelationships: Record<ContentType, ContentType[]> = {
-    page: ["component", "template"],
-    component: ["component"],
-    template: ["component", "page"],
-    workflow: ["page", "component", "template"],
-  };
-
-  const isAllowed = allowedRelationships[parentType]?.includes(childType);
-  if (!isAllowed) {
-    toast.error(`Relationship between ${parentType} and ${childType} is not allowed`);
-  }
-  
-  return isAllowed;
+/**
+ * Check if a content type can be related to another
+ * @param sourceType Source content type
+ * @param targetType Target content type
+ * @returns Boolean indicating if relationship is allowed
+ */
+export const canRelateContentTypes = (sourceType: ContentType, targetType: ContentType): boolean => {
+  const allowedRelationships = contentTypeRelationships[sourceType] || [];
+  return allowedRelationships.includes(targetType);
 };

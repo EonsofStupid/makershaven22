@@ -9,6 +9,13 @@ export interface WorkflowStage {
   order: number;
   config: WorkflowStageConfig;
   description?: string;
+  validationRules?: WorkflowValidationRule[];
+}
+
+export interface WorkflowValidationRule {
+  field: string;
+  rule: string;
+  errorMessage: string;
 }
 
 export interface WorkflowStageConfig {
@@ -51,7 +58,7 @@ export const parseWorkflowStage = (data: Json): WorkflowStage => {
     throw new Error('Invalid workflow stage data');
   }
 
-  const stage = data as Record<string, Json>;
+  const stage = data as Record<string, any>;
   
   return {
     id: String(stage.id || ''),
@@ -59,7 +66,8 @@ export const parseWorkflowStage = (data: Json): WorkflowStage => {
     type: (stage.type as WorkflowStageType) || 'TASK',
     order: Number(stage.order || 0),
     config: stage.config as WorkflowStageConfig || {},
-    description: stage.description ? String(stage.description) : undefined
+    description: stage.description ? String(stage.description) : undefined,
+    validationRules: stage.validationRules as WorkflowValidationRule[] || []
   };
 };
 

@@ -1777,6 +1777,7 @@ export type Database = {
           name: string | null
           next_level_points: number | null
           onboarding_completed: boolean | null
+          pin_enabled: boolean | null
           points: number | null
           role: Database["public"]["Enums"]["user_role"]
           role_id: number | null
@@ -1812,6 +1813,7 @@ export type Database = {
           name?: string | null
           next_level_points?: number | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null
@@ -1847,6 +1849,7 @@ export type Database = {
           name?: string | null
           next_level_points?: number | null
           onboarding_completed?: boolean | null
+          pin_enabled?: boolean | null
           points?: number | null
           role?: Database["public"]["Enums"]["user_role"]
           role_id?: number | null

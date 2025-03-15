@@ -1,16 +1,7 @@
 
-export type ContentType = 
-  | 'template' 
-  | 'page' 
-  | 'build' 
-  | 'guide' 
-  | 'part' 
-  | 'component'
-  | 'workflow'
-  | 'hero'
-  | 'feature';
-
-export type ContentStatus = 'draft' | 'published' | 'archived';
+import { ContentType, ContentStatus } from '@/lib/types/enums';
+import { Json } from '@/lib/types/core/json';
+import { baseContentSchema, pageContentSchema, componentContentSchema, getSchemaByType, contentTypeRelationships } from './contentTypeSchema';
 
 export interface BaseContent {
   id: string;
@@ -26,6 +17,29 @@ export interface BaseContent {
   updated_by?: string;
   version?: number;
 }
+
+export interface PageContent extends BaseContent {
+  type: 'page';
+  content?: {
+    body?: string;
+    seo?: {
+      title?: string;
+      description?: string;
+      keywords?: string[];
+    };
+  };
+}
+
+export interface ComponentContent extends BaseContent {
+  type: 'component';
+  content?: {
+    template?: string;
+    props?: Record<string, any>;
+    styles?: Record<string, string>;
+  };
+}
+
+export type AnyContent = PageContent | ComponentContent | BaseContent;
 
 export interface ContentVersionMetadata {
   version: number;
@@ -64,3 +78,6 @@ export interface ContentTypeSchema {
     field?: string;
   }[];
 }
+
+// Export for convenience
+export { getSchemaByType, contentTypeRelationships };

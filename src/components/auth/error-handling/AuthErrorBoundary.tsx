@@ -1,66 +1,67 @@
 
-import React from "react";
-import { AuthError } from "@/lib/types/auth/types";
-import { ErrorRecoveryHandler } from "./ErrorRecoveryHandler";
-import { useAuthStore } from "@/lib/store/auth-store";
+import React, { Component, ErrorInfo } from 'react';
+import { ErrorRecoveryHandler } from './ErrorRecoveryHandler';
+import { AuthError as LibAuthError } from '@/lib/auth/types/errors';
 
-interface AuthErrorBoundaryProps {
+interface Props {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: AuthError; reset: () => void }>;
+  fallback?: React.ReactNode;
 }
 
-interface AuthErrorBoundaryState {
+interface State {
   hasError: boolean;
-  error: AuthError | null;
+  error: LibAuthError | null;
 }
 
-export class AuthErrorBoundary extends React.Component<AuthErrorBoundaryProps, AuthErrorBoundaryState> {
-  public state: AuthErrorBoundaryState = {
-    hasError: false,
-    error: null,
-  };
+export class AuthErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
-  public static getDerivedStateFromError(error: Error): AuthErrorBoundaryState {
-    // Convert standard Error to AuthError
-    const authError: AuthError = {
-      type: 'UNKNOWN_ERROR',
+  static getDerivedStateFromError(error: Error): State {
+    // Convert standard Error to AuthError format
+    const authError: LibAuthError = {
+      type: 'unknown',
       message: error.message,
-      stack: error.stack,
-      ...(error as any) // Preserve any additional properties that might exist
+      code: 'UNKNOWN_ERROR',
+      stack: error.stack
     };
+
+    return {
+      hasError: true,
+      error: authError
+    };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('Auth Error Boundary caught an error:', error, errorInfo);
     
-    return { 
-      hasError: true, 
-      error: authError 
-    };
+    // You could log the error to an error reporting service here
+    // logErrorToService(error, errorInfo);
   }
 
-  public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Auth error caught:", error, errorInfo);
-  }
-
-  private handleReset = () => {
-    this.setState({ hasError: false, error: null });
+  resetErrorState = (): void => {
+    this.setState({
+      hasError: false,
+      error: null
+    });
   };
 
-  private handleRetry = async () => {
-    const { initialize } = useAuthStore.getState();
-    await initialize();
-    this.handleReset();
-  };
-
-  public render() {
+  render(): React.ReactNode {
     if (this.state.hasError) {
+      // You can render any custom fallback UI
       if (this.props.fallback) {
-        const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error!} reset={this.handleReset} />;
+        return this.props.fallback;
       }
 
       return (
-        <ErrorRecoveryHandler
-          error={this.state.error!}
-          onRetry={this.handleRetry}
-          onReset={this.handleReset}
+        <ErrorRecoveryHandler 
+          error={this.state.error as LibAuthError} 
+          resetError={this.resetErrorState}
         />
       );
     }
@@ -68,5 +69,3 @@ export class AuthErrorBoundary extends React.Component<AuthErrorBoundaryProps, A
     return this.props.children;
   }
 }
-
-export default AuthErrorBoundary;
