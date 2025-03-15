@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Plus, X } from 'lucide-react';
-import { SecuritySettings } from '@/lib/types/security/types';
+import { SecuritySettings, parseSecuritySettings, prepareSecuritySettingsForDb } from '@/lib/types/security/types';
 
 export const IPSecuritySection = () => {
   const [newIP, setNewIP] = React.useState('');
@@ -21,7 +22,7 @@ export const IPSecuritySection = () => {
         .single();
 
       if (error) throw error;
-      return data.security_settings as SecuritySettings;
+      return parseSecuritySettings(data.security_settings);
     }
   });
 
@@ -36,7 +37,7 @@ export const IPSecuritySection = () => {
 
       const { data, error } = await supabase
         .from('site_settings')
-        .update({ security_settings: newSettings })
+        .update({ security_settings: prepareSecuritySettingsForDb(newSettings) })
         .eq('id', settingsData.id);
 
       if (error) throw error;

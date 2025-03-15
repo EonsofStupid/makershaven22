@@ -36,17 +36,20 @@ export interface SecurityEvent {
 
 /**
  * Security log interface for detailed security audit logging
+ * Aligns with security_logs table in database
  */
 export interface SecurityLog {
   id: string;
+  event_type: string;
+  severity: string;
   user_id?: string;
-  action: string;
-  resource: string;
-  details: string;
-  success: boolean;
   ip_address?: string;
-  user_agent?: string;
-  created_at: string;
+  details?: Json;
+  created_at?: string;
+  profiles?: {
+    username: string;
+    display_name: string;
+  };
 }
 
 /**
