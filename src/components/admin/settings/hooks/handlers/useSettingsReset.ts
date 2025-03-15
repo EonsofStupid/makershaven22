@@ -4,11 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SettingsResponse } from "../../types";
-import { DEFAULT_SETTINGS } from "../useSettingsDefaults";
-import { safeRecord } from "@/lib/utils/type-utils";
+import { DEFAULT_SETTINGS } from "@/lib/types/settings/core";
+import { safeRecord, safeThemeMode, safeTransitionType, ensureJson } from "@/lib/utils/type-utils";
 import { SecuritySettings, parseSecuritySettings } from "@/lib/types/security/types";
-import { safeThemeMode } from "@/lib/utils/type-utils";
-import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useSettingsReset = () => {
   const [isResetting, setIsResetting] = useState(false);
@@ -48,9 +46,9 @@ export const useSettingsReset = () => {
           box_shadow: DEFAULT_SETTINGS.box_shadow,
           backdrop_blur: DEFAULT_SETTINGS.backdrop_blur,
           transition_type: DEFAULT_SETTINGS.transition_type,
-          security_settings: DEFAULT_SETTINGS.security_settings
+          security_settings: ensureJson(DEFAULT_SETTINGS.security_settings)
         })
-        .eq('id', '1') // Use a string for the ID
+        .eq('id', '1') // Use string instead of number
         .select()
         .single();
 
@@ -67,12 +65,16 @@ export const useSettingsReset = () => {
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
       
-      // Create a properly typed FlattenedSettings object
+      // Ensure transition_type is a valid TransitionType
+      const transitionType = safeTransitionType(data.transition_type);
+      
+      // Create a properly typed FlattenedSettings object with explicit type casting
       const settingsResult: FlattenedSettings = {
         ...data,
-        theme_mode: themeMode as ThemeMode,
+        theme_mode: themeMode,
+        transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: metadata
+        metadata: ensureJson(metadata)
       };
       
       toast.success("Settings reset to defaults");
@@ -82,9 +84,10 @@ export const useSettingsReset = () => {
       console.error("Error resetting settings:", error);
       toast.error("Failed to reset settings");
       
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return { 
         data: null as unknown as FlattenedSettings, 
-        error: { message: error instanceof Error ? error.message : "Unknown error" } 
+        error: { message: errorMessage } 
       };
     } finally {
       setIsResetting(false);

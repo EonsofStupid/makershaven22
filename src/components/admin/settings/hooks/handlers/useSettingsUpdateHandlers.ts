@@ -4,10 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { uploadMedia } from "@/utils/media";
 import { FlattenedSettings } from "@/lib/types/settings/types";
-import { safeRecord } from "@/lib/utils/type-utils";
+import { safeRecord, safeThemeMode, safeTransitionType, recordToJson, ensureJson } from "@/lib/utils/type-utils";
 import { parseSecuritySettings } from "@/lib/types/security/types";
-import { safeThemeMode } from "@/lib/utils/type-utils";
-import { ThemeMode } from "@/lib/types/core/enums";
+import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
 
 export const useSettingsUpdateHandlers = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -43,8 +42,7 @@ export const useSettingsUpdateHandlers = () => {
         console.log("Favicon uploaded successfully:", favicon_url);
       }
 
-      // Create a structured database object removing any complex types that
-      // aren't directly supported by the database
+      // Create a properly typed database object with correct conversions
       const databaseData = {
         site_title: formData.site_title,
         tagline: formData.tagline,
@@ -76,8 +74,9 @@ export const useSettingsUpdateHandlers = () => {
         backdrop_blur: formData.backdrop_blur,
         transition_type: formData.transition_type,
         theme_mode: formData.theme_mode,
-        metadata: formData.metadata || {},
-        security_settings: formData.security_settings
+        // Convert complex objects to Json-compatible types
+        metadata: ensureJson(formData.metadata || {}),
+        security_settings: ensureJson(formData.security_settings)
       };
 
       // Use Supabase update directly
@@ -101,12 +100,16 @@ export const useSettingsUpdateHandlers = () => {
       // Ensure theme_mode is a valid ThemeMode
       const themeMode = safeThemeMode(data.theme_mode);
       
+      // Ensure transition_type is a valid TransitionType
+      const transitionType = safeTransitionType(data.transition_type);
+      
       // Create a properly typed FlattenedSettings object with explicit type casting
       const settingsResult: FlattenedSettings = {
         ...data,
-        theme_mode: themeMode as ThemeMode,
+        theme_mode: themeMode,
+        transition_type: transitionType,
         security_settings: securitySettings,
-        metadata: metadata
+        metadata: ensureJson(metadata)
       };
       
       toast.success("Settings updated successfully");

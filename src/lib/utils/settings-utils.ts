@@ -1,8 +1,17 @@
 
 import { FlattenedSettings } from "../types/settings/core";
 import { SecuritySettings, parseSecuritySettings } from "../types/security/types";
-import { safeRecord, safeThemeMode, safeHexColor, safeCssMeasurement, safeString } from "./type-utils";
-import { ThemeMode } from "../types/core/enums";
+import { 
+  safeRecord, 
+  safeThemeMode, 
+  safeHexColor, 
+  safeCssMeasurement, 
+  safeString, 
+  safeTransitionType,
+  recordToJson,
+  ensureJson
+} from "./type-utils";
+import { ThemeMode, TransitionType } from "../types/core/enums";
 import { Json } from "../types/core/json";
 import { DEFAULT_SETTINGS } from "../types/settings/core";
 
@@ -24,6 +33,9 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
   // Ensure theme_mode is a valid ThemeMode
   const themeMode = safeThemeMode(data.theme_mode);
   
+  // Ensure transition_type is valid TransitionType
+  const transitionType = safeTransitionType(data.transition_type);
+  
   // Create a properly typed FlattenedSettings object
   const settingsResult: FlattenedSettings = {
     // Site info
@@ -33,7 +45,7 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
     favicon_url: typeof data.favicon_url === 'string' ? data.favicon_url : undefined,
     
     // Theme mode
-    theme_mode: themeMode as ThemeMode,
+    theme_mode: themeMode,
     
     // Colors
     primary_color: safeHexColor(data.primary_color, DEFAULT_SETTINGS.primary_color),
@@ -64,15 +76,11 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
     hover_scale: safeString(data.hover_scale, DEFAULT_SETTINGS.hover_scale),
     box_shadow: safeString(data.box_shadow, DEFAULT_SETTINGS.box_shadow),
     backdrop_blur: safeString(data.backdrop_blur, DEFAULT_SETTINGS.backdrop_blur),
-    transition_type: 
-      data.transition_type === 'fade' || 
-      data.transition_type === 'slide' || 
-      data.transition_type === 'scale' ? 
-      data.transition_type : DEFAULT_SETTINGS.transition_type,
+    transition_type: transitionType, // Use the safely converted TransitionType
     
     // Complex objects
     security_settings: securitySettings,
-    metadata: metadata,
+    metadata: ensureJson(metadata), // Ensure metadata is valid Json type
     
     // Metadata fields
     id: typeof data.id === 'string' ? data.id : undefined,

@@ -39,3 +39,32 @@ export type SettingType = 'theme' | 'security' | 'site' | 'user';
 
 // Theme inheritance strategies
 export type ThemeInheritanceStrategy = 'merge' | 'override' | 'selective';
+
+/**
+ * Enum guards - type validation functions
+ */
+
+// Validate TransitionType
+export function isValidTransitionType(value: string): value is TransitionType {
+  return ['fade', 'slide', 'scale', 'blur'].includes(value);
+}
+
+// Validate ThemeMode
+export function isValidThemeMode(value: string): value is ThemeMode {
+  return ['light', 'dark', 'system'].includes(value);
+}
+
+// Validate GlassEffectLevel
+export function isValidGlassEffectLevel(value: string): value is GlassEffectLevel {
+  return ['none', 'light', 'medium', 'heavy'].includes(value);
+}
+
+// Validate SettingType
+export function isValidSettingType(value: string): value is SettingType {
+  return ['theme', 'security', 'site', 'user'].includes(value);
+}
+
+// Validate ThemeInheritanceStrategy
+export function isValidThemeInheritanceStrategy(value: string): value is ThemeInheritanceStrategy {
+  return ['merge', 'override', 'selective'].includes(value);
+}

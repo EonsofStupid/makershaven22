@@ -1,6 +1,6 @@
 
 import { Json, JsonObject, isJsonObject } from "../types/core/json";
-import { ThemeMode } from "../types/core/enums";
+import { ThemeMode, TransitionType, isValidTransitionType, isValidThemeMode } from "../types/core/enums";
 
 /**
  * Safely converts a value to a boolean with fallback
@@ -44,11 +44,20 @@ export function safeRecord(value: unknown): Record<string, unknown> {
  * Safely converts a value to a ThemeMode enum value
  */
 export function safeThemeMode(value: unknown): ThemeMode {
-  if (typeof value === 'string' && 
-      (value === 'light' || value === 'dark' || value === 'system')) {
+  if (typeof value === 'string' && isValidThemeMode(value)) {
     return value as ThemeMode;
   }
   return 'system';
+}
+
+/**
+ * Safely converts a value to a TransitionType enum value
+ */
+export function safeTransitionType(value: unknown): TransitionType {
+  if (typeof value === 'string' && isValidTransitionType(value)) {
+    return value as TransitionType;
+  }
+  return 'fade';
 }
 
 /**
@@ -84,3 +93,47 @@ export function safeCssMeasurement(value: unknown, fallback: string): string {
   }
   return fallback;
 }
+
+/**
+ * Convert a Record to Json safely
+ */
+export function recordToJson(record: Record<string, unknown>): Json {
+  return record as unknown as Json;
+}
+
+/**
+ * Ensure a value is a Json compliant value
+ */
+export function ensureJson(value: unknown): Json {
+  // If it's a primitive, it's already Json compatible
+  if (value === null || 
+      typeof value === 'string' || 
+      typeof value === 'number' || 
+      typeof value === 'boolean') {
+    return value as Json;
+  }
+  
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map(item => ensureJson(item)) as Json;
+  }
+  
+  // Handle objects
+  if (typeof value === 'object' && value !== null) {
+    const result: Record<string, Json> = {};
+    
+    for (const [key, val] of Object.entries(value)) {
+      result[key] = ensureJson(val);
+    }
+    
+    return result as Json;
+  }
+  
+  // If we can't convert it, return null
+  return null;
+}
+
+/**
+ * Export isJsonObject from core/json for backward compatibility
+ */
+export { isJsonObject };
