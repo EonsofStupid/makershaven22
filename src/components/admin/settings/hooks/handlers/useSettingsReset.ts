@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { FlattenedSettings } from "@/lib/types/settings/types";
 import { SettingsResponse } from "../../types";
 import { DEFAULT_SETTINGS } from "@/lib/types/settings/core";
-import { safeRecord, safeThemeMode, safeTransitionType, ensureJson, jsonToRecord } from "@/lib/utils/type-utils";
-import { SecuritySettings, parseSecuritySettings } from "@/lib/types/security/types";
+import { ensureJson } from "@/lib/utils/type-utils";
+import { processDatabaseSettings } from "@/lib/utils/settings/process-utils";
 
 export const useSettingsReset = () => {
   const [isResetting, setIsResetting] = useState(false);
@@ -56,32 +56,12 @@ export const useSettingsReset = () => {
       
       console.log("Settings reset successfully:", data);
       
-      // Process security settings from JSON to SecuritySettings type
-      const securitySettings = parseSecuritySettings(data.security_settings);
-      
-      // Process metadata - using jsonToRecord to ensure we get a Record<string, unknown>
-      const metadata = data.metadata 
-        ? jsonToRecord(data.metadata) 
-        : {};
-      
-      // Ensure theme_mode is a valid ThemeMode
-      const themeMode = safeThemeMode(data.theme_mode);
-      
-      // Ensure transition_type is a valid TransitionType
-      const transitionType = safeTransitionType(data.transition_type);
-      
-      // Create a properly typed FlattenedSettings object with explicit type casting
-      const settingsResult: FlattenedSettings = {
-        ...data,
-        theme_mode: themeMode,
-        transition_type: transitionType,
-        security_settings: securitySettings,
-        metadata: metadata // Now properly typed as Record<string, unknown>
-      };
+      // Process the returned data using our utility
+      const processedSettings = processDatabaseSettings(data);
       
       toast.success("Settings reset to defaults");
       
-      return { data: settingsResult, error: null };
+      return { data: processedSettings, error: null };
     } catch (error) {
       console.error("Error resetting settings:", error);
       toast.error("Failed to reset settings");

@@ -13,4 +13,4 @@ export {
   isFlattenedSettings, 
   flattenSettings, 
   unflattenSettings 
-} from '../../utils/settings-utils';
+} from '../../utils/settings/structure-utils';
