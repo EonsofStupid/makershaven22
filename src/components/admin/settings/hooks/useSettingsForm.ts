@@ -5,7 +5,7 @@ import { useSettingsUpdateHandlers } from "./handlers/useSettingsUpdateHandlers"
 import { useSettingsReset } from "./handlers/useSettingsReset";
 
 export const useSettingsForm = () => {
-  const { settings, isLoading, fetchSettings } = useSettingsFetch();
+  const { settings, isLoading, error, fetchSettings } = useSettingsFetch();
   const { 
     isSaving, 
     logoFile, 
@@ -19,6 +19,7 @@ export const useSettingsForm = () => {
   return {
     settings,
     isLoading,
+    error,
     isSaving,
     isResetting,
     logoFile,
@@ -27,5 +28,6 @@ export const useSettingsForm = () => {
     handleFaviconUpload,
     handleSettingsUpdate,
     handleResetToDefault,
+    fetchSettings
   };
 };

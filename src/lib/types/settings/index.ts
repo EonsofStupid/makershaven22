@@ -5,7 +5,7 @@ export * from './core';
 // Zod validation schemas
 export * from './schema';
 
-// Form and API interaction types
+// State and form types
 export * from './state';
 
 // Export utility functions

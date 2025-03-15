@@ -122,6 +122,7 @@ export interface FlattenedSettings extends
   ThemeSettings {
   security_settings: SecuritySettings;
   metadata?: Record<string, unknown>;
+  theme_preferences?: ThemePreferences;
   theme_mode: ThemeMode;
 }
 
