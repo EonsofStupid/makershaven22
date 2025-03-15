@@ -22,7 +22,7 @@ export const parseWorkflowStage = (stageData: Json): WorkflowStage => {
     }
   }
 
-  if (!stageData || typeof stageData !== 'object') {
+  if (!stageData || typeof stageData !== 'object' || Array.isArray(stageData)) {
     return createEmptyStage();
   }
 
@@ -64,21 +64,23 @@ export const createEmptyStage = (): WorkflowStage => ({
 export const parseWorkflowStages = (stagesData: Json | null): WorkflowStage[] => {
   if (!stagesData) return [];
   
-  if (!Array.isArray(stagesData)) {
-    try {
-      if (typeof stagesData === 'string') {
-        stagesData = JSON.parse(stagesData);
-      }
-      if (!Array.isArray(stagesData)) {
-        return [];
-      }
-    } catch (e) {
-      console.error('Failed to parse workflow stages:', e);
-      return [];
-    }
+  if (Array.isArray(stagesData)) {
+    return stagesData.map(stage => parseWorkflowStage(stage));
   }
   
-  return stagesData.map(stage => parseWorkflowStage(stage));
+  try {
+    if (typeof stagesData === 'string') {
+      const parsed = JSON.parse(stagesData);
+      if (Array.isArray(parsed)) {
+        return parsed.map(stage => parseWorkflowStage(stage));
+      }
+    }
+    // If it's not an array or can't be parsed to an array, return empty array
+    return [];
+  } catch (e) {
+    console.error('Failed to parse workflow stages:', e);
+    return [];
+  }
 };
 
 export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {

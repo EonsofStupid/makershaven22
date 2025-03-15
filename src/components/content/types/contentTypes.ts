@@ -1,9 +1,8 @@
-
 import { ContentType, ContentStatus } from '@/lib/types/enums';
 import { Json } from '@/lib/types/core/json';
 import { baseContentSchema, pageContentSchema, componentContentSchema, getSchemaByType, contentTypeRelationships } from './contentTypeSchema';
 
-// Export all needed types
+// Export all needed types - exporting ContentType properly
 export { ContentType, ContentStatus } from '@/lib/types/enums';
 
 export interface BaseContent {

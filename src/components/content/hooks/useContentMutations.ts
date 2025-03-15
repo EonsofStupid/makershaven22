@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ContentType } from "@/lib/types/enums";
 import { validateContent } from "../utils/contentTypeValidation";
+import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
@@ -12,18 +13,27 @@ export const useContentMutations = () => {
     mutationFn: async ({ type, title, ...data }: { type: ContentType; title: string } & Record<string, any>) => {
       console.log("Creating content:", { type, title, data });
       
-      const validation = await validateContent(type, { type, title, ...data });
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
+      const contentData: ContentCreate = {
+        type,
+        title,
+        created_by: user.id, // Use the authenticated user's ID
+        ...data,
+      };
+      
+      const validation = await validateContent(type, contentData);
       if (!validation.success) {
         throw new Error("Content validation failed");
       }
 
       const { data: result, error } = await supabase
         .from("cms_content")
-        .insert({
-          type,
-          title,
-          ...validation.data
-        })
+        .insert(validation.data)
         .select()
         .single();
 
@@ -48,18 +58,28 @@ export const useContentMutations = () => {
     mutationFn: async ({ id, type, title, ...data }: { id: string; type: ContentType; title: string } & Record<string, any>) => {
       console.log("Updating content:", { id, type, title, data });
       
-      const validation = await validateContent(type, { type, title, ...data });
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+      
+      const contentData: ContentUpdate = {
+        id,
+        type,
+        title,
+        updated_by: user.id, // Use the authenticated user's ID for tracking updates
+        ...data
+      };
+      
+      const validation = await validateContent(type, contentData);
       if (!validation.success) {
         throw new Error("Content validation failed");
       }
 
       const { data: result, error } = await supabase
         .from("cms_content")
-        .update({
-          type,
-          title,
-          ...validation.data
-        })
+        .update(validation.data)
         .eq("id", id)
         .select()
         .single();
