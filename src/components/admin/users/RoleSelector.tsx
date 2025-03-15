@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Select,
@@ -6,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UserRole } from '@/components/auth/types';
+import { UserRole } from '@/lib/types/enums';
 
 interface RoleSelectorProps {
   currentRole: UserRole;

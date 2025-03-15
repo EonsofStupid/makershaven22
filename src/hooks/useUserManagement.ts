@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { UserRole } from '@/components/auth/types';
+import type { UserRole } from '@/lib/types/enums';
 
 export const useUserManagement = () => {
   const queryClient = useQueryClient();
@@ -87,8 +87,8 @@ export const useUserManagement = () => {
   const banUser = useMutation({
     mutationFn: async ({ userId, reason }: { userId: string; reason: string }) => {
       const { error } = await supabase.rpc('ban_user', {
-        user_id: userId,
-        reason: reason,
+        p_user_id: userId,
+        p_reason: reason,
         admin_id: (await supabase.auth.getUser()).data.user?.id
       });
 
