@@ -1,3 +1,4 @@
+
 import { Json } from '../core/json';
 
 export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -30,6 +31,11 @@ export interface SecurityLog {
   ip_address: string;
   timestamp: string;
   details: Json;
+  created_at?: string;
+  profiles?: {
+    display_name: string;
+    username: string;
+  };
 }
 
 export interface SecurityAuditLog {
@@ -56,3 +62,6 @@ export interface SessionSecurityConfig {
   refresh_token_rotation: boolean;
   persistent_sessions: boolean;
 }
+
+// Re-export everything from types.ts for backward compatibility
+export * from './types';

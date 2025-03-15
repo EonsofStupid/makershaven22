@@ -14,3 +14,6 @@ export {
   flattenSettings, 
   unflattenSettings 
 } from '../../utils/settings/structure-utils';
+
+// Export security types
+export * from '../security/types';
