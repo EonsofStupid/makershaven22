@@ -62,26 +62,26 @@ export interface WorkflowFormData {
 }
 
 /**
- * Serializes an array of workflow stages into a JSON format that can be stored in the database
+ * Safely serializes an array of workflow stages into a JSON format that can be stored in the database
  */
 export const serializeWorkflowStages = (stages: WorkflowStage[]): Json => {
   return JSON.parse(JSON.stringify(stages)) as Json;
 };
 
 /**
- * Parses JSON data from the database into typed WorkflowStage objects
+ * Safely parses JSON data from the database into typed WorkflowStage objects
  */
 export const parseWorkflowStages = (data: Json): WorkflowStage[] => {
   if (!Array.isArray(data)) return [];
   
   return data.map(stage => ({
-    id: String(stage.id || crypto.randomUUID()),
-    name: String(stage.name || ''),
-    type: (stage.type as WorkflowStageType) || 'task',
-    order: Number(stage.order || 0),
-    config: stage.config as WorkflowStageConfig || {},
-    description: stage.description ? String(stage.description) : undefined,
-    validationRules: stage.validationRules as StageValidationRule[] || []
+    id: String(stage?.id || crypto.randomUUID()),
+    name: String(stage?.name || ''),
+    type: (stage?.type as WorkflowStageType) || 'task',
+    order: Number(stage?.order || 0),
+    config: stage?.config as WorkflowStageConfig || {},
+    description: stage?.description ? String(stage.description) : undefined,
+    validationRules: stage?.validationRules as StageValidationRule[] || []
   }));
 };
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AdminNav } from "@/components/admin/dashboard/AdminNav";
@@ -9,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { WorkflowForm } from "@/components/admin/workflows/WorkflowForm";
-import type { WorkflowFormData, WorkflowData, ParsedWorkflowData } from "@/components/content/types/workflow";
-import { parseWorkflowSteps, serializeWorkflowSteps } from "@/components/content/types/workflow";
+import { WorkflowFormData } from "@/lib/types/workflow/types";
+import { parseWorkflowStages, serializeWorkflowStages } from "@/lib/types/workflow/types";
 
 const WorkflowEditor = () => {
   const { id } = useParams();
@@ -41,12 +42,11 @@ const WorkflowEditor = () => {
       }
 
       // Parse the workflow data
-      const parsedData: ParsedWorkflowData = {
+      return {
         ...data,
-        steps: parseWorkflowSteps(data.steps),
+        steps: parseWorkflowStages(data.steps),
+        stages: data.stages ? parseWorkflowStages(data.stages) : []
       };
-
-      return parsedData;
     },
     enabled: !isNewWorkflow,
   });
@@ -57,6 +57,7 @@ const WorkflowEditor = () => {
         name: workflow.name,
         description: workflow.description || "",
         steps: workflow.steps,
+        stages: workflow.stages
       });
     }
   }, [workflow]);
@@ -66,7 +67,8 @@ const WorkflowEditor = () => {
       const workflowData = {
         name: formData.name,
         description: formData.description,
-        steps: serializeWorkflowSteps(formData.steps),
+        steps: serializeWorkflowStages(formData.steps || []),
+        stages: formData.stages ? serializeWorkflowStages(formData.stages) : []
       };
 
       if (isNewWorkflow) {

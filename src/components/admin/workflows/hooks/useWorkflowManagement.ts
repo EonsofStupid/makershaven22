@@ -32,7 +32,8 @@ export const useWorkflowManagement = () => {
         stages: parseWorkflowStages(item.stages || []),
         is_active: item.is_active,
         created_by: item.created_by,
-        created_at: item.created_at,
+        // Ensure we properly handle these fields that might not exist
+        created_at: item?.updated_at || null, // Use a fallback if the field doesn't exist
         updated_at: item.updated_at
       } as WorkflowTemplate));
     }

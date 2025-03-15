@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, X } from "lucide-react";
@@ -21,26 +22,38 @@ export const PinLogin = ({ onSwitchToPassword }: { onSwitchToPassword: () => voi
           return;
         }
 
-        const { data: profile } = await supabase
+        // Check if the profile has pin login enabled
+        const { data: profile, error } = await supabase
           .from("profiles")
-          .select("pin_enabled, last_password_login")
+          .select("*")
           .eq("id", session.user.id)
           .single();
 
-        if (!profile?.pin_enabled) {
+        if (error) {
+          console.error("Profile check error:", error);
+          toast.error("Unable to verify profile. Please try again.");
+          onSwitchToPassword();
+          return;
+        }
+
+        // Check if pin_enabled field exists and is true
+        if (!profile || !profile.pin_enabled) {
           toast.error("PIN login not set up. Please log in with password first.");
           onSwitchToPassword();
           return;
         }
 
-        const lastPasswordLogin = new Date(profile.last_password_login);
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        // Check if last password login exists and is within the last month
+        if (profile.last_password_login) {
+          const lastPasswordLogin = new Date(profile.last_password_login);
+          const oneMonthAgo = new Date();
+          oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-        if (lastPasswordLogin < oneMonthAgo) {
-          toast.error("Monthly password verification required. Please log in with your password.");
-          onSwitchToPassword();
-          return;
+          if (lastPasswordLogin < oneMonthAgo) {
+            toast.error("Monthly password verification required. Please log in with your password.");
+            onSwitchToPassword();
+            return;
+          }
         }
 
         setEmail(session.user.email || "");

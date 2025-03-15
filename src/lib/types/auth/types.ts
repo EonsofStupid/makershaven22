@@ -1,6 +1,6 @@
 
 import { Json } from '../core/json';
-import { UserRole } from '../core/enums';
+import { UserRole } from '../enums';
 
 export interface AuthUser {
   id: string;

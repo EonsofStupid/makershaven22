@@ -1,5 +1,6 @@
+
 import React from "react";
-import { AuthError } from "@/lib/auth/types/errors";
+import { AuthError } from "@/lib/types/auth/types";
 import { ErrorRecoveryHandler } from "./ErrorRecoveryHandler";
 import { useAuthStore } from "@/lib/store/auth-store";
 
@@ -20,9 +21,17 @@ export class AuthErrorBoundary extends React.Component<AuthErrorBoundaryProps, A
   };
 
   public static getDerivedStateFromError(error: Error): AuthErrorBoundaryState {
+    // Convert standard Error to AuthError
+    const authError: AuthError = {
+      type: 'UNKNOWN_ERROR',
+      message: error.message,
+      stack: error.stack,
+      ...(error as any) // Preserve any additional properties that might exist
+    };
+    
     return { 
       hasError: true, 
-      error: error as AuthError 
+      error: authError 
     };
   }
 

@@ -1,5 +1,6 @@
+
 import { Json } from '../core/json';
-import { WorkflowStageType } from '../core/enums';
+import { WorkflowStageType } from '../enums';
 
 export interface WorkflowStage {
   id: string;
@@ -42,6 +43,9 @@ export interface WorkflowStageConfig {
   }>;
 }
 
+/**
+ * Parses a JSON object from the database into a typed WorkflowStage object
+ */
 export const parseWorkflowStage = (data: Json): WorkflowStage => {
   if (typeof data !== 'object' || !data) {
     throw new Error('Invalid workflow stage data');
@@ -59,6 +63,9 @@ export const parseWorkflowStage = (data: Json): WorkflowStage => {
   };
 };
 
+/**
+ * Converts a WorkflowStage object to a JSON format suitable for database storage
+ */
 export const serializeWorkflowStage = (stage: WorkflowStage): Json => {
   return stage as unknown as Json;
 };
