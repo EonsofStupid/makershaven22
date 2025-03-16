@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 export const useAuthSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { setSession, setUser, setIsSignedIn } = useAuthStore();
+  const { setSession, setUser } = useAuthStore();
   const initialSetupDone = useRef(false);
 
   const handleAuthChange = useCallback(async (session: Session | null) => {
@@ -19,20 +19,30 @@ export const useAuthSetup = () => {
         const { user } = session;
         console.log('Setting authenticated user:', user.id);
         
-        setSession(session);
+        setSession({
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.user_metadata?.role,
+            username: user.user_metadata?.username,
+            displayName: user.user_metadata?.display_name || user.user_metadata?.username,
+            user_metadata: user.user_metadata
+          },
+          expires_at: session.expires_at
+        });
+        
         setUser({
           id: user.id,
           email: user.email,
+          role: user.user_metadata?.role,
           username: user.user_metadata?.username,
           displayName: user.user_metadata?.display_name || user.user_metadata?.username,
           user_metadata: user.user_metadata
         });
-        setIsSignedIn(true);
       } else {
         console.log('No active session, clearing auth state');
         setSession(null);
         setUser(null);
-        setIsSignedIn(false);
       }
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
@@ -40,7 +50,7 @@ export const useAuthSetup = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [setSession, setUser, setIsSignedIn]);
+  }, [setSession, setUser]);
 
   return {
     isLoading,

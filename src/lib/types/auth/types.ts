@@ -1,11 +1,9 @@
 
-import { Json } from '../core/json';
-import { UserRole } from '../enums';
-import { AuthErrorType } from '../../auth/types/errors';
+import { UserRole } from '../core/enums';
 
 export interface AuthUser {
   id: string;
-  email?: string;
+  email?: string | null;
   role?: UserRole;
   username?: string;
   displayName?: string;
@@ -20,6 +18,14 @@ export interface AuthSession {
   expires_at?: number;
 }
 
+export type AuthErrorType = 
+  | 'authentication' 
+  | 'authorization' 
+  | 'validation' 
+  | 'server' 
+  | 'network'
+  | 'unknown';
+
 export interface AuthError {
   type: AuthErrorType;
   code?: string;
@@ -31,4 +37,11 @@ export interface AuthErrorRecoveryState {
   attemptCount: number;
   lastAttempt?: Date;
   nextAttemptDelay: number;
+}
+
+export interface AuthState {
+  isLoading: boolean;
+  hasAccess: boolean;
+  error: Error | { message: string } | null;
+  isTransitioning?: boolean;
 }

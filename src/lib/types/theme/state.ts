@@ -1,7 +1,6 @@
 
 import { ThemeMode, TransitionType } from '../core/enums';
-import { SecuritySettings } from '../security/types';
-import { FlattenedSettings } from '../settings/core';
+import { Json } from '../core/json';
 
 /**
  * Core theme state interface for Zustand store
@@ -28,6 +27,43 @@ export interface ThemeState {
   
   // Computed effective theme (result of themeMode + systemPreference)
   effectiveTheme: 'light' | 'dark';
+}
+
+export interface FlattenedSettings {
+  site_title: string;
+  tagline?: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  text_primary_color: string;
+  text_secondary_color: string;
+  text_link_color: string;
+  text_heading_color: string;
+  neon_cyan: string;
+  neon_pink: string;
+  neon_purple: string;
+  font_family_heading: string;
+  font_family_body: string;
+  font_size_base: string;
+  font_weight_normal: string;
+  font_weight_bold: string;
+  line_height_base: string;
+  letter_spacing: string;
+  border_radius: string;
+  spacing_unit: string;
+  transition_duration: string;
+  shadow_color: string;
+  hover_scale: string;
+  security_settings: Record<string, unknown>;
+  theme_mode: ThemeMode;
+  transition_type?: TransitionType;
+  box_shadow?: string;
+  backdrop_blur?: string;
+  logo_url?: string;
+  favicon_url?: string;
+  updated_at?: string;
+  updated_by?: string;
+  metadata?: Record<string, unknown>;
 }
 
 /**

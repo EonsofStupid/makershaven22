@@ -7,9 +7,11 @@ import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
+import { useAuthStore } from '@/lib/store/auth-store';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
+  const { isLoading } = useAuthStore();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initSecurity();
 
+    // Only run the setup once
     if (initialSetupDone.current) {
       console.log('Initial setup already done, skipping');
       return;
@@ -38,30 +41,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const maxRetries = 3;
     const retryDelay = 1000;
 
+    // Setup authentication
     const setupAuth = async () => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize security systems first
+        // Initialize session and security
         try {
-          sessionManager.startSession();
+          await sessionManager.startSession();
           securityManager.initialize();
           console.log('Security systems initialized');
         } catch (securityError) {
           console.error('Error initializing security systems:', securityError);
-          // Continue with auth setup even if security init fails
         }
 
+        // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          if (sessionError.message.includes('refresh_token_not_found')) {
-            console.log('Refresh token not found, signing out');
-            await supabase.auth.signOut();
-            return;
-          }
-          throw sessionError;
-        }
+        if (sessionError) throw sessionError;
 
         console.log('Initial session check:', session?.user?.id || 'No session');
         await handleAuthChange(session);
@@ -82,21 +79,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setupAuth();
 
-    console.log('Setting up auth state change subscription');
+    // Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('Auth state changed:', _event, session?.user?.id);
       try {
-        console.log('Auth state changed:', _event, session?.user?.id);
         await handleAuthChange(session);
       } catch (error) {
-        console.error('Auth state change error:', error);
-        toast.error('Authentication error', {
-          description: 'There was a problem with your session. Please try signing in again.',
-        });
+        console.error("Auth state change error:", error);
       }
     });
     
+    // Cleanup
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
@@ -105,6 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [handleAuthChange]);
 
+  // Render with motion for smooth transitions
   return (
     <motion.div
       initial={{ opacity: 0 }}

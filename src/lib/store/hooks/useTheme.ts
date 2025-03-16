@@ -22,7 +22,7 @@ export const useTheme = () => {
 
   // Apply theme mode to document
   useEffect(() => {
-    if (typeof document !== 'undefined') {
+    if (typeof document !== 'undefined' && effectiveTheme) {
       // Remove all theme classes
       document.documentElement.classList.remove('light', 'dark');
       // Add current theme class
