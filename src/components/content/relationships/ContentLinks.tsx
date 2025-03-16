@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -9,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import type { BaseContent } from '../types/cms';
+import type { BaseContent } from '@/components/content/types/cms';
 
 interface ContentLinksProps {
   contentId: string;

@@ -26,6 +26,14 @@ export const contentFormValidAtom = atom(
   }
 );
 
+// Define a separate writer atom for currentContentAtom
+export const writeCurrentContentAtom = atom(
+  null, 
+  (get, set, content: BaseContent | null) => {
+    set(currentContentAtom, content);
+  }
+);
+
 // Reset form atoms to defaults or with specific content
 export const resetContentFormAtom = atom(
   null, 

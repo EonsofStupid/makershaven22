@@ -1,17 +1,8 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { BaseContent } from "../types/cms";
-
-interface RelationshipWithContent {
-  id: string;
-  parent_id: string;
-  child_id: string;
-  relationship_type: string;
-  order_index: number;
-  parent: BaseContent;
-  child: BaseContent;
-}
+import type { BaseContent, ContentRelationship } from "@/components/content/types/cms";
 
 export const useContentRelationships = (contentId?: string) => {
   return useQuery({
@@ -46,7 +37,7 @@ export const useContentRelationships = (contentId?: string) => {
 
       console.log("Fetched relationships:", data);
 
-      // Transform the data to match the RelationshipWithContent type
+      // Transform the data to match the ContentRelationship type
       return data.map((relationship) => ({
         ...relationship,
         parent: Array.isArray(relationship.parent) 
@@ -55,7 +46,7 @@ export const useContentRelationships = (contentId?: string) => {
         child: Array.isArray(relationship.child)
           ? relationship.child[0]
           : relationship.child,
-      })) as RelationshipWithContent[];
+      })) as ContentRelationship[];
     },
     enabled: !!contentId,
   });

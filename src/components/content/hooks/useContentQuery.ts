@@ -1,7 +1,8 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { BaseContent } from "../types/cms";
+import type { BaseContent } from "@/components/content/types/cms";
 
 export const useContentQuery = (contentId?: string) => {
   return useQuery({
