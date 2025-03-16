@@ -76,14 +76,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               
             if (userRole?.role === 'admin') {
               // Only admins should run this profile management task
-              ensureUserProfilesExist();
+              await ensureUserProfilesExist();
             }
           }
         }
 
         // Import and run the seed function if needed
         try {
-          const { seedDemoProjects } = await import('../../scripts/seed-demo-data');
+          const { seedDemoProjects } = await import('@/scripts/seed-demo-data');
           await seedDemoProjects();
         } catch (error) {
           console.error("Error during demo data setup:", error);
