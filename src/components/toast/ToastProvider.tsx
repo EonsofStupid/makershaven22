@@ -11,30 +11,6 @@ export interface ToastProviderProps {
 export function ToastProvider({ children }: ToastProviderProps) {
   const { theme } = useTheme();
   
-  // Setup keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Alt+K to focus on the most recent toast
-      if (e.altKey && e.key === 'k') {
-        const toasts = document.querySelectorAll('[role="status"]');
-        if (toasts.length) {
-          (toasts[0] as HTMLElement).focus();
-        }
-      }
-      
-      // Escape to dismiss all toasts
-      if (e.key === 'Escape') {
-        const closeButtons = document.querySelectorAll('[toast-close]');
-        closeButtons.forEach((button) => {
-          (button as HTMLElement).click();
-        });
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-  
   return (
     <>
       {children}

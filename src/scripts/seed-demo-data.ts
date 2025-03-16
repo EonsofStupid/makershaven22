@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 // Demo printer builds data
 const demoPrinterBuilds = [
@@ -11,7 +11,7 @@ const demoPrinterBuilds = [
     status: 'approved',
     likes_count: 243,
     views_count: 1852,
-    estimated_time: '40-60h',
+    estimated_time: '40 hours',
     build_specs: {
       category: 'CoreXY',
       buildVolume: {
@@ -35,7 +35,7 @@ const demoPrinterBuilds = [
     status: 'approved',
     likes_count: 189,
     views_count: 1456,
-    estimated_time: '10-15h',
+    estimated_time: '15 hours',
     build_specs: {
       category: 'Cartesian',
       buildVolume: {
@@ -58,7 +58,7 @@ const demoPrinterBuilds = [
     status: 'approved',
     likes_count: 127,
     views_count: 983,
-    estimated_time: '25-30h',
+    estimated_time: '25 hours',
     build_specs: {
       category: 'Cartesian',
       buildVolume: {
@@ -81,7 +81,7 @@ const demoPrinterBuilds = [
     status: 'approved',
     likes_count: 152,
     views_count: 1205,
-    estimated_time: '35-45h',
+    estimated_time: '35 hours',
     build_specs: {
       category: 'CoreXY',
       buildVolume: {
@@ -105,7 +105,7 @@ const demoPrinterBuilds = [
     status: 'approved',
     likes_count: 98,
     views_count: 867,
-    estimated_time: '30-40h',
+    estimated_time: '30 hours',
     build_specs: {
       category: 'CoreXY',
       buildVolume: {
@@ -125,6 +125,9 @@ const demoPrinterBuilds = [
 
 // Function to seed data
 export const seedDemoProjects = async () => {
+  // Use a single toast for the entire seeding process
+  const loadingToastId = toast.loading('Setting up demo data...');
+  
   try {
     // Check if we already have data
     const { data: existingData, error: countError } = await supabase
@@ -134,12 +137,14 @@ export const seedDemoProjects = async () => {
     
     if (countError) {
       console.error('Error checking for existing data:', countError);
+      toast.error.fromLoading(loadingToastId, 'Error checking for existing data', countError.message);
       return false;
     }
     
     // If we already have data, don't seed
     if (existingData && existingData.length > 0) {
       console.log('Data already exists, skipping seed');
+      toast.success.fromLoading(loadingToastId, 'Demo data already exists', 'Using existing data');
       return false;
     }
     
@@ -153,14 +158,16 @@ export const seedDemoProjects = async () => {
     
     if (error) {
       console.error('Error seeding demo data:', error);
-      toast.error('Error seeding demo data');
+      toast.error.fromLoading(loadingToastId, 'Error seeding demo data', error.message);
       return false;
     }
     
     console.log('Demo data seeded successfully');
+    toast.success.fromLoading(loadingToastId, 'Demo data seeded successfully');
     return true;
   } catch (error) {
     console.error('Error in seed function:', error);
+    toast.error.fromLoading(loadingToastId, 'Failed to seed demo data', (error as Error).message);
     return false;
   }
 };
