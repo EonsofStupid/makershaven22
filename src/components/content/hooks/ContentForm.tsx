@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import type { Json } from "@/lib/types/core/json";
 import { isJsonObject } from "@/lib/types/core/json";
 
-// Type guard to ensure content is an object before submission
+/**
+ * Type guard to ensure content is an object before submission
+ * @param content The JSON content to validate
+ * @returns Record<string, unknown> A validated object
+ */
 const ensureContentObject = (content: Json): Record<string, unknown> => {
   if (isJsonObject(content)) {
     return content as Record<string, unknown>;
@@ -16,6 +20,10 @@ const ensureContentObject = (content: Json): Record<string, unknown> => {
   return {};
 };
 
+/**
+ * Handle content submission
+ * @param content The content to submit
+ */
 const handleSubmit = async (content: Json) => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
 
