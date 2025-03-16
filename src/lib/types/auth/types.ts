@@ -1,21 +1,66 @@
+import type { UserRole } from '../core/enums';
+import type { JsonObject } from '../core/json';
 
-import { UserRole } from '../core/enums';
-
+/**
+ * Auth user interface
+ */
 export interface AuthUser {
   id: string;
-  email?: string | null;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  email: string;
+  role: UserRole;
+  display_name?: string;
+  avatar_url?: string;
+  metadata?: JsonObject;
+  created_at?: string;
+  updated_at?: string;
+  last_sign_in?: string;
+  email_verified?: boolean;
+  is_active: boolean;
 }
 
+/**
+ * Auth session interface
+ */
 export interface AuthSession {
+  id: string;
   user: AuthUser;
-  expires_at?: number;
+  access_token: string;
+  refresh_token?: string;
+  expires_at: string;
+  created_at: string;
+  updated_at?: string;
+  metadata?: JsonObject;
+}
+
+/**
+ * Security event severity levels
+ */
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+/**
+ * Security event categories
+ */
+export type SecurityEventCategory = 
+  | 'authentication'
+  | 'authorization'
+  | 'data_access'
+  | 'system'
+  | 'user_management';
+
+/**
+ * Security event interface
+ */
+export interface SecurityEvent {
+  id: string;
+  user_id?: string;
+  event_type: string;
+  severity: SecurityEventSeverity;
+  category: SecurityEventCategory;
+  description: string;
+  metadata?: JsonObject;
+  created_at: string;
+  ip_address?: string;
+  user_agent?: string;
 }
 
 export type AuthErrorType = 
