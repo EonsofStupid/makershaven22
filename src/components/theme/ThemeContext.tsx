@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Settings } from "@/components/admin/settings/types";
 import { useThemeSetup } from "./hooks/useThemeSetup";
@@ -6,6 +7,7 @@ import { applyThemeToDocument } from "./utils/themeUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthStore } from '@/lib/store/auth-store';
+import { flattenedSettingsToTheme, themeToFlattenedSettings, Theme } from "./types/theme";
 
 interface ThemeContextType {
   theme: Settings | null;

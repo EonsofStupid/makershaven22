@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Theme, FlattenedSettings } from './types/theme';
+import { Theme, FlattenedSettings, flattenedSettingsToTheme, themeToFlattenedSettings } from './types/theme';
+import { toast } from 'sonner';
 
 interface ThemeContextType {
   theme: Theme;
@@ -107,12 +108,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Update theme in database
-  const updateTheme = async (newThemeData: FlattenedSettings) => {
+  const updateTheme = async (newThemeData: FlattenedSettings): Promise<void> => {
     try {
       // Convert theme to the format expected by the database function
       const params = {
         p_site_title: newThemeData.site_title,
-        p_tagline: '', // Add empty tagline or get from newThemeData if needed
+        p_tagline: newThemeData.tagline || '',
         p_primary_color: newThemeData.primary_color,
         p_secondary_color: newThemeData.secondary_color,
         p_accent_color: newThemeData.accent_color,
@@ -137,7 +138,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_hover_scale: newThemeData.hover_scale
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .rpc('update_site_settings', params);
 
       if (error) {
@@ -146,17 +147,15 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       // Update local state with the new theme
-      const updatedTheme = { 
-        ...theme,
-        ...newThemeData
-      } as Theme;
+      const updatedTheme = flattenedSettingsToTheme(newThemeData);
       
       setTheme(updatedTheme);
       applyThemeToDOM(updatedTheme);
       
-      return data;
+      toast.success('Theme updated successfully');
     } catch (error) {
       console.error('Error updating theme:', error);
+      toast.error('Failed to update theme');
       throw error;
     }
   };
