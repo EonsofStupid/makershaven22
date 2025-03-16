@@ -1,9 +1,9 @@
 
 import { atom } from 'jotai';
-import type { ContentCreate, ContentUpdate, BaseContent } from '@/lib/types/content/types';
+import type { BaseContent } from '@/lib/types/content/types';
 import { ContentStatus, ContentType } from '@/lib/types/core/enums';
 
-// State atoms for content management - explicitly making these writable
+// State atoms for content management
 export const contentListAtom = atom<BaseContent[]>([]);
 export const contentLoadingAtom = atom<boolean>(false);
 export const contentErrorAtom = atom<Error | null>(null);
@@ -26,42 +26,10 @@ export const contentFormValidAtom = atom(
   }
 );
 
-// Create an atom that represents the form data for creating content
-export const contentCreateDataAtom = atom(
-  (get) => {
-    return {
-      title: get(contentFormTitleAtom),
-      type: get(contentFormTypeAtom),
-      status: get(contentFormStatusAtom),
-      slug: get(contentFormSlugAtom),
-      content: get(contentFormContentAtom),
-      metadata: get(contentFormMetadataAtom),
-    } as Omit<ContentCreate, 'created_by'>;
-  }
-);
-
-// Create an atom that represents the form data for updating content
-export const contentUpdateDataAtom = atom(
-  (get) => {
-    const currentContent = get(currentContentAtom);
-    if (!currentContent) return null;
-    
-    return {
-      id: currentContent.id,
-      title: get(contentFormTitleAtom),
-      type: get(contentFormTypeAtom),
-      status: get(contentFormStatusAtom),
-      slug: get(contentFormSlugAtom),
-      content: get(contentFormContentAtom),
-      metadata: get(contentFormMetadataAtom),
-    } as Omit<ContentUpdate, 'updated_by'>;
-  }
-);
-
 // Reset form atoms to defaults or with specific content
 export const resetContentFormAtom = atom(
-  null,
-  (get, set, content: BaseContent | null = null) => {
+  null, 
+  (_get, set, content: BaseContent | null = null) => {
     if (content) {
       set(contentFormTitleAtom, content.title);
       set(contentFormTypeAtom, content.type);

@@ -1,80 +1,80 @@
 
-import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
+import React from 'react';
 import { useContentMutations } from "./useContentMutations";
 import { isContentPage, isContentComponent } from "@/utils/validators";
 import { toast } from "sonner";
-import type { Json } from "@/lib/types/core/json";
-import { isJsonObject } from "@/lib/types/core/json";
+import { BaseContent } from "@/lib/types/content/types";
 import { useAtom } from "jotai";
 import { 
-  contentCreateDataAtom, 
-  contentUpdateDataAtom, 
-  contentFormValidAtom 
+  contentFormTitleAtom, 
+  contentFormTypeAtom,
+  contentFormStatusAtom,
+  contentFormSlugAtom,
+  contentFormContentAtom,
+  contentFormMetadataAtom,
+  contentFormValidAtom,
+  currentContentAtom
 } from "@/lib/store/atoms/content-atoms";
 
-/**
- * Type guard to ensure content is an object before submission
- * @param content The JSON content to validate
- * @returns Record<string, unknown> A validated object
- */
-const ensureContentObject = (content: Json): Record<string, unknown> => {
-  if (isJsonObject(content)) {
-    return content as Record<string, unknown>;
-  }
-  // If not a valid object, return an empty object
-  console.warn("Content was not a valid object, converting to empty object");
-  return {};
-};
-
-/**
- * Handle content submission
- * @param content The content to submit
- */
-const handleSubmit = async (content: Json) => {
+const ContentForm: React.FC = () => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
-  const [createData] = useAtom(contentCreateDataAtom);
-  const [updateData] = useAtom(contentUpdateDataAtom);
+  const [title] = useAtom(contentFormTitleAtom);
+  const [type] = useAtom(contentFormTypeAtom);
+  const [status] = useAtom(contentFormStatusAtom);
+  const [slug] = useAtom(contentFormSlugAtom);
+  const [content] = useAtom(contentFormContentAtom);
+  const [metadata] = useAtom(contentFormMetadataAtom);
   const [isValid] = useAtom(contentFormValidAtom);
+  const [currentContent] = useAtom(currentContentAtom);
 
-  if (!isValid) {
-    toast.error("Please fill in all required fields");
-    return;
-  }
-
-  try {
-    // Ensure content is a valid object for both validations and mutations
-    const contentObj = ensureContentObject(content);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    if (isContentPage(contentObj)) {
-      // Logic for page content
-      console.log('Handling page content:', contentObj);
-      
-      if ('id' in contentObj) {
-        if (updateData) {
-          await updateContentWithUser(updateData);
-        }
-      } else {
-        await createContentWithUser(createData);
-      }
-    } else if (isContentComponent(contentObj)) {
-      // Logic for component content
-      console.log('Handling component content:', contentObj);
-      
-      if ('id' in contentObj) {
-        if (updateData) {
-          await updateContentWithUser(updateData);
-        }
-      } else {
-        await createContentWithUser(createData);
-      }
-    } else {
-      toast.error("Invalid content structure");
+    if (!isValid) {
+      toast.error("Please fill in all required fields");
       return;
     }
-  } catch (error) {
-    console.error("Error handling content submission:", error);
-    toast.error(error instanceof Error ? error.message : "Error handling content");
-  }
+
+    try {
+      const formData = {
+        title,
+        type,
+        status,
+        slug,
+        content,
+        metadata
+      };
+
+      if (currentContent?.id) {
+        // Update existing content
+        await updateContentWithUser({
+          ...formData,
+          id: currentContent.id
+        });
+        toast.success("Content updated successfully");
+      } else {
+        // Create new content
+        await createContentWithUser(formData);
+        toast.success("Content created successfully");
+      }
+    } catch (error) {
+      console.error("Error handling content submission:", error);
+      toast.error(error instanceof Error ? error.message : "Error handling content");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Form implementation - This is a stub, actual form would be implemented based on design requirements */}
+      <button 
+        type="submit"
+        disabled={!isValid}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+      >
+        {currentContent?.id ? 'Update Content' : 'Create Content'}
+      </button>
+    </form>
+  );
 };
 
-export default handleSubmit;
+export default ContentForm;
