@@ -1,3 +1,4 @@
+
 import { ContentType } from '@/lib/types/enums';
 import { ContentCreate, ContentUpdate } from '@/lib/types/content/types';
 import { 
@@ -7,6 +8,7 @@ import {
   contentUpdateSchema 
 } from '../types/contentTypeSchema';
 import { z } from 'zod';
+import { isJsonObject } from '@/lib/types/core/json';
 
 /**
  * Validate content data against its schema based on content type
@@ -15,6 +17,14 @@ import { z } from 'zod';
  * @returns Validation result with success status and optional errors
  */
 export const validateContentData = (type: ContentType, data: any) => {
+  // Ensure data is an object before validation
+  if (!isJsonObject(data)) {
+    return {
+      success: false,
+      errors: [{ message: 'Content data must be an object' }]
+    };
+  }
+
   const schema = getSchemaByType(type);
   try {
     schema.parse(data);
@@ -35,11 +45,18 @@ export const validateContentData = (type: ContentType, data: any) => {
 
 /**
  * Validate content for creation operation
- * @param type ContentType to validate against
  * @param data Content data to validate
  * @returns Validation result with success status, optional errors, and sanitized data
  */
 export const validateContentCreate = (data: ContentCreate) => {
+  // Ensure created_by is present and is a string
+  if (!data.created_by || typeof data.created_by !== 'string') {
+    return {
+      success: false,
+      errors: [{ message: 'created_by is required and must be a string' }]
+    };
+  }
+
   try {
     const validatedData = contentCreateSchema.parse(data);
     return { 
@@ -66,6 +83,22 @@ export const validateContentCreate = (data: ContentCreate) => {
  * @returns Validation result with success status, optional errors, and sanitized data
  */
 export const validateContentUpdate = (data: ContentUpdate) => {
+  // Ensure updated_by is present and is a string
+  if (!data.updated_by || typeof data.updated_by !== 'string') {
+    return {
+      success: false,
+      errors: [{ message: 'updated_by is required and must be a string' }]
+    };
+  }
+
+  // Ensure id is present and is a string
+  if (!data.id || typeof data.id !== 'string') {
+    return {
+      success: false,
+      errors: [{ message: 'id is required and must be a string' }]
+    };
+  }
+
   try {
     const validatedData = contentUpdateSchema.parse(data);
     return { 
@@ -93,6 +126,14 @@ export const validateContentUpdate = (data: ContentUpdate) => {
  * @returns Validation result with success status, optional errors, and sanitized data
  */
 export const validateContent = (type: ContentType, data: any) => {
+  // Ensure data is an object before validation
+  if (!isJsonObject(data)) {
+    return {
+      success: false,
+      errors: [{ message: 'Content data must be an object' }]
+    };
+  }
+
   // Check if it's a content update (has id and updated_by)
   if (data.id && data.updated_by) {
     return validateContentUpdate(data as ContentUpdate);

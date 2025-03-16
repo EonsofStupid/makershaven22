@@ -1,3 +1,4 @@
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,10 +21,15 @@ export const useContentMutations = () => {
         throw new Error(errorMessage);
       }
 
+      // Ensure contentData has created_by, which is required by the database
+      if (!contentData.created_by) {
+        throw new Error("User ID (created_by) is required for content creation");
+      }
+
       // Insert the validated data
       const { data: result, error } = await supabase
         .from("cms_content")
-        .insert(validation.data)
+        .insert(validation.data as Required<ContentCreate>)
         .select()
         .single();
 
@@ -56,10 +62,15 @@ export const useContentMutations = () => {
         throw new Error(errorMessage);
       }
 
+      // Ensure contentData has updated_by, which is required for updates
+      if (!contentData.updated_by) {
+        throw new Error("User ID (updated_by) is required for content updates");
+      }
+
       // Update with validated data
       const { data: result, error } = await supabase
         .from("cms_content")
-        .update(validation.data)
+        .update(validation.data as Required<ContentUpdate>)
         .eq("id", contentData.id)
         .select()
         .single();

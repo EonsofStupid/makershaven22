@@ -1,10 +1,16 @@
-import { Json } from "@/integrations/supabase/types";
+
+import type { Json } from "@/lib/types/core/json";
+import { isJsonObject } from "@/lib/types/core/json";
 import type { BaseContent } from "@/components/content/types/cms";
 
-export const isContentPage = (content: Json): boolean => {
-  return typeof content === 'object' && content !== null && 'type' in content && content.type === 'page';
+export const isContentPage = (content: Json | Record<string, unknown>): boolean => {
+  return isJsonObject(content) && 
+         'type' in content && 
+         content.type === 'page';
 };
 
-export const isContentComponent = (content: Json): boolean => {
-  return typeof content === 'object' && content !== null && 'type' in content && content.type === 'component';
+export const isContentComponent = (content: Json | Record<string, unknown>): boolean => {
+  return isJsonObject(content) && 
+         'type' in content && 
+         content.type === 'component';
 };
