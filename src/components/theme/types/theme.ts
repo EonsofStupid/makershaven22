@@ -1,5 +1,6 @@
+
 import { Settings } from "@/components/admin/settings/types";
-import { ThemeMode } from "@/lib/types/enums";
+import { ThemeMode } from "@/lib/types/core/enums";
 import { SecuritySettings } from "@/lib/types/security/types";
 
 export interface DatabaseSettingsRow {
@@ -33,8 +34,11 @@ export interface DatabaseSettingsRow {
   updated_at?: string;
   updated_by?: string;
   setting_key?: string;
-  security_settings?: SecuritySettings;
-  theme_mode?: ThemeMode;
+  security_settings?: any; // Accept any type from database
+  theme_mode?: string;
+  tagline?: string;
+  logo_url?: string;
+  favicon_url?: string;
 }
 
 export interface Theme {
@@ -98,8 +102,8 @@ export interface FlattenedSettings {
   box_shadow: string;
   backdrop_blur: string;
   transition_type: string;
-  security_settings?: SecuritySettings;
-  theme_mode?: ThemeMode;
+  security_settings: SecuritySettings;
+  theme_mode: ThemeMode;
   tagline?: string;
   logo_url?: string;
   favicon_url?: string;

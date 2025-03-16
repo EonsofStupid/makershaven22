@@ -1,6 +1,7 @@
 
 import { Theme, DatabaseSettingsRow } from "../types/theme";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const DEFAULT_THEME_SETTINGS: Theme = {
   site_title: 'MakersImpulse',
@@ -30,7 +31,7 @@ export const DEFAULT_THEME_SETTINGS: Theme = {
   backdrop_blur: '0',
   transition_type: 'fade',
   security_settings: DEFAULT_SECURITY_SETTINGS,
-  theme_mode: 'system',
+  theme_mode: 'system' as ThemeMode,
 };
 
 export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): Theme => {
@@ -38,6 +39,16 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
     console.log("Using default theme settings");
     return DEFAULT_THEME_SETTINGS;
   }
+
+  // Process security_settings from database
+  const securitySettings = settings.security_settings 
+    ? (typeof settings.security_settings === 'string' 
+        ? JSON.parse(settings.security_settings) 
+        : settings.security_settings)
+    : DEFAULT_SECURITY_SETTINGS;
+
+  // Process theme_mode from database
+  const themeMode = (settings.theme_mode as ThemeMode) || 'system';
 
   return {
     site_title: settings.site_title || DEFAULT_THEME_SETTINGS.site_title,
@@ -66,8 +77,8 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
     box_shadow: settings.box_shadow || DEFAULT_THEME_SETTINGS.box_shadow,
     backdrop_blur: settings.backdrop_blur || DEFAULT_THEME_SETTINGS.backdrop_blur,
     transition_type: settings.transition_type || DEFAULT_THEME_SETTINGS.transition_type,
-    security_settings: settings.security_settings || DEFAULT_SECURITY_SETTINGS,
-    theme_mode: settings.theme_mode || 'system',
+    security_settings: securitySettings,
+    theme_mode: themeMode,
     tagline: settings.tagline,
     logo_url: settings.logo_url,
     favicon_url: settings.favicon_url,
@@ -75,29 +86,18 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
 };
 
 export const applyThemeToDocument = (theme: Theme) => {
-  console.log("Applying theme to document:", theme);
-  document.documentElement.style.setProperty('--primary-color', theme.primary_color);
-  document.documentElement.style.setProperty('--secondary-color', theme.secondary_color);
-  document.documentElement.style.setProperty('--accent-color', theme.accent_color);
-  document.documentElement.style.setProperty('--text-primary-color', theme.text_primary_color);
-  document.documentElement.style.setProperty('--text-secondary-color', theme.text_secondary_color);
-  document.documentElement.style.setProperty('--text-link-color', theme.text_link_color);
-  document.documentElement.style.setProperty('--text-heading-color', theme.text_heading_color);
-  document.documentElement.style.setProperty('--neon-cyan', theme.neon_cyan);
-  document.documentElement.style.setProperty('--neon-pink', theme.neon_pink);
-  document.documentElement.style.setProperty('--neon-purple', theme.neon_purple);
-  document.documentElement.style.setProperty('--font-family-heading', theme.font_family_heading);
-  document.documentElement.style.setProperty('--font-family-body', theme.font_family_body);
-  document.documentElement.style.setProperty('--font-size-base', theme.font_size_base);
-  document.documentElement.style.setProperty('--font-weight-normal', theme.font_weight_normal);
-  document.documentElement.style.setProperty('--font-weight-bold', theme.font_weight_bold);
-  document.documentElement.style.setProperty('--line-height-base', theme.line_height_base);
-  document.documentElement.style.setProperty('--letter-spacing', theme.letter_spacing);
-  document.documentElement.style.setProperty('--border-radius', theme.border_radius);
-  document.documentElement.style.setProperty('--spacing-unit', theme.spacing_unit);
-  document.documentElement.style.setProperty('--transition-duration', theme.transition_duration);
-  document.documentElement.style.setProperty('--shadow-color', theme.shadow_color);
-  document.documentElement.style.setProperty('--hover-scale', theme.hover_scale);
-  document.documentElement.style.setProperty('--box-shadow', theme.box_shadow);
-  document.documentElement.style.setProperty('--backdrop-blur', theme.backdrop_blur);
+  console.log("Applying theme to document:", theme.site_title);
+  
+  const root = document.documentElement;
+  // Only apply string values as CSS variables
+  Object.entries(theme).forEach(([key, value]) => {
+    if (value && typeof value === 'string' && key !== 'theme_mode' && !key.includes('settings')) {
+      root.style.setProperty(`--${kebabCase(key)}`, value);
+    }
+  });
+
+  // Helper to convert camelCase to kebab-case for CSS variables
+  function kebabCase(str: string): string {
+    return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+  }
 };

@@ -6,6 +6,7 @@ import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme } from "../utils/themeUtils";
 import { toast } from "sonner";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useThemeSubscription = (setTheme: (theme: Settings) => void) => {
   useEffect(() => {
@@ -19,18 +20,11 @@ export const useThemeSubscription = (setTheme: (theme: Settings) => void) => {
           table: 'site_settings'
         },
         (payload) => {
-          console.log("Received real-time theme update:", payload.new);
+          console.log("Received real-time theme update");
           const dbSettings = payload.new as DatabaseSettingsRow;
           const themeData = convertDbSettingsToTheme(dbSettings);
           
-          // Ensure theme data is compatible with FlattenedSettings
-          const completeThemeData = {
-            ...themeData,
-            security_settings: dbSettings.security_settings || DEFAULT_SECURITY_SETTINGS,
-            theme_mode: dbSettings.theme_mode || 'system'
-          };
-          
-          setTheme(completeThemeData);
+          setTheme(themeData);
           toast.success("Theme updated in real-time");
         }
       )

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Theme, DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
 import { DEFAULT_SECURITY_SETTINGS } from '@/lib/types/security/types';
+import { ThemeMode } from '@/lib/types/core/enums';
+import { ensureJson } from '@/lib/utils/type-utils';
 
 export const useThemeSettings = () => {
   const [theme, setTheme] = useState<Theme | null>(null);
@@ -24,7 +26,7 @@ export const useThemeSettings = () => {
 
       if (!rawData) {
         console.log("No settings found, creating default settings...");
-        // Create a single settings object instead of an array
+        // Create default settings with properly typed security_settings and theme_mode
         const defaultSettings = {
           site_title: 'MakersImpulse',
           primary_color: '#7FFFD4',
@@ -53,10 +55,12 @@ export const useThemeSettings = () => {
           backdrop_blur: '0',
           transition_type: 'fade',
           setting_key: 'theme_settings', // Required field for site_settings table
-          theme_mode: 'system',
-          security_settings: DEFAULT_SECURITY_SETTINGS
+          // Convert complex objects to JSON for database
+          security_settings: ensureJson(DEFAULT_SECURITY_SETTINGS),
+          theme_mode: 'system'
         };
 
+        // Insert with proper database types
         const { data: newSettings, error: insertError } = await supabase
           .from("site_settings")
           .insert(defaultSettings)
@@ -68,7 +72,9 @@ export const useThemeSettings = () => {
           throw insertError;
         }
 
-        console.log("Default settings created:", newSettings);
+        console.log("Default settings created");
+        
+        // Convert database row to Theme object
         const themeData = convertDbSettingsToTheme(newSettings as DatabaseSettingsRow);
         setTheme(themeData);
         applyThemeToDocument(themeData);
@@ -76,13 +82,15 @@ export const useThemeSettings = () => {
         return;
       }
 
-      console.log("Settings found:", rawData);
+      console.log("Settings found");
+      // Convert database row to Theme object
       const themeData = convertDbSettingsToTheme(rawData as DatabaseSettingsRow);
       setTheme(themeData);
       applyThemeToDocument(themeData);
       toast.success("Theme settings loaded");
     } catch (error) {
       console.error("Error in fetchSettings:", error);
+      // Create a default theme with required properties
       const defaultTheme = convertDbSettingsToTheme(null);
       setTheme(defaultTheme);
       applyThemeToDocument(defaultTheme);

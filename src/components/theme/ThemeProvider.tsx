@@ -3,6 +3,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Theme, FlattenedSettings, flattenedSettingsToTheme, themeToFlattenedSettings } from './types/theme';
 import { toast } from 'sonner';
+import { ThemeMode } from '@/lib/types/core/enums';
+import { SecuritySettings, DEFAULT_SECURITY_SETTINGS } from '@/lib/types/security/types';
+import { ensureJson } from '@/lib/utils/type-utils';
 
 interface ThemeContextType {
   theme: Theme;
@@ -10,7 +13,7 @@ interface ThemeContextType {
   updateTheme: (theme: FlattenedSettings) => Promise<void>;
 }
 
-// Default theme values
+// Default theme values with required security_settings and theme_mode
 const defaultTheme: Theme = {
   site_title: 'MakersImpulse',
   primary_color: '#7FFFD4',
@@ -37,7 +40,9 @@ const defaultTheme: Theme = {
   hover_scale: '1.05',
   box_shadow: 'none',
   backdrop_blur: '0',
-  transition_type: 'fade'
+  transition_type: 'fade',
+  security_settings: DEFAULT_SECURITY_SETTINGS,
+  theme_mode: 'system' as ThemeMode
 };
 
 // Create context with default values
@@ -67,6 +72,16 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (data) {
+          // Process security_settings from raw JSON
+          const securitySettings: SecuritySettings = data.security_settings 
+            ? (typeof data.security_settings === 'string' 
+                ? JSON.parse(data.security_settings) 
+                : data.security_settings)
+            : DEFAULT_SECURITY_SETTINGS;
+            
+          // Determine theme_mode from data or use default
+          const themeMode = (data.theme_mode as ThemeMode) || 'system';
+          
           const themeData: Theme = {
             site_title: data.site_title || defaultTheme.site_title,
             primary_color: data.primary_color || defaultTheme.primary_color,
@@ -93,7 +108,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
             hover_scale: data.hover_scale || defaultTheme.hover_scale,
             box_shadow: data.box_shadow || defaultTheme.box_shadow,
             backdrop_blur: data.backdrop_blur || defaultTheme.backdrop_blur,
-            transition_type: data.transition_type || defaultTheme.transition_type
+            transition_type: data.transition_type || defaultTheme.transition_type,
+            // Add required properties
+            security_settings: securitySettings,
+            theme_mode: themeMode,
+            // Optional properties
+            tagline: data.tagline,
+            logo_url: data.logo_url,
+            favicon_url: data.favicon_url
           };
           
           setTheme(themeData);
@@ -110,6 +132,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // Update theme in database
   const updateTheme = async (newThemeData: FlattenedSettings): Promise<void> => {
     try {
+      // Ensure security_settings is properly serialized for database storage
+      const serializedSecuritySettings = ensureJson(newThemeData.security_settings);
+      
       // Convert theme to the format expected by the database function
       const params = {
         p_site_title: newThemeData.site_title,
@@ -135,7 +160,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_spacing_unit: newThemeData.spacing_unit,
         p_transition_duration: newThemeData.transition_duration,
         p_shadow_color: newThemeData.shadow_color,
-        p_hover_scale: newThemeData.hover_scale
+        p_hover_scale: newThemeData.hover_scale,
+        p_security_settings: serializedSecuritySettings,
+        p_theme_mode: newThemeData.theme_mode
       };
 
       const { error } = await supabase
@@ -164,7 +191,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const applyThemeToDOM = (theme: Theme) => {
     const root = document.documentElement;
     Object.entries(theme).forEach(([key, value]) => {
-      if (value) {
+      if (value && typeof value === 'string') {
         root.style.setProperty(`--${kebabCase(key)}`, value);
       }
     });

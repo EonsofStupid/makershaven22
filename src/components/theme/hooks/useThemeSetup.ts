@@ -6,13 +6,14 @@ import { toast } from "sonner";
 import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, DEFAULT_THEME_SETTINGS, applyThemeToDocument } from "../utils/themeUtils";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
+import { ThemeMode } from "@/lib/types/core/enums";
 
 export const useThemeSetup = () => {
   // Initialize with proper security_settings and theme_mode
   const defaultSettings = {
     ...DEFAULT_THEME_SETTINGS,
     security_settings: DEFAULT_SECURITY_SETTINGS,
-    theme_mode: 'system'
+    theme_mode: 'system' as ThemeMode
   };
   
   const [theme, setTheme] = useState<Settings>(defaultSettings);
@@ -45,16 +46,9 @@ export const useThemeSetup = () => {
         const dbSettings = rawData as DatabaseSettingsRow;
         const themeData = convertDbSettingsToTheme(dbSettings);
         
-        // Ensure we have security_settings and theme_mode
-        const completeThemeData = {
-          ...themeData,
-          security_settings: dbSettings.security_settings || DEFAULT_SECURITY_SETTINGS,
-          theme_mode: dbSettings.theme_mode || 'system'
-        };
-        
-        console.log("Initial theme settings fetched:", completeThemeData);
-        setTheme(completeThemeData);
-        applyThemeToDocument(completeThemeData);
+        console.log("Initial theme settings fetched:", themeData.site_title);
+        setTheme(themeData);
+        applyThemeToDocument(themeData);
         toast.success("Theme settings loaded");
       } catch (error) {
         console.error("Error in theme setup:", error);
