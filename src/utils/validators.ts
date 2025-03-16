@@ -1,26 +1,52 @@
 
-import type { Json } from "@/lib/types/core/json";
-import { isJsonObject } from "@/lib/types/core/json";
-import type { BaseContent } from "@/components/content/types/cms";
+import { ContentType } from "@/lib/types/core/enums";
 
 /**
- * Validates if content is a page type
- * @param content The content to validate
- * @returns boolean indicating if the content is a page
+ * Type guard to check if content data is a page content type
  */
-export const isContentPage = (content: Json | Record<string, unknown>): boolean => {
-  return isJsonObject(content) && 
-         'type' in content && 
-         content.type === 'page';
-};
+export function isContentPage(content: Record<string, unknown>): boolean {
+  return content.type === 'page';
+}
 
 /**
- * Validates if content is a component type
- * @param content The content to validate
- * @returns boolean indicating if the content is a component
+ * Type guard to check if content data is a component content type
  */
-export const isContentComponent = (content: Json | Record<string, unknown>): boolean => {
-  return isJsonObject(content) && 
-         'type' in content && 
-         content.type === 'component';
-};
+export function isContentComponent(content: Record<string, unknown>): boolean {
+  return content.type === 'component';
+}
+
+/**
+ * Validate content type is valid
+ */
+export function isValidContentType(type: string): type is ContentType {
+  return [
+    'page', 
+    'component', 
+    'template', 
+    'workflow', 
+    'build', 
+    'guide', 
+    'part', 
+    'hero', 
+    'feature'
+  ].includes(type as ContentType);
+}
+
+/**
+ * Validate slug format
+ */
+export function isValidSlug(slug: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+/**
+ * Generate a slug from a title
+ */
+export function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')  // Remove special characters
+    .replace(/\s+/g, '-')      // Replace spaces with hyphens
+    .replace(/--+/g, '-')      // Replace multiple hyphens with single hyphen
+    .trim();                   // Trim leading/trailing whitespace
+}

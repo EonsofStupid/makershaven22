@@ -1,8 +1,6 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ContentType } from "@/lib/types/enums";
 import { validateContentCreate, validateContentUpdate } from "../utils/contentTypeValidation";
 import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
 import { useAtom } from "jotai";
