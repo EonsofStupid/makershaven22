@@ -1,14 +1,12 @@
 
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings } from "@/components/admin/settings/types";
+import { FlattenedSettings } from "@/lib/types/settings/core";
 import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme } from "../utils/themeUtils";
 import { toast } from "sonner";
-import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
-import { ThemeMode } from "@/lib/types/core/enums";
 
-export const useThemeSubscription = (setTheme: (theme: Settings) => void) => {
+export const useThemeSubscription = (setTheme: (theme: FlattenedSettings) => void) => {
   useEffect(() => {
     const channel = supabase
       .channel('site_settings_changes')

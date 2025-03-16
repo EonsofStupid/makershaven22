@@ -1,22 +1,23 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Settings } from "@/components/admin/settings/types";
+import { FlattenedSettings } from "@/lib/types/settings/core";
 import { toast } from "sonner";
 import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, DEFAULT_THEME_SETTINGS, applyThemeToDocument } from "../utils/themeUtils";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
-import { ThemeMode } from "@/lib/types/core/enums";
+import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
 
 export const useThemeSetup = () => {
-  // Initialize with proper security_settings and theme_mode
-  const defaultSettings = {
+  // Initialize with proper security_settings, theme_mode and transition_type
+  const defaultSettings: FlattenedSettings = {
     ...DEFAULT_THEME_SETTINGS,
     security_settings: DEFAULT_SECURITY_SETTINGS,
-    theme_mode: 'system' as ThemeMode
+    theme_mode: 'system' as ThemeMode,
+    transition_type: 'fade' as TransitionType // explicitly set as TransitionType
   };
   
-  const [theme, setTheme] = useState<Settings>(defaultSettings);
+  const [theme, setTheme] = useState<FlattenedSettings>(defaultSettings);
 
   useEffect(() => {
     const fetchInitialTheme = async () => {

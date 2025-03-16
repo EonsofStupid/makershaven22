@@ -2,14 +2,15 @@
 import { useState, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Theme, DatabaseSettingsRow } from "../types/theme";
+import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
 import { DEFAULT_SECURITY_SETTINGS } from '@/lib/types/security/types';
-import { ThemeMode } from '@/lib/types/core/enums';
+import { ThemeMode, TransitionType } from '@/lib/types/core/enums';
 import { ensureJson } from '@/lib/utils/type-utils';
+import { FlattenedSettings } from '@/lib/types/settings/core';
 
 export const useThemeSettings = () => {
-  const [theme, setTheme] = useState<Theme | null>(null);
+  const [theme, setTheme] = useState<FlattenedSettings | null>(null);
 
   const fetchSettings = useCallback(async () => {
     console.log("Fetching theme settings...");

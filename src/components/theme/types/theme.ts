@@ -1,7 +1,8 @@
-
-import { Settings } from "@/components/admin/settings/types";
-import { ThemeMode } from "@/lib/types/core/enums";
+import { FlattenedSettings } from "@/lib/types/settings/core";
+import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
 import { SecuritySettings } from "@/lib/types/security/types";
+import { Json } from "@/lib/types/core/json";
+import { ensureJson } from "@/lib/utils/type-utils";
 
 export interface DatabaseSettingsRow {
   id: string;
@@ -34,11 +35,20 @@ export interface DatabaseSettingsRow {
   updated_at?: string;
   updated_by?: string;
   setting_key?: string;
-  security_settings?: any; // Accept any type from database
+  security_settings?: Json; // Accept Json type from database
   theme_mode?: string;
   tagline?: string;
   logo_url?: string;
   favicon_url?: string;
+}
+
+export function prepareSettingsForDatabase(settings: FlattenedSettings): Record<string, any> {
+  return {
+    ...settings,
+    security_settings: ensureJson(settings.security_settings),
+    theme_mode: settings.theme_mode,
+    transition_type: settings.transition_type,
+  };
 }
 
 export interface Theme {

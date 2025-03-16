@@ -1,10 +1,17 @@
 
 import { createContext, useContext } from "react";
-import { Theme, ThemeContextType } from "../types/theme";
+import { FlattenedSettings } from "@/lib/types/settings/core";
 import { useThemeSettings } from "../hooks/useThemeSettings";
 import { useThemeSubscription } from "../hooks/useThemeSubscription";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureJson } from "@/lib/utils/type-utils";
+
+interface ThemeContextType {
+  theme: FlattenedSettings | null;
+  setTheme: (theme: FlattenedSettings) => void;
+  updateTheme: (theme: FlattenedSettings) => Promise<void>;
+}
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
@@ -13,11 +20,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useThemeSubscription(setTheme);
 
-  const updateTheme = async (newTheme: Theme) => {
+  const updateTheme = async (newTheme: FlattenedSettings) => {
     try {
+      // Convert security_settings to JSON for database storage
+      const securitySettingsJson = ensureJson(newTheme.security_settings);
+      
       const { error } = await supabase.rpc('update_site_settings', {
         p_site_title: newTheme.site_title,
-        p_tagline: newTheme.tagline,
+        p_tagline: newTheme.tagline || "",
         p_primary_color: newTheme.primary_color,
         p_secondary_color: newTheme.secondary_color,
         p_accent_color: newTheme.accent_color,
@@ -40,7 +50,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_transition_duration: newTheme.transition_duration,
         p_shadow_color: newTheme.shadow_color,
         p_hover_scale: newTheme.hover_scale,
-        p_security_settings: newTheme.security_settings,
+        p_security_settings: securitySettingsJson,
         p_theme_mode: newTheme.theme_mode
       });
 

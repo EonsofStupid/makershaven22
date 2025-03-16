@@ -1,9 +1,11 @@
 
-import { Theme, DatabaseSettingsRow } from "../types/theme";
+import { FlattenedSettings } from "@/lib/types/settings/core";
+import { DatabaseSettingsRow } from "../types/theme";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
-import { ThemeMode } from "@/lib/types/core/enums";
+import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
+import { ensureJson } from "@/lib/utils/type-utils";
 
-export const DEFAULT_THEME_SETTINGS: Theme = {
+export const DEFAULT_THEME_SETTINGS: FlattenedSettings = {
   site_title: 'MakersImpulse',
   primary_color: '#7FFFD4',
   secondary_color: '#FFB6C1',
@@ -29,12 +31,12 @@ export const DEFAULT_THEME_SETTINGS: Theme = {
   hover_scale: '1.05',
   box_shadow: 'none',
   backdrop_blur: '0',
-  transition_type: 'fade',
+  transition_type: 'fade' as TransitionType,
   security_settings: DEFAULT_SECURITY_SETTINGS,
   theme_mode: 'system' as ThemeMode,
 };
 
-export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): Theme => {
+export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): FlattenedSettings => {
   if (!settings) {
     console.log("Using default theme settings");
     return DEFAULT_THEME_SETTINGS;
@@ -47,8 +49,21 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
         : settings.security_settings)
     : DEFAULT_SECURITY_SETTINGS;
 
-  // Process theme_mode from database
-  const themeMode = (settings.theme_mode as ThemeMode) || 'system';
+  // Process theme_mode from database with validation
+  let themeMode: ThemeMode = 'system';
+  if (settings.theme_mode) {
+    if (settings.theme_mode === 'light' || settings.theme_mode === 'dark' || settings.theme_mode === 'system') {
+      themeMode = settings.theme_mode as ThemeMode;
+    }
+  }
+
+  // Process transition_type from database with validation
+  let transitionType: TransitionType = 'fade';
+  if (settings.transition_type) {
+    if (settings.transition_type === 'fade' || settings.transition_type === 'slide' || settings.transition_type === 'scale') {
+      transitionType = settings.transition_type as TransitionType;
+    }
+  }
 
   return {
     site_title: settings.site_title || DEFAULT_THEME_SETTINGS.site_title,
@@ -76,7 +91,7 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
     hover_scale: settings.hover_scale || DEFAULT_THEME_SETTINGS.hover_scale,
     box_shadow: settings.box_shadow || DEFAULT_THEME_SETTINGS.box_shadow,
     backdrop_blur: settings.backdrop_blur || DEFAULT_THEME_SETTINGS.backdrop_blur,
-    transition_type: settings.transition_type || DEFAULT_THEME_SETTINGS.transition_type,
+    transition_type: transitionType,
     security_settings: securitySettings,
     theme_mode: themeMode,
     tagline: settings.tagline,
@@ -85,7 +100,7 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
   };
 };
 
-export const applyThemeToDocument = (theme: Theme) => {
+export const applyThemeToDocument = (theme: FlattenedSettings) => {
   console.log("Applying theme to document:", theme.site_title);
   
   const root = document.documentElement;
