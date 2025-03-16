@@ -169,13 +169,25 @@ export const validateContent = (type: ContentType, data: any) => {
 
   // Check if data matches the structure of a ContentUpdate
   if (isContentUpdate(data)) {
-    return validateContentUpdate(data as ContentUpdate);
+    // Use explicit type assertion with appropriate checks
+    const updateData = {
+      id: data.id as string,
+      updated_by: data.updated_by as string,
+      ...data
+    } as ContentUpdate;
+    
+    return validateContentUpdate(updateData);
   }
   
   // Check if data has the required fields for content creation
   if (hasCreateContentRequiredFields(data)) {
     // It's a create operation, ensure the type is set
-    return validateContentCreate({...data, type} as ContentCreate);
+    const createData = {
+      ...data,
+      type
+    } as ContentCreate;
+    
+    return validateContentCreate(createData);
   }
   
   // Neither update nor create conditions are met

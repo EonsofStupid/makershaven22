@@ -60,9 +60,9 @@ export const RevisionHistory: React.FC<RevisionHistoryProps> = ({
         id: item.id,
         content: item.content,
         created_at: item.created_at,
-        created_by: item.created_by 
+        created_by: item.created_by && typeof item.created_by === 'object' 
           ? {
-              display_name: item.created_by.display_name,
+              display_name: item.created_by.display_name || 'Unknown',
               avatar_url: item.created_by.avatar_url,
             }
           : null,
