@@ -1,11 +1,12 @@
 
 import { createContext, useContext } from "react";
 import { FlattenedSettings } from "@/lib/types/settings/core";
-import { useThemeSettings } from "../hooks/useThemeSettings";
+import { useThemeSetup } from "../hooks/useThemeSetup";
 import { useThemeSubscription } from "../hooks/useThemeSubscription";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureJson } from "@/lib/utils/type-utils";
+import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
 
 interface ThemeContextType {
   theme: FlattenedSettings | null;
@@ -16,7 +17,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { theme, setTheme, fetchSettings } = useThemeSettings();
+  const { theme, setTheme } = useThemeSetup();
 
   useThemeSubscription(setTheme);
 
@@ -24,6 +25,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Convert security_settings to JSON for database storage
       const securitySettingsJson = ensureJson(newTheme.security_settings);
+      
+      // Ensure theme_mode and transition_type are correct types
+      const themeMode: ThemeMode = newTheme.theme_mode;
+      const transitionType: TransitionType = newTheme.transition_type;
       
       const { error } = await supabase.rpc('update_site_settings', {
         p_site_title: newTheme.site_title,
@@ -51,7 +56,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_shadow_color: newTheme.shadow_color,
         p_hover_scale: newTheme.hover_scale,
         p_security_settings: securitySettingsJson,
-        p_theme_mode: newTheme.theme_mode
+        p_theme_mode: themeMode
       });
 
       if (error) throw error;

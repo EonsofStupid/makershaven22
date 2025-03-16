@@ -12,7 +12,7 @@ export type GlassEffectLevel = 'none' | 'low' | 'medium' | 'high';
 /**
  * Transition types for animations
  */
-export type TransitionType = 'fade' | 'slide' | 'scale';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 
 /**
  * Type guard to check if a value is a valid ThemeMode
@@ -35,5 +35,5 @@ export function isValidGlassEffectLevel(value: unknown): value is GlassEffectLev
  */
 export function isValidTransitionType(value: unknown): value is TransitionType {
   return typeof value === 'string' && 
-         ['fade', 'slide', 'scale'].includes(value as string);
+         ['fade', 'slide', 'scale', 'blur'].includes(value as string);
 }

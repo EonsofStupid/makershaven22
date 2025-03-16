@@ -3,7 +3,7 @@ import { FlattenedSettings } from "@/lib/types/settings/core";
 import { DatabaseSettingsRow } from "../types/theme";
 import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
 import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
-import { ensureJson } from "@/lib/utils/type-utils";
+import { ensureJson, safeThemeMode, safeTransitionType } from "@/lib/utils/type-utils";
 
 export const DEFAULT_THEME_SETTINGS: FlattenedSettings = {
   site_title: 'MakersImpulse',
@@ -49,21 +49,9 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
         : settings.security_settings)
     : DEFAULT_SECURITY_SETTINGS;
 
-  // Process theme_mode from database with validation
-  let themeMode: ThemeMode = 'system';
-  if (settings.theme_mode) {
-    if (settings.theme_mode === 'light' || settings.theme_mode === 'dark' || settings.theme_mode === 'system') {
-      themeMode = settings.theme_mode as ThemeMode;
-    }
-  }
-
-  // Process transition_type from database with validation
-  let transitionType: TransitionType = 'fade';
-  if (settings.transition_type) {
-    if (settings.transition_type === 'fade' || settings.transition_type === 'slide' || settings.transition_type === 'scale') {
-      transitionType = settings.transition_type as TransitionType;
-    }
-  }
+  // Process theme_mode and transition_type using type guards
+  const themeMode = safeThemeMode(settings.theme_mode);
+  const transitionType = safeTransitionType(settings.transition_type);
 
   return {
     site_title: settings.site_title || DEFAULT_THEME_SETTINGS.site_title,
