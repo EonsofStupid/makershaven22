@@ -1,16 +1,17 @@
-
 import { Json } from '../core/json';
 import { ContentStatus, ContentType } from '../core/enums';
+import type { BaseEntity } from '../core/entity';
+import type { JsonObject } from '../core/json';
 
 // Base Content interface - foundation for all content types
-export interface BaseContent {
+export interface BaseContent extends BaseEntity {
   id: string;
   title: string;
   type: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
-  status?: ContentStatus;
+  content?: JsonObject;
+  metadata?: JsonObject;
+  slug: string;
+  status: ContentStatus;
   version?: number;
   created_by: string; // This is required, fixing the type mismatch
   updated_by?: string;
@@ -22,22 +23,21 @@ export interface BaseContent {
 export interface ContentCreate {
   title: string;
   type: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
-  status?: ContentStatus;
+  status: ContentStatus;
+  slug: string;
+  content?: JsonObject;
+  metadata?: JsonObject;
   created_by: string; // Required for database insertion
 }
 
 // Content Update type - used specifically for updating existing content
 export interface ContentUpdate {
-  id: string;
   title?: string;
   type?: ContentType;
-  content?: Json;
-  metadata?: Json;
-  slug?: string;
   status?: ContentStatus;
+  slug?: string;
+  content?: JsonObject;
+  metadata?: JsonObject;
   updated_by: string; // Required for updates
 }
 
@@ -113,3 +113,16 @@ export const ValidContentTypes = {
   HERO: 'hero' as ContentType,
   FEATURE: 'feature' as ContentType
 } as const;
+
+/**
+ * Content query options
+ */
+export interface ContentQueryOptions {
+  type?: ContentType;
+  status?: ContentStatus;
+  search?: string;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+}
