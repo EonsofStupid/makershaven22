@@ -1,4 +1,3 @@
-
 import { Settings } from "@/components/admin/settings/types";
 import { ThemeMode } from "@/lib/types/enums";
 import { SecuritySettings } from "@/lib/types/security/types";
@@ -33,6 +32,9 @@ export interface DatabaseSettingsRow {
   transition_type?: string;
   updated_at?: string;
   updated_by?: string;
+  setting_key?: string;
+  security_settings?: SecuritySettings;
+  theme_mode?: ThemeMode;
 }
 
 export interface Theme {
@@ -62,6 +64,8 @@ export interface Theme {
   box_shadow: string;
   backdrop_blur: string;
   transition_type: string;
+  security_settings: SecuritySettings;
+  theme_mode: ThemeMode;
   tagline?: string;
   logo_url?: string;
   favicon_url?: string;
@@ -126,7 +130,6 @@ export interface ThemeContextType {
   updateTheme: (theme: Theme) => Promise<void>;
 }
 
-// Helper functions to convert between types
 export function flattenedSettingsToTheme(settings: FlattenedSettings): Theme {
   return {
     site_title: settings.site_title,
@@ -155,6 +158,8 @@ export function flattenedSettingsToTheme(settings: FlattenedSettings): Theme {
     box_shadow: settings.box_shadow,
     backdrop_blur: settings.backdrop_blur,
     transition_type: settings.transition_type,
+    security_settings: settings.security_settings,
+    theme_mode: settings.theme_mode,
     tagline: settings.tagline,
     logo_url: settings.logo_url,
     favicon_url: settings.favicon_url
@@ -190,6 +195,8 @@ export function themeToFlattenedSettings(theme: Theme, existingSettings?: Flatte
     box_shadow: theme.box_shadow,
     backdrop_blur: theme.backdrop_blur,
     transition_type: theme.transition_type,
+    security_settings: theme.security_settings,
+    theme_mode: theme.theme_mode,
     tagline: theme.tagline,
     logo_url: theme.logo_url,
     favicon_url: theme.favicon_url

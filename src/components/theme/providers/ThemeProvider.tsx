@@ -1,3 +1,4 @@
+
 import { createContext, useContext } from "react";
 import { Theme, ThemeContextType } from "../types/theme";
 import { useThemeSettings } from "../hooks/useThemeSettings";
@@ -33,7 +34,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_font_weight_normal: newTheme.font_weight_normal,
         p_font_weight_bold: newTheme.font_weight_bold,
         p_line_height_base: newTheme.line_height_base,
-        p_letter_spacing: newTheme.letter_spacing
+        p_letter_spacing: newTheme.letter_spacing,
+        p_border_radius: newTheme.border_radius,
+        p_spacing_unit: newTheme.spacing_unit,
+        p_transition_duration: newTheme.transition_duration,
+        p_shadow_color: newTheme.shadow_color,
+        p_hover_scale: newTheme.hover_scale,
+        p_security_settings: newTheme.security_settings,
+        p_theme_mode: newTheme.theme_mode
       });
 
       if (error) throw error;

@@ -1,4 +1,6 @@
+
 import { Theme, DatabaseSettingsRow } from "../types/theme";
+import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
 
 export const DEFAULT_THEME_SETTINGS: Theme = {
   site_title: 'MakersImpulse',
@@ -27,6 +29,8 @@ export const DEFAULT_THEME_SETTINGS: Theme = {
   box_shadow: 'none',
   backdrop_blur: '0',
   transition_type: 'fade',
+  security_settings: DEFAULT_SECURITY_SETTINGS,
+  theme_mode: 'system',
 };
 
 export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): Theme => {
@@ -54,14 +58,19 @@ export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): 
     font_weight_bold: settings.font_weight_bold || DEFAULT_THEME_SETTINGS.font_weight_bold,
     line_height_base: settings.line_height_base || DEFAULT_THEME_SETTINGS.line_height_base,
     letter_spacing: settings.letter_spacing || DEFAULT_THEME_SETTINGS.letter_spacing,
-    border_radius: DEFAULT_THEME_SETTINGS.border_radius,
-    spacing_unit: DEFAULT_THEME_SETTINGS.spacing_unit,
-    transition_duration: DEFAULT_THEME_SETTINGS.transition_duration,
-    shadow_color: DEFAULT_THEME_SETTINGS.shadow_color,
-    hover_scale: DEFAULT_THEME_SETTINGS.hover_scale,
-    box_shadow: DEFAULT_THEME_SETTINGS.box_shadow,
-    backdrop_blur: DEFAULT_THEME_SETTINGS.backdrop_blur,
-    transition_type: DEFAULT_THEME_SETTINGS.transition_type,
+    border_radius: settings.border_radius || DEFAULT_THEME_SETTINGS.border_radius,
+    spacing_unit: settings.spacing_unit || DEFAULT_THEME_SETTINGS.spacing_unit,
+    transition_duration: settings.transition_duration || DEFAULT_THEME_SETTINGS.transition_duration,
+    shadow_color: settings.shadow_color || DEFAULT_THEME_SETTINGS.shadow_color,
+    hover_scale: settings.hover_scale || DEFAULT_THEME_SETTINGS.hover_scale,
+    box_shadow: settings.box_shadow || DEFAULT_THEME_SETTINGS.box_shadow,
+    backdrop_blur: settings.backdrop_blur || DEFAULT_THEME_SETTINGS.backdrop_blur,
+    transition_type: settings.transition_type || DEFAULT_THEME_SETTINGS.transition_type,
+    security_settings: settings.security_settings || DEFAULT_SECURITY_SETTINGS,
+    theme_mode: settings.theme_mode || 'system',
+    tagline: settings.tagline,
+    logo_url: settings.logo_url,
+    favicon_url: settings.favicon_url,
   };
 };
 

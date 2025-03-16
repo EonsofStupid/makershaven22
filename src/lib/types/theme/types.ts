@@ -58,6 +58,10 @@ export interface ThemeCore {
   backdrop_blur: string;
   transition_type: string;
   
+  // Required for FlattenedSettings compatibility
+  theme_mode: ThemeMode;
+  security_settings: SecuritySettings;
+  
   // Optional properties
   tagline?: string;
   logo_url?: string;
@@ -93,6 +97,12 @@ export function convertSettingsToTheme(settings: any): ThemeCore {
     box_shadow: settings.box_shadow || 'none',
     backdrop_blur: settings.backdrop_blur || '0',
     transition_type: settings.transition_type || 'fade',
+    theme_mode: settings.theme_mode || 'system',
+    security_settings: settings.security_settings || {
+      enable_ip_filtering: false,
+      two_factor_auth: false,
+      max_login_attempts: 5
+    },
     tagline: settings.tagline,
     logo_url: settings.logo_url,
     favicon_url: settings.favicon_url

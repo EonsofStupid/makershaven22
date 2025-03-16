@@ -1,8 +1,10 @@
+
 import { useState, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Theme, DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
+import { DEFAULT_SECURITY_SETTINGS } from '@/lib/types/security/types';
 
 export const useThemeSettings = () => {
   const [theme, setTheme] = useState<Theme | null>(null);
@@ -22,28 +24,42 @@ export const useThemeSettings = () => {
 
       if (!rawData) {
         console.log("No settings found, creating default settings...");
+        // Create a single settings object instead of an array
+        const defaultSettings = {
+          site_title: 'MakersImpulse',
+          primary_color: '#7FFFD4',
+          secondary_color: '#FFB6C1',
+          accent_color: '#E6E6FA',
+          text_primary_color: '#FFFFFF',
+          text_secondary_color: '#A1A1AA',
+          text_link_color: '#3B82F6',
+          text_heading_color: '#FFFFFF',
+          neon_cyan: '#41f0db',
+          neon_pink: '#ff0abe',
+          neon_purple: '#8000ff',
+          font_family_heading: 'Inter',
+          font_family_body: 'Inter',
+          font_size_base: '16px',
+          font_weight_normal: '400',
+          font_weight_bold: '700',
+          line_height_base: '1.5',
+          letter_spacing: 'normal',
+          border_radius: '0.5rem',
+          spacing_unit: '1rem',
+          transition_duration: '0.3s',
+          shadow_color: '#000000',
+          hover_scale: '1.05',
+          box_shadow: 'none',
+          backdrop_blur: '0',
+          transition_type: 'fade',
+          setting_key: 'theme_settings', // Required field for site_settings table
+          theme_mode: 'system',
+          security_settings: DEFAULT_SECURITY_SETTINGS
+        };
+
         const { data: newSettings, error: insertError } = await supabase
           .from("site_settings")
-          .insert([{
-            site_title: 'MakersImpulse',
-            primary_color: '#7FFFD4',
-            secondary_color: '#FFB6C1',
-            accent_color: '#E6E6FA',
-            text_primary_color: '#FFFFFF',
-            text_secondary_color: '#A1A1AA',
-            text_link_color: '#3B82F6',
-            text_heading_color: '#FFFFFF',
-            neon_cyan: '#41f0db',
-            neon_pink: '#ff0abe',
-            neon_purple: '#8000ff',
-            font_family_heading: 'Inter',
-            font_family_body: 'Inter',
-            font_size_base: '16px',
-            font_weight_normal: '400',
-            font_weight_bold: '700',
-            line_height_base: '1.5',
-            letter_spacing: 'normal'
-          }])
+          .insert(defaultSettings)
           .select()
           .single();
 

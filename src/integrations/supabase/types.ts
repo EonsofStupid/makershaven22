@@ -3768,80 +3768,135 @@ export type Database = {
         }
         Returns: Json
       }
-      update_site_settings: {
-        Args: {
-          p_site_title: string
-          p_tagline: string
-          p_primary_color: string
-          p_secondary_color: string
-          p_accent_color: string
-          p_text_primary_color: string
-          p_text_secondary_color: string
-          p_text_link_color: string
-          p_text_heading_color: string
-          p_neon_cyan: string
-          p_neon_pink: string
-          p_neon_purple: string
-          p_border_radius: string
-          p_spacing_unit: string
-          p_transition_duration: string
-          p_shadow_color: string
-          p_hover_scale: string
-          p_font_family_heading: string
-          p_font_family_body: string
-          p_font_size_base: string
-          p_font_weight_normal: string
-          p_font_weight_bold: string
-          p_line_height_base: string
-          p_letter_spacing: string
-        }
-        Returns: {
-          accent_color: string | null
-          animations_enabled: boolean | null
-          backdrop_blur: string | null
-          border_radius: string | null
-          box_shadow: string | null
-          component_type:
-            | Database["public"]["Enums"]["theme_component_type"]
-            | null
-          default_animation_duration: number | null
-          font_family_body: string
-          font_family_heading: string
-          font_size_base: string
-          font_weight_bold: string
-          font_weight_normal: string
-          hover_scale: string | null
-          id: string
-          inheritance_strategy:
-            | Database["public"]["Enums"]["theme_inheritance_strategy"]
-            | null
-          inherited_settings: Json | null
-          last_sync: string | null
-          letter_spacing: string
-          line_height_base: string
-          neon_cyan: string | null
-          neon_pink: string | null
-          neon_purple: string | null
-          parent_theme_id: string | null
-          preview_preferences: Json | null
-          primary_color: string | null
-          real_time_toggle: boolean | null
-          secondary_color: string | null
-          shadow_color: string | null
-          spacing_unit: string | null
-          state_version: number | null
-          text_heading_color: string | null
-          text_link_color: string | null
-          text_primary_color: string | null
-          text_secondary_color: string | null
-          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
-          theme_preferences: Json | null
-          transition_duration: string | null
-          transition_type: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }[]
-      }
+      update_site_settings:
+        | {
+            Args: {
+              p_site_title: string
+              p_tagline: string
+              p_border_radius: string
+              p_spacing_unit: string
+              p_transition_duration: string
+              p_shadow_color: string
+              p_hover_scale: string
+              p_security_settings?: Json
+              p_theme_mode?: string
+            }
+            Returns: {
+              accent_color: string | null
+              backdrop_blur: string | null
+              border_radius: string | null
+              box_shadow: string | null
+              created_at: string | null
+              favicon_url: string | null
+              font_family_body: string | null
+              font_family_heading: string | null
+              font_size_base: string | null
+              font_weight_bold: string | null
+              font_weight_normal: string | null
+              hover_scale: string | null
+              id: string
+              letter_spacing: string | null
+              line_height_base: string | null
+              logo_url: string | null
+              metadata: Json | null
+              neon_cyan: string | null
+              neon_pink: string | null
+              neon_purple: string | null
+              primary_color: string | null
+              secondary_color: string | null
+              security_settings: Json | null
+              setting_key: string
+              setting_type: string | null
+              setting_value: string | null
+              shadow_color: string | null
+              site_title: string | null
+              spacing_unit: string | null
+              tagline: string | null
+              text_heading_color: string | null
+              text_link_color: string | null
+              text_primary_color: string | null
+              text_secondary_color: string | null
+              theme_mode: string | null
+              transition_duration: string | null
+              transition_type: string | null
+              updated_at: string | null
+              updated_by: string | null
+            }[]
+          }
+        | {
+            Args: {
+              p_site_title: string
+              p_tagline: string
+              p_primary_color: string
+              p_secondary_color: string
+              p_accent_color: string
+              p_text_primary_color: string
+              p_text_secondary_color: string
+              p_text_link_color: string
+              p_text_heading_color: string
+              p_neon_cyan: string
+              p_neon_pink: string
+              p_neon_purple: string
+              p_border_radius: string
+              p_spacing_unit: string
+              p_transition_duration: string
+              p_shadow_color: string
+              p_hover_scale: string
+              p_font_family_heading: string
+              p_font_family_body: string
+              p_font_size_base: string
+              p_font_weight_normal: string
+              p_font_weight_bold: string
+              p_line_height_base: string
+              p_letter_spacing: string
+            }
+            Returns: {
+              accent_color: string | null
+              animations_enabled: boolean | null
+              backdrop_blur: string | null
+              border_radius: string | null
+              box_shadow: string | null
+              component_type:
+                | Database["public"]["Enums"]["theme_component_type"]
+                | null
+              default_animation_duration: number | null
+              font_family_body: string
+              font_family_heading: string
+              font_size_base: string
+              font_weight_bold: string
+              font_weight_normal: string
+              hover_scale: string | null
+              id: string
+              inheritance_strategy:
+                | Database["public"]["Enums"]["theme_inheritance_strategy"]
+                | null
+              inherited_settings: Json | null
+              last_sync: string | null
+              letter_spacing: string
+              line_height_base: string
+              neon_cyan: string | null
+              neon_pink: string | null
+              neon_purple: string | null
+              parent_theme_id: string | null
+              preview_preferences: Json | null
+              primary_color: string | null
+              real_time_toggle: boolean | null
+              secondary_color: string | null
+              shadow_color: string | null
+              spacing_unit: string | null
+              state_version: number | null
+              text_heading_color: string | null
+              text_link_color: string | null
+              text_primary_color: string | null
+              text_secondary_color: string | null
+              theme_mode: Database["public"]["Enums"]["theme_mode"] | null
+              theme_preferences: Json | null
+              transition_duration: string | null
+              transition_type: string | null
+              updated_at: string | null
+              updated_by: string | null
+            }[]
+          }
       verify_2fa_code: {
         Args: {
           p_code: string
