@@ -5,7 +5,9 @@ import { Database, Filter, Search, SortAsc } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/shared/ui/loading/LoadingStates";
 import { toast } from "sonner";
-import { usePrinterBuildsStore, formatBuildsForTable } from "@/lib/store/printer-builds-store";
+import { usePrinterBuildsStore, formatBuildsForDisplay } from "@/lib/store/printer-builds-store";
+import { tableViewLimitAtom } from "@/lib/store/atoms/ui-atoms";
+import { useAtom } from "jotai";
 
 export const TableView = () => {
   const { 
@@ -14,12 +16,14 @@ export const TableView = () => {
     builds,
     fetchBuilds
   } = usePrinterBuildsStore();
+  
+  const [limit] = useAtom(tableViewLimitAtom);
 
   useEffect(() => {
-    fetchBuilds(5);
-  }, [fetchBuilds]);
+    fetchBuilds({ limit });
+  }, [fetchBuilds, limit]);
 
-  const formattedProjects = formatBuildsForTable(builds);
+  const formattedProjects = formatBuildsForDisplay(builds);
 
   if (error) {
     toast.error('Failed to load projects', {
@@ -79,6 +83,7 @@ export const TableView = () => {
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       project.difficulty_level === 'beginner' ? 'bg-green-500/20 text-green-300' :
                       project.difficulty_level === 'intermediate' ? 'bg-yellow-500/20 text-yellow-300' :
+                      project.difficulty_level === 'advanced' ? 'bg-orange-500/20 text-orange-300' :
                       'bg-red-500/20 text-red-300'
                     }`}>
                       {project.difficulty_level.charAt(0).toUpperCase() + project.difficulty_level.slice(1)}

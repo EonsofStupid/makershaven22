@@ -6,19 +6,31 @@ import { HeroSection } from "./components/HeroSection";
 import { FeaturePanel } from "./components/FeaturePanel";
 import { TableView } from "./components/DatabaseVisual/TableView";
 import { seedDemoProjects } from "@/scripts/seed-demo-data";
+import { usePrinterBuildsStore } from "@/lib/store/printer-builds-store";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 
 const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
+  const { fetchBuilds } = usePrinterBuildsStore();
   
   const backgroundY = useTransform(scrollY, [0, 1000], ["0%", "50%"]);
   const textY = useTransform(scrollY, [0, 500], ["0%", "100%"]);
   const parallaxY = useTransform(scrollY, [0, 1000], ["0%", "25%"]);
 
-  // Seed demo data for demonstration purposes
+  // Seed demo data and fetch builds on initial load
   useEffect(() => {
-    seedDemoProjects().catch(console.error);
-  }, []);
+    const initData = async () => {
+      try {
+        await seedDemoProjects();
+        await fetchBuilds({ limit: 5 });
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      }
+    };
+    
+    initData();
+  }, [fetchBuilds]);
 
   return (
     <div ref={containerRef} className="min-h-screen relative overflow-hidden bg-[#1a1a1a]">
@@ -38,7 +50,9 @@ const LandingPage = () => {
         <HeroSection />
 
         <div className="container mx-auto px-6 py-20">
-          <TableView />
+          <ErrorBoundary>
+            <TableView />
+          </ErrorBoundary>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mt-20">
             <FeaturePanel

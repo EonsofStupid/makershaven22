@@ -1,143 +1,139 @@
-
-import { Json, JsonObject, isJsonObject, jsonToRecord, recordToJson } from "../types/core/json";
-import { ThemeMode, TransitionType, isValidTransitionType, isValidThemeMode } from "../types/core/enums";
-
-/**
- * Safely converts a value to a boolean with fallback
- */
-export function safeBoolean(value: unknown, defaultValue: boolean): boolean {
-  return typeof value === 'boolean' ? value : defaultValue;
-}
+import { Json, JsonObject } from '@/lib/types/core/json';
+import { ThemeMode, TransitionType } from '@/lib/types/core/enums';
 
 /**
- * Safely converts a value to a number with fallback
- */
-export function safeNumber(value: unknown, defaultValue: number): number {
-  return typeof value === 'number' && !isNaN(value) ? value : defaultValue;
-}
-
-/**
- * Safely converts a value to a string with fallback
- */
-export function safeString(value: unknown, defaultValue: string): string {
-  return typeof value === 'string' ? value : defaultValue;
-}
-
-/**
- * Safely filters an array to only include strings
- */
-export function safeStringArray(arr: any[]): string[] {
-  return arr.filter(item => typeof item === 'string');
-}
-
-/**
- * Safely converts a JSON value to a Record<string, unknown>
- */
-export function safeRecord(value: unknown): Record<string, unknown> {
-  if (isJsonObject(value)) {
-    return jsonToRecord(value);
-  }
-  return {};
-}
-
-/**
- * Safely converts a value to a ThemeMode enum value
- */
-export function safeThemeMode(value: unknown): ThemeMode {
-  if (typeof value === 'string' && isValidThemeMode(value)) {
-    return value as ThemeMode;
-  }
-  return 'system';
-}
-
-/**
- * Safely converts a value to a TransitionType enum value
- */
-export function safeTransitionType(value: unknown): TransitionType {
-  if (typeof value === 'string' && isValidTransitionType(value)) {
-    return value as TransitionType;
-  }
-  return 'fade';
-}
-
-/**
- * Safely checks if a string is a valid hex color
- */
-export function isValidHexColor(color: string): boolean {
-  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
-}
-
-/**
- * Safely checks if a string is a valid CSS measurement
- */
-export function isValidCssMeasurement(value: string): boolean {
-  return /^[0-9]+(px|rem|em|%|vh|vw|vmin|vmax|pt|pc|in|cm|mm|ex|ch)$/.test(value);
-}
-
-/**
- * Ensures a value is a valid hex color or returns fallback
- */
-export function safeHexColor(value: unknown, fallback: string): string {
-  if (typeof value === 'string' && isValidHexColor(value)) {
-    return value;
-  }
-  return fallback;
-}
-
-/**
- * Ensures a value is a valid CSS measurement or returns fallback
- */
-export function safeCssMeasurement(value: unknown, fallback: string): string {
-  if (typeof value === 'string' && isValidCssMeasurement(value)) {
-    return value;
-  }
-  return fallback;
-}
-
-/**
- * Convert a Record to Json safely
- */
-export function recordToJsonSafe(record: Record<string, unknown>): Json {
-  return recordToJson(record);
-}
-
-/**
- * Ensure a value is a Json compliant value
+ * Ensures a value is a valid JSON object, converting it if necessary
  */
 export function ensureJson(value: unknown): Json {
-  return valueToJson(value);
-}
-
-/**
- * Convert any value to Json
- */
-function valueToJson(value: unknown): Json {
-  if (value === null || 
-      typeof value === 'string' || 
-      typeof value === 'number' || 
-      typeof value === 'boolean') {
-    return value as Json;
+  if (value === null || value === undefined) {
+    return null;
   }
   
-  if (Array.isArray(value)) {
-    return value.map(valueToJson) as Json[];
-  }
-  
-  if (typeof value === 'object' && value !== null) {
-    const result: Record<string, Json> = {};
-    
-    for (const [key, val] of Object.entries(value)) {
-      result[key] = valueToJson(val);
+  try {
+    if (typeof value === 'string') {
+      // If it's already a JSON string, parse it
+      return JSON.parse(value);
+    } else {
+      // Otherwise, try to convert to JSON
+      return JSON.parse(JSON.stringify(value));
     }
-    
-    return result as Json;
+  } catch (e) {
+    console.error('Failed to convert value to JSON:', e);
+    return null;
   }
-  
-  // If we can't convert it, return null
-  return null;
 }
 
 /**
- * Export isJsonObject from core/json for backward compatibility
+ * Ensures a value is a valid JSON object, not null or an array
  */
-export { isJsonObject, jsonToRecord };
+export function ensureJsonObject(value: unknown): JsonObject {
+  const jsonValue = ensureJson(value);
+  
+  if (jsonValue === null || Array.isArray(jsonValue) || typeof jsonValue !== 'object') {
+    return {};
+  }
+  
+  return jsonValue as JsonObject;
+}
+
+/**
+ * Safely parse a string to an object
+ */
+export function safeParseJson<T>(value: string, fallback: T): T {
+  try {
+    return JSON.parse(value) as T;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+/**
+ * Convert object to camelCase keys
+ */
+export function toCamelCase<T extends object>(obj: T): Record<string, any> {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => toCamelCase(item)) as unknown as Record<string, any>;
+  }
+
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    acc[camelKey] = value !== null && typeof value === 'object' ? toCamelCase(value as object) : value;
+    return acc;
+  }, {} as Record<string, any>);
+}
+
+/**
+ * Convert object to snake_case keys
+ */
+export function toSnakeCase<T extends object>(obj: T): Record<string, any> {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => toSnakeCase(item)) as unknown as Record<string, any>;
+  }
+
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+    acc[snakeKey] = value !== null && typeof value === 'object' ? toSnakeCase(value as object) : value;
+    return acc;
+  }, {} as Record<string, any>);
+}
+
+/**
+ * Safely convert a value to a ThemeMode, with fallback
+ */
+export function safeThemeMode(value: unknown, fallback: ThemeMode = 'system'): ThemeMode {
+  if (typeof value === 'string' && ['light', 'dark', 'system'].includes(value)) {
+    return value as ThemeMode;
+  }
+  return fallback;
+}
+
+/**
+ * Safely convert a value to a TransitionType, with fallback
+ */
+export function safeTransitionType(value: unknown, fallback: TransitionType = 'fade'): TransitionType {
+  if (typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value)) {
+    return value as TransitionType;
+  }
+  return fallback;
+}
+
+/**
+ * Deep merge two objects
+ */
+export function deepMerge<T>(target: T, source: Partial<T>): T {
+  const output = { ...target };
+  
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key as keyof typeof source])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key as keyof typeof source] });
+        } else {
+          (output as any)[key] = deepMerge(
+            (target as any)[key],
+            source[key as keyof typeof source] as any
+          );
+        }
+      } else {
+        Object.assign(output, { [key]: source[key as keyof typeof source] });
+      }
+    });
+  }
+  
+  return output;
+}
+
+/**
+ * Check if value is an object
+ */
+function isObject(item: unknown): item is Record<string, unknown> {
+  return item !== null && typeof item === 'object' && !Array.isArray(item);
+}

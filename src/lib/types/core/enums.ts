@@ -1,3 +1,4 @@
+
 /**
  * Core enum types for the application
  */
@@ -40,6 +41,16 @@ export type ContentType =
   | 'workflow'
   | 'hero'
   | 'feature';
+
+/**
+ * Build difficulty levels
+ */
+export type BuildDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
+
+/**
+ * Build status values
+ */
+export type BuildStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived';
 
 /**
  * Workflow stage types
@@ -97,6 +108,16 @@ export function isValidContentType(value: unknown): value is ContentType {
     'component', 'workflow', 'hero', 'feature'
   ];
   return typeof value === 'string' && validTypes.includes(value);
+}
+
+export function isValidBuildDifficulty(value: unknown): value is BuildDifficulty {
+  return typeof value === 'string' && 
+         ['beginner', 'intermediate', 'advanced', 'expert'].includes(value);
+}
+
+export function isValidBuildStatus(value: unknown): value is BuildStatus {
+  return typeof value === 'string' && 
+         ['draft', 'pending_review', 'approved', 'rejected', 'archived'].includes(value);
 }
 
 export function isValidWorkflowStageType(value: unknown): value is WorkflowStageType {
