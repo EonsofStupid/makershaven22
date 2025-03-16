@@ -5,13 +5,19 @@ import { toast } from "sonner";
 import { ContentType } from "@/lib/types/enums";
 import { validateContentCreate, validateContentUpdate } from "../utils/contentTypeValidation";
 import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
+import { useAtom } from "jotai";
+import { contentListAtom, contentLoadingAtom, contentErrorAtom } from "@/lib/store/atoms/content-atoms";
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
+  const [, setContentList] = useAtom(contentListAtom);
+  const [, setLoading] = useAtom(contentLoadingAtom);
+  const [, setError] = useAtom(contentErrorAtom);
 
   const createContent = useMutation({
     mutationFn: async (contentData: ContentCreate) => {
       console.log("Creating content:", contentData);
+      setLoading(true);
       
       // Validate the content data
       const validation = validateContentCreate(contentData);
@@ -40,12 +46,17 @@ export const useContentMutations = () => {
 
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (newContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
+      // Update Jotai atom state
+      setContentList(prevList => [newContent, ...prevList]);
+      setLoading(false);
       toast.success("Content created successfully");
     },
     onError: (error) => {
       console.error("Error in content creation:", error);
+      setError(error);
+      setLoading(false);
       toast.error(error instanceof Error ? error.message : "Failed to create content");
     },
   });
@@ -53,6 +64,7 @@ export const useContentMutations = () => {
   const updateContent = useMutation({
     mutationFn: async (contentData: ContentUpdate) => {
       console.log("Updating content:", contentData);
+      setLoading(true);
       
       // Validate the content data
       const validation = validateContentUpdate(contentData);
@@ -82,12 +94,19 @@ export const useContentMutations = () => {
 
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (updatedContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
+      // Update Jotai atom state
+      setContentList(prevList => 
+        prevList.map(item => item.id === updatedContent.id ? updatedContent : item)
+      );
+      setLoading(false);
       toast.success("Content updated successfully");
     },
     onError: (error) => {
       console.error("Error in content update:", error);
+      setError(error);
+      setLoading(false);
       toast.error(error instanceof Error ? error.message : "Failed to update content");
     },
   });

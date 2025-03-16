@@ -17,6 +17,29 @@ export interface BaseContent {
   updated_at?: string;
 }
 
+// Add ContentCreate interface for content creation operations
+export interface ContentCreate {
+  title: string;
+  type: ContentType;
+  content?: Json;
+  metadata?: Json;
+  slug?: string;
+  status?: ContentStatus;
+  created_by: string;
+}
+
+// Add ContentUpdate interface for content update operations
+export interface ContentUpdate {
+  id: string;
+  title?: string;
+  type?: ContentType;
+  content?: Json;
+  metadata?: Json;
+  slug?: string;
+  status?: ContentStatus;
+  updated_by: string;
+}
+
 export interface ContentRevision {
   id: string;
   content_id: string;

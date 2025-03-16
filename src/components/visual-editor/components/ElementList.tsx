@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { DndContext, useDraggable } from '@dnd-kit/core';
-import { SortableContext } from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { motion } from 'framer-motion';
 
 interface Element {
@@ -14,8 +15,10 @@ interface ElementListProps {
 }
 
 const ElementList: React.FC<ElementListProps> = ({ elements, onReorder }) => {
-  const handleDragEnd = ({ active, over }) => {
-    if (active.id !== over.id) {
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    
+    if (active && over && active.id !== over.id) {
       const oldIndex = elements.findIndex(el => el.id === active.id);
       const newIndex = elements.findIndex(el => el.id === over.id);
       const updatedElements = [...elements];
@@ -26,7 +29,7 @@ const ElementList: React.FC<ElementListProps> = ({ elements, onReorder }) => {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <SortableContext items={elements.map(el => el.id)}>
+      <SortableContext items={elements.map(el => el.id)} strategy={verticalListSortingStrategy}>
         <div className="element-list">
           {elements.map(element => (
             <motion.div key={element.id} layout>{element.content}</motion.div>

@@ -1,6 +1,8 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { atom, useAtom } from "jotai";
 
 export interface Post {
   id: string;
@@ -14,16 +16,26 @@ export interface Post {
 
 export interface PostWithAuthor extends Post {
   profiles: {
-    display_name: string | null;
-    username: string | null;
+    display_name: string;
+    username: string;
   };
 }
 
+// Create Jotai atoms for post state management
+export const postsAtom = atom<PostWithAuthor[]>([]);
+export const postsLoadingAtom = atom(false);
+export const postsErrorAtom = atom<Error | null>(null);
+
 export const usePostsQuery = () => {
+  const [, setPosts] = useAtom(postsAtom);
+  const [, setLoading] = useAtom(postsLoadingAtom);
+  const [, setError] = useAtom(postsErrorAtom);
+
   return useQuery({
     queryKey: ['admin-posts'],
     queryFn: async () => {
       console.log('Starting posts fetch operation...');
+      setLoading(true);
       
       try {
         console.log('Executing Supabase query with profiles join...');
@@ -31,7 +43,7 @@ export const usePostsQuery = () => {
           .from('blog_posts')
           .select(`
             *,
-            profiles (
+            profiles:author_id(
               display_name,
               username
             )
@@ -54,27 +66,31 @@ export const usePostsQuery = () => {
         // Transform the data
         console.log('Transforming posts data...');
         const transformedData: PostWithAuthor[] = rawData.map(post => {
-          // Log each post's profile data for debugging
-          console.log('Post profile data:', {
-            postId: post.id,
-            profiles: post.profiles,
-            authorId: post.author_id
-          });
+          // Extract profile data or use default empty values
+          const profileData = post.profiles && typeof post.profiles === 'object' 
+            ? post.profiles 
+            : { display_name: '', username: '' };
 
           return {
             ...post,
-            profiles: post.profiles || {
-              display_name: null,
-              username: null
+            // Ensure we have a properly typed profiles object
+            profiles: {
+              display_name: profileData.display_name || '',
+              username: profileData.username || ''
             }
           };
         });
 
+        // Update atoms
+        setPosts(transformedData);
         console.log('Successfully transformed posts:', transformedData);
         return transformedData;
       } catch (error) {
         console.error('Unexpected error in posts query:', error);
+        setError(error as Error);
         throw error;
+      } finally {
+        setLoading(false);
       }
     },
   });

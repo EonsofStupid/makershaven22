@@ -5,6 +5,12 @@ import { isContentPage, isContentComponent } from "@/utils/validators";
 import { toast } from "sonner";
 import type { Json } from "@/lib/types/core/json";
 import { isJsonObject } from "@/lib/types/core/json";
+import { useAtom } from "jotai";
+import { 
+  contentCreateDataAtom, 
+  contentUpdateDataAtom, 
+  contentFormValidAtom 
+} from "@/lib/store/atoms/content-atoms";
 
 /**
  * Type guard to ensure content is an object before submission
@@ -26,6 +32,14 @@ const ensureContentObject = (content: Json): Record<string, unknown> => {
  */
 const handleSubmit = async (content: Json) => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
+  const [createData] = useAtom(contentCreateDataAtom);
+  const [updateData] = useAtom(contentUpdateDataAtom);
+  const [isValid] = useAtom(contentFormValidAtom);
+
+  if (!isValid) {
+    toast.error("Please fill in all required fields");
+    return;
+  }
 
   try {
     // Ensure content is a valid object for both validations and mutations
@@ -36,18 +50,22 @@ const handleSubmit = async (content: Json) => {
       console.log('Handling page content:', contentObj);
       
       if ('id' in contentObj) {
-        await updateContentWithUser(contentObj as Omit<ContentUpdate, 'updated_by'>);
+        if (updateData) {
+          await updateContentWithUser(updateData);
+        }
       } else {
-        await createContentWithUser(contentObj as Omit<ContentCreate, 'created_by'>);
+        await createContentWithUser(createData);
       }
     } else if (isContentComponent(contentObj)) {
       // Logic for component content
       console.log('Handling component content:', contentObj);
       
       if ('id' in contentObj) {
-        await updateContentWithUser(contentObj as Omit<ContentUpdate, 'updated_by'>);
+        if (updateData) {
+          await updateContentWithUser(updateData);
+        }
       } else {
-        await createContentWithUser(contentObj as Omit<ContentCreate, 'created_by'>);
+        await createContentWithUser(createData);
       }
     } else {
       toast.error("Invalid content structure");
