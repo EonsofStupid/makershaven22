@@ -1,48 +1,63 @@
 import { useEffect } from 'react';
 import { useThemeStore } from '@/lib/store/theme-store';
+import { ThemeMode } from '@/lib/types/core/enums';
 
 export const useTheme = () => {
   const {
-    themeMode,
-    setThemeMode,
-    systemTheme,
-    setSystemTheme,
-    effectiveTheme,
-    cssVariables,
-    themeState,
-    updateTheme,
+    settings,
+    isLoading,
+    error,
+    setSettings,
+    setLoading,
+    setError,
+    updateSettings
   } = useThemeStore();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
+      if (settings) {
+        updateSettings({
+          ...settings,
+          theme_mode: e.matches ? 'dark' : 'light' as ThemeMode
+        });
+      }
     };
 
-    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    if (settings) {
+      const isDark = mediaQuery.matches;
+      updateSettings({
+        ...settings,
+        theme_mode: isDark ? 'dark' : 'light' as ThemeMode
+      });
+    }
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [setSystemTheme]);
+  }, [settings, updateSettings]);
 
   useEffect(() => {
     // Apply CSS variables to document root
-    const root = document.documentElement;
-    Object.entries(cssVariables).forEach(([key, value]) => {
-      root.style.setProperty(key, value);
-    });
+    if (settings) {
+      const root = document.documentElement;
+      Object.entries(settings).forEach(([key, value]) => {
+        if (typeof value === 'string') {
+          root.style.setProperty(`--${key}`, value);
+        }
+      });
 
-    // Apply theme class
-    root.classList.remove('light', 'dark');
-    root.classList.add(effectiveTheme);
-  }, [cssVariables, effectiveTheme]);
+      // Apply theme class
+      root.classList.remove('light', 'dark');
+      root.classList.add(settings.theme_mode);
+    }
+  }, [settings]);
 
   return {
-    mode: themeMode,
-    setMode: setThemeMode,
-    effectiveTheme,
-    settings: themeState.settings,
-    isLoading: themeState.isLoading,
-    error: themeState.error,
-    updateTheme,
+    settings,
+    isLoading,
+    error,
+    updateSettings,
+    setSettings,
+    setError
   };
 };

@@ -1,13 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { ThemeState } from '../types/store-types';
-import { ThemeSettings } from '@/integrations/supabase/types/database/core/settings-types';
+import { Settings } from '../types/settings/types';
 import { supabase } from '@/integrations/supabase/client';
 
 const initialState: ThemeState = {
   settings: null,
   isLoading: false,
-  error: null
+  error: null,
+  setSettings: () => {},
+  setLoading: () => {},
+  setError: () => {},
+  updateSettings: async () => {}
 };
 
 export const useThemeStore = create<ThemeState>()(
@@ -15,11 +19,11 @@ export const useThemeStore = create<ThemeState>()(
     (set) => ({
       ...initialState,
       
-      setSettings: (settings: ThemeSettings) => set({ settings }),
+      setSettings: (settings: Settings) => set({ settings }),
       setLoading: (isLoading: boolean) => set({ isLoading }),
       setError: (error: Error | null) => set({ error }),
       
-      updateSettings: async (settings: ThemeSettings) => {
+      updateSettings: async (settings: Settings) => {
         set({ isLoading: true });
         try {
           const { data, error } = await supabase.rpc('update_site_settings', settings);

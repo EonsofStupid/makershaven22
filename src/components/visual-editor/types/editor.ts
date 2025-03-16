@@ -24,3 +24,18 @@ export type EditorAction =
   | { type: 'ADD_ELEMENT'; payload: EditorElement }
   | { type: 'REMOVE_ELEMENT'; payload: string }
   | { type: 'SET_DRAGGING'; payload: boolean };
+
+export interface VisualElement {
+  id: string;
+  type: string;
+  content: Record<string, any>;
+}
+
+export interface ElementPreset {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  defaultProps?: Record<string, any>;
+  icon?: string;
+}

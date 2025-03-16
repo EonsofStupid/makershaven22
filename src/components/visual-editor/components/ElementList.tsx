@@ -1,8 +1,19 @@
 import React from 'react';
-import { DndContext, useDraggable, SortableContext } from '@dnd-kit/core';
+import { DndContext, useDraggable } from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
 import { motion } from 'framer-motion';
 
-const ElementList = ({ elements, onReorder }) => {
+interface Element {
+  id: string;
+  content: React.ReactNode;
+}
+
+interface ElementListProps {
+  elements: Element[];
+  onReorder: (elements: Element[]) => void;
+}
+
+const ElementList: React.FC<ElementListProps> = ({ elements, onReorder }) => {
   const handleDragEnd = ({ active, over }) => {
     if (active.id !== over.id) {
       const oldIndex = elements.findIndex(el => el.id === active.id);

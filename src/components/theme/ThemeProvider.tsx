@@ -1,11 +1,13 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Theme, FlattenedSettings, flattenedSettingsToTheme, themeToFlattenedSettings } from './types/theme';
+import { Theme } from './types/theme';
+import { FlattenedSettings } from '@/lib/types/settings/core';
+import { flattenedSettingsToTheme, themeToFlattenedSettings } from './types/theme';
 import { toast } from 'sonner';
 import { ThemeMode } from '@/lib/types/core/enums';
 import { SecuritySettings, DEFAULT_SECURITY_SETTINGS } from '@/lib/types/security/types';
 import { ensureJson } from '@/lib/utils/type-utils';
+import { TransitionType } from '@/lib/types/core/enums';
 
 interface ThemeContextType {
   theme: Theme;
@@ -108,7 +110,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
             hover_scale: data.hover_scale || defaultTheme.hover_scale,
             box_shadow: data.box_shadow || defaultTheme.box_shadow,
             backdrop_blur: data.backdrop_blur || defaultTheme.backdrop_blur,
-            transition_type: data.transition_type || defaultTheme.transition_type,
+            transition_type: (data.transition_type as TransitionType) || defaultTheme.transition_type,
             // Add required properties
             security_settings: securitySettings,
             theme_mode: themeMode,
