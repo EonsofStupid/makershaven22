@@ -1,9 +1,9 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { toast } from 'sonner';
 
 interface AuthGuardProps {
@@ -11,16 +11,19 @@ interface AuthGuardProps {
   requireAuth?: boolean;
   requiredRole?: string | string[];
   fallbackPath?: string;
+  waitForAuth?: boolean;
 }
 
 export const AuthGuard = ({ 
   children, 
   requireAuth = false,
   requiredRole,
-  fallbackPath = '/login'
+  fallbackPath = '/login',
+  waitForAuth = false,
 }: AuthGuardProps) => {
   const navigate = useNavigate();
   const { session, user, isLoading } = useAuthStore();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(waitForAuth);
 
   useEffect(() => {
     console.log('AuthGuard: Checking access', {
@@ -31,37 +34,46 @@ export const AuthGuard = ({
     });
 
     if (!isLoading) {
+      // If we need to check auth and there's no session
       if (requireAuth && !session) {
         console.log('AuthGuard: No session, redirecting to', fallbackPath);
-        toast.error('Please sign in to continue');
-        navigate(fallbackPath);
+        if (location.pathname !== fallbackPath) {
+          toast.error('Please sign in to continue');
+          navigate(fallbackPath);
+        }
         return;
       }
 
+      // If we have a session and specific roles are required
       if (requiredRole && user) {
         const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
         if (!roles.includes(user.role as string)) {
           console.log('AuthGuard: Insufficient permissions');
           toast.error('You do not have permission to access this page');
-          navigate(fallbackPath);
+          navigate('/');
           return;
         }
       }
+
+      // Auth checks complete
+      setIsCheckingAuth(false);
     }
   }, [session, user, isLoading, requireAuth, requiredRole, navigate, fallbackPath]);
 
-  if (isLoading) {
+  // If we're still loading auth and the component should wait
+  if ((isLoading && waitForAuth) || isCheckingAuth) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="flex items-center justify-center min-h-screen"
+        className="flex items-center justify-center min-h-[200px]"
       >
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <LoadingSpinner size="md" color="neon-cyan" />
       </motion.div>
     );
   }
 
+  // Auth checks passed or not required, render children
   return <>{children}</>;
 };

@@ -1,45 +1,89 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Settings } from "@/components/admin/settings/types";
+import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
 import { useThemeSetup } from "./hooks/useThemeSetup";
 import { useThemeSubscription } from "./hooks/useThemeSubscription";
 import { applyThemeToDocument } from "./utils/themeUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuthStore } from '@/lib/store/auth-store';
-import { flattenedSettingsToTheme, themeToFlattenedSettings, Theme } from "./types/theme";
+import { LoadingState } from "@/components/common/LoadingState";
 
 interface ThemeContextType {
-  theme: Settings | null;
-  updateTheme: (newTheme: Settings) => void;
+  theme: FlattenedSettings;
+  isLoading: boolean;
+  updateTheme: (newTheme: FlattenedSettings) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const { theme, setTheme } = useThemeSetup();
+  const [theme, setTheme] = useState<FlattenedSettings>({ ...DEFAULT_SETTINGS });
+  const [isLoading, setIsLoading] = useState(true);
   const { session } = useAuthStore();
   
+  // Apply default theme immediately
+  useEffect(() => {
+    applyThemeToDocument(DEFAULT_SETTINGS);
+  }, []);
+
+  // Try to fetch the theme from the database
+  useEffect(() => {
+    const fetchTheme = async () => {
+      try {
+        setIsLoading(true);
+        
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("*")
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.warn("Error fetching theme:", error.message);
+          // Continue with default theme
+          return;
+        }
+
+        if (data) {
+          const updatedTheme = {
+            ...DEFAULT_SETTINGS,
+            ...data,
+            security_settings: data.security_settings || {}
+          };
+          
+          setTheme(updatedTheme);
+          applyThemeToDocument(updatedTheme);
+          console.log("Theme loaded from database:", updatedTheme.site_title);
+        }
+      } catch (error) {
+        console.error("Theme loading error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTheme();
+  }, []);
+  
+  // Subscribe to theme changes
   useThemeSubscription(setTheme);
 
-  useEffect(() => {
-    console.log('ThemeProvider mounted, current theme:', theme?.site_title);
-  }, [theme]);
-
-  const updateTheme = async (newTheme: Settings) => {
-    console.log('Updating theme with new settings:', newTheme.site_title);
-    
+  const updateTheme = async (newTheme: FlattenedSettings) => {
     try {
+      setIsLoading(true);
+      
       if (!session?.user) {
         console.log('No active session, applying theme without persistence');
         applyThemeToDocument(newTheme);
         setTheme(newTheme);
+        setIsLoading(false);
         return;
       }
 
       const { error } = await supabase.rpc('update_site_settings', {
         p_site_title: newTheme.site_title,
-        p_tagline: newTheme.tagline,
+        p_tagline: newTheme.tagline || "",
         p_primary_color: newTheme.primary_color,
         p_secondary_color: newTheme.secondary_color,
         p_accent_color: newTheme.accent_color,
@@ -61,7 +105,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_font_weight_normal: newTheme.font_weight_normal,
         p_font_weight_bold: newTheme.font_weight_bold,
         p_line_height_base: newTheme.line_height_base,
-        p_letter_spacing: newTheme.letter_spacing
+        p_letter_spacing: newTheme.letter_spacing,
+        p_security_settings: newTheme.security_settings || {}
       });
 
       if (error) throw error;
@@ -76,16 +121,19 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       toast.error("Failed to update theme", {
         description: "Please try again or contact support if the issue persists"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (!theme) {
-    console.log("ThemeProvider: Theme not loaded yet");
-    return null;
-  }
+  const contextValue = {
+    theme,
+    isLoading,
+    updateTheme
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

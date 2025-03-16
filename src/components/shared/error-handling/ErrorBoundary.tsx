@@ -1,3 +1,4 @@
+
 import React from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,7 +8,8 @@ import { toast } from "sonner";
 
 interface Props {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error }>;
+  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 interface State {
@@ -28,6 +30,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
     
+    // Call the optional onError callback
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+    
     toast.error("An unexpected error occurred", {
       description: error.message,
       duration: 5000,
@@ -43,7 +50,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error!} />;
+        return <FallbackComponent error={this.state.error!} resetError={this.handleReset} />;
       }
 
       return (
@@ -77,5 +84,3 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

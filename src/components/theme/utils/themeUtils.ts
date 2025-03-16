@@ -1,106 +1,89 @@
 
-import { FlattenedSettings } from "@/lib/types/settings/core";
+import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
 import { DatabaseSettingsRow } from "../types/theme";
-import { DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
-import { ThemeMode, TransitionType } from "@/lib/types/core/enums";
-import { ensureJson, safeThemeMode, safeTransitionType } from "@/lib/utils/type-utils";
 
-export const DEFAULT_THEME_SETTINGS: FlattenedSettings = {
-  site_title: 'MakersImpulse',
-  primary_color: '#7FFFD4',
-  secondary_color: '#FFB6C1',
-  accent_color: '#E6E6FA',
-  text_primary_color: '#FFFFFF',
-  text_secondary_color: '#A1A1AA',
-  text_link_color: '#3B82F6',
-  text_heading_color: '#FFFFFF',
-  neon_cyan: '#41f0db',
-  neon_pink: '#ff0abe',
-  neon_purple: '#8000ff',
-  font_family_heading: 'Inter',
-  font_family_body: 'Inter',
-  font_size_base: '16px',
-  font_weight_normal: '400',
-  font_weight_bold: '700',
-  line_height_base: '1.5',
-  letter_spacing: 'normal',
-  border_radius: '0.5rem',
-  spacing_unit: '1rem',
-  transition_duration: '0.3s',
-  shadow_color: '#000000',
-  hover_scale: '1.05',
-  box_shadow: 'none',
-  backdrop_blur: '0',
-  transition_type: 'fade' as TransitionType,
-  security_settings: DEFAULT_SECURITY_SETTINGS,
-  theme_mode: 'system' as ThemeMode,
-};
-
-export const convertDbSettingsToTheme = (settings: DatabaseSettingsRow | null): FlattenedSettings => {
-  if (!settings) {
-    console.log("Using default theme settings");
-    return DEFAULT_THEME_SETTINGS;
+export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null): FlattenedSettings => {
+  if (!dbSettings) {
+    return { ...DEFAULT_SETTINGS };
   }
 
-  // Process security_settings from database
-  const securitySettings = settings.security_settings 
-    ? (typeof settings.security_settings === 'string' 
-        ? JSON.parse(settings.security_settings) 
-        : settings.security_settings)
-    : DEFAULT_SECURITY_SETTINGS;
-
-  // Process theme_mode and transition_type using type guards
-  const themeMode = safeThemeMode(settings.theme_mode);
-  const transitionType = safeTransitionType(settings.transition_type);
-
+  // Map database settings to flattened settings
   return {
-    site_title: settings.site_title || DEFAULT_THEME_SETTINGS.site_title,
-    primary_color: settings.primary_color || DEFAULT_THEME_SETTINGS.primary_color,
-    secondary_color: settings.secondary_color || DEFAULT_THEME_SETTINGS.secondary_color,
-    accent_color: settings.accent_color || DEFAULT_THEME_SETTINGS.accent_color,
-    text_primary_color: settings.text_primary_color || DEFAULT_THEME_SETTINGS.text_primary_color,
-    text_secondary_color: settings.text_secondary_color || DEFAULT_THEME_SETTINGS.text_secondary_color,
-    text_link_color: settings.text_link_color || DEFAULT_THEME_SETTINGS.text_link_color,
-    text_heading_color: settings.text_heading_color || DEFAULT_THEME_SETTINGS.text_heading_color,
-    neon_cyan: settings.neon_cyan || DEFAULT_THEME_SETTINGS.neon_cyan,
-    neon_pink: settings.neon_pink || DEFAULT_THEME_SETTINGS.neon_pink,
-    neon_purple: settings.neon_purple || DEFAULT_THEME_SETTINGS.neon_purple,
-    font_family_heading: settings.font_family_heading || DEFAULT_THEME_SETTINGS.font_family_heading,
-    font_family_body: settings.font_family_body || DEFAULT_THEME_SETTINGS.font_family_body,
-    font_size_base: settings.font_size_base || DEFAULT_THEME_SETTINGS.font_size_base,
-    font_weight_normal: settings.font_weight_normal || DEFAULT_THEME_SETTINGS.font_weight_normal,
-    font_weight_bold: settings.font_weight_bold || DEFAULT_THEME_SETTINGS.font_weight_bold,
-    line_height_base: settings.line_height_base || DEFAULT_THEME_SETTINGS.line_height_base,
-    letter_spacing: settings.letter_spacing || DEFAULT_THEME_SETTINGS.letter_spacing,
-    border_radius: settings.border_radius || DEFAULT_THEME_SETTINGS.border_radius,
-    spacing_unit: settings.spacing_unit || DEFAULT_THEME_SETTINGS.spacing_unit,
-    transition_duration: settings.transition_duration || DEFAULT_THEME_SETTINGS.transition_duration,
-    shadow_color: settings.shadow_color || DEFAULT_THEME_SETTINGS.shadow_color,
-    hover_scale: settings.hover_scale || DEFAULT_THEME_SETTINGS.hover_scale,
-    box_shadow: settings.box_shadow || DEFAULT_THEME_SETTINGS.box_shadow,
-    backdrop_blur: settings.backdrop_blur || DEFAULT_THEME_SETTINGS.backdrop_blur,
-    transition_type: transitionType,
-    security_settings: securitySettings,
-    theme_mode: themeMode,
-    tagline: settings.tagline,
-    logo_url: settings.logo_url,
-    favicon_url: settings.favicon_url,
+    ...DEFAULT_SETTINGS,
+    site_title: dbSettings.site_title || DEFAULT_SETTINGS.site_title,
+    tagline: dbSettings.tagline || undefined,
+    primary_color: dbSettings.primary_color || DEFAULT_SETTINGS.primary_color,
+    secondary_color: dbSettings.secondary_color || DEFAULT_SETTINGS.secondary_color,
+    accent_color: dbSettings.accent_color || DEFAULT_SETTINGS.accent_color,
+    text_primary_color: dbSettings.text_primary_color || DEFAULT_SETTINGS.text_primary_color,
+    text_secondary_color: dbSettings.text_secondary_color || DEFAULT_SETTINGS.text_secondary_color,
+    text_link_color: dbSettings.text_link_color || DEFAULT_SETTINGS.text_link_color,
+    text_heading_color: dbSettings.text_heading_color || DEFAULT_SETTINGS.text_heading_color,
+    neon_cyan: dbSettings.neon_cyan || DEFAULT_SETTINGS.neon_cyan,
+    neon_pink: dbSettings.neon_pink || DEFAULT_SETTINGS.neon_pink,
+    neon_purple: dbSettings.neon_purple || DEFAULT_SETTINGS.neon_purple,
+    border_radius: dbSettings.border_radius || DEFAULT_SETTINGS.border_radius,
+    spacing_unit: dbSettings.spacing_unit || DEFAULT_SETTINGS.spacing_unit,
+    transition_duration: dbSettings.transition_duration || DEFAULT_SETTINGS.transition_duration,
+    shadow_color: dbSettings.shadow_color || DEFAULT_SETTINGS.shadow_color,
+    hover_scale: dbSettings.hover_scale || DEFAULT_SETTINGS.hover_scale,
+    font_family_heading: dbSettings.font_family_heading || DEFAULT_SETTINGS.font_family_heading,
+    font_family_body: dbSettings.font_family_body || DEFAULT_SETTINGS.font_family_body,
+    font_size_base: dbSettings.font_size_base || DEFAULT_SETTINGS.font_size_base,
+    font_weight_normal: dbSettings.font_weight_normal || DEFAULT_SETTINGS.font_weight_normal,
+    font_weight_bold: dbSettings.font_weight_bold || DEFAULT_SETTINGS.font_weight_bold,
+    line_height_base: dbSettings.line_height_base || DEFAULT_SETTINGS.line_height_base,
+    letter_spacing: dbSettings.letter_spacing || DEFAULT_SETTINGS.letter_spacing,
+    logo_url: dbSettings.logo_url || undefined,
+    favicon_url: dbSettings.favicon_url || undefined,
+    security_settings: dbSettings.security_settings || DEFAULT_SETTINGS.security_settings,
   };
 };
 
-export const applyThemeToDocument = (theme: FlattenedSettings) => {
-  console.log("Applying theme to document:", theme.site_title);
-  
-  const root = document.documentElement;
-  // Only apply string values as CSS variables
-  Object.entries(theme).forEach(([key, value]) => {
-    if (value && typeof value === 'string' && key !== 'theme_mode' && !key.includes('settings')) {
-      root.style.setProperty(`--${kebabCase(key)}`, value);
-    }
-  });
-
-  // Helper to convert camelCase to kebab-case for CSS variables
-  function kebabCase(str: string): string {
-    return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+export const applyThemeToDocument = (theme: FlattenedSettings): void => {
+  if (!theme) {
+    console.warn('Attempting to apply null theme, using defaults');
+    theme = { ...DEFAULT_SETTINGS };
   }
+
+  // Apply CSS variables to document root
+  const root = document.documentElement;
+
+  // Apply colors
+  root.style.setProperty('--primary-color', theme.primary_color);
+  root.style.setProperty('--secondary-color', theme.secondary_color);
+  root.style.setProperty('--accent-color', theme.accent_color);
+  root.style.setProperty('--text-primary-color', theme.text_primary_color);
+  root.style.setProperty('--text-secondary-color', theme.text_secondary_color);
+  root.style.setProperty('--text-link-color', theme.text_link_color);
+  root.style.setProperty('--text-heading-color', theme.text_heading_color);
+  root.style.setProperty('--neon-cyan', theme.neon_cyan);
+  root.style.setProperty('--neon-pink', theme.neon_pink);
+  root.style.setProperty('--neon-purple', theme.neon_purple);
+
+  // Apply layout variables
+  root.style.setProperty('--border-radius', theme.border_radius);
+  root.style.setProperty('--spacing-unit', theme.spacing_unit);
+  root.style.setProperty('--transition-duration', theme.transition_duration);
+  root.style.setProperty('--shadow-color', theme.shadow_color);
+  root.style.setProperty('--hover-scale', theme.hover_scale);
+
+  // Apply typography variables
+  root.style.setProperty('--font-family-heading', theme.font_family_heading);
+  root.style.setProperty('--font-family-body', theme.font_family_body);
+  root.style.setProperty('--font-size-base', theme.font_size_base);
+  root.style.setProperty('--font-weight-normal', theme.font_weight_normal);
+  root.style.setProperty('--font-weight-bold', theme.font_weight_bold);
+  root.style.setProperty('--line-height-base', theme.line_height_base);
+  root.style.setProperty('--letter-spacing', theme.letter_spacing);
+
+  // Apply additional properties if they exist
+  if (theme.box_shadow) {
+    root.style.setProperty('--box-shadow', theme.box_shadow);
+  }
+  if (theme.backdrop_blur) {
+    root.style.setProperty('--backdrop-blur', theme.backdrop_blur);
+  }
+
+  console.log('Theme applied to document:', theme.site_title);
 };

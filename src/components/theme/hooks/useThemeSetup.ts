@@ -1,15 +1,19 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { FlattenedSettings } from "@/lib/types/settings/core";
+import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
 import { toast } from "sonner";
 import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
 
 export const useThemeSetup = () => {
-  const [theme, setTheme] = useState<FlattenedSettings | null>(null);
+  const [theme, setTheme] = useState<FlattenedSettings>({ ...DEFAULT_SETTINGS });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Apply default theme immediately to ensure something is always rendered
+    applyThemeToDocument(DEFAULT_SETTINGS);
+
     const fetchInitialTheme = async () => {
       try {
         console.log("Fetching initial theme settings...");
@@ -21,20 +25,15 @@ export const useThemeSetup = () => {
           .maybeSingle();
 
         if (error) {
-          console.error("Error fetching theme:", error);
-          const defaultTheme = convertDbSettingsToTheme(null);
-          setTheme(defaultTheme);
-          applyThemeToDocument(defaultTheme);
-          toast.error("Error loading theme settings, using defaults");
+          console.warn("Error fetching theme:", error.message);
+          // Continue with default theme
+          setIsLoading(false);
           return;
         }
 
         if (!rawData) {
           console.log("No settings found, using defaults");
-          const defaultTheme = convertDbSettingsToTheme(null);
-          setTheme(defaultTheme);
-          applyThemeToDocument(defaultTheme);
-          toast.info("Using default theme settings");
+          setIsLoading(false);
           return;
         }
 
@@ -44,18 +43,16 @@ export const useThemeSetup = () => {
         console.log("Initial theme settings fetched:", themeData.site_title);
         setTheme(themeData);
         applyThemeToDocument(themeData);
-        toast.success("Theme settings loaded");
       } catch (error) {
         console.error("Error in theme setup:", error);
-        const defaultTheme = convertDbSettingsToTheme(null);
-        setTheme(defaultTheme);
-        applyThemeToDocument(defaultTheme);
-        toast.error("Failed to load theme settings, using defaults");
+        // Still using the default theme applied earlier
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchInitialTheme();
   }, []);
 
-  return { theme, setTheme };
+  return { theme, setTheme, isLoading };
 };

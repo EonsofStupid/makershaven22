@@ -7,11 +7,10 @@ import { toast } from 'sonner';
 
 export const useAuthSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { setSession, setUser } = useAuthStore();
+  const { setSession, setUser, setLoading, setError } = useAuthStore();
   const initialSetupDone = useRef(false);
 
   const handleAuthChange = useCallback(async (session: Session | null) => {
-    setIsLoading(true);
     try {
       console.log('handleAuthChange called with session:', session?.user?.id || 'No session');
 
@@ -46,11 +45,13 @@ export const useAuthSetup = () => {
       }
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
+      setError(error as Error);
       toast.error('Authentication error');
     } finally {
+      setLoading(false);
       setIsLoading(false);
     }
-  }, [setSession, setUser]);
+  }, [setSession, setUser, setLoading, setError]);
 
   return {
     isLoading,

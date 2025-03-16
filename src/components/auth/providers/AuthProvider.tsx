@@ -11,12 +11,12 @@ import { useAuthStore } from '@/lib/store/auth-store';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
-  const { isLoading } = useAuthStore();
+  const { isLoading, initialize } = useAuthStore();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
     
-    // Apply security headers
+    // Apply security headers without blocking
     const initSecurity = async () => {
       try {
         const success = await applySecurityHeaders();
@@ -29,6 +29,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initSecurity();
+    
+    // Initialize auth store
+    initialize();
 
     // Only run the setup once
     if (initialSetupDone.current) {
@@ -37,43 +40,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     initialSetupDone.current = true;
-    let retryCount = 0;
-    const maxRetries = 3;
-    const retryDelay = 1000;
 
     // Setup authentication
     const setupAuth = async () => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize session and security
+        // Initialize session and security in background
         try {
           await sessionManager.startSession();
           securityManager.initialize();
           console.log('Security systems initialized');
         } catch (securityError) {
           console.error('Error initializing security systems:', securityError);
+          // Continue anyway - non-blocking
         }
 
         // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
-
-        console.log('Initial session check:', session?.user?.id || 'No session');
-        await handleAuthChange(session);
-
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          // Continue without session - non-blocking
+        } else {
+          console.log('Initial session check:', session?.user?.id || 'No session');
+          await handleAuthChange(session);
+        }
       } catch (error) {
         console.error("Auth setup error:", error);
-        if (retryCount < maxRetries) {
-          retryCount++;
-          console.log(`Retrying auth setup (${retryCount}/${maxRetries})...`);
-          setTimeout(setupAuth, retryDelay * retryCount);
-        } else {
-          toast.error('Failed to initialize authentication', {
-            description: 'Please refresh the page or try again later.',
-          });
-        }
+        // Continue anyway - non-blocking
       }
     };
 
@@ -98,9 +93,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       sessionManager.destroy();
       securityManager.cleanup();
     };
-  }, [handleAuthChange]);
+  }, [handleAuthChange, initialize]);
 
-  // Render with motion for smooth transitions
   return (
     <motion.div
       initial={{ opacity: 0 }}

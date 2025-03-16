@@ -123,45 +123,6 @@ export type Database = {
         }
         Relationships: []
       }
-      application_settings: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          favicon_url: string | null
-          id: string
-          logo_url: string | null
-          metadata: Json | null
-          site_title: string
-          tagline: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          favicon_url?: string | null
-          id?: string
-          logo_url?: string | null
-          metadata?: Json | null
-          site_title?: string
-          tagline?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          favicon_url?: string | null
-          id?: string
-          logo_url?: string | null
-          metadata?: Json | null
-          site_title?: string
-          tagline?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
       audit_logs: {
         Row: {
           action: string
@@ -1038,22 +999,25 @@ export type Database = {
       }
       feature_flags: {
         Row: {
+          core_flags: number | null
           created_at: string | null
-          flags: Json | null
+          custom_flags: Json | null
           id: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          core_flags?: number | null
           created_at?: string | null
-          flags?: Json | null
+          custom_flags?: Json | null
           id?: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          core_flags?: number | null
           created_at?: string | null
-          flags?: Json | null
+          custom_flags?: Json | null
           id?: string
           updated_at?: string | null
           user_id?: string
@@ -2332,22 +2296,49 @@ export type Database = {
       }
       security_settings: {
         Row: {
+          created_at: string | null
           id: string
+          is_active: boolean | null
           settings: Json
           updated_at: string | null
-          updated_by: string | null
         }
         Insert: {
+          created_at?: string | null
           id?: string
+          is_active?: boolean | null
           settings?: Json
           updated_at?: string | null
-          updated_by?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string
+          is_active?: boolean | null
           settings?: Json
           updated_at?: string | null
-          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      security_user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          override_settings: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          override_settings?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          override_settings?: Json | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -2390,132 +2381,6 @@ export type Database = {
           metric_name?: string
           metric_value?: Json
           recorded_at?: string | null
-        }
-        Relationships: []
-      }
-      site_settings: {
-        Row: {
-          accent_color: string | null
-          backdrop_blur: string | null
-          border_radius: string | null
-          box_shadow: string | null
-          created_at: string | null
-          favicon_url: string | null
-          font_family_body: string | null
-          font_family_heading: string | null
-          font_size_base: string | null
-          font_weight_bold: string | null
-          font_weight_normal: string | null
-          hover_scale: string | null
-          id: string
-          letter_spacing: string | null
-          line_height_base: string | null
-          logo_url: string | null
-          metadata: Json | null
-          neon_cyan: string | null
-          neon_pink: string | null
-          neon_purple: string | null
-          primary_color: string | null
-          secondary_color: string | null
-          security_settings: Json | null
-          setting_key: string
-          setting_type: string | null
-          setting_value: string | null
-          shadow_color: string | null
-          site_title: string | null
-          spacing_unit: string | null
-          tagline: string | null
-          text_heading_color: string | null
-          text_link_color: string | null
-          text_primary_color: string | null
-          text_secondary_color: string | null
-          theme_mode: string | null
-          transition_duration: string | null
-          transition_type: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          accent_color?: string | null
-          backdrop_blur?: string | null
-          border_radius?: string | null
-          box_shadow?: string | null
-          created_at?: string | null
-          favicon_url?: string | null
-          font_family_body?: string | null
-          font_family_heading?: string | null
-          font_size_base?: string | null
-          font_weight_bold?: string | null
-          font_weight_normal?: string | null
-          hover_scale?: string | null
-          id?: string
-          letter_spacing?: string | null
-          line_height_base?: string | null
-          logo_url?: string | null
-          metadata?: Json | null
-          neon_cyan?: string | null
-          neon_pink?: string | null
-          neon_purple?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          security_settings?: Json | null
-          setting_key: string
-          setting_type?: string | null
-          setting_value?: string | null
-          shadow_color?: string | null
-          site_title?: string | null
-          spacing_unit?: string | null
-          tagline?: string | null
-          text_heading_color?: string | null
-          text_link_color?: string | null
-          text_primary_color?: string | null
-          text_secondary_color?: string | null
-          theme_mode?: string | null
-          transition_duration?: string | null
-          transition_type?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          accent_color?: string | null
-          backdrop_blur?: string | null
-          border_radius?: string | null
-          box_shadow?: string | null
-          created_at?: string | null
-          favicon_url?: string | null
-          font_family_body?: string | null
-          font_family_heading?: string | null
-          font_size_base?: string | null
-          font_weight_bold?: string | null
-          font_weight_normal?: string | null
-          hover_scale?: string | null
-          id?: string
-          letter_spacing?: string | null
-          line_height_base?: string | null
-          logo_url?: string | null
-          metadata?: Json | null
-          neon_cyan?: string | null
-          neon_pink?: string | null
-          neon_purple?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          security_settings?: Json | null
-          setting_key?: string
-          setting_type?: string | null
-          setting_value?: string | null
-          shadow_color?: string | null
-          site_title?: string | null
-          spacing_unit?: string | null
-          tagline?: string | null
-          text_heading_color?: string | null
-          text_link_color?: string | null
-          text_primary_color?: string | null
-          text_secondary_color?: string | null
-          theme_mode?: string | null
-          transition_duration?: string | null
-          transition_type?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
         }
         Relationships: []
       }
@@ -2766,155 +2631,6 @@ export type Database = {
         }
         Relationships: []
       }
-      theme_configuration: {
-        Row: {
-          accent_color: string | null
-          animations_enabled: boolean | null
-          backdrop_blur: string | null
-          border_radius: string | null
-          box_shadow: string | null
-          component_type:
-            | Database["public"]["Enums"]["theme_component_type"]
-            | null
-          default_animation_duration: number | null
-          font_family_body: string
-          font_family_heading: string
-          font_size_base: string
-          font_weight_bold: string
-          font_weight_normal: string
-          hover_scale: string | null
-          id: string
-          inheritance_strategy:
-            | Database["public"]["Enums"]["theme_inheritance_strategy"]
-            | null
-          inherited_settings: Json | null
-          last_sync: string | null
-          letter_spacing: string
-          line_height_base: string
-          neon_cyan: string | null
-          neon_pink: string | null
-          neon_purple: string | null
-          parent_theme_id: string | null
-          preview_preferences: Json | null
-          primary_color: string | null
-          real_time_toggle: boolean | null
-          secondary_color: string | null
-          shadow_color: string | null
-          spacing_unit: string | null
-          state_version: number | null
-          text_heading_color: string | null
-          text_link_color: string | null
-          text_primary_color: string | null
-          text_secondary_color: string | null
-          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
-          theme_preferences: Json | null
-          transition_duration: string | null
-          transition_type: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          accent_color?: string | null
-          animations_enabled?: boolean | null
-          backdrop_blur?: string | null
-          border_radius?: string | null
-          box_shadow?: string | null
-          component_type?:
-            | Database["public"]["Enums"]["theme_component_type"]
-            | null
-          default_animation_duration?: number | null
-          font_family_body: string
-          font_family_heading: string
-          font_size_base: string
-          font_weight_bold: string
-          font_weight_normal: string
-          hover_scale?: string | null
-          id?: string
-          inheritance_strategy?:
-            | Database["public"]["Enums"]["theme_inheritance_strategy"]
-            | null
-          inherited_settings?: Json | null
-          last_sync?: string | null
-          letter_spacing: string
-          line_height_base: string
-          neon_cyan?: string | null
-          neon_pink?: string | null
-          neon_purple?: string | null
-          parent_theme_id?: string | null
-          preview_preferences?: Json | null
-          primary_color?: string | null
-          real_time_toggle?: boolean | null
-          secondary_color?: string | null
-          shadow_color?: string | null
-          spacing_unit?: string | null
-          state_version?: number | null
-          text_heading_color?: string | null
-          text_link_color?: string | null
-          text_primary_color?: string | null
-          text_secondary_color?: string | null
-          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
-          theme_preferences?: Json | null
-          transition_duration?: string | null
-          transition_type?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          accent_color?: string | null
-          animations_enabled?: boolean | null
-          backdrop_blur?: string | null
-          border_radius?: string | null
-          box_shadow?: string | null
-          component_type?:
-            | Database["public"]["Enums"]["theme_component_type"]
-            | null
-          default_animation_duration?: number | null
-          font_family_body?: string
-          font_family_heading?: string
-          font_size_base?: string
-          font_weight_bold?: string
-          font_weight_normal?: string
-          hover_scale?: string | null
-          id?: string
-          inheritance_strategy?:
-            | Database["public"]["Enums"]["theme_inheritance_strategy"]
-            | null
-          inherited_settings?: Json | null
-          last_sync?: string | null
-          letter_spacing?: string
-          line_height_base?: string
-          neon_cyan?: string | null
-          neon_pink?: string | null
-          neon_purple?: string | null
-          parent_theme_id?: string | null
-          preview_preferences?: Json | null
-          primary_color?: string | null
-          real_time_toggle?: boolean | null
-          secondary_color?: string | null
-          shadow_color?: string | null
-          spacing_unit?: string | null
-          state_version?: number | null
-          text_heading_color?: string | null
-          text_link_color?: string | null
-          text_primary_color?: string | null
-          text_secondary_color?: string | null
-          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
-          theme_preferences?: Json | null
-          transition_duration?: string | null
-          transition_type?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "theme_configuration_parent_theme_id_fkey"
-            columns: ["parent_theme_id"]
-            isOneToOne: false
-            referencedRelation: "base_themes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       theme_history: {
         Row: {
           action: string
@@ -3072,13 +2788,6 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
-            foreignKeyName: "theme_inheritance_log_child_theme_id_fkey"
-            columns: ["child_theme_id"]
-            isOneToOne: false
-            referencedRelation: "theme_configuration"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "theme_inheritance_log_parent_theme_id_fkey"
             columns: ["parent_theme_id"]
             isOneToOne: false
@@ -3229,6 +2938,42 @@ export type Database = {
           },
         ]
       }
+      theme_settings: {
+        Row: {
+          colors: Json
+          created_at: string | null
+          effects: Json
+          id: string
+          is_active: boolean | null
+          layout: Json
+          name: string
+          typography: Json
+          updated_at: string | null
+        }
+        Insert: {
+          colors?: Json
+          created_at?: string | null
+          effects?: Json
+          id?: string
+          is_active?: boolean | null
+          layout?: Json
+          name: string
+          typography?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          colors?: Json
+          created_at?: string | null
+          effects?: Json
+          id?: string
+          is_active?: boolean | null
+          layout?: Json
+          name?: string
+          typography?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       theme_snapshots: {
         Row: {
           created_at: string | null
@@ -3260,6 +3005,41 @@ export type Database = {
             columns: ["theme_id"]
             isOneToOne: false
             referencedRelation: "theme_base_configuration"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      theme_user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          override_settings: Json | null
+          theme_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          override_settings?: Json | null
+          theme_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          override_settings?: Json | null
+          theme_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theme_user_preferences_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "theme_settings"
             referencedColumns: ["id"]
           },
         ]
@@ -3309,13 +3089,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_roles_view"
             referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "theme_versions_theme_id_fkey"
-            columns: ["theme_id"]
-            isOneToOne: false
-            referencedRelation: "theme_configuration"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -3416,80 +3189,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
-      }
-      unified_settings: {
-        Row: {
-          category: Database["public"]["Enums"]["setting_type"]
-          created_at: string | null
-          created_by: string | null
-          id: string
-          is_encrypted: boolean | null
-          key: string
-          metadata: Json | null
-          setting_type: Database["public"]["Enums"]["setting_type"] | null
-          theme_scope: string | null
-          updated_at: string | null
-          updated_by: string | null
-          value: Json
-        }
-        Insert: {
-          category: Database["public"]["Enums"]["setting_type"]
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          is_encrypted?: boolean | null
-          key: string
-          metadata?: Json | null
-          setting_type?: Database["public"]["Enums"]["setting_type"] | null
-          theme_scope?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-          value?: Json
-        }
-        Update: {
-          category?: Database["public"]["Enums"]["setting_type"]
-          created_at?: string | null
-          created_by?: string | null
-          id?: string
-          is_encrypted?: boolean | null
-          key?: string
-          metadata?: Json | null
-          setting_type?: Database["public"]["Enums"]["setting_type"] | null
-          theme_scope?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-          value?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "unified_settings_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "unified_settings_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "user_roles_view"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "unified_settings_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "unified_settings_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "user_roles_view"
-            referencedColumns: ["user_id"]
-          },
-        ]
       }
       user_achievements: {
         Row: {
@@ -3944,135 +3643,6 @@ export type Database = {
         }
         Returns: Json
       }
-      update_site_settings:
-        | {
-            Args: {
-              p_site_title: string
-              p_tagline: string
-              p_border_radius: string
-              p_spacing_unit: string
-              p_transition_duration: string
-              p_shadow_color: string
-              p_hover_scale: string
-              p_security_settings?: Json
-              p_theme_mode?: string
-            }
-            Returns: {
-              accent_color: string | null
-              backdrop_blur: string | null
-              border_radius: string | null
-              box_shadow: string | null
-              created_at: string | null
-              favicon_url: string | null
-              font_family_body: string | null
-              font_family_heading: string | null
-              font_size_base: string | null
-              font_weight_bold: string | null
-              font_weight_normal: string | null
-              hover_scale: string | null
-              id: string
-              letter_spacing: string | null
-              line_height_base: string | null
-              logo_url: string | null
-              metadata: Json | null
-              neon_cyan: string | null
-              neon_pink: string | null
-              neon_purple: string | null
-              primary_color: string | null
-              secondary_color: string | null
-              security_settings: Json | null
-              setting_key: string
-              setting_type: string | null
-              setting_value: string | null
-              shadow_color: string | null
-              site_title: string | null
-              spacing_unit: string | null
-              tagline: string | null
-              text_heading_color: string | null
-              text_link_color: string | null
-              text_primary_color: string | null
-              text_secondary_color: string | null
-              theme_mode: string | null
-              transition_duration: string | null
-              transition_type: string | null
-              updated_at: string | null
-              updated_by: string | null
-            }[]
-          }
-        | {
-            Args: {
-              p_site_title: string
-              p_tagline: string
-              p_primary_color: string
-              p_secondary_color: string
-              p_accent_color: string
-              p_text_primary_color: string
-              p_text_secondary_color: string
-              p_text_link_color: string
-              p_text_heading_color: string
-              p_neon_cyan: string
-              p_neon_pink: string
-              p_neon_purple: string
-              p_border_radius: string
-              p_spacing_unit: string
-              p_transition_duration: string
-              p_shadow_color: string
-              p_hover_scale: string
-              p_font_family_heading: string
-              p_font_family_body: string
-              p_font_size_base: string
-              p_font_weight_normal: string
-              p_font_weight_bold: string
-              p_line_height_base: string
-              p_letter_spacing: string
-            }
-            Returns: {
-              accent_color: string | null
-              animations_enabled: boolean | null
-              backdrop_blur: string | null
-              border_radius: string | null
-              box_shadow: string | null
-              component_type:
-                | Database["public"]["Enums"]["theme_component_type"]
-                | null
-              default_animation_duration: number | null
-              font_family_body: string
-              font_family_heading: string
-              font_size_base: string
-              font_weight_bold: string
-              font_weight_normal: string
-              hover_scale: string | null
-              id: string
-              inheritance_strategy:
-                | Database["public"]["Enums"]["theme_inheritance_strategy"]
-                | null
-              inherited_settings: Json | null
-              last_sync: string | null
-              letter_spacing: string
-              line_height_base: string
-              neon_cyan: string | null
-              neon_pink: string | null
-              neon_purple: string | null
-              parent_theme_id: string | null
-              preview_preferences: Json | null
-              primary_color: string | null
-              real_time_toggle: boolean | null
-              secondary_color: string | null
-              shadow_color: string | null
-              spacing_unit: string | null
-              state_version: number | null
-              text_heading_color: string | null
-              text_link_color: string | null
-              text_primary_color: string | null
-              text_secondary_color: string | null
-              theme_mode: Database["public"]["Enums"]["theme_mode"] | null
-              theme_preferences: Json | null
-              transition_duration: string | null
-              transition_type: string | null
-              updated_at: string | null
-              updated_by: string | null
-            }[]
-          }
       verify_2fa_code: {
         Args: {
           p_code: string
