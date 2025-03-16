@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSetup } from '@/hooks/useAuthSetup';
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
 import { useAuthStore } from '@/lib/store/auth-store';
+import { ensureUserProfilesExist } from "@/utils/auth/profileUtils";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
@@ -65,6 +65,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           console.log('Initial session check:', session?.user?.id || 'No session');
           await handleAuthChange(session);
+          
+          // Check and update user profiles if needed (admin function)
+          if (session?.user?.id) {
+            const { data: userRole } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (userRole?.role === 'admin') {
+              // Only admins should run this profile management task
+              ensureUserProfilesExist();
+            }
+          }
+        }
+
+        // Import and run the seed function if needed
+        try {
+          const { seedDemoProjects } = await import('../../scripts/seed-demo-data');
+          await seedDemoProjects();
+        } catch (error) {
+          console.error("Error during demo data setup:", error);
         }
       } catch (error) {
         console.error("Auth setup error:", error);

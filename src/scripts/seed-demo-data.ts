@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 
@@ -148,12 +147,19 @@ export const seedDemoProjects = async () => {
       return false;
     }
     
-    // Insert demo data
+    // Get current user ID if available
+    let userId = null;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      userId = user.id;
+    }
+    
+    // Insert demo data with proper user ID or null if not available
     const { error } = await supabase
       .from('printer_builds')
       .insert(demoPrinterBuilds.map(build => ({
         ...build,
-        user_id: 'system' // This would be replaced with a real user ID in production
+        user_id: userId // Use actual user ID or null
       })));
     
     if (error) {
