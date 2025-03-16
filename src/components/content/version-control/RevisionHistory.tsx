@@ -42,17 +42,33 @@ function isValidProfile(profile: any): profile is Profile {
 }
 
 // Transform response data safely
-function transformRevision(item: RevisionResponse): Revision {
-  return {
-    id: item.id,
-    content: item.content,
-    created_at: item.created_at,
-    created_by: isValidProfile(item.created_by) 
+function transformRevision(item: any): Revision {
+  // Check if created_by is an array (which happens with some Supabase responses)
+  let createdBy = null;
+  
+  if (Array.isArray(item.created_by) && item.created_by.length > 0) {
+    // If it's an array, take the first profile
+    createdBy = isValidProfile(item.created_by[0]) 
+      ? {
+          display_name: item.created_by[0].display_name || 'Unknown',
+          avatar_url: item.created_by[0].avatar_url,
+        }
+      : null;
+  } else {
+    // Handle the case where it's a single object
+    createdBy = isValidProfile(item.created_by) 
       ? {
           display_name: item.created_by.display_name || 'Unknown',
           avatar_url: item.created_by.avatar_url,
         }
-      : null,
+      : null;
+  }
+  
+  return {
+    id: item.id,
+    content: item.content,
+    created_at: item.created_at,
+    created_by: createdBy,
   };
 }
 
@@ -97,7 +113,7 @@ export const RevisionHistory: React.FC<RevisionHistoryProps> = ({
         }
 
         // Safely transform each revision with proper type checking
-        return data.map(item => transformRevision(item as RevisionResponse));
+        return data.map(item => transformRevision(item));
       } catch (error) {
         console.error("Error in revision history query:", error);
         toast.error("Failed to load revision history");
