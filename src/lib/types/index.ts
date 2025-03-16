@@ -1,64 +1,72 @@
-// Core types and enums
-export type { 
-  ContentStatus,
-  ContentType,
+// Core types - explicitly import and re-export to avoid ambiguity
+import type {
+  Json,
+  JsonObject,
   ThemeMode,
   GlassEffectLevel,
   TransitionType,
   UserRole,
-  WorkflowStageType
-} from './core/enums';
-
-export type { Json } from './core/json';
-
-// Content types
-export type {
+  ContentStatus,
+  ContentType,
+  WorkflowStageType,
+  BaseEntity,
   BaseContent,
-  ContentCreate,
-  ContentUpdate,
-  ContentRevision,
-  ContentRelationship,
-  PostWithAuthor
-} from './content/types';
+  BaseWorkflow
+} from './core';
 
-// Theme types - resolve ambiguity
+// Re-export core types
+export type {
+  Json,
+  JsonObject,
+  ThemeMode,
+  GlassEffectLevel,
+  TransitionType,
+  UserRole,
+  ContentStatus,
+  ContentType,
+  WorkflowStageType,
+  BaseEntity,
+  BaseContent,
+  BaseWorkflow
+};
+
+// Re-export core utilities
+export {
+  toJson,
+  isJson,
+  isJsonObject,
+  isValidThemeMode,
+  isValidGlassEffectLevel,
+  isValidTransitionType,
+  isValidUserRole,
+  isValidContentStatus,
+  isValidContentType,
+  isValidWorkflowStageType
+} from './core';
+
+// Extended types that build on core types
+export type { AuthSession } from './auth/types';
+export type { 
+  ContentCreate, 
+  ContentUpdate, 
+  ContentRevision, 
+  ContentRelationship, 
+  PostWithAuthor 
+} from './content/types';
+export type { 
+  WorkflowStage, 
+  WorkflowStageConfig, 
+  WorkflowTemplate 
+} from './workflow/types';
 export type { ThemePreferences } from './theme/core';
 export type { FlattenedSettings as ThemeSettings } from './theme/state';
 
-// Auth types
-export type { AuthSession, AuthState } from './auth/types';
-
 // Database types
-export type {
-  DatabaseTables,
-  DatabaseFunctions
-} from './database/core';
-
-// Workflow types
-export type {
-  WorkflowStage,
-  WorkflowStageConfig,
-  WorkflowTemplate
-} from './workflow/types';
-
-export type { WorkflowTemplate as WorkflowTemplateType } from './workflow/template';
-
-// Media types
-export type * from './media';
-
-// Activity types
-export type * from './activity';
+export type { DatabaseTables } from './database/core';
+export * from './database/tables';
 
 // Store types
-export type * from './store-types';
-
-// Table types
-export type * from './tables/auth';
-export type * from './tables/content';
-export type * from './tables/workflow';
+export type { ThemeState, AuthState, SettingsState } from './store-types';
 
 // Pagination types
-export type * from './pagination';
-
-// Client types
-export type * from './client';
+export * from './pagination';
