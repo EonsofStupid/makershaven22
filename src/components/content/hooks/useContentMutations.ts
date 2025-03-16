@@ -48,7 +48,7 @@ export const useContentMutations = () => {
     },
     onSuccess: (newContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
-      // Update Jotai atom state
+      // Update Jotai atom state with a new array reference
       setContentList([newContent, ...contentList]);
       setLoading(false);
       toast.success("Content created successfully");
@@ -96,7 +96,7 @@ export const useContentMutations = () => {
     },
     onSuccess: (updatedContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
-      // Update Jotai atom state
+      // Update Jotai atom state with a new array reference
       setContentList(contentList.map(item => 
         item.id === updatedContent.id ? updatedContent : item
       ));

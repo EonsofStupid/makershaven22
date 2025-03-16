@@ -3,11 +3,11 @@ import { atom } from 'jotai';
 import type { ContentCreate, ContentUpdate, BaseContent } from '@/lib/types/content/types';
 import { ContentStatus, ContentType } from '@/lib/types/core/enums';
 
-// State atoms for content management
-export const currentContentAtom = atom<BaseContent | null>(null);
+// State atoms for content management - explicitly making these writable
 export const contentListAtom = atom<BaseContent[]>([]);
-export const contentLoadingAtom = atom(false);
+export const contentLoadingAtom = atom<boolean>(false);
 export const contentErrorAtom = atom<Error | null>(null);
+export const currentContentAtom = atom<BaseContent | null>(null);
 
 // Form state atoms
 export const contentFormTitleAtom = atom('');
