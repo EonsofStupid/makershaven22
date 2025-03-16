@@ -1036,6 +1036,30 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          created_at: string | null
+          flags: Json | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          flags?: Json | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          flags?: Json | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       forum_flags: {
         Row: {
           created_at: string | null
@@ -1750,6 +1774,72 @@ export type Database = {
           metric_type?: string
           timestamp?: string | null
           value?: number
+        }
+        Relationships: []
+      }
+      printer_builds: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          build_specs: Json | null
+          created_at: string | null
+          description: string | null
+          difficulty_level:
+            | Database["public"]["Enums"]["build_difficulty"]
+            | null
+          estimated_time: unknown | null
+          id: string
+          likes_count: number | null
+          media_links: Json | null
+          parts_list: Json | null
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["build_status"] | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          views_count: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          build_specs?: Json | null
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?:
+            | Database["public"]["Enums"]["build_difficulty"]
+            | null
+          estimated_time?: unknown | null
+          id?: string
+          likes_count?: number | null
+          media_links?: Json | null
+          parts_list?: Json | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["build_status"] | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          views_count?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          build_specs?: Json | null
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?:
+            | Database["public"]["Enums"]["build_difficulty"]
+            | null
+          estimated_time?: unknown | null
+          id?: string
+          likes_count?: number | null
+          media_links?: Json | null
+          parts_list?: Json | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["build_status"] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          views_count?: number | null
         }
         Relationships: []
       }
@@ -3229,6 +3319,65 @@ export type Database = {
           },
         ]
       }
+      token_packages: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          price_usd: number
+          tokens_amount: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          price_usd: number
+          tokens_amount: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          price_usd?: number
+          tokens_amount?: number
+        }
+        Relationships: []
+      }
+      token_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          package_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          package_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          package_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_transactions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "token_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trusted_devices: {
         Row: {
           created_at: string | null
@@ -3533,6 +3682,33 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      user_tokens: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          id: string
+          last_purchase_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          id?: string
+          last_purchase_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          id?: string
+          last_purchase_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       wizard_help_content: {
         Row: {
@@ -3933,6 +4109,13 @@ export type Database = {
         | "user_action"
         | "configuration"
       audit_severity: "info" | "warn" | "error" | "critical"
+      build_difficulty: "beginner" | "intermediate" | "advanced" | "expert"
+      build_status:
+        | "draft"
+        | "pending_review"
+        | "approved"
+        | "rejected"
+        | "archived"
       component_type: "color" | "typography" | "layout" | "animation" | "effect"
       content_status: "draft" | "published" | "archived"
       content_type:

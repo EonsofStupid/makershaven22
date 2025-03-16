@@ -1,9 +1,11 @@
+
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Database, Box, Users, TrendingUp, BookOpen } from "lucide-react";
 import { HeroSection } from "./components/HeroSection";
 import { FeaturePanel } from "./components/FeaturePanel";
 import { TableView } from "./components/DatabaseVisual/TableView";
+import { seedDemoProjects } from "@/scripts/seed-demo-data";
 
 const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,6 +14,11 @@ const LandingPage = () => {
   const backgroundY = useTransform(scrollY, [0, 1000], ["0%", "50%"]);
   const textY = useTransform(scrollY, [0, 500], ["0%", "100%"]);
   const parallaxY = useTransform(scrollY, [0, 1000], ["0%", "25%"]);
+
+  // Seed demo data for demonstration purposes
+  useEffect(() => {
+    seedDemoProjects().catch(console.error);
+  }, []);
 
   return (
     <div ref={containerRef} className="min-h-screen relative overflow-hidden bg-[#1a1a1a]">

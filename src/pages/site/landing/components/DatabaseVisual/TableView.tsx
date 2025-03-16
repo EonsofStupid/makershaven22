@@ -1,38 +1,25 @@
+
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { supabase, withRetry } from "@/integrations/supabase/client";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useEffect } from "react";
 import { Database, Filter, Search, SortAsc } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/shared/ui/loading/LoadingStates";
 import { toast } from "sonner";
+import { usePrinterBuildsStore, formatBuildsForTable } from "@/lib/store/printer-builds-store";
 
 export const TableView = () => {
-  const { data: projects, isLoading, error } = useQuery({
-    queryKey: ['maker-projects'],
-    queryFn: async () => {
-      return withRetry(async () => {
-        console.log('Fetching maker projects...');
-        const { data, error } = await supabase
-          .from('maker_projects')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
-        
-        if (error) {
-          console.error('Error fetching projects:', error);
-          throw error;
-        }
+  const { 
+    isLoading, 
+    error, 
+    builds,
+    fetchBuilds
+  } = usePrinterBuildsStore();
 
-        console.log('Successfully fetched projects:', data);
-        return data;
-      });
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    meta: {
-      errorMessage: 'Failed to load projects'
-    }
-  });
+  useEffect(() => {
+    fetchBuilds(5);
+  }, [fetchBuilds]);
+
+  const formattedProjects = formatBuildsForTable(builds);
 
   if (error) {
     toast.error('Failed to load projects', {
@@ -81,7 +68,7 @@ export const TableView = () => {
                 ))}
               </>
             ) : (
-              projects?.map((project) => (
+              formattedProjects.map((project) => (
                 <TableRow 
                   key={project.id}
                   className="border-white/10 hover:bg-white/5 cursor-pointer transition-colors"
@@ -90,15 +77,15 @@ export const TableView = () => {
                   <TableCell className="text-white/80">{project.category}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      project.difficulty_level === 'Beginner' ? 'bg-green-500/20 text-green-300' :
-                      project.difficulty_level === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-300' :
+                      project.difficulty_level === 'beginner' ? 'bg-green-500/20 text-green-300' :
+                      project.difficulty_level === 'intermediate' ? 'bg-yellow-500/20 text-yellow-300' :
                       'bg-red-500/20 text-red-300'
                     }`}>
-                      {project.difficulty_level}
+                      {project.difficulty_level.charAt(0).toUpperCase() + project.difficulty_level.slice(1)}
                     </span>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-white/80">{project.estimated_time}</TableCell>
-                  <TableCell className="hidden md:table-cell text-white/80">{project.parts_count}</TableCell>
+                  <TableCell className="hidden md:table-cell text-white/80">{project.estimated_time || 'N/A'}</TableCell>
+                  <TableCell className="hidden md:table-cell text-white/80">{project.parts_count || 0}</TableCell>
                 </TableRow>
               ))
             )}
