@@ -1,3 +1,6 @@
+/**
+ * Core JSON types and utilities
+ */
 
 /**
  * Type representing any JSON value: object, array, string, number, boolean, or null
@@ -16,11 +19,9 @@ export type Json =
 export type JsonObject = { [key: string]: Json };
 
 /**
- * Safely converts any value to a JSON-compatible format
+ * Type representing a JSON array
  */
-export function toJson(value: unknown): Json {
-  return JSON.parse(JSON.stringify(value));
-}
+export type JsonArray = Json[];
 
 /**
  * Type guard to check if a value is a valid JSON value
@@ -39,6 +40,20 @@ export function isJson(value: unknown): value is Json {
  */
 export function isJsonObject(value: unknown): value is JsonObject {
   return isJson(value) && typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Type guard to check if a value is a valid JSON array
+ */
+export function isJsonArray(value: unknown): value is JsonArray {
+  return isJson(value) && Array.isArray(value);
+}
+
+/**
+ * Safely converts any value to a JSON-compatible format
+ */
+export function toJson(value: unknown): Json {
+  return JSON.parse(JSON.stringify(value));
 }
 
 /**

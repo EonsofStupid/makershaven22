@@ -1,3 +1,6 @@
+/**
+ * Core enum types for the application
+ */
 
 /**
  * Theme mode options
@@ -44,33 +47,74 @@ export type ContentType =
 export type WorkflowStageType = 'APPROVAL' | 'TASK' | 'REVIEW' | 'NOTIFICATION';
 
 /**
- * Type guard to check if a value is a valid ThemeMode
+ * Security event severity levels
  */
+export type SecurityEventSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+/**
+ * Security event categories
+ */
+export type SecurityEventCategory = 
+  | 'authentication'
+  | 'authorization'
+  | 'data_access'
+  | 'system'
+  | 'user_management';
+
+/**
+ * Settings scope types
+ */
+export type SettingsScope = 'global' | 'user' | 'theme' | 'security';
+
+/**
+ * Type guards for core enums
+ */
+
 export function isValidThemeMode(value: unknown): value is ThemeMode {
-  return typeof value === 'string' && 
-         ['light', 'dark', 'system'].includes(value as string);
+  return typeof value === 'string' && ['light', 'dark', 'system'].includes(value);
 }
 
-/**
- * Type guard to check if a value is a valid GlassEffectLevel
- */
 export function isValidGlassEffectLevel(value: unknown): value is GlassEffectLevel {
-  return typeof value === 'string' && 
-         ['none', 'low', 'medium', 'high'].includes(value as string);
+  return typeof value === 'string' && ['none', 'low', 'medium', 'high'].includes(value);
 }
 
-/**
- * Type guard to check if a value is a valid TransitionType
- */
 export function isValidTransitionType(value: unknown): value is TransitionType {
-  return typeof value === 'string' && 
-         ['fade', 'slide', 'scale', 'blur'].includes(value as string);
+  return typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value);
 }
 
-/**
- * Type guard to check if a value is a valid UserRole
- */
 export function isValidUserRole(value: unknown): value is UserRole {
   return typeof value === 'string' && 
-         ['subscriber', 'maker', 'admin', 'super_admin', 'moderator'].includes(value as string);
+         ['subscriber', 'maker', 'admin', 'super_admin', 'moderator'].includes(value);
+}
+
+export function isValidContentStatus(value: unknown): value is ContentStatus {
+  return typeof value === 'string' && ['draft', 'published', 'archived'].includes(value);
+}
+
+export function isValidContentType(value: unknown): value is ContentType {
+  const validTypes = [
+    'template', 'page', 'build', 'guide', 'part', 
+    'component', 'workflow', 'hero', 'feature'
+  ];
+  return typeof value === 'string' && validTypes.includes(value);
+}
+
+export function isValidWorkflowStageType(value: unknown): value is WorkflowStageType {
+  return typeof value === 'string' && 
+         ['APPROVAL', 'TASK', 'REVIEW', 'NOTIFICATION'].includes(value);
+}
+
+export function isValidSecurityEventSeverity(value: unknown): value is SecurityEventSeverity {
+  return typeof value === 'string' && 
+         ['low', 'medium', 'high', 'critical'].includes(value);
+}
+
+export function isValidSecurityEventCategory(value: unknown): value is SecurityEventCategory {
+  return typeof value === 'string' && 
+         ['authentication', 'authorization', 'data_access', 'system', 'user_management'].includes(value);
+}
+
+export function isValidSettingsScope(value: unknown): value is SettingsScope {
+  return typeof value === 'string' && 
+         ['global', 'user', 'theme', 'security'].includes(value);
 }

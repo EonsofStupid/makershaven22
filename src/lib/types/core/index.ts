@@ -1,4 +1,49 @@
 /**
+ * Core types index file
+ * Re-exports all core types, interfaces, and utilities
+ */
+
+// Re-export all module contents
+export * from './json';
+export * from './entity';
+export * from './enums';
+
+// Import types for combined types
+import type { JsonObject } from './json';
+import type { 
+  BaseEntity,
+  ContentEntity,
+  SettingsEntity,
+  AuditEntity 
+} from './entity';
+import type {
+  ContentStatus,
+  ContentType,
+  SettingsScope,
+  SecurityEventSeverity,
+  SecurityEventCategory
+} from './enums';
+
+// Define commonly used combinations
+export type CoreEntity = BaseEntity & {
+  metadata?: JsonObject;
+};
+
+export type CoreContent = ContentEntity & {
+  status: ContentStatus;
+  type: ContentType;
+};
+
+export type CoreSettings = SettingsEntity & {
+  scope: SettingsScope;
+};
+
+export type CoreAudit = AuditEntity & {
+  severity?: SecurityEventSeverity;
+  category?: SecurityEventCategory;
+};
+
+/**
  * Core JSON types and utilities
  */
 export type Json = 
@@ -8,8 +53,6 @@ export type Json =
   | null
   | { [key: string]: Json }
   | Json[];
-
-export type JsonObject = { [key: string]: Json };
 
 export function toJson(value: unknown): Json {
   return JSON.parse(JSON.stringify(value));
@@ -35,17 +78,6 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export type GlassEffectLevel = 'none' | 'low' | 'medium' | 'high';
 export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
-export type ContentStatus = 'draft' | 'published' | 'archived';
-export type ContentType = 
-  | 'template' 
-  | 'page' 
-  | 'build' 
-  | 'guide' 
-  | 'part' 
-  | 'component'
-  | 'workflow'
-  | 'hero'
-  | 'feature';
 export type WorkflowStageType = 'APPROVAL' | 'TASK' | 'REVIEW' | 'NOTIFICATION';
 
 /**
