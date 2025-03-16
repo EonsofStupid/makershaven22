@@ -10,9 +10,9 @@ import { contentListAtom, contentLoadingAtom, contentErrorAtom } from "@/lib/sto
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
-  const [, setContentList] = useAtom(contentListAtom);
-  const [, setLoading] = useAtom(contentLoadingAtom);
-  const [, setError] = useAtom(contentErrorAtom);
+  const [contentList, setContentList] = useAtom(contentListAtom);
+  const [isLoading, setLoading] = useAtom(contentLoadingAtom);
+  const [error, setError] = useAtom(contentErrorAtom);
 
   const createContent = useMutation({
     mutationFn: async (contentData: ContentCreate) => {
@@ -49,13 +49,13 @@ export const useContentMutations = () => {
     onSuccess: (newContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
       // Update Jotai atom state
-      setContentList(prevList => [newContent, ...prevList]);
+      setContentList([newContent, ...contentList]);
       setLoading(false);
       toast.success("Content created successfully");
     },
     onError: (error) => {
       console.error("Error in content creation:", error);
-      setError(error);
+      setError(error as Error);
       setLoading(false);
       toast.error(error instanceof Error ? error.message : "Failed to create content");
     },
@@ -97,15 +97,15 @@ export const useContentMutations = () => {
     onSuccess: (updatedContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
       // Update Jotai atom state
-      setContentList(prevList => 
-        prevList.map(item => item.id === updatedContent.id ? updatedContent : item)
-      );
+      setContentList(contentList.map(item => 
+        item.id === updatedContent.id ? updatedContent : item
+      ));
       setLoading(false);
       toast.success("Content updated successfully");
     },
     onError: (error) => {
       console.error("Error in content update:", error);
-      setError(error);
+      setError(error as Error);
       setLoading(false);
       toast.error(error instanceof Error ? error.message : "Failed to update content");
     },
