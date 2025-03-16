@@ -120,6 +120,36 @@ export const validateContentUpdate = (data: ContentUpdate) => {
 };
 
 /**
+ * Type guard to check if an object conforms to ContentUpdate
+ * @param obj The object to check
+ * @returns boolean indicating if the object is a valid ContentUpdate
+ */
+function isContentUpdate(obj: JsonObject): obj is ContentUpdate {
+  return (
+    'id' in obj && 
+    typeof obj.id === 'string' && 
+    'updated_by' in obj && 
+    typeof obj.updated_by === 'string'
+  );
+}
+
+/**
+ * Type guard to check if an object has the minimum required fields for ContentCreate
+ * @param obj The object to check
+ * @returns boolean indicating if the object has the required fields for ContentCreate
+ */
+function hasCreateContentRequiredFields(obj: JsonObject): boolean {
+  return (
+    'type' in obj && 
+    typeof obj.type === 'string' && 
+    'title' in obj && 
+    typeof obj.title === 'string' &&
+    'created_by' in obj && 
+    typeof obj.created_by === 'string'
+  );
+}
+
+/**
  * General validation function that chooses the appropriate validator based on operation type
  * @param type ContentType to validate against
  * @param data Content data to validate
@@ -134,14 +164,22 @@ export const validateContent = (type: ContentType, data: any) => {
     };
   }
 
-  // Check if it's a content update (has id and updated_by)
-  if (data.id && data.updated_by) {
-    // Fix: Explicitly type cast to ContentUpdate after confirming required properties exist
-    return validateContentUpdate(data as ContentUpdate);
+  // Use type guard to properly check if data is a ContentUpdate
+  if (isContentUpdate(data)) {
+    return validateContentUpdate(data);
   }
   
-  // Otherwise treat as content creation
-  return validateContentCreate({...data, type} as ContentCreate);
+  // Check if data has the required fields for content creation
+  if (hasCreateContentRequiredFields(data)) {
+    // It's a create operation, ensure the type is set
+    return validateContentCreate({...data, type} as ContentCreate);
+  }
+  
+  // Neither update nor create conditions are met
+  return {
+    success: false,
+    errors: [{ message: 'Invalid content data: missing required fields' }]
+  };
 };
 
 /**
