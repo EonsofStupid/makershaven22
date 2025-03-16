@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { RootLayout } from "@/components/layouts/RootLayout";
 import { AppRoutes } from "@/routes";
 import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
+import { PublicErrorBoundary } from "@/components/shared/error-handling/PublicErrorBoundary";
 import { ThemeProvider } from "@/components/theme/ThemeContext";
 import { QueryProvider } from "@/components/auth/providers/QueryProvider";
 import { AuthProvider } from "@/components/auth/providers/AuthProvider";
@@ -14,7 +15,7 @@ import { StoreProvider } from "@/lib/store/providers/StoreProvider";
 
 const App = () => {
   return (
-    <ErrorBoundary>
+    <PublicErrorBoundary>
       <QueryProvider>
         <BrowserRouter>
           <StoreProvider>
@@ -25,7 +26,9 @@ const App = () => {
                     <AdminSidebarProvider>
                       <KeyboardNavigationProvider>
                         <RootLayout>
-                          <AppRoutes />
+                          <ErrorBoundary>
+                            <AppRoutes />
+                          </ErrorBoundary>
                         </RootLayout>
                       </KeyboardNavigationProvider>
                     </AdminSidebarProvider>
@@ -36,7 +39,7 @@ const App = () => {
           </StoreProvider>
         </BrowserRouter>
       </QueryProvider>
-    </ErrorBoundary>
+    </PublicErrorBoundary>
   );
 };
 

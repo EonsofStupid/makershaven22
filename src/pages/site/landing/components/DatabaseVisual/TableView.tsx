@@ -1,13 +1,16 @@
 
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { Database, Filter, Search, SortAsc } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Database, Filter, Search, SortAsc, UserPlus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/shared/ui/loading/LoadingStates";
 import { toast } from "sonner";
 import { usePrinterBuildsStore, formatBuildsForDisplay } from "@/lib/store/printer-builds-store";
 import { tableViewLimitAtom } from "@/lib/store/atoms/ui-atoms";
 import { useAtom } from "jotai";
+import { useAuthStore } from "@/lib/store/auth-store";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const TableView = () => {
   const { 
@@ -18,14 +21,32 @@ export const TableView = () => {
   } = usePrinterBuildsStore();
   
   const [limit] = useAtom(tableViewLimitAtom);
+  const { getIsAuthenticated } = useAuthStore();
+  const isAuthenticated = getIsAuthenticated();
+  const navigate = useNavigate();
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    fetchBuilds({ limit });
+    const loadBuilds = async () => {
+      try {
+        await fetchBuilds({ limit, status: 'approved' });
+        setIsError(false);
+      } catch (err) {
+        console.error('Error loading builds:', err);
+        setIsError(true);
+        toast.error('Failed to load projects', {
+          description: 'Please try again later'
+        });
+      }
+    };
+    
+    loadBuilds();
   }, [fetchBuilds, limit]);
 
   const formattedProjects = formatBuildsForDisplay(builds);
 
-  if (error) {
+  if (error && !isError) {
+    setIsError(true);
     toast.error('Failed to load projects', {
       description: 'Please try again later'
     });
@@ -71,11 +92,12 @@ export const TableView = () => {
                   </TableRow>
                 ))}
               </>
-            ) : (
+            ) : formattedProjects.length > 0 ? (
               formattedProjects.map((project) => (
                 <TableRow 
                   key={project.id}
                   className="border-white/10 hover:bg-white/5 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/maker-space/builds/${project.id}`)}
                 >
                   <TableCell className="font-medium text-white">{project.title}</TableCell>
                   <TableCell className="text-white/80">{project.category}</TableCell>
@@ -93,10 +115,40 @@ export const TableView = () => {
                   <TableCell className="hidden md:table-cell text-white/80">{project.parts_count || 0}</TableCell>
                 </TableRow>
               ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <p className="text-white/70">No projects found</p>
+                  </div>
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+      
+      {!isAuthenticated && (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 p-4 rounded-lg border border-[#ff0abe]/20 bg-[#ff0abe]/10 backdrop-blur-sm"
+        >
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <UserPlus className="w-5 h-5 text-[#ff0abe]" />
+              <p className="text-white">Sign up to submit your own printer builds and view more details!</p>
+            </div>
+            <Button 
+              onClick={() => navigate('/auth/register')}
+              className="bg-[#ff0abe] hover:bg-[#ff0abe]/80 text-white"
+            >
+              Sign Up
+            </Button>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

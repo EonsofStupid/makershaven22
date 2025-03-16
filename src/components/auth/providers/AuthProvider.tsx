@@ -8,10 +8,11 @@ import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
 import { useAuthStore } from '@/lib/store/auth-store';
 import { ensureUserProfilesExist } from "@/utils/auth/profileUtils";
+import { toast } from 'sonner';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
-  const { isLoading, initialize } = useAuthStore();
+  const { isLoading, initialize, getIsAdmin } = useAuthStore();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
@@ -68,13 +69,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           // Check and update user profiles if needed (admin function)
           if (session?.user?.id) {
-            const { data: userRole } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', session.user.id)
-              .single();
+            // Use the user's role from the auth store
+            const isAdmin = getIsAdmin();
               
-            if (userRole?.role === 'admin') {
+            if (isAdmin) {
               // Only admins should run this profile management task
               await ensureUserProfilesExist();
             }
@@ -87,9 +85,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           await seedDemoProjects();
         } catch (error) {
           console.error("Error during demo data setup:", error);
+          // Non-blocking, continue anyway
         }
       } catch (error) {
         console.error("Auth setup error:", error);
+        toast.error("Error initializing auth", {
+          description: "There was a problem setting up authentication. Some features may be limited."
+        });
         // Continue anyway - non-blocking
       }
     };
@@ -115,7 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       sessionManager.destroy();
       securityManager.cleanup();
     };
-  }, [handleAuthChange, initialize]);
+  }, [handleAuthChange, initialize, getIsAdmin]);
 
   return (
     <motion.div

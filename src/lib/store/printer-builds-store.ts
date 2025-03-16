@@ -2,161 +2,204 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { PrinterBuild, ProjectDisplay, PrinterBuildsQueryParams } from '@/lib/types/content/printer-types';
 
+// Define types for our printer builds
+export interface PrinterBuild {
+  id: string;
+  title: string;
+  description?: string;
+  status: string;
+  difficulty_level: string;
+  user_id: string;
+  estimated_time?: string;
+  likes_count?: number;
+  views_count?: number;
+  build_specs?: {
+    category?: string;
+    buildVolume?: {
+      x: number;
+      y: number;
+      z: number;
+    };
+    features?: string[];
+  };
+  parts_list?: any[];
+  media_links?: {
+    gallery?: string[];
+    videos?: string[];
+    main_image?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Define props for fetching builds
+interface FetchBuildsProps {
+  limit?: number;
+  page?: number;
+  status?: string;
+  category?: string;
+  difficulty?: string;
+  searchTerm?: string;
+}
+
+// Define our store state
 interface PrinterBuildsState {
-  // Build state
   builds: PrinterBuild[];
+  filteredBuilds: PrinterBuild[];
   currentBuild: PrinterBuild | null;
-  featuredBuilds: PrinterBuild[];
   isLoading: boolean;
   error: Error | null;
-  
-  // Filtering state
-  filterDifficulty: string | null;
-  filterCategory: string | null;
-  searchQuery: string;
+  totalCount: number;
+  hasMore: boolean;
+  currentPage: number;
   
   // Actions
-  fetchBuilds: (params?: PrinterBuildsQueryParams) => Promise<void>;
-  fetchFeaturedBuilds: () => Promise<void>;
-  fetchBuildById: (id: string) => Promise<PrinterBuild | null>;
-  
-  // Filter actions
-  setFilterDifficulty: (difficulty: string | null) => void;
-  setFilterCategory: (category: string | null) => void;
-  setSearchQuery: (query: string) => void;
-  clearFilters: () => void;
+  fetchBuilds: (props?: FetchBuildsProps) => Promise<void>;
+  getBuildById: (id: string) => Promise<PrinterBuild | null>;
+  filterBuilds: (filters: Partial<FetchBuildsProps>) => void;
+  setCurrentBuild: (build: PrinterBuild | null) => void;
+  clearError: () => void;
 }
 
 export const usePrinterBuildsStore = create<PrinterBuildsState>((set, get) => ({
-  // Initial state
   builds: [],
+  filteredBuilds: [],
   currentBuild: null,
-  featuredBuilds: [],
   isLoading: false,
   error: null,
+  totalCount: 0,
+  hasMore: false,
+  currentPage: 1,
   
-  filterDifficulty: null,
-  filterCategory: null,
-  searchQuery: '',
-  
-  // Fetch all builds with basic filtering
-  fetchBuilds: async (params = { limit: 10 }) => {
+  fetchBuilds: async (props = {}) => {
+    const { limit = 10, page = 1, status = 'approved', category, difficulty, searchTerm } = props;
+    
     set({ isLoading: true, error: null });
     
     try {
-      const { filterDifficulty, filterCategory, searchQuery } = get();
+      console.log('Fetching printer builds with params:', props);
       
+      // Start building our query
       let query = supabase
         .from('printer_builds')
-        .select('*')
-        .eq('status', params.status || 'approved')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' });
       
-      if (filterDifficulty || params.difficulty) {
-        query = query.eq('difficulty_level', filterDifficulty || params.difficulty);
+      // Apply status filter - always filter by approved for public access
+      query = query.eq('status', status);
+      
+      // Apply optional filters
+      if (category) {
+        query = query.contains('build_specs', { category: category });
       }
       
-      if ((filterCategory || params.category) && (filterCategory !== 'All' || params.category !== 'All')) {
-        const category = filterCategory || params.category;
-        if (category) {
-          query = query.ilike('build_specs->category', `%${category}%`);
-        }
+      if (difficulty) {
+        query = query.eq('difficulty_level', difficulty);
       }
       
-      if (searchQuery || params.search) {
-        const search = searchQuery || params.search;
-        if (search) {
-          query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-        }
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
       }
       
-      if (params.limit) {
-        query = query.limit(params.limit);
-      }
+      // Apply pagination
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
       
-      const { data, error } = await query;
+      // Execute the query
+      const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
       
       if (error) throw error;
       
-      set({ builds: data as PrinterBuild[], isLoading: false });
+      // Handle the results
+      const totalCount = count || 0;
+      const hasMore = totalCount > from + data.length;
+      
+      set({
+        builds: data as PrinterBuild[],
+        filteredBuilds: data as PrinterBuild[],
+        totalCount,
+        hasMore,
+        currentPage: page,
+        isLoading: false
+      });
+      
+      console.log(`Fetched ${data.length} printer builds. Total count: ${totalCount}`);
     } catch (error) {
       console.error('Error fetching printer builds:', error);
       set({ error: error as Error, isLoading: false });
-      toast.error('Failed to load builds', {
-        description: 'Please try again later'
+      toast.error('Failed to load printer builds', {
+        description: 'There was a problem fetching printer builds. Please try again.'
       });
     }
   },
   
-  // Fetch featured builds
-  fetchFeaturedBuilds: async () => {
-    set({ isLoading: true, error: null });
-    
-    try {
-      const { data, error } = await supabase
-        .from('printer_builds')
-        .select('*')
-        .eq('status', 'approved')
-        .order('views_count', { ascending: false })
-        .limit(5);
-      
-      if (error) throw error;
-      
-      set({ featuredBuilds: data as PrinterBuild[], isLoading: false });
-    } catch (error) {
-      console.error('Error fetching featured builds:', error);
-      set({ error: error as Error, isLoading: false });
-    }
-  },
-  
-  // Fetch a single build by ID
-  fetchBuildById: async (id: string) => {
-    set({ isLoading: true, error: null });
-    
+  getBuildById: async (id: string) => {
     try {
       const { data, error } = await supabase
         .from('printer_builds')
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .single();
       
       if (error) throw error;
       
-      set({ currentBuild: data as PrinterBuild, isLoading: false });
-      return data as PrinterBuild;
+      if (data) {
+        set({ currentBuild: data as PrinterBuild });
+        return data as PrinterBuild;
+      }
+      
+      return null;
     } catch (error) {
-      console.error('Error fetching build details:', error);
-      set({ error: error as Error, isLoading: false });
-      toast.error('Failed to load build details');
+      console.error('Error fetching printer build by ID:', error);
+      set({ error: error as Error });
+      toast.error('Failed to load printer build', {
+        description: 'The requested build could not be loaded.'
+      });
       return null;
     }
   },
   
-  // Filter actions
-  setFilterDifficulty: (difficulty) => set({ filterDifficulty: difficulty }),
-  setFilterCategory: (category) => set({ filterCategory: category }),
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  clearFilters: () => set({ 
-    filterDifficulty: null, 
-    filterCategory: null,
-    searchQuery: '' 
-  }),
+  filterBuilds: (filters) => {
+    const { builds } = get();
+    let filtered = [...builds];
+    
+    // Apply filters based on the provided criteria
+    if (filters.category) {
+      filtered = filtered.filter(build => 
+        build.build_specs?.category === filters.category
+      );
+    }
+    
+    if (filters.difficulty) {
+      filtered = filtered.filter(build =>
+        build.difficulty_level === filters.difficulty
+      );
+    }
+    
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(build =>
+        build.title.toLowerCase().includes(searchLower) ||
+        (build.description?.toLowerCase().includes(searchLower) || false)
+      );
+    }
+    
+    set({ filteredBuilds: filtered });
+  },
+  
+  setCurrentBuild: (build) => set({ currentBuild: build }),
+  
+  clearError: () => set({ error: null })
 }));
 
-// Helper function to prepare data for the landing page table
-export const formatBuildsForDisplay = (builds: PrinterBuild[]): ProjectDisplay[] => {
+// Helper function to format build data for display
+export const formatBuildsForDisplay = (builds: PrinterBuild[]) => {
   return builds.map(build => ({
-    id: build.id,
-    title: build.title,
-    category: build.build_specs?.category || 'General',
-    difficulty_level: build.difficulty_level,
-    estimated_time: build.estimated_time,
-    parts_count: Array.isArray(build.parts_list) ? build.parts_list.length : 
-                (build.parts_list && typeof build.parts_list === 'object' ? 
-                Object.keys(build.parts_list).length : 0),
-    likes_count: build.likes_count,
-    views_count: build.views_count
+    ...build,
+    category: build.build_specs?.category || 'Uncategorized',
+    parts_count: build.parts_list?.length || 0,
+    // Format any other fields as needed for display
   }));
 };
