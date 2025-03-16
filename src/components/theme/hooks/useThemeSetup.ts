@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
-import { toast } from "sonner";
 import { DatabaseSettingsRow } from "../types/theme";
 import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
+import { toast } from "@/lib/toast";
 
 export const useThemeSetup = () => {
   const [theme, setTheme] = useState<FlattenedSettings>({ ...DEFAULT_SETTINGS });
@@ -26,6 +26,9 @@ export const useThemeSetup = () => {
 
         if (error) {
           console.warn("Error fetching theme:", error.message);
+          toast.error("Could not load theme settings", {
+            description: "Using default theme instead"
+          });
           // Continue with default theme
           setIsLoading(false);
           return;
@@ -45,6 +48,9 @@ export const useThemeSetup = () => {
         applyThemeToDocument(themeData);
       } catch (error) {
         console.error("Error in theme setup:", error);
+        toast.error("Theme setup error", {
+          description: "An unexpected error occurred when loading theme"
+        });
         // Still using the default theme applied earlier
       } finally {
         setIsLoading(false);

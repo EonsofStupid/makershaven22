@@ -3,7 +3,7 @@ import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/store/auth-store';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export const useAuthSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +46,9 @@ export const useAuthSetup = () => {
     } catch (error) {
       console.error('Error in handleAuthChange:', error);
       setError(error as Error);
-      toast.error('Authentication error');
+      toast.error('Authentication error', {
+        description: 'There was a problem with your authentication session'
+      });
     } finally {
       setLoading(false);
       setIsLoading(false);

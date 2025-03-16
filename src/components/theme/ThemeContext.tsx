@@ -5,9 +5,9 @@ import { useThemeSetup } from "./hooks/useThemeSetup";
 import { useThemeSubscription } from "./hooks/useThemeSubscription";
 import { applyThemeToDocument } from "./utils/themeUtils";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { useAuthStore } from '@/lib/store/auth-store';
 import { LoadingState } from "@/components/common/LoadingState";
+import { toast } from "@/lib/toast";
 
 interface ThemeContextType {
   theme: FlattenedSettings;
@@ -41,6 +41,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (error) {
           console.warn("Error fetching theme:", error.message);
+          toast.error("Could not load theme settings", {
+            description: "Using default theme instead"
+          });
           // Continue with default theme
           return;
         }
@@ -58,6 +61,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error("Theme loading error:", error);
+        toast.error("Theme loading error", {
+          description: "An unexpected error occurred when loading theme"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -71,6 +77,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateTheme = async (newTheme: FlattenedSettings) => {
     try {
+      const loadingToastId = toast.loading("Updating theme...");
       setIsLoading(true);
       
       if (!session?.user) {
@@ -78,6 +85,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         applyThemeToDocument(newTheme);
         setTheme(newTheme);
         setIsLoading(false);
+        toast.success.fromLoading(loadingToastId, "Theme updated locally", {
+          description: "Changes won't be saved until you sign in"
+        });
         return;
       }
 
@@ -109,11 +119,13 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         p_security_settings: newTheme.security_settings || {}
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       
       setTheme(newTheme);
       applyThemeToDocument(newTheme);
-      toast.success("Theme updated successfully", {
+      toast.success.fromLoading(loadingToastId, "Theme updated successfully", {
         description: "Your changes have been saved and applied"
       });
     } catch (error) {

@@ -1,0 +1,111 @@
+
+:root {
+  /* Toast animation durations */
+  --toast-enter-duration: 0.35s;
+  --toast-exit-duration: 0.2s;
+  
+  /* Toast colors (RGB format for shadow manipulation) */
+  --neon-cyan-rgb: 65, 240, 219;
+  --neon-pink-rgb: 255, 10, 190;
+  --neon-purple-rgb: 128, 0, 255;
+  
+  /* Toast typography */
+  --toast-font-size: 0.875rem;
+  --toast-line-height: 1.4;
+  
+  /* Toast layout */
+  --toast-padding: 0.75rem 1rem;
+  --toast-spacing: 0.5rem;
+  --toast-width: 22rem;
+  --toast-min-height: 3.5rem;
+  --toast-border-radius: 0.5rem;
+}
+
+/* Toast animation keyframes */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+}
+
+/* Global toast styles */
+.sonner-toast {
+  animation-name: toastIn;
+  animation-duration: var(--toast-enter-duration);
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center top;
+}
+
+.sonner-toast[data-removed="true"] {
+  animation-name: toastOut;
+  animation-duration: var(--toast-exit-duration);
+}
+
+/* Focus styles for keyboard navigation */
+.sonner-toast:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 2px;
+}
+
+/* Additional styles for types */
+.sonner-toast[data-type="success"] {
+  box-shadow: 0 0 20px rgba(var(--neon-cyan-rgb), 0.2);
+}
+
+.sonner-toast[data-type="error"] {
+  box-shadow: 0 0 20px rgba(var(--neon-pink-rgb), 0.2);
+}
+
+.sonner-toast[data-type="info"] {
+  box-shadow: 0 0 20px rgba(var(--neon-purple-rgb), 0.2);
+}
+
+/* Custom close button */
+.sonner-toast [toast-close] {
+  opacity: 0.5;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.sonner-toast:hover [toast-close],
+.sonner-toast:focus [toast-close] {
+  opacity: 1;
+}
+
+.sonner-toast [toast-close]:focus-visible {
+  background-color: rgba(255, 255, 255, 0.1);
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 1px;
+}
+
+/* Toast content spacing */
+.sonner-toast-content {
+  gap: 0.5rem;
+}
+
+/* Toast heading */
+.sonner-toast-heading {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Toast message */
+.sonner-toast-message {
+  opacity: 0.9;
+  line-height: var(--toast-line-height);
+}
