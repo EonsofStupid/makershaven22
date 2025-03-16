@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useContentMutations } from "./useContentMutations";
 import { toast } from "sonner";
@@ -17,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { ContentType, ContentStatus } from "@/lib/types";
 
 const ContentForm: React.FC = () => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();

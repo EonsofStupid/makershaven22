@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { supabase } from '@/integrations/supabase/client';
-import type { BaseContent, ContentStatus, ContentType } from '@/integrations/supabase/types';
+import { devtools } from 'zustand/middleware';
+import { BaseContent, ContentStatus, ContentType } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 interface ContentState {

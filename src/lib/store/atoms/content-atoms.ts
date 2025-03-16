@@ -1,7 +1,5 @@
-
 import { atom } from 'jotai';
-import type { BaseContent } from '@/lib/types/content/types';
-import { ContentStatus, ContentType } from '@/lib/types/core/enums';
+import { BaseContent, ContentStatus, ContentType } from '@/lib/types';
 
 // State atoms for content management
 export const contentListAtom = atom<BaseContent[]>([]);
@@ -14,8 +12,8 @@ export const contentFormTitleAtom = atom<string>('');
 export const contentFormTypeAtom = atom<ContentType>('page');
 export const contentFormStatusAtom = atom<ContentStatus>('draft');
 export const contentFormSlugAtom = atom<string>('');
-export const contentFormContentAtom = atom<any>({});
-export const contentFormMetadataAtom = atom<any>({});
+export const contentFormContentAtom = atom<Record<string, unknown>>({});
+export const contentFormMetadataAtom = atom<Record<string, unknown>>({});
 
 // Derived atoms for form operations
 export const contentFormValidAtom = atom(
