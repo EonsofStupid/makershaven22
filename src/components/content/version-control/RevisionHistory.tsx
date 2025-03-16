@@ -55,11 +55,12 @@ export const RevisionHistory: React.FC<RevisionHistoryProps> = ({
         throw error;
       }
 
+      // Transform the data to match our Revision interface
       return data.map((item) => ({
         id: item.id,
         content: item.content,
         created_at: item.created_at,
-        created_by: item.created_by
+        created_by: item.created_by 
           ? {
               display_name: item.created_by.display_name,
               avatar_url: item.created_by.avatar_url,

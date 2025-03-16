@@ -8,7 +8,7 @@ import {
   contentUpdateSchema 
 } from '../types/contentTypeSchema';
 import { z } from 'zod';
-import { isJsonObject } from '@/lib/types/core/json';
+import { isJsonObject, JsonObject } from '@/lib/types/core/json';
 
 /**
  * Validate content data against its schema based on content type
@@ -136,6 +136,7 @@ export const validateContent = (type: ContentType, data: any) => {
 
   // Check if it's a content update (has id and updated_by)
   if (data.id && data.updated_by) {
+    // Fix: Explicitly type cast to ContentUpdate after confirming required properties exist
     return validateContentUpdate(data as ContentUpdate);
   }
   
