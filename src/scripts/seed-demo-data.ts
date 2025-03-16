@@ -2,145 +2,165 @@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const demoProjects = [
+// Demo printer builds data
+const demoPrinterBuilds = [
   {
-    title: 'Prusa i3 MK3S+ Build',
-    description: 'A complete build of the Prusa i3 MK3S+ with custom firmware modifications.',
-    build_specs: {
-      category: 'Cartesian',
-      dimensions: '210x210x250mm',
-      controller: 'Einsy RAMBo',
-      mainboard: 'Prusa Einsy RAMBo',
-      stepper_drivers: 'TMC2130'
-    },
-    difficulty_level: 'intermediate',
-    estimated_time: '16 hours',
-    status: 'approved',
-    likes_count: 147,
-    views_count: 2304
-  },
-  {
-    title: 'Voron 2.4 300mm Build',
-    description: 'High-speed CoreXY 3D printer with linear rails and enclosed chamber.',
-    build_specs: {
-      category: 'CoreXY',
-      dimensions: '300x300x300mm',
-      controller: 'Klipper',
-      mainboard: 'BTT Octopus Pro',
-      stepper_drivers: 'TMC2209'
-    },
-    difficulty_level: 'expert',
-    estimated_time: '40 hours',
-    status: 'approved',
-    likes_count: 256,
-    views_count: 3412
-  },
-  {
-    title: 'Ender 3 V2 Upgrades',
-    description: 'Comprehensive upgrade guide for the Ender 3 V2.',
-    build_specs: {
-      category: 'Cartesian',
-      dimensions: '220x220x250mm',
-      controller: 'Marlin 2.0',
-      mainboard: 'Creality 4.2.2',
-      upgrades: ['Direct drive', 'BLTouch', 'Dual Z-axis']
-    },
-    difficulty_level: 'beginner',
-    estimated_time: '8 hours',
-    status: 'approved',
-    likes_count: 324,
-    views_count: 4506
-  },
-  {
-    title: 'Hypercube CoreXY Build',
-    description: 'Custom Hypercube Evolution with carbon fiber reinforcements.',
-    build_specs: {
-      category: 'CoreXY',
-      dimensions: '300x300x350mm',
-      controller: 'Klipper',
-      mainboard: 'BTT SKR 1.4 Turbo',
-      stepper_drivers: 'TMC2209'
-    },
+    title: 'Voron 2.4 R2',
+    description: 'A high-speed CoreXY 3D printer with a fully enclosed chamber',
     difficulty_level: 'advanced',
-    estimated_time: '30 hours',
+    status: 'approved',
+    likes_count: 243,
+    views_count: 1852,
+    estimated_time: '40-60h',
+    build_specs: {
+      category: 'CoreXY',
+      buildVolume: {
+        x: 350,
+        y: 350,
+        z: 350
+      },
+      features: ['Enclosed', 'High-temperature', 'Automatic bed leveling']
+    },
+    parts_list: [
+      { name: 'LDO Motors Kit', type: 'mechanical' },
+      { name: 'Raspberry Pi 4', type: 'electronics' },
+      { name: 'BTT Octopus Pro', type: 'electronics' },
+      { name: 'E3D Revo Voron Hotend', type: 'hotend' }
+    ]
+  },
+  {
+    title: 'Ender 3 V2 Upgrade',
+    description: 'Comprehensive upgrade package for the popular Ender 3 V2 printer',
+    difficulty_level: 'intermediate',
+    status: 'approved',
+    likes_count: 189,
+    views_count: 1456,
+    estimated_time: '10-15h',
+    build_specs: {
+      category: 'Cartesian',
+      buildVolume: {
+        x: 235,
+        y: 235,
+        z: 250
+      },
+      features: ['Silent', 'PEI Sheet', 'Direct Drive']
+    },
+    parts_list: [
+      { name: 'Micro Swiss Direct Drive', type: 'extruder' },
+      { name: 'PEI Spring Steel Sheet', type: 'bed' },
+      { name: 'BTT SKR Mini E3 V3', type: 'electronics' }
+    ]
+  },
+  {
+    title: 'Prusa i3 MK3S+ Clone',
+    description: 'Open source Prusa i3 MK3S+ clone with quality components',
+    difficulty_level: 'beginner',
+    status: 'approved',
+    likes_count: 127,
+    views_count: 983,
+    estimated_time: '25-30h',
+    build_specs: {
+      category: 'Cartesian',
+      buildVolume: {
+        x: 250,
+        y: 210,
+        z: 210
+      },
+      features: ['Auto-leveling', 'Filament sensor', 'Removable sheet']
+    },
+    parts_list: [
+      { name: 'E3D V6 Hotend', type: 'hotend' },
+      { name: 'LDO Stepper Motors', type: 'mechanical' },
+      { name: 'PINDA Probe', type: 'sensors' }
+    ]
+  },
+  {
+    title: 'Voron Trident 300',
+    description: 'CoreXY 3D printer with triple Z motors for perfect bed alignment',
+    difficulty_level: 'advanced',
+    status: 'approved',
+    likes_count: 152,
+    views_count: 1205,
+    estimated_time: '35-45h',
+    build_specs: {
+      category: 'CoreXY',
+      buildVolume: {
+        x: 300,
+        y: 300,
+        z: 250
+      },
+      features: ['Triple Z', 'Enclosed', 'Auto-calibration']
+    },
+    parts_list: [
+      { name: 'BTT Octopus', type: 'electronics' },
+      { name: 'Dragon Hotend', type: 'hotend' },
+      { name: 'Gates Belts', type: 'mechanical' },
+      { name: 'Meanwell PSU', type: 'power' }
+    ]
+  },
+  {
+    title: 'RatRig V-Core 3',
+    description: 'Industrial grade CoreXY 3D printer with linear rails',
+    difficulty_level: 'expert',
     status: 'approved',
     likes_count: 98,
-    views_count: 1876
-  },
-  {
-    title: 'Delta Printer FLSUN QQ-S Pro',
-    description: 'Build and optimization guide for the FLSUN QQ-S Pro delta printer.',
+    views_count: 867,
+    estimated_time: '30-40h',
     build_specs: {
-      category: 'Delta',
-      dimensions: '255mm diameter x 360mm height',
-      controller: 'Marlin',
-      mainboard: 'MKS Robin Nano',
-      stepper_drivers: 'TMC2208'
+      category: 'CoreXY',
+      buildVolume: {
+        x: 300,
+        y: 300,
+        z: 300
+      },
+      features: ['Linear Rails', 'EVA Carriage', 'Duet Electronics']
     },
-    difficulty_level: 'intermediate',
-    estimated_time: '10 hours',
-    status: 'approved',
-    likes_count: 76,
-    views_count: 1256
+    parts_list: [
+      { name: 'Duet 3 Mini 5+', type: 'electronics' },
+      { name: 'MGN Linear Rails', type: 'mechanical' },
+      { name: 'Slice Engineering Mosquito', type: 'hotend' }
+    ]
   }
 ];
 
+// Function to seed data
 export const seedDemoProjects = async () => {
   try {
-    // Check if we already have projects in the database
-    const { count, error: countError } = await supabase
+    // Check if we already have data
+    const { data: existingData, error: countError } = await supabase
       .from('printer_builds')
-      .select('*', { count: 'exact', head: true });
+      .select('id')
+      .limit(1);
     
-    if (countError) throw countError;
-    
-    // Only seed if table is empty
-    if (count === 0) {
-      console.log('Seeding demo projects...');
-      
-      // Get a random user ID for demo purposes (or create a default one)
-      let userId: string;
-      
-      const { data: users, error: usersError } = await supabase
-        .from('profiles')
-        .select('id')
-        .limit(1);
-      
-      if (usersError) {
-        console.error('Error fetching users:', usersError);
-        // If no users found or error, we'll use a UUID constant for demo purposes
-        userId = '00000000-0000-0000-0000-000000000000';
-      } else if (users && users.length > 0) {
-        userId = users[0].id;
-      } else {
-        // No users found, use a default UUID
-        userId = '00000000-0000-0000-0000-000000000000';
-      }
-      
-      // Prepare projects with the user ID
-      const projectsToSeed = demoProjects.map(project => ({
-        ...project,
-        user_id: userId,
-        parts_list: project.build_specs?.upgrades 
-          ? project.build_specs.upgrades.map(upgrade => ({ name: upgrade })) 
-          : [],
-        media_links: {
-          images: [`https://placehold.co/600x400?text=${encodeURIComponent(project.title)}`]
-        }
-      }));
-      
-      // Insert projects
-      const { error: insertError } = await supabase
-        .from('printer_builds')
-        .insert(projectsToSeed);
-      
-      if (insertError) throw insertError;
-      
-      console.log('Demo projects seeded successfully');
-    } else {
-      console.log('Database already contains printer builds, skipping seed');
+    if (countError) {
+      console.error('Error checking for existing data:', countError);
+      return false;
     }
+    
+    // If we already have data, don't seed
+    if (existingData && existingData.length > 0) {
+      console.log('Data already exists, skipping seed');
+      return false;
+    }
+    
+    // Insert demo data
+    const { error } = await supabase
+      .from('printer_builds')
+      .insert(demoPrinterBuilds.map(build => ({
+        ...build,
+        user_id: 'system' // This would be replaced with a real user ID in production
+      })));
+    
+    if (error) {
+      console.error('Error seeding demo data:', error);
+      toast.error('Error seeding demo data');
+      return false;
+    }
+    
+    console.log('Demo data seeded successfully');
+    return true;
   } catch (error) {
-    console.error('Error seeding demo projects:', error);
+    console.error('Error in seed function:', error);
+    return false;
   }
 };

@@ -2,34 +2,45 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FlattenedSettings } from "@/lib/types/settings/core";
-import { DatabaseSettingsRow } from "../types/theme";
-import { convertDbSettingsToTheme } from "../utils/themeUtils";
 import { toast } from "sonner";
+import { convertDbSettingsToTheme, applyThemeToDocument } from "../utils/themeUtils";
 
-export const useThemeSubscription = (setTheme: (theme: FlattenedSettings) => void) => {
+export function useThemeSubscription(
+  setTheme: (theme: FlattenedSettings) => void
+) {
   useEffect(() => {
-    const channel = supabase
-      .channel('site_settings_changes')
+    console.log("Setting up theme subscription...");
+    
+    const subscription = supabase
+      .channel("site_settings_changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'site_settings'
+          event: "*",
+          schema: "public",
+          table: "site_settings",
         },
         (payload) => {
-          console.log("Received real-time theme update");
-          const dbSettings = payload.new as DatabaseSettingsRow;
-          const themeData = convertDbSettingsToTheme(dbSettings);
+          console.log("Theme settings changed:", payload);
           
-          setTheme(themeData);
-          toast.success("Theme updated in real-time");
+          const newData = payload.new;
+          if (!newData) return;
+          
+          try {
+            const updatedTheme = convertDbSettingsToTheme(newData);
+            setTheme(updatedTheme);
+            applyThemeToDocument(updatedTheme);
+            toast.info("Theme settings updated");
+          } catch (error) {
+            console.error("Error processing theme update:", error);
+          }
         }
       )
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      console.log("Cleaning up theme subscription");
+      supabase.removeChannel(subscription);
     };
   }, [setTheme]);
-};
+}

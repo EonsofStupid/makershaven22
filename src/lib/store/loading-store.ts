@@ -1,39 +1,32 @@
+
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
-export interface LoadingState {
+interface LoadingState {
   isLoading: boolean;
+  message: string | null;
   error: Error | null;
-  message?: string;
-}
-
-export const initialLoadingState: LoadingState = {
-  isLoading: false,
-  error: null
-};
-
-interface LoadingStore extends LoadingState {
   startLoading: (message?: string) => void;
   stopLoading: () => void;
-  setError: (error: Error) => void;
+  setError: (error: Error | null) => void;
 }
 
-export const useLoadingStore = create<LoadingStore>((set) => ({
-  ...initialLoadingState,
-  
-  startLoading: (message) => set({ 
-    isLoading: true, 
-    error: null,
-    message 
-  }),
-  
-  stopLoading: () => set({ 
-    isLoading: false,
-    error: null,
-    message: undefined
-  }),
-  
-  setError: (error) => set({
-    isLoading: false,
-    error
-  })
-}));
+export const useLoadingStore = create<LoadingState>()(
+  devtools(
+    (set) => ({
+      isLoading: false,
+      message: null,
+      error: null,
+      
+      startLoading: (message = 'Loading...') => 
+        set({ isLoading: true, message, error: null }),
+      
+      stopLoading: () => 
+        set({ isLoading: false, message: null }),
+      
+      setError: (error) => 
+        set({ error, isLoading: false })
+    }),
+    { name: 'LoadingStore' }
+  )
+);

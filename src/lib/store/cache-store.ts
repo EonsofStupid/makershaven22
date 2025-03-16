@@ -1,92 +1,81 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+interface CacheStoreState {
+  cache: Record<string, any>;
+  getCache: (key: string) => any;
+  setCache: (key: string, data: any, expirationMs?: number) => void;
+  clearCache: (key?: string) => void;
+  isExpired: (key: string) => boolean;
+}
 
 interface CacheItem {
   data: any;
   timestamp: number;
-  ttl: number;
+  expirationMs?: number;
 }
 
-interface CacheState {
-  cache: Record<string, CacheItem>;
-  setCache: (key: string, value: any, ttl?: number) => void;
-  getCache: (key: string) => any;
-  clearCache: () => void;
-  removeFromCache: (key: string) => void;
-  pruneExpiredCache: () => void;
-}
-
-export const useCacheStore = create<CacheState>()(
+export const useCacheStore = create<CacheStoreState>()(
   persist(
     (set, get) => ({
       cache: {},
-      setCache: (key, value, ttl = 5 * 60 * 1000) => {
-        console.log(`Setting cache for ${key} with TTL ${ttl}ms`);
-        set((state) => ({ 
-          cache: { 
-            ...state.cache, 
-            [key]: { 
-              data: value, 
+      
+      getCache: (key: string) => {
+        const cache = get().cache;
+        const cacheItem = cache[key] as CacheItem | undefined;
+        
+        if (!cacheItem) return null;
+        
+        // Check if expired
+        if (get().isExpired(key)) {
+          get().clearCache(key);
+          return null;
+        }
+        
+        return cacheItem.data;
+      },
+      
+      setCache: (key: string, data: any, expirationMs?: number) => {
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [key]: {
+              data,
               timestamp: Date.now(),
-              ttl 
-            } 
+              expirationMs
+            }
           }
         }));
       },
-      getCache: (key) => {
-        const state = get();
-        const cached = state.cache[key];
-        
-        if (!cached) {
-          console.log(`Cache miss for ${key}`);
-          return null;
-        }
-        
-        const isExpired = Date.now() - cached.timestamp > cached.ttl;
-        if (isExpired) {
-          console.log(`Cache expired for ${key}`);
-          get().removeFromCache(key);
-          return null;
-        }
-        
-        console.log(`Cache hit for ${key}`);
-        return cached.data;
-      },
-      clearCache: () => {
-        console.log('Clearing entire cache');
-        set({ cache: {} });
-      },
-      removeFromCache: (key) => {
-        console.log(`Removing ${key} from cache`);
-        set((state) => {
-          const newCache = { ...state.cache };
-          delete newCache[key];
-          return { cache: newCache };
-        });
-      },
-      pruneExpiredCache: () => {
-        console.log('Pruning expired cache entries');
-        set((state) => {
-          const newCache = { ...state.cache };
-          Object.entries(newCache).forEach(([key, item]) => {
-            if (Date.now() - item.timestamp > item.ttl) {
-              delete newCache[key];
-            }
+      
+      clearCache: (key?: string) => {
+        if (key) {
+          set((state) => {
+            const newCache = { ...state.cache };
+            delete newCache[key];
+            return { cache: newCache };
           });
-          return { cache: newCache };
-        });
+        } else {
+          set({ cache: {} });
+        }
       },
+      
+      isExpired: (key: string) => {
+        const cache = get().cache;
+        const cacheItem = cache[key] as CacheItem | undefined;
+        
+        if (!cacheItem || !cacheItem.expirationMs) return false;
+        
+        const now = Date.now();
+        const expiration = cacheItem.timestamp + cacheItem.expirationMs;
+        
+        return now > expiration;
+      }
     }),
     {
-      name: 'cache-storage',
-      partialize: (state) => ({ cache: state.cache }),
+      name: 'app-cache',
+      partialize: (state) => ({ cache: state.cache })
     }
   )
 );
-
-// Set up automatic cache pruning
-if (typeof window !== 'undefined') {
-  setInterval(() => {
-    useCacheStore.getState().pruneExpiredCache();
-  }, 60000); // Prune every minute
-}

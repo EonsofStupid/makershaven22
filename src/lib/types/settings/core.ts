@@ -1,3 +1,4 @@
+
 import type { JsonObject } from '../core/json';
 import type { ThemeMode, GlassEffectLevel, TransitionType } from '../core/enums';
 import type { SecuritySettings } from '../security/types';

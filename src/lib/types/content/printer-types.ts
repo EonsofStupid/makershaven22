@@ -1,33 +1,38 @@
 
-import { JsonObject } from '../core/json';
 import { BuildDifficulty, BuildStatus } from '../core/enums';
+import { Json, JsonObject } from '../core/json';
 
-/**
- * Printer build interface matching the database schema
- */
 export interface PrinterBuild {
   id: string;
-  user_id: string;
   title: string;
   description?: string;
-  build_specs?: JsonObject;
-  difficulty_level: BuildDifficulty;
-  estimated_time?: string;
-  parts_list?: JsonObject;
-  media_links?: JsonObject;
-  status: BuildStatus;
-  likes_count: number;
-  views_count: number;
-  approved_by?: string;
-  approved_at?: string;
-  rejection_reason?: string;
+  user_id: string;
   created_at: string;
   updated_at: string;
+  status: BuildStatus | string;
+  difficulty_level: BuildDifficulty | string;
+  parts_list: JsonObject[] | null;
+  build_specs: JsonObject | null;
+  media_links: JsonObject | null;
+  likes_count: number;
+  views_count: number;
+  estimated_time?: string;
+  approved_at?: string;
+  approved_by?: string;
+  rejection_reason?: string;
 }
 
-/**
- * Project data for display on the landing page
- */
+export interface PrinterBuildsQueryParams {
+  limit?: number;
+  offset?: number;
+  status?: string;
+  difficulty?: string;
+  category?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface ProjectDisplay {
   id: string;
   title: string;
@@ -35,19 +40,6 @@ export interface ProjectDisplay {
   difficulty_level: string;
   estimated_time?: string;
   parts_count?: number;
-  likes_count: number;
-  views_count: number;
-}
-
-/**
- * Query parameters for fetching printer builds
- */
-export interface PrinterBuildsQueryParams {
-  limit?: number;
-  status?: BuildStatus;
-  difficulty?: BuildDifficulty;
-  category?: string;
-  search?: string;
-  orderBy?: string;
-  orderDirection?: 'asc' | 'desc';
+  likes_count?: number;
+  views_count?: number;
 }

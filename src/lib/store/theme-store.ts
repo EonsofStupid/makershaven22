@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ThemeState, settingsToUpdateParams } from '../types/theme/state';
 import { FlattenedSettings, DEFAULT_SETTINGS } from '../types/settings/core';
 import { ThemeMode } from '../types/core/enums';
-import { applyThemeToDOM } from '@/components/theme/utils/themeUtils';
+import { applyThemeToDocument } from '@/components/theme/utils/themeUtils';
 import { toast } from 'sonner';
 import { devtools } from 'zustand/middleware';
 
@@ -47,7 +47,7 @@ export const useThemeStore = create<ThemeState>()(
         // Actions
         setSettings: (settings: FlattenedSettings) => {
           set({ settings });
-          applyThemeToDOM(settings);
+          applyThemeToDocument(settings);
           
           // Sync theme mode if needed
           const themeMode = settings.theme_mode || 'system';
@@ -93,7 +93,7 @@ export const useThemeStore = create<ThemeState>()(
               error: null 
             });
             
-            applyThemeToDOM(settings);
+            applyThemeToDocument(settings);
             
           } catch (error) {
             console.error('Failed to update theme settings:', error);
@@ -126,7 +126,7 @@ export const useThemeStore = create<ThemeState>()(
             
             // Apply theme to DOM if settings exist
             if (state?.settings) {
-              applyThemeToDOM(state.settings);
+              applyThemeToDocument(state.settings);
             }
           }
         }
