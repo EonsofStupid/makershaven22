@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useRevisionStore } from '@/lib/store/revision-store';
 import { VersionSelector } from './VersionSelector';
@@ -7,14 +8,18 @@ interface RevisionSelectorProps {
 }
 
 export const RevisionSelector: React.FC<RevisionSelectorProps> = ({ side }) => {
-  const { selectedVersions, setSelectedVersions, revisions } = useRevisionStore();
+  const store = useRevisionStore();
+  
+  // Define a default state for selected versions if it doesn't exist in the store
+  const selectedVersions = store.selectedVersions || { left: 1, right: 1 };
+  const revisions = store.revisions || [];
 
   const handleVersionChange = (increment: boolean) => {
     const currentVersion = selectedVersions[side];
     const newValue = increment ? currentVersion + 1 : currentVersion - 1;
     
     if (newValue >= 1 && newValue <= revisions.length) {
-      setSelectedVersions({
+      store.setSelectedVersions?.({
         ...selectedVersions,
         [side]: newValue
       });

@@ -1,6 +1,17 @@
-import { create } from 'zustand';
-import type { ContentRevision, RevisionState } from '@/components/content/version-control/types/revision';
 
+import { create } from 'zustand';
+import type { ContentRevision } from '@/lib/types/content/index';
+
+// Define the interface for the revision state
+interface RevisionState {
+  revisions: ContentRevision[];
+  selectedRevision: ContentRevision | null;
+  compareRevision: ContentRevision | null;
+  diffMode: 'split' | 'unified';
+  selectedVersions: { left: number; right: number };
+}
+
+// Extend the state with actions
 interface RevisionStore extends RevisionState {
   setRevisions: (revisions: ContentRevision[]) => void;
   setSelectedRevision: (revision: ContentRevision | null) => void;

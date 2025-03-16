@@ -121,10 +121,13 @@ export const validateContentUpdate = (data: ContentUpdate) => {
 
 /**
  * Type guard to check if an object conforms to ContentUpdate
+ * The return type is deliberately not using the 'is' type predicate because
+ * ContentUpdate doesn't have an index signature, but we need to validate it
+ * against JsonObject which does have one.
  * @param obj The object to check
  * @returns boolean indicating if the object is a valid ContentUpdate
  */
-function isContentUpdate(obj: JsonObject): obj is ContentUpdate {
+function isContentUpdate(obj: JsonObject): boolean {
   return (
     'id' in obj && 
     typeof obj.id === 'string' && 
@@ -164,9 +167,9 @@ export const validateContent = (type: ContentType, data: any) => {
     };
   }
 
-  // Use type guard to properly check if data is a ContentUpdate
+  // Check if data matches the structure of a ContentUpdate
   if (isContentUpdate(data)) {
-    return validateContentUpdate(data);
+    return validateContentUpdate(data as ContentUpdate);
   }
   
   // Check if data has the required fields for content creation
