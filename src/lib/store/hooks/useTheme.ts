@@ -1,63 +1,51 @@
+
 import { useEffect } from 'react';
-import { useThemeStore } from '@/lib/store/theme-store';
+import { useThemeStore, initializeThemeStore } from '@/lib/store/theme-store';
 import { ThemeMode } from '@/lib/types/core/enums';
 
 export const useTheme = () => {
-  const {
+  const { 
     settings,
     isLoading,
     error,
+    themeMode,
+    effectiveTheme,
     setSettings,
-    setLoading,
-    setError,
+    setThemeMode,
     updateSettings
   } = useThemeStore();
 
+  // Initialize theme on first render
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (settings) {
-        updateSettings({
-          ...settings,
-          theme_mode: e.matches ? 'dark' : 'light' as ThemeMode
-        });
-      }
-    };
+    initializeThemeStore();
+  }, []);
 
-    if (settings) {
-      const isDark = mediaQuery.matches;
-      updateSettings({
-        ...settings,
-        theme_mode: isDark ? 'dark' : 'light' as ThemeMode
-      });
-    }
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [settings, updateSettings]);
-
+  // Apply theme mode to document
   useEffect(() => {
-    // Apply CSS variables to document root
-    if (settings) {
-      const root = document.documentElement;
-      Object.entries(settings).forEach(([key, value]) => {
-        if (typeof value === 'string') {
-          root.style.setProperty(`--${key}`, value);
-        }
-      });
-
-      // Apply theme class
-      root.classList.remove('light', 'dark');
-      root.classList.add(settings.theme_mode);
+    if (typeof document !== 'undefined') {
+      // Remove all theme classes
+      document.documentElement.classList.remove('light', 'dark');
+      // Add current theme class
+      document.documentElement.classList.add(effectiveTheme);
     }
-  }, [settings]);
+  }, [effectiveTheme]);
 
   return {
+    // Data
     settings,
     isLoading,
     error,
+    themeMode,
+    effectiveTheme,
+    
+    // Actions
+    setThemeMode,
     updateSettings,
-    setSettings,
-    setError
+    
+    // Helpers
+    toggleTheme: () => {
+      const newMode: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
+      setThemeMode(newMode);
+    }
   };
 };

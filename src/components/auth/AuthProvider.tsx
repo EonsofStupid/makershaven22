@@ -7,13 +7,16 @@ import { toast } from "sonner";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
 import { sessionManager } from "@/lib/auth/SessionManager";
 import { securityManager } from "@/lib/auth/SecurityManager";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
+  const { isLoading } = useAuthStore();
 
   useEffect(() => {
     console.log('AuthProvider mounted - Starting initialization');
     
+    // Apply security headers
     const initSecurity = async () => {
       try {
         const success = await applySecurityHeaders();
@@ -27,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initSecurity();
 
+    // Only run the setup once
     if (initialSetupDone.current) {
       console.log('Initial setup already done, skipping');
       return;
@@ -37,10 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const maxRetries = 3;
     const retryDelay = 1000;
 
+    // Setup authentication
     const setupAuth = async () => {
       try {
         console.log('Starting auth setup');
         
+        // Initialize session and security
         try {
           await sessionManager.startSession();
           securityManager.initialize();
@@ -49,6 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error('Error initializing security systems:', securityError);
         }
 
+        // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) throw sessionError;
@@ -72,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setupAuth();
 
+    // Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -79,6 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await handleAuthChange(session);
     });
     
+    // Cleanup
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
@@ -87,6 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [handleAuthChange]);
 
+  // Render with motion for smooth transitions
   return (
     <motion.div
       initial={{ opacity: 0 }}

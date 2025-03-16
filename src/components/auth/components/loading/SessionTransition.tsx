@@ -1,3 +1,4 @@
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -12,10 +13,11 @@ export const SessionTransition = ({
   loadingMessage = "Loading session..." 
 }: SessionTransitionProps) => {
   const { isLoading, isTransitioning } = useAuthStore();
+  const isAuthBusy = isLoading || isTransitioning;
 
   return (
     <AnimatePresence mode="wait">
-      {(isLoading || isTransitioning) ? (
+      {isAuthBusy ? (
         <motion.div
           key="loading"
           initial={{ opacity: 0 }}
