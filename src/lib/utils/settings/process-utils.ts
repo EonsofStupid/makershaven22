@@ -1,17 +1,16 @@
-
 import { FlattenedSettings } from "../../types/settings/core";
 import { SecuritySettings, parseSecuritySettings } from "../../types/security/types";
 import { 
-  safeRecord, 
   safeThemeMode, 
   safeHexColor, 
   safeCssMeasurement, 
   safeString, 
   safeTransitionType,
-  jsonToRecord
+  ensureJsonObject
 } from "../type-utils";
 import { ThemeMode } from "../../types/core/enums";
 import { DEFAULT_SETTINGS } from "../../types/settings/core";
+import { JsonObject } from "../../types/core/json";
 
 /**
  * Processes raw database response into a properly typed FlattenedSettings object
@@ -25,22 +24,42 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
   // Process security settings from JSON to SecuritySettings type
   const securitySettings = parseSecuritySettings(data.security_settings);
   
-  // Process metadata using jsonToRecord to ensure we get a Record<string, unknown>
-  const metadata = data.metadata ? jsonToRecord(data.metadata) : {};
+  // Process metadata using ensureJsonObject to ensure we get JsonObject type
+  const metadata = ensureJsonObject(data.metadata);
+  const themePreferences = ensureJsonObject(data.theme_preferences);
+  const themeMetadata = ensureJsonObject(data.theme_metadata);
   
   // Ensure theme_mode is a valid ThemeMode
   const themeMode = safeThemeMode(data.theme_mode);
   
   // Ensure transition_type is valid TransitionType
   const transitionType = safeTransitionType(data.transition_type);
+  const menuAnimationType = data.menu_animation_type ? safeTransitionType(data.menu_animation_type) : undefined;
   
   // Create a properly typed FlattenedSettings object
   const settingsResult: FlattenedSettings = {
+    // System fields
+    id: data.id,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+    created_by: data.created_by,
+    updated_by: data.updated_by,
+
     // Site info
     site_title: safeString(data.site_title, DEFAULT_SETTINGS.site_title),
     tagline: typeof data.tagline === 'string' ? data.tagline : undefined,
+    description: typeof data.description === 'string' ? data.description : undefined,
+    keywords: Array.isArray(data.keywords) ? data.keywords : undefined,
     logo_url: typeof data.logo_url === 'string' ? data.logo_url : undefined,
     favicon_url: typeof data.favicon_url === 'string' ? data.favicon_url : undefined,
+    primary_domain: typeof data.primary_domain === 'string' ? data.primary_domain : undefined,
+    support_email: typeof data.support_email === 'string' ? data.support_email : undefined,
+    contact_email: typeof data.contact_email === 'string' ? data.contact_email : undefined,
+    social_links: ensureJsonObject(data.social_links),
+    analytics_id: typeof data.analytics_id === 'string' ? data.analytics_id : undefined,
+    custom_scripts: Array.isArray(data.custom_scripts) ? data.custom_scripts : undefined,
+    maintenance_mode: typeof data.maintenance_mode === 'boolean' ? data.maintenance_mode : undefined,
+    maintenance_message: typeof data.maintenance_message === 'string' ? data.maintenance_message : undefined,
     
     // Theme mode
     theme_mode: themeMode,
@@ -66,27 +85,29 @@ export function processDatabaseSettings(data: any): FlattenedSettings {
     line_height_base: safeString(data.line_height_base, DEFAULT_SETTINGS.line_height_base),
     letter_spacing: safeString(data.letter_spacing, DEFAULT_SETTINGS.letter_spacing),
     
-    // Measurements and effects
+    // Layout
     border_radius: safeCssMeasurement(data.border_radius, DEFAULT_SETTINGS.border_radius),
     spacing_unit: safeCssMeasurement(data.spacing_unit, DEFAULT_SETTINGS.spacing_unit),
     transition_duration: safeString(data.transition_duration, DEFAULT_SETTINGS.transition_duration),
     shadow_color: safeHexColor(data.shadow_color, DEFAULT_SETTINGS.shadow_color),
     hover_scale: safeString(data.hover_scale, DEFAULT_SETTINGS.hover_scale),
-    box_shadow: safeString(data.box_shadow, DEFAULT_SETTINGS.box_shadow),
-    backdrop_blur: safeString(data.backdrop_blur, DEFAULT_SETTINGS.backdrop_blur),
-    transition_type: transitionType, // Use the safely converted TransitionType
+    box_shadow: typeof data.box_shadow === 'string' ? data.box_shadow : DEFAULT_SETTINGS.box_shadow,
+    backdrop_blur: typeof data.backdrop_blur === 'string' ? data.backdrop_blur : DEFAULT_SETTINGS.backdrop_blur,
     
-    // Complex objects
+    // Effects
+    transition_type: transitionType,
+    menu_animation_type: menuAnimationType,
+    glass_effect: data.glass_effect,
+    custom_css: typeof data.custom_css === 'string' ? data.custom_css : undefined,
+    
+    // Security settings
     security_settings: securitySettings,
-    metadata: metadata, // Now properly typed as Record<string, unknown>
     
-    // Metadata fields
-    id: typeof data.id === 'string' ? data.id : undefined,
-    created_at: typeof data.created_at === 'string' ? data.created_at : undefined,
-    updated_at: typeof data.updated_at === 'string' ? data.updated_at : undefined,
-    created_by: typeof data.created_by === 'string' ? data.created_by : undefined,
-    updated_by: typeof data.updated_by === 'string' ? data.updated_by : undefined,
+    // Metadata
+    metadata,
+    theme_preferences: themePreferences,
+    theme_metadata: themeMetadata,
   };
-  
+
   return settingsResult;
 }

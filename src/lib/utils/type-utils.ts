@@ -48,45 +48,47 @@ export function safeParseJson<T>(value: string, fallback: T): T {
 }
 
 /**
- * Convert object to camelCase keys
+ * Convert a JSON value to a Record<string, unknown>
  */
-export function toCamelCase<T extends object>(obj: T): Record<string, any> {
-  if (obj === null || typeof obj !== 'object') {
-    return obj;
+export function jsonToRecord(value: Json | null | undefined): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
   }
-
-  if (Array.isArray(obj)) {
-    return obj.map(item => toCamelCase(item)) as unknown as Record<string, any>;
-  }
-
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    acc[camelKey] = value !== null && typeof value === 'object' ? toCamelCase(value as object) : value;
-    return acc;
-  }, {} as Record<string, any>);
+  return value as Record<string, unknown>;
 }
 
 /**
- * Convert object to snake_case keys
+ * Safely convert a value to a string with fallback
  */
-export function toSnakeCase<T extends object>(obj: T): Record<string, any> {
-  if (obj === null || typeof obj !== 'object') {
-    return obj;
+export function safeString(value: unknown, fallback: string): string {
+  if (typeof value === 'string') {
+    return value;
   }
-
-  if (Array.isArray(obj)) {
-    return obj.map(item => toSnakeCase(item)) as unknown as Record<string, any>;
-  }
-
-  return Object.entries(obj).reduce((acc, [key, value]) => {
-    const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-    acc[snakeKey] = value !== null && typeof value === 'object' ? toSnakeCase(value as object) : value;
-    return acc;
-  }, {} as Record<string, any>);
+  return fallback;
 }
 
 /**
- * Safely convert a value to a ThemeMode, with fallback
+ * Safely convert a value to a hex color with fallback
+ */
+export function safeHexColor(value: unknown, fallback: string): string {
+  if (typeof value === 'string' && /^#[0-9A-Fa-f]{6}$/.test(value)) {
+    return value;
+  }
+  return fallback;
+}
+
+/**
+ * Safely convert a value to a CSS measurement with fallback
+ */
+export function safeCssMeasurement(value: unknown, fallback: string): string {
+  if (typeof value === 'string' && /^[0-9]+(\.[0-9]+)?(px|rem|em|vh|vw|%)$/.test(value)) {
+    return value;
+  }
+  return fallback;
+}
+
+/**
+ * Safely convert a value to a theme mode with fallback
  */
 export function safeThemeMode(value: unknown, fallback: ThemeMode = 'system'): ThemeMode {
   if (typeof value === 'string' && ['light', 'dark', 'system'].includes(value)) {
@@ -96,10 +98,10 @@ export function safeThemeMode(value: unknown, fallback: ThemeMode = 'system'): T
 }
 
 /**
- * Safely convert a value to a TransitionType, with fallback
+ * Safely convert a value to a transition type with fallback
  */
 export function safeTransitionType(value: unknown, fallback: TransitionType = 'fade'): TransitionType {
-  if (typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value)) {
+  if (typeof value === 'string' && ['fade', 'slide', 'scale'].includes(value)) {
     return value as TransitionType;
   }
   return fallback;
@@ -113,17 +115,14 @@ export function deepMerge<T>(target: T, source: Partial<T>): T {
   
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach(key => {
-      if (isObject(source[key as keyof typeof source])) {
+      if (isObject(source[key])) {
         if (!(key in target)) {
-          Object.assign(output, { [key]: source[key as keyof typeof source] });
+          Object.assign(output, { [key]: source[key] });
         } else {
-          (output as any)[key] = deepMerge(
-            (target as any)[key],
-            source[key as keyof typeof source] as any
-          );
+          output[key] = deepMerge(target[key], source[key]);
         }
       } else {
-        Object.assign(output, { [key]: source[key as keyof typeof source] });
+        Object.assign(output, { [key]: source[key] });
       }
     });
   }
@@ -132,8 +131,8 @@ export function deepMerge<T>(target: T, source: Partial<T>): T {
 }
 
 /**
- * Check if value is an object
+ * Type guard for objects
  */
 function isObject(item: unknown): item is Record<string, unknown> {
-  return item !== null && typeof item === 'object' && !Array.isArray(item);
+  return Boolean(item && typeof item === 'object' && !Array.isArray(item));
 }
