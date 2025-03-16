@@ -2,6 +2,7 @@
 import { Json } from '../core/json';
 import { ContentStatus, ContentType } from '../core/enums';
 
+// Base Content interface - foundation for all content types
 export interface BaseContent {
   id: string;
   title: string;
@@ -11,13 +12,13 @@ export interface BaseContent {
   slug?: string;
   status?: ContentStatus;
   version?: number;
-  created_by: string;
+  created_by: string; // This is required, fixing the type mismatch
   updated_by?: string;
   created_at?: string;
   updated_at?: string;
 }
 
-// Add ContentCreate interface for content creation operations
+// Content Creation type - used specifically for creating new content
 export interface ContentCreate {
   title: string;
   type: ContentType;
@@ -25,10 +26,10 @@ export interface ContentCreate {
   metadata?: Json;
   slug?: string;
   status?: ContentStatus;
-  created_by: string;
+  created_by: string; // Required for database insertion
 }
 
-// Add ContentUpdate interface for content update operations
+// Content Update type - used specifically for updating existing content
 export interface ContentUpdate {
   id: string;
   title?: string;
@@ -37,9 +38,10 @@ export interface ContentUpdate {
   metadata?: Json;
   slug?: string;
   status?: ContentStatus;
-  updated_by: string;
+  updated_by: string; // Required for updates
 }
 
+// Additional content-related types
 export interface ContentRevision {
   id: string;
   content_id: string;
@@ -63,6 +65,7 @@ export interface ContentRelationship {
   order_index?: number;
 }
 
+// Additional post-related types
 export interface PostWithAuthor {
   id: string;
   title: string;
@@ -98,15 +101,15 @@ export const ContentCategories = {
   OTHER: 'other'
 } as const;
 
-// Define valid content types
+// Define valid content types for convenience
 export const ValidContentTypes = {
-  PAGE: ContentType.page,
-  COMPONENT: ContentType.component,
-  TEMPLATE: ContentType.template,
-  WORKFLOW: ContentType.workflow,
-  BUILD: ContentType.build,
-  GUIDE: ContentType.guide,
-  PART: ContentType.part,
-  HERO: ContentType.hero,
-  FEATURE: ContentType.feature
+  PAGE: 'page' as ContentType,
+  COMPONENT: 'component' as ContentType,
+  TEMPLATE: 'template' as ContentType,
+  WORKFLOW: 'workflow' as ContentType,
+  BUILD: 'build' as ContentType,
+  GUIDE: 'guide' as ContentType,
+  PART: 'part' as ContentType,
+  HERO: 'hero' as ContentType,
+  FEATURE: 'feature' as ContentType
 } as const;

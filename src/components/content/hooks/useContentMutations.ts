@@ -1,12 +1,14 @@
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { validateContentCreate, validateContentUpdate } from "../utils/contentTypeValidation";
-import { ContentCreate, ContentUpdate } from "@/lib/types/content/types";
+import { ContentCreate, ContentUpdate, BaseContent } from "@/lib/types/content/types";
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
 
+  // Define mutation for content creation with proper typing
   const createContent = useMutation({
     mutationFn: async (contentData: ContentCreate) => {
       console.log("Creating content:", contentData);
@@ -36,7 +38,7 @@ export const useContentMutations = () => {
         throw error;
       }
 
-      return result;
+      return result as BaseContent;
     },
     onSuccess: (newContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });
@@ -48,6 +50,7 @@ export const useContentMutations = () => {
     },
   });
 
+  // Define mutation for content updates with proper typing
   const updateContent = useMutation({
     mutationFn: async (contentData: ContentUpdate) => {
       console.log("Updating content:", contentData);
@@ -78,7 +81,7 @@ export const useContentMutations = () => {
         throw error;
       }
 
-      return result;
+      return result as BaseContent;
     },
     onSuccess: (updatedContent) => {
       queryClient.invalidateQueries({ queryKey: ["cms_content"] });

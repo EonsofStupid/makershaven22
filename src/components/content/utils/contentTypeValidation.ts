@@ -1,47 +1,27 @@
 
-import { ContentType } from '@/lib/types/enums';
+import { ContentType } from '@/lib/types/core/enums';
 import { ContentCreate, ContentUpdate } from '@/lib/types/content/types';
-import { 
-  getSchemaByType, 
-  contentTypeRelationships, 
-  contentCreateSchema, 
-  contentUpdateSchema 
-} from '../types/contentTypeSchema';
-import { z } from 'zod';
 import { isJsonObject, JsonObject } from '@/lib/types/core/json';
+import { z } from 'zod';
 
-/**
- * Validate content data against its schema based on content type
- * @param type ContentType to validate against
- * @param data Content data to validate
- * @returns Validation result with success status and optional errors
- */
-export const validateContentData = (type: ContentType, data: any) => {
-  // Ensure data is an object before validation
-  if (!isJsonObject(data)) {
-    return {
-      success: false,
-      errors: [{ message: 'Content data must be an object' }]
-    };
-  }
+// Create schemas for validation
+const baseContentSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  type: z.enum(['template', 'page', 'build', 'guide', 'part', 'component', 'workflow', 'hero', 'feature']),
+  status: z.enum(['draft', 'published', 'archived']).default('draft').optional(),
+  slug: z.string().optional(),
+  content: z.any().optional(),
+  metadata: z.any().optional(),
+});
 
-  const schema = getSchemaByType(type);
-  try {
-    schema.parse(data);
-    return { success: true };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        errors: error.errors
-      };
-    }
-    return {
-      success: false,
-      errors: [{ message: 'Unknown validation error' }]
-    };
-  }
-};
+const createContentSchema = baseContentSchema.extend({
+  created_by: z.string().min(1, "Creator ID is required")
+});
+
+const updateContentSchema = baseContentSchema.partial().extend({
+  id: z.string().min(1, "ID is required"),
+  updated_by: z.string().min(1, "Updater ID is required")
+});
 
 /**
  * Validate content for creation operation
@@ -49,16 +29,8 @@ export const validateContentData = (type: ContentType, data: any) => {
  * @returns Validation result with success status, optional errors, and sanitized data
  */
 export const validateContentCreate = (data: ContentCreate) => {
-  // Ensure created_by is present and is a string
-  if (!data.created_by || typeof data.created_by !== 'string') {
-    return {
-      success: false,
-      errors: [{ message: 'created_by is required and must be a string' }]
-    };
-  }
-
   try {
-    const validatedData = contentCreateSchema.parse(data);
+    const validatedData = createContentSchema.parse(data);
     return { 
       success: true,
       data: validatedData
@@ -83,24 +55,8 @@ export const validateContentCreate = (data: ContentCreate) => {
  * @returns Validation result with success status, optional errors, and sanitized data
  */
 export const validateContentUpdate = (data: ContentUpdate) => {
-  // Ensure updated_by is present and is a string
-  if (!data.updated_by || typeof data.updated_by !== 'string') {
-    return {
-      success: false,
-      errors: [{ message: 'updated_by is required and must be a string' }]
-    };
-  }
-
-  // Ensure id is present and is a string
-  if (!data.id || typeof data.id !== 'string') {
-    return {
-      success: false,
-      errors: [{ message: 'id is required and must be a string' }]
-    };
-  }
-
   try {
-    const validatedData = contentUpdateSchema.parse(data);
+    const validatedData = updateContentSchema.parse(data);
     return { 
       success: true,
       data: validatedData
@@ -120,23 +76,6 @@ export const validateContentUpdate = (data: ContentUpdate) => {
 };
 
 /**
- * Type guard to check if an object conforms to ContentUpdate
- * The return type is deliberately not using the 'is' type predicate because
- * ContentUpdate doesn't have an index signature, but we need to validate it
- * against JsonObject which does have one.
- * @param obj The object to check
- * @returns boolean indicating if the object is a valid ContentUpdate
- */
-function isContentUpdate(obj: JsonObject): boolean {
-  return (
-    'id' in obj && 
-    typeof obj.id === 'string' && 
-    'updated_by' in obj && 
-    typeof obj.updated_by === 'string'
-  );
-}
-
-/**
  * Type guard to check if an object has the minimum required fields for ContentCreate
  * @param obj The object to check
  * @returns boolean indicating if the object has the required fields for ContentCreate
@@ -149,6 +88,20 @@ function hasCreateContentRequiredFields(obj: JsonObject): boolean {
     typeof obj.title === 'string' &&
     'created_by' in obj && 
     typeof obj.created_by === 'string'
+  );
+}
+
+/**
+ * Type guard to check if an object conforms to ContentUpdate
+ * @param obj The object to check
+ * @returns boolean indicating if the object is a valid ContentUpdate
+ */
+function isContentUpdate(obj: JsonObject): boolean {
+  return (
+    'id' in obj && 
+    typeof obj.id === 'string' && 
+    'updated_by' in obj && 
+    typeof obj.updated_by === 'string'
   );
 }
 
@@ -169,7 +122,6 @@ export const validateContent = (type: ContentType, data: any) => {
 
   // Check if data matches the structure of a ContentUpdate
   if (isContentUpdate(data)) {
-    // Use explicit type assertion with appropriate checks
     const updateData = {
       id: data.id as string,
       updated_by: data.updated_by as string,
@@ -195,6 +147,19 @@ export const validateContent = (type: ContentType, data: any) => {
     success: false,
     errors: [{ message: 'Invalid content data: missing required fields' }]
   };
+};
+
+// Define relationship mappings between content types (simplified)
+export const contentTypeRelationships: Record<ContentType, ContentType[]> = {
+  page: ['template', 'component'],
+  component: ['component'],
+  template: ['page', 'component'],
+  workflow: ['template', 'page', 'component'],
+  build: ['component', 'part'],
+  guide: ['component', 'build'],
+  part: ['component'],
+  hero: ['component'],
+  feature: ['component']
 };
 
 /**

@@ -1,10 +1,9 @@
 
-import { useContentQuery } from "./useContentQuery";
-import { useContentMutations } from "./useContentMutations";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BaseContent } from "@/lib/types/content/types";
+import { useContentMutations } from "./useContentMutations";
 
 export const useContent = (contentId?: string) => {
   // Fetch content directly to avoid type mismatches
@@ -25,7 +24,7 @@ export const useContent = (contentId?: string) => {
         throw error;
       }
 
-      return data as BaseContent;
+      return data as BaseContent; // Cast to the centralized BaseContent type
     },
     enabled: !!contentId,
   });
@@ -33,7 +32,7 @@ export const useContent = (contentId?: string) => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
 
   const setCurrentContent = (newContent: BaseContent | null) => {
-    // Empty implementation - just a placeholder to maintain API compatibility
+    // Implementation will be handled separately
     console.log("Setting current content:", newContent);
   };
 

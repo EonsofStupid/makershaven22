@@ -10,10 +10,10 @@ export const contentErrorAtom = atom<Error | null>(null);
 export const currentContentAtom = atom<BaseContent | null>(null);
 
 // Form state atoms
-export const contentFormTitleAtom = atom('');
+export const contentFormTitleAtom = atom<string>('');
 export const contentFormTypeAtom = atom<ContentType>('page');
 export const contentFormStatusAtom = atom<ContentStatus>('draft');
-export const contentFormSlugAtom = atom('');
+export const contentFormSlugAtom = atom<string>('');
 export const contentFormContentAtom = atom<any>({});
 export const contentFormMetadataAtom = atom<any>({});
 
@@ -29,7 +29,7 @@ export const contentFormValidAtom = atom(
 // Reset form atoms to defaults or with specific content
 export const resetContentFormAtom = atom(
   null, 
-  (_get, set, content: BaseContent | null = null) => {
+  (get, set, content: BaseContent | null = null) => {
     if (content) {
       set(contentFormTitleAtom, content.title);
       set(contentFormTypeAtom, content.type);

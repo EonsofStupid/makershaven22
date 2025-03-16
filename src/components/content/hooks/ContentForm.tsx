@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useContentMutations } from "./useContentMutations";
-import { isContentPage, isContentComponent } from "@/utils/validators";
 import { toast } from "sonner";
 import { BaseContent } from "@/lib/types/content/types";
 import { useAtom } from "jotai";
@@ -18,12 +17,12 @@ import {
 
 const ContentForm: React.FC = () => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
-  const [title] = useAtom(contentFormTitleAtom);
-  const [type] = useAtom(contentFormTypeAtom);
-  const [status] = useAtom(contentFormStatusAtom);
-  const [slug] = useAtom(contentFormSlugAtom);
-  const [content] = useAtom(contentFormContentAtom);
-  const [metadata] = useAtom(contentFormMetadataAtom);
+  const [title, setTitle] = useAtom(contentFormTitleAtom);
+  const [type, setType] = useAtom(contentFormTypeAtom);
+  const [status, setStatus] = useAtom(contentFormStatusAtom);
+  const [slug, setSlug] = useAtom(contentFormSlugAtom);
+  const [content, setContent] = useAtom(contentFormContentAtom);
+  const [metadata, setMetadata] = useAtom(contentFormMetadataAtom);
   const [isValid] = useAtom(contentFormValidAtom);
   const [currentContent] = useAtom(currentContentAtom);
 
@@ -66,6 +65,33 @@ const ContentForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Form implementation - This is a stub, actual form would be implemented based on design requirements */}
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium">Title</label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="slug" className="block text-sm font-medium">Slug</label>
+          <input
+            id="slug"
+            type="text"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+          />
+        </div>
+        
+        {/* Content type and status selectors would go here */}
+      </div>
+      
       <button 
         type="submit"
         disabled={!isValid}
