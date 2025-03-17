@@ -39,3 +39,11 @@ export interface Database {
     };
   };
 }
+export type Tables = {
+  admin_settings: {
+    Row: AdminSetting;
+    Insert: Omit<AdminSetting, 'id' | 'created_at' | 'updated_at'>;
+    Update: Partial<AdminSetting>;
+  };
+  // ... other table definitions ...
+}
