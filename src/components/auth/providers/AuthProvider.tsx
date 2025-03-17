@@ -4,12 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthSetup } from '@/hooks/useAuthSetup';
 import { motion } from "framer-motion";
 import { applySecurityHeaders } from "@/utils/auth/securityHeaders";
-import { sessionManager } from "@/lib/auth/SessionManager";
-import { securityManager } from "@/lib/auth/SecurityManager";
 import { useAuthStore } from '@/lib/store/auth-store';
 import { ensureUserProfilesExist } from "@/utils/auth/profileUtils";
 import { toast } from 'sonner';
 
+/**
+ * AuthProvider that handles authentication state and initialization
+ * Separates concerns and provides auth context to the app
+ */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { handleAuthChange, initialSetupDone } = useAuthSetup();
   const { isLoading, initialize, getIsAdmin } = useAuthStore();
@@ -47,16 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting auth setup');
         
-        // Initialize session and security in background
-        try {
-          await sessionManager.startSession();
-          securityManager.initialize();
-          console.log('Security systems initialized');
-        } catch (securityError) {
-          console.error('Error initializing security systems:', securityError);
-          // Continue anyway - non-blocking
-        }
-
         // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
@@ -78,21 +70,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           }
         }
-
-        // Import and run the seed function if needed
-        try {
-          const { seedDemoProjects } = await import('@/scripts/seed-demo-data');
-          await seedDemoProjects();
-        } catch (error) {
-          console.error("Error during demo data setup:", error);
-          // Non-blocking, continue anyway
-        }
       } catch (error) {
         console.error("Auth setup error:", error);
         toast.error("Error initializing auth", {
           description: "There was a problem setting up authentication. Some features may be limited."
         });
-        // Continue anyway - non-blocking
       }
     };
 
@@ -114,8 +96,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       console.log('Cleaning up AuthProvider');
       subscription.unsubscribe();
-      sessionManager.destroy();
-      securityManager.cleanup();
     };
   }, [handleAuthChange, initialize, getIsAdmin]);
 

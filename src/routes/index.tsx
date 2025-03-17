@@ -9,6 +9,7 @@ import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
 import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
+import { Dashboard } from "@/pages/admin/dashboard";
 
 export const AppRoutes = () => {
   const { isLoading } = useAuthStore();
@@ -45,6 +46,22 @@ export const AppRoutes = () => {
               />
             ))}
 
+            {/* Admin Dashboard Route */}
+            <Route 
+              path="/admin" 
+              element={
+                <ErrorBoundary>
+                  <AuthGuard 
+                    requireAuth={true}
+                    requiredRole={["admin", "super_admin"]}
+                    fallbackPath="/login"
+                  >
+                    <Dashboard />
+                  </AuthGuard>
+                </ErrorBoundary>
+              }
+            />
+
             {/* Admin Routes - Restricted to admin/super_admin */}
             {adminRoutes.map((route) => (
               <Route
@@ -55,7 +72,7 @@ export const AppRoutes = () => {
                     <AuthGuard 
                       requireAuth={true}
                       requiredRole={["admin", "super_admin"]}
-                      fallbackPath="/"
+                      fallbackPath="/login"
                     >
                       {route.element}
                     </AuthGuard>

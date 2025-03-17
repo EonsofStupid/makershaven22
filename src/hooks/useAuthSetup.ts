@@ -5,15 +5,19 @@ import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from 'sonner';
 
+/**
+ * Hook to handle auth setup and session changes
+ * Separates auth initialization logic from the provider
+ */
 export const useAuthSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { setSession, setUser, setLoading, setError, refreshUserRole } = useAuthStore();
   const initialSetupDone = useRef(false);
+  const { setSession, setUser, setLoading, setError, refreshUserRole } = useAuthStore();
 
   const handleAuthChange = useCallback(async (session: Session | null) => {
     try {
-      console.log('handleAuthChange called with session:', session?.user?.id || 'No session');
-
+      console.log('Auth state change handler called with session:', session?.user?.id || 'No session');
+      
       if (session) {
         const { user } = session;
         console.log('Setting authenticated user:', user.id);
