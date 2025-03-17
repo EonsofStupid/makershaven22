@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "../../../integrations/supabase/client";
-import { FlattenedSettings } from "@/lib/types/settings/types";
+import { supabase } from "@/integrations/supabase/client";
+import { FlattenedSettings } from "@/lib/types/settings/core";
 import { processDatabaseSettings } from "@/lib/utils/settings/process-utils";
 
 export function SiteSettingsManager() {

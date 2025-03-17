@@ -1,94 +1,114 @@
 
-import React from 'react';
-import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { SecuritySettings, parseSecuritySettings, prepareSecuritySettingsForDb } from '@/lib/types/security/types';
+import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { prepareSecuritySettingsForDb } from "@/lib/types/security/types";
 
-export const RateLimitingSection = () => {
-  const queryClient = useQueryClient();
+export function RateLimitingSection() {
+  const [requestsPerMinute, setRequestsPerMinute] = useState(100);
+  const [windowMinutes, setWindowMinutes] = useState(5);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('security_settings')
+  // Fetch current security settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("security_settings")
+          .single();
+
+        if (error) throw error;
+
+        const settings = data.security_settings || {};
+        setRequestsPerMinute(settings.rate_limit_requests || 100);
+        setWindowMinutes(settings.rate_limit_window_minutes || 5);
+      } catch (err) {
+        console.error("Error fetching rate limiting settings:", err);
+        toast.error("Failed to load rate limiting settings");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleUpdateSettings = async () => {
+    try {
+      // Get current settings first
+      const { data, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("security_settings")
         .single();
 
+      if (fetchError) throw fetchError;
+      
+      // Preserve other security settings
+      const currentSettings = data.security_settings || {};
+      
+      // Update specific rate limiting settings
+      const { error } = await supabase
+        .from("site_settings")
+        .update({
+          security_settings: {
+            ...currentSettings,
+            rate_limit_requests: requestsPerMinute,
+            rate_limit_window_minutes: windowMinutes
+          }
+        })
+        .eq("id", '1');
+
       if (error) throw error;
-      return parseSecuritySettings(data.security_settings);
+
+      toast.success("Rate limiting settings updated");
+    } catch (err) {
+      console.error("Error updating rate limiting settings:", err);
+      toast.error("Failed to update rate limiting settings");
     }
-  });
-
-  const updateSettings = useMutation({
-    mutationFn: async (newSettings: SecuritySettings) => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .update({ security_settings: prepareSecuritySettingsForDb(newSettings) })
-        .eq('id', (await supabase.from('site_settings').select('id').single()).data.id);
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      toast.success('Rate limiting settings updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating rate limiting settings:', error);
-      toast.error('Failed to update rate limiting settings');
-    }
-  });
-
-  const handleUpdate = (key: keyof SecuritySettings, value: number) => {
-    if (!settings) return;
-    
-    const updatedSettings = {
-      ...settings,
-      [key]: value
-    };
-    updateSettings.mutate(updatedSettings);
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="py-4">Loading...</div>;
   }
 
   return (
-    <Card className="p-6 bg-gray-800/50 border border-white/10">
-      <div className="space-y-6">
-        <div>
-          <Label htmlFor="max-requests">Maximum Requests</Label>
-          <Input
-            id="max-requests"
-            type="number"
-            value={settings?.rate_limit_requests || 100}
-            onChange={(e) => handleUpdate('rate_limit_requests', parseInt(e.target.value))}
-            className="mt-1"
-          />
-          <p className="text-sm text-gray-400 mt-1">
-            Maximum number of requests allowed within the time window
-          </p>
+    <div className="space-y-4 py-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="requests-per-minute">Maximum Requests Per Minute</Label>
+          <span>{requestsPerMinute}</span>
         </div>
-
-        <div>
-          <Label htmlFor="time-window">Time Window (minutes)</Label>
-          <Input
-            id="time-window"
-            type="number"
-            value={settings?.rate_limit_window_minutes || 5}
-            onChange={(e) => handleUpdate('rate_limit_window_minutes', parseInt(e.target.value))}
-            className="mt-1"
-          />
-          <p className="text-sm text-gray-400 mt-1">
-            Time window in minutes for rate limiting
-          </p>
-        </div>
+        <Slider
+          id="requests-per-minute"
+          min={10}
+          max={500}
+          step={10}
+          value={[requestsPerMinute]}
+          onValueChange={(value) => setRequestsPerMinute(value[0])}
+          onValueCommit={handleUpdateSettings}
+        />
       </div>
-    </Card>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="window-minutes">Rate Limit Window (minutes)</Label>
+          <span>{windowMinutes}</span>
+        </div>
+        <Slider
+          id="window-minutes"
+          min={1}
+          max={30}
+          step={1}
+          value={[windowMinutes]}
+          onValueChange={(value) => setWindowMinutes(value[0])}
+          onValueCommit={handleUpdateSettings}
+        />
+      </div>
+    </div>
   );
-};
+}

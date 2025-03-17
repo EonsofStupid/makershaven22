@@ -1,148 +1,167 @@
 
-import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Plus, X } from 'lucide-react';
-import { SecuritySettings, parseSecuritySettings, prepareSecuritySettingsForDb } from '@/lib/types/security/types';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { prepareSecuritySettingsForDb } from "@/lib/types/security/types";
+import { useForm } from "react-hook-form";
 
-export const IPSecuritySection = () => {
-  const [newIP, setNewIP] = React.useState('');
-  const queryClient = useQueryClient();
+export function IPSecuritySection() {
+  const [enabled, setEnabled] = useState(false);
+  const [blacklist, setBlacklist] = useState<string[]>([]);
+  const [newIP, setNewIP] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('security_settings')
-        .single();
+  // Fetch current security settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("security_settings")
+          .single();
 
-      if (error) throw error;
-      return parseSecuritySettings(data.security_settings);
-    }
-  });
+        if (error) throw error;
 
-  const updateSettings = useMutation({
-    mutationFn: async (newSettings: SecuritySettings) => {
-      const { data: settingsData } = await supabase
-        .from('site_settings')
-        .select('id')
-        .single();
-
-      if (!settingsData?.id) throw new Error('Settings not found');
-
-      const { data, error } = await supabase
-        .from('site_settings')
-        .update({ security_settings: prepareSecuritySettingsForDb(newSettings) })
-        .eq('id', settingsData.id);
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      toast.success('Security settings updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating security settings:', error);
-      toast.error('Failed to update security settings');
-    }
-  });
-
-  const addToList = (list: 'ip_whitelist' | 'ip_blacklist') => {
-    if (!newIP || !settings) return;
-    
-    const updatedSettings = {
-      ...settings,
-      [list]: [...(settings[list] || []), newIP]
+        const settings = data.security_settings || {};
+        setEnabled(!!settings.enable_ip_filtering);
+        setBlacklist(Array.isArray(settings.ip_blacklist) ? settings.ip_blacklist : []);
+      } catch (err) {
+        console.error("Error fetching security settings:", err);
+        toast.error("Failed to load IP filtering settings");
+      } finally {
+        setIsLoading(false);
+      }
     };
-    
-    updateSettings.mutate(updatedSettings);
-    setNewIP('');
+
+    fetchSettings();
+  }, []);
+
+  const toggleEnabled = async () => {
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({
+          security_settings: {
+            enable_ip_filtering: !enabled,
+            ip_blacklist: blacklist
+          }
+        })
+        .eq("id", '1');
+
+      if (error) throw error;
+
+      setEnabled(!enabled);
+      toast.success(`IP filtering ${!enabled ? "enabled" : "disabled"}`);
+    } catch (err) {
+      console.error("Error updating IP filtering:", err);
+      toast.error("Failed to update IP filtering settings");
+    }
   };
 
-  const removeFromList = (list: 'ip_whitelist' | 'ip_blacklist', ip: string) => {
-    if (!settings) return;
+  const addIP = async () => {
+    if (!newIP || blacklist.includes(newIP)) return;
 
-    const updatedSettings = {
-      ...settings,
-      [list]: settings[list].filter((item: string) => item !== ip)
-    };
+    const updatedBlacklist = [...blacklist, newIP];
     
-    updateSettings.mutate(updatedSettings);
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({
+          security_settings: {
+            enable_ip_filtering: enabled,
+            ip_blacklist: updatedBlacklist
+          }
+        })
+        .eq("id", '1');
+
+      if (error) throw error;
+
+      setBlacklist(updatedBlacklist);
+      setNewIP("");
+      toast.success(`IP address ${newIP} added to blacklist`);
+    } catch (err) {
+      console.error("Error adding IP to blacklist:", err);
+      toast.error("Failed to add IP address to blacklist");
+    }
+  };
+
+  const removeIP = async (ip: string) => {
+    const updatedBlacklist = blacklist.filter(item => item !== ip);
+    
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({
+          security_settings: {
+            enable_ip_filtering: enabled,
+            ip_blacklist: updatedBlacklist
+          }
+        })
+        .eq("id", '1');
+
+      if (error) throw error;
+
+      setBlacklist(updatedBlacklist);
+      toast.success(`IP address ${ip} removed from blacklist`);
+    } catch (err) {
+      console.error("Error removing IP from blacklist:", err);
+      toast.error("Failed to remove IP address from blacklist");
+    }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="py-4">Loading...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6 bg-gray-800/50 border border-white/10">
-        <h3 className="text-lg font-semibold mb-4">IP Whitelist</h3>
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter IP address"
-              value={newIP}
-              onChange={(e) => setNewIP(e.target.value)}
-            />
-            <Button onClick={() => addToList('ip_whitelist')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add IP
-            </Button>
-          </div>
-          <div className="grid gap-2">
-            {settings?.ip_whitelist?.map((ip: string) => (
-              <div key={ip} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                <span>{ip}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeFromList('ip_whitelist', ip)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
+    <div className="space-y-4 py-4">
+      <div className="flex items-center justify-between">
+        <Label htmlFor="enable-ip-filtering">Enable IP Filtering</Label>
+        <Switch id="enable-ip-filtering" checked={enabled} onCheckedChange={toggleEnabled} />
+      </div>
 
-      <Card className="p-6 bg-gray-800/50 border border-white/10">
-        <h3 className="text-lg font-semibold mb-4">IP Blacklist</h3>
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter IP address"
-              value={newIP}
-              onChange={(e) => setNewIP(e.target.value)}
-            />
-            <Button onClick={() => addToList('ip_blacklist')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add IP
-            </Button>
+      {enabled && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="ip-blacklist">IP Blacklist</Label>
+            <div className="flex space-x-2">
+              <Input
+                id="ip-blacklist"
+                placeholder="Enter IP address"
+                value={newIP}
+                onChange={(e) => setNewIP(e.target.value)}
+              />
+              <Button type="button" onClick={addIP}>Add</Button>
+            </div>
           </div>
-          <div className="grid gap-2">
-            {settings?.ip_blacklist?.map((ip: string) => (
-              <div key={ip} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                <span>{ip}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeFromList('ip_blacklist', ip)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+
+          <div className="space-y-2">
+            {blacklist.length > 0 ? (
+              <div className="space-y-2">
+                {blacklist.map((ip) => (
+                  <div key={ip} className="flex items-center justify-between bg-gray-800 p-2 rounded">
+                    <span>{ip}</span>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => removeIP(ip)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p className="text-gray-400">No IP addresses in blacklist</p>
+            )}
           </div>
-        </div>
-      </Card>
+        </>
+      )}
     </div>
   );
-};
+}

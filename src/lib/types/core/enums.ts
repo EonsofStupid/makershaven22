@@ -1,6 +1,6 @@
 
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type TransitionType = 'fade' | 'slide' | 'scale';
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';
 
 export enum BuildDifficulty {

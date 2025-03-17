@@ -1,6 +1,9 @@
 
-import { JsonObject } from '../core/json';
+import { Json, JsonObject } from '../core/json';
 
+/**
+ * Core security settings interface
+ */
 export interface SecuritySettings {
   enable_ip_filtering: boolean;
   two_factor_auth: boolean;
@@ -13,71 +16,67 @@ export interface SecuritySettings {
   rate_limit_window_minutes?: number;
 }
 
-export const DEFAULT_SECURITY_SETTINGS: SecuritySettings = {
-  enable_ip_filtering: false,
-  two_factor_auth: false,
-  max_login_attempts: 5,
-  ip_blacklist: [],
-  ip_whitelist: [],
-  rate_limit_requests: 100,
-  session_timeout_minutes: 60,
-  lockout_duration_minutes: 30,
-  rate_limit_window_minutes: 5
-};
+/**
+ * Security log entry interface
+ */
+export interface SecurityLog {
+  id: string;
+  event_type: string;
+  severity: string;
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  details?: JsonObject;
+  created_at: string;
+}
 
+/**
+ * Parse security settings from JSON or object
+ */
 export function parseSecuritySettings(data: unknown): SecuritySettings {
+  const defaultSettings: SecuritySettings = {
+    enable_ip_filtering: false,
+    two_factor_auth: false,
+    max_login_attempts: 5
+  };
+  
   if (!data) {
-    return DEFAULT_SECURITY_SETTINGS;
+    return defaultSettings;
   }
-
+  
   try {
-    let securityData: JsonObject;
-    
-    if (typeof data === 'string') {
-      securityData = JSON.parse(data) as JsonObject;
-    } else {
-      securityData = data as JsonObject;
-    }
+    const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
     
     return {
-      enable_ip_filtering: typeof securityData.enable_ip_filtering === 'boolean' 
-        ? securityData.enable_ip_filtering as boolean 
-        : DEFAULT_SECURITY_SETTINGS.enable_ip_filtering,
-      
-      two_factor_auth: typeof securityData.two_factor_auth === 'boolean'
-        ? securityData.two_factor_auth as boolean
-        : DEFAULT_SECURITY_SETTINGS.two_factor_auth,
-      
-      max_login_attempts: typeof securityData.max_login_attempts === 'number'
-        ? securityData.max_login_attempts as number
-        : DEFAULT_SECURITY_SETTINGS.max_login_attempts,
-      
-      ip_blacklist: Array.isArray(securityData.ip_blacklist)
-        ? securityData.ip_blacklist as string[]
-        : DEFAULT_SECURITY_SETTINGS.ip_blacklist,
-      
-      ip_whitelist: Array.isArray(securityData.ip_whitelist)
-        ? securityData.ip_whitelist as string[]
-        : DEFAULT_SECURITY_SETTINGS.ip_whitelist,
-      
-      rate_limit_requests: typeof securityData.rate_limit_requests === 'number'
-        ? securityData.rate_limit_requests as number
-        : DEFAULT_SECURITY_SETTINGS.rate_limit_requests,
-      
-      session_timeout_minutes: typeof securityData.session_timeout_minutes === 'number'
-        ? securityData.session_timeout_minutes as number
-        : DEFAULT_SECURITY_SETTINGS.session_timeout_minutes,
-      
-      lockout_duration_minutes: typeof securityData.lockout_duration_minutes === 'number'
-        ? securityData.lockout_duration_minutes as number
-        : DEFAULT_SECURITY_SETTINGS.lockout_duration_minutes,
-      
-      rate_limit_window_minutes: typeof securityData.rate_limit_window_minutes === 'number'
-        ? securityData.rate_limit_window_minutes as number
-        : DEFAULT_SECURITY_SETTINGS.rate_limit_window_minutes
+      enable_ip_filtering: parsedData.enable_ip_filtering ?? defaultSettings.enable_ip_filtering,
+      two_factor_auth: parsedData.two_factor_auth ?? defaultSettings.two_factor_auth,
+      max_login_attempts: parsedData.max_login_attempts ?? defaultSettings.max_login_attempts,
+      ip_blacklist: Array.isArray(parsedData.ip_blacklist) ? parsedData.ip_blacklist : [],
+      ip_whitelist: Array.isArray(parsedData.ip_whitelist) ? parsedData.ip_whitelist : [],
+      rate_limit_requests: parsedData.rate_limit_requests ?? 100,
+      session_timeout_minutes: parsedData.session_timeout_minutes ?? 60,
+      lockout_duration_minutes: parsedData.lockout_duration_minutes ?? 30,
+      rate_limit_window_minutes: parsedData.rate_limit_window_minutes ?? 5
     };
   } catch (error) {
     console.error('Error parsing security settings:', error);
-    return DEFAULT_SECURITY_SETTINGS;
+    return defaultSettings;
   }
+}
+
+/**
+ * Prepare security settings for database
+ */
+export function prepareSecuritySettingsForDb(settings: SecuritySettings): JsonObject {
+  return {
+    enable_ip_filtering: settings.enable_ip_filtering,
+    two_factor_auth: settings.two_factor_auth,
+    max_login_attempts: settings.max_login_attempts,
+    ip_blacklist: settings.ip_blacklist || [],
+    ip_whitelist: settings.ip_whitelist || [],
+    rate_limit_requests: settings.rate_limit_requests || 100,
+    session_timeout_minutes: settings.session_timeout_minutes || 60,
+    lockout_duration_minutes: settings.lockout_duration_minutes || 30,
+    rate_limit_window_minutes: settings.rate_limit_window_minutes || 5
+  };
 }

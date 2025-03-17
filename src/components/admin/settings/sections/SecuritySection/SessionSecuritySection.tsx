@@ -1,108 +1,133 @@
 
-import React from 'react';
-import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { SecuritySettings, parseSecuritySettings, prepareSecuritySettingsForDb } from '@/lib/types/security/types';
+import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { prepareSecuritySettingsForDb } from "@/lib/types/security/types";
 
-export const SessionSecuritySection = () => {
-  const queryClient = useQueryClient();
+export function SessionSecuritySection() {
+  const [sessionTimeout, setSessionTimeout] = useState(60);
+  const [lockoutDuration, setLockoutDuration] = useState(30);
+  const [maxLoginAttempts, setMaxLoginAttempts] = useState(5);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('security_settings')
+  // Fetch current security settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("security_settings")
+          .single();
+
+        if (error) throw error;
+
+        const settings = data.security_settings || {};
+        setSessionTimeout(settings.session_timeout_minutes || 60);
+        setLockoutDuration(settings.lockout_duration_minutes || 30);
+        setMaxLoginAttempts(settings.max_login_attempts || 5);
+      } catch (err) {
+        console.error("Error fetching session security settings:", err);
+        toast.error("Failed to load session security settings");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleUpdateSettings = async () => {
+    try {
+      // Get current settings first
+      const { data, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("security_settings")
         .single();
 
+      if (fetchError) throw fetchError;
+      
+      // Preserve other security settings
+      const currentSettings = data.security_settings || {};
+      
+      // Update specific session security settings
+      const { error } = await supabase
+        .from("site_settings")
+        .update({
+          security_settings: {
+            ...currentSettings,
+            session_timeout_minutes: sessionTimeout,
+            lockout_duration_minutes: lockoutDuration,
+            max_login_attempts: maxLoginAttempts
+          }
+        })
+        .eq("id", '1');
+
       if (error) throw error;
-      return parseSecuritySettings(data.security_settings);
+
+      toast.success("Session security settings updated");
+    } catch (err) {
+      console.error("Error updating session security settings:", err);
+      toast.error("Failed to update session security settings");
     }
-  });
-
-  const updateSettings = useMutation({
-    mutationFn: async (newSettings: SecuritySettings) => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .update({ security_settings: prepareSecuritySettingsForDb(newSettings) })
-        .eq('id', (await supabase.from('site_settings').select('id').single()).data.id);
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      toast.success('Session security settings updated successfully');
-    },
-    onError: (error) => {
-      console.error('Error updating session security settings:', error);
-      toast.error('Failed to update session security settings');
-    }
-  });
-
-  const handleUpdate = (key: keyof SecuritySettings, value: number) => {
-    if (!settings) return;
-    
-    const updatedSettings = {
-      ...settings,
-      [key]: value
-    };
-    updateSettings.mutate(updatedSettings);
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="py-4">Loading...</div>;
   }
 
   return (
-    <Card className="p-6 bg-gray-800/50 border border-white/10">
-      <div className="space-y-6">
-        <div>
-          <Label htmlFor="max-attempts">Maximum Login Attempts</Label>
-          <Input
-            id="max-attempts"
-            type="number"
-            value={settings?.max_login_attempts || 5}
-            onChange={(e) => handleUpdate('max_login_attempts', parseInt(e.target.value))}
-            className="mt-1"
-          />
-          <p className="text-sm text-gray-400 mt-1">
-            Number of failed login attempts before account lockout
-          </p>
-        </div>
-
-        <div>
-          <Label htmlFor="lockout-duration">Lockout Duration (minutes)</Label>
-          <Input
-            id="lockout-duration"
-            type="number"
-            value={settings?.lockout_duration_minutes || 30}
-            onChange={(e) => handleUpdate('lockout_duration_minutes', parseInt(e.target.value))}
-            className="mt-1"
-          />
-          <p className="text-sm text-gray-400 mt-1">
-            Duration of account lockout after maximum failed attempts
-          </p>
-        </div>
-
-        <div>
+    <div className="space-y-4 py-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
-          <Input
-            id="session-timeout"
-            type="number"
-            value={settings?.session_timeout_minutes || 60}
-            onChange={(e) => handleUpdate('session_timeout_minutes', parseInt(e.target.value))}
-            className="mt-1"
-          />
-          <p className="text-sm text-gray-400 mt-1">
-            Duration before an inactive session expires
-          </p>
+          <span>{sessionTimeout}</span>
         </div>
+        <Slider
+          id="session-timeout"
+          min={5}
+          max={240}
+          step={5}
+          value={[sessionTimeout]}
+          onValueChange={(value) => setSessionTimeout(value[0])}
+          onValueCommit={handleUpdateSettings}
+        />
       </div>
-    </Card>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="lockout-duration">Account Lockout Duration (minutes)</Label>
+          <span>{lockoutDuration}</span>
+        </div>
+        <Slider
+          id="lockout-duration"
+          min={1}
+          max={120}
+          step={1}
+          value={[lockoutDuration]}
+          onValueChange={(value) => setLockoutDuration(value[0])}
+          onValueCommit={handleUpdateSettings}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="max-login-attempts">Max Login Attempts</Label>
+          <span>{maxLoginAttempts}</span>
+        </div>
+        <Slider
+          id="max-login-attempts"
+          min={1}
+          max={10}
+          step={1}
+          value={[maxLoginAttempts]}
+          onValueChange={(value) => setMaxLoginAttempts(value[0])}
+          onValueCommit={handleUpdateSettings}
+        />
+      </div>
+    </div>
   );
-};
+}

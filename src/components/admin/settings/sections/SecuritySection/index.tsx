@@ -11,6 +11,9 @@ interface SecuritySectionProps {
 }
 
 export function SecuritySection({ form }: SecuritySectionProps) {
+  // Get nested security settings values safely
+  const securitySettings = form.watch("security_settings") || {};
+
   return (
     <AccordionItem value="security">
       <AccordionTrigger>Security Settings</AccordionTrigger>
@@ -20,7 +23,7 @@ export function SecuritySection({ form }: SecuritySectionProps) {
             <Label htmlFor="enable_ip_filtering">Enable IP Filtering</Label>
             <Switch 
               id="enable_ip_filtering"
-              checked={form.watch("security_settings.enable_ip_filtering") || false}
+              checked={Boolean(securitySettings.enable_ip_filtering)}
               onCheckedChange={(checked) => 
                 form.setValue("security_settings.enable_ip_filtering", checked, { shouldDirty: true })}
             />
@@ -30,7 +33,7 @@ export function SecuritySection({ form }: SecuritySectionProps) {
             <Label htmlFor="two_factor_auth">Two Factor Authentication</Label>
             <Switch 
               id="two_factor_auth"
-              checked={form.watch("security_settings.two_factor_auth") || false}
+              checked={Boolean(securitySettings.two_factor_auth)}
               onCheckedChange={(checked) => 
                 form.setValue("security_settings.two_factor_auth", checked, { shouldDirty: true })}
             />
@@ -43,7 +46,7 @@ export function SecuritySection({ form }: SecuritySectionProps) {
               type="number"
               min={1}
               max={10}
-              defaultValue={form.watch("security_settings.max_login_attempts") || 5}
+              value={securitySettings.max_login_attempts || 5}
               onChange={(e) => 
                 form.setValue("security_settings.max_login_attempts", 
                   parseInt(e.target.value), { shouldDirty: true })}

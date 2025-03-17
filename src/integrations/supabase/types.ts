@@ -2384,6 +2384,185 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          accent_color: string | null
+          analytics_id: string | null
+          backdrop_blur: string | null
+          border_radius: string | null
+          box_shadow: string | null
+          contact_email: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_css: string | null
+          custom_scripts: string[] | null
+          description: string | null
+          favicon_url: string | null
+          font_family_body: string | null
+          font_family_heading: string | null
+          font_size_base: string | null
+          font_weight_bold: string | null
+          font_weight_normal: string | null
+          glass_effect: Database["public"]["Enums"]["glass_effect_level"] | null
+          hover_scale: string | null
+          id: string
+          keywords: string[] | null
+          letter_spacing: string | null
+          line_height_base: string | null
+          logo_url: string | null
+          maintenance_message: string | null
+          maintenance_mode: boolean | null
+          menu_animation_type:
+            | Database["public"]["Enums"]["transition_type"]
+            | null
+          metadata: Json | null
+          neon_cyan: string | null
+          neon_pink: string | null
+          neon_purple: string | null
+          primary_color: string | null
+          primary_domain: string | null
+          secondary_color: string | null
+          security_settings: Json | null
+          shadow_color: string | null
+          site_title: string
+          social_links: Json | null
+          spacing_unit: string | null
+          support_email: string | null
+          tagline: string | null
+          text_heading_color: string | null
+          text_link_color: string | null
+          text_primary_color: string | null
+          text_secondary_color: string | null
+          theme_metadata: Json | null
+          theme_mode: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences: Json | null
+          transition_duration: string | null
+          transition_type: Database["public"]["Enums"]["transition_type"] | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          analytics_id?: string | null
+          backdrop_blur?: string | null
+          border_radius?: string | null
+          box_shadow?: string | null
+          contact_email?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_css?: string | null
+          custom_scripts?: string[] | null
+          description?: string | null
+          favicon_url?: string | null
+          font_family_body?: string | null
+          font_family_heading?: string | null
+          font_size_base?: string | null
+          font_weight_bold?: string | null
+          font_weight_normal?: string | null
+          glass_effect?:
+            | Database["public"]["Enums"]["glass_effect_level"]
+            | null
+          hover_scale?: string | null
+          id?: string
+          keywords?: string[] | null
+          letter_spacing?: string | null
+          line_height_base?: string | null
+          logo_url?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean | null
+          menu_animation_type?:
+            | Database["public"]["Enums"]["transition_type"]
+            | null
+          metadata?: Json | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
+          primary_color?: string | null
+          primary_domain?: string | null
+          secondary_color?: string | null
+          security_settings?: Json | null
+          shadow_color?: string | null
+          site_title?: string
+          social_links?: Json | null
+          spacing_unit?: string | null
+          support_email?: string | null
+          tagline?: string | null
+          text_heading_color?: string | null
+          text_link_color?: string | null
+          text_primary_color?: string | null
+          text_secondary_color?: string | null
+          theme_metadata?: Json | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences?: Json | null
+          transition_duration?: string | null
+          transition_type?:
+            | Database["public"]["Enums"]["transition_type"]
+            | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          analytics_id?: string | null
+          backdrop_blur?: string | null
+          border_radius?: string | null
+          box_shadow?: string | null
+          contact_email?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_css?: string | null
+          custom_scripts?: string[] | null
+          description?: string | null
+          favicon_url?: string | null
+          font_family_body?: string | null
+          font_family_heading?: string | null
+          font_size_base?: string | null
+          font_weight_bold?: string | null
+          font_weight_normal?: string | null
+          glass_effect?:
+            | Database["public"]["Enums"]["glass_effect_level"]
+            | null
+          hover_scale?: string | null
+          id?: string
+          keywords?: string[] | null
+          letter_spacing?: string | null
+          line_height_base?: string | null
+          logo_url?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean | null
+          menu_animation_type?:
+            | Database["public"]["Enums"]["transition_type"]
+            | null
+          metadata?: Json | null
+          neon_cyan?: string | null
+          neon_pink?: string | null
+          neon_purple?: string | null
+          primary_color?: string | null
+          primary_domain?: string | null
+          secondary_color?: string | null
+          security_settings?: Json | null
+          shadow_color?: string | null
+          site_title?: string
+          social_links?: Json | null
+          spacing_unit?: string | null
+          support_email?: string | null
+          tagline?: string | null
+          text_heading_color?: string | null
+          text_link_color?: string | null
+          text_primary_color?: string | null
+          text_secondary_color?: string | null
+          theme_metadata?: Json | null
+          theme_mode?: Database["public"]["Enums"]["theme_mode"] | null
+          theme_preferences?: Json | null
+          transition_duration?: string | null
+          transition_type?:
+            | Database["public"]["Enums"]["transition_type"]
+            | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       site_theme_availability: {
         Row: {
           created_at: string | null
@@ -3698,6 +3877,7 @@ export type Database = {
         | "workflow"
         | "hero"
         | "feature"
+      glass_effect_level: "none" | "light" | "medium" | "heavy"
       pin_verification_status: "success" | "failed" | "locked"
       post_category:
         | "Guides"
