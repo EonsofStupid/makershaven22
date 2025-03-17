@@ -22,3 +22,18 @@ export interface SecurityEventDetails {
   description: string;
   metadata?: ActivityMetadata;
 }
+export interface ActivityLog {
+  id: string;
+  user_id: string;
+  activity_type: string;
+  details: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ActivityLogWithProfile = ActivityLog & {
+  profiles: {
+    full_name: string;
+    avatar_url: string;
+  };
+};
