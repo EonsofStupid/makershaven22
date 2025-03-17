@@ -1,18 +1,11 @@
-
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from '@/components/theme/ThemeContext';
 
 interface SearchButtonProps {
   onClick: () => void;
 }
 
 export const SearchButton = ({ onClick }: SearchButtonProps) => {
-  const { theme } = useTheme();
-  
-  const neonCyan = theme?.neon_cyan || '#41f0db';
-  const neonPurple = theme?.neon_purple || '#8000ff';
-
   return (
     <Button
       variant="ghost"
