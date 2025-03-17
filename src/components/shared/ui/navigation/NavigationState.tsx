@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 
 interface NavigationState {
@@ -9,7 +10,7 @@ interface NavigationState {
 
 export const useNavigationStore = create<NavigationState>((set) => ({
   isScrolled: false,
-  mousePosition: { x: 0, y: 0 },
+  mousePosition: { x: 50, y: 50 },
   setIsScrolled: (value) => set({ isScrolled: value }),
   setMousePosition: (position) => set({ mousePosition: position }),
 }));

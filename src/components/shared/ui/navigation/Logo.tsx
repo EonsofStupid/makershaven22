@@ -1,17 +1,17 @@
+
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { useTheme } from '@/components/theme/ThemeContext';
 
 export const Logo = () => {
-  const handleNavigation = (path: string) => {
-    console.log('Navigating to:', path);
-    toast.success(`Navigating to ${path}`);
-  };
+  const { theme } = useTheme();
+  
+  const neonCyan = theme?.neon_cyan || '#41f0db';
+  const neonPink = theme?.neon_pink || '#ff0abe';
 
   return (
     <Link 
       to="/"
       className="flex items-center space-x-2 cursor-pointer group -ml-6 scale-125"
-      onClick={() => handleNavigation('/')}
     >
       <span className="text-3xl font-bold flex items-center space-x-1 relative">
         <span className="neon-text-cyan relative transform -translate-y-1">
