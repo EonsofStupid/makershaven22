@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -5,6 +6,7 @@ import {
   Wrench, 
   BookOpen, 
   Globe,
+  FileText,
   ChevronDown 
 } from 'lucide-react';
 import {
@@ -18,6 +20,7 @@ import { BuildsMenu } from './menu-items/BuildsMenu';
 import { PartsMenu } from './menu-items/PartsMenu';
 import { GuidesMenu } from './menu-items/GuidesMenu';
 import { SiteMenu } from './menu-items/SiteMenu';
+import { BlogMenu } from './menu-items/BlogMenu';
 
 export function MegaMenu() {
   return (
@@ -68,6 +71,22 @@ export function MegaMenu() {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <GuidesMenu />
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <NavigationMenuTrigger 
+            className="h-9 px-4 py-2 group/nav-trigger bg-transparent text-white data-[state=open]:bg-white/5 hover:bg-gradient-to-r hover:from-[#41f0db]/20 hover:to-[#8000ff]/20 hover:text-[#41f0db] transition-all duration-300"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            <span className="relative">
+              Blog
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#41f0db] to-[#8000ff] transition-all duration-300 group-hover/nav-trigger:w-full" />
+            </span>
+            <ChevronDown className="w-3 h-3 ml-1 transition-transform duration-300 group-data-[state=open]/nav-trigger:rotate-180" />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <BlogMenu />
           </NavigationMenuContent>
         </NavigationMenuItem>
 

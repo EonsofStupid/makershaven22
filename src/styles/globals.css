@@ -1,3 +1,4 @@
+
 @import './admin/layout.css';
 @import './admin/components.css';
 
@@ -40,7 +41,23 @@
     0 0 7px var(--neon-cyan),
     0 0 10px var(--neon-cyan),
     0 0 21px var(--neon-cyan),
+    0 0 42px var(--neon-cyan),
     0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.neon-text-cyan::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.7;
+  background: var(--neon-cyan);
+  transform: translateZ(0);
 }
 
 .neon-text-pink {
@@ -49,5 +66,21 @@
     0 0 7px var(--neon-pink),
     0 0 10px var(--neon-pink),
     0 0 21px var(--neon-pink),
+    0 0 42px var(--neon-pink),
     0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.neon-text-pink::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.7;
+  background: var(--neon-pink);
+  transform: translateZ(0);
 }

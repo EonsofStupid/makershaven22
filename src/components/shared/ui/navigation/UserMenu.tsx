@@ -1,10 +1,12 @@
+
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { toast } from "sonner";
 import { 
   UserCircle, Settings, Activity, 
   LayoutDashboard, LogOut, Database,
-  Image, FileText, Zap, Radio
+  Image, FileText, Zap, Radio,
+  Hammer
 } from "lucide-react";
 import { UserMenuHeader } from "./menu/UserMenuHeader";
 import { UserMenuItem } from "./menu/UserMenuItem";
@@ -40,6 +42,12 @@ export const UserMenu = ({ onClose }: { onClose: () => void }) => {
           icon={UserCircle}
           label="Profile"
           onClick={() => handleNavigation("/profile")}
+        />
+
+        <UserMenuItem
+          icon={Hammer}
+          label="Maker Space"
+          onClick={() => handleNavigation("/maker-space")}
         />
 
         <UserMenuItem
