@@ -58,3 +58,43 @@ export function toJson(value: unknown): Json {
   }
   throw new Error('Value cannot be converted to JSON');
 }
+
+/**
+ * Ensures the input is converted to a JsonObject
+ */
+export function ensureJsonObject(value: unknown): JsonObject {
+  if (!value) return {};
+  
+  if (isJsonObject(value)) {
+    return value;
+  }
+  
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (isJsonObject(parsed)) {
+        return parsed;
+      }
+    } catch (e) {
+      // Parsing failed, return empty object
+    }
+  }
+  
+  return {};
+}
+
+/**
+ * Converts a value to a JSON value for storage
+ */
+export function ensureJson(value: unknown): Json {
+  if (isJson(value)) {
+    return value;
+  }
+  
+  // Try to convert to string
+  try {
+    return JSON.stringify(value);
+  } catch (e) {
+    return null;
+  }
+}

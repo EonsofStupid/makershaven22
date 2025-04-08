@@ -33,8 +33,8 @@ export const AuthGuard: FC<AuthGuardProps> = ({
     return <SessionTransition />;
   }
 
-  const isAuthenticated = auth.getIsAuthenticated();
-  const userRole = auth.getUserRole();
+  const isAuthenticated = !!auth.user;
+  const userRole = auth.user?.role;
   
   // Handle authentication requirements
   if (requireAuth && !isAuthenticated) {
@@ -45,7 +45,7 @@ export const AuthGuard: FC<AuthGuardProps> = ({
   if (isAuthenticated && requiredRole) {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     
-    if (!userRole || !roles.includes(userRole)) {
+    if (!userRole || !roles.includes(userRole as UserRole)) {
       return <Navigate to={fallbackPath} replace />;
     }
   }
@@ -53,3 +53,6 @@ export const AuthGuard: FC<AuthGuardProps> = ({
   // If all checks pass, render the children
   return <>{children}</>;
 };
+
+// For backward compatibility, also export as AuthBoundary
+export const AuthBoundary = AuthGuard;

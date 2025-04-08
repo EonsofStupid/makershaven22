@@ -17,7 +17,7 @@ export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
 /**
  * User role types
  */
-export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin' | 'moderator';
 
 /**
  * Content status types
@@ -41,17 +41,27 @@ export type ContentType =
 /**
  * Workflow stage types
  */
-export type WorkflowStageType = 'approval' | 'review' | 'edit' | 'publish';
+export type WorkflowStageType = 'APPROVAL' | 'TASK' | 'REVIEW' | 'NOTIFICATION' | 'CONDITIONAL';
 
 /**
- * Security event severity
+ * Build difficulty levels
  */
-export type SecurityEventSeverity = 'low' | 'medium' | 'high';
+export type BuildDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 
 /**
- * Security event category
+ * Build status values
  */
-export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';
+export type BuildStatus = 'draft' | 'submitted' | 'approved' | 'rejected' | 'published';
+
+/**
+ * Post category types
+ */
+export type PostCategory = 'tutorial' | 'news' | 'guide' | 'showcase' | 'review';
+
+/**
+ * Theme availability status
+ */
+export type ThemeAvailabilityStatus = 'enabled' | 'disabled' | 'preview';
 
 /**
  * Type guards for enums
@@ -60,16 +70,16 @@ export function isValidThemeMode(value: unknown): value is ThemeMode {
   return typeof value === 'string' && ['light', 'dark', 'system'].includes(value);
 }
 
-export function isValidGlassEffectLevel(value: unknown): value is GlassEffectLevel {
-  return typeof value === 'string' && ['none', 'light', 'medium', 'heavy'].includes(value);
-}
-
 export function isValidTransitionType(value: unknown): value is TransitionType {
   return typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value);
 }
 
+export function isValidGlassEffectLevel(value: unknown): value is GlassEffectLevel {
+  return typeof value === 'string' && ['none', 'light', 'medium', 'heavy'].includes(value);
+}
+
 export function isValidUserRole(value: unknown): value is UserRole {
-  return typeof value === 'string' && ['subscriber', 'maker', 'admin', 'super_admin'].includes(value);
+  return typeof value === 'string' && ['subscriber', 'maker', 'admin', 'super_admin', 'moderator'].includes(value);
 }
 
 export function isValidContentStatus(value: unknown): value is ContentStatus {
@@ -83,5 +93,21 @@ export function isValidContentType(value: unknown): value is ContentType {
 }
 
 export function isValidWorkflowStageType(value: unknown): value is WorkflowStageType {
-  return typeof value === 'string' && ['approval', 'review', 'edit', 'publish'].includes(value);
+  return typeof value === 'string' && ['APPROVAL', 'TASK', 'REVIEW', 'NOTIFICATION', 'CONDITIONAL'].includes(value);
+}
+
+export function isValidBuildDifficulty(value: unknown): value is BuildDifficulty {
+  return typeof value === 'string' && ['beginner', 'intermediate', 'advanced', 'expert'].includes(value);
+}
+
+export function isValidBuildStatus(value: unknown): value is BuildStatus {
+  return typeof value === 'string' && ['draft', 'submitted', 'approved', 'rejected', 'published'].includes(value);
+}
+
+export function isValidPostCategory(value: unknown): value is PostCategory {
+  return typeof value === 'string' && ['tutorial', 'news', 'guide', 'showcase', 'review'].includes(value);
+}
+
+export function isValidThemeAvailabilityStatus(value: unknown): value is ThemeAvailabilityStatus {
+  return typeof value === 'string' && ['enabled', 'disabled', 'preview'].includes(value);
 }

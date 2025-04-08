@@ -1,49 +1,10 @@
+
+import { Json } from '../types/core/json';
+
 export interface Database {
   public: {
     Tables: {
-      import_sessions: {
-        Row: {
-          id: string;
-          user_id: string;
-          status: string;
-          file_name: string;
-          file_size: number;
-          file_type: string;
-          metadata: Json;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          status: string;
-          file_name: string;
-          file_size: number;
-          file_type: string;
-          metadata?: Json;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          status?: string;
-          file_name?: string;
-          file_size?: number;
-          file_type?: string;
-          metadata?: Json;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "import_sessions_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
+      // User activity table
       user_activity: {
         Row: {
           id: string;
@@ -52,6 +13,9 @@ export interface Database {
           details: string;
           created_at: string;
           updated_at: string;
+          metadata?: Json;
+          state_data?: Json;
+          sync_status?: string;
         };
         Insert: {
           id?: string;
@@ -60,6 +24,9 @@ export interface Database {
           details: string;
           created_at?: string;
           updated_at?: string;
+          metadata?: Json;
+          state_data?: Json;
+          sync_status?: string;
         };
         Update: {
           id?: string;
@@ -68,16 +35,13 @@ export interface Database {
           details?: string;
           created_at?: string;
           updated_at?: string;
+          metadata?: Json;
+          state_data?: Json;
+          sync_status?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: "user_activity_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          }
-        ];
       };
+
+      // Import sessions table
       import_sessions: {
         Row: {
           id: string;
@@ -89,6 +53,11 @@ export interface Database {
           metadata: Json;
           created_at: string;
           updated_at: string;
+          row_count?: number;
+          error_message?: string;
+          completed_at?: string;
+          type?: string;
+          name?: string;
         };
         Insert: {
           id?: string;
@@ -100,6 +69,11 @@ export interface Database {
           metadata?: Json;
           created_at?: string;
           updated_at?: string;
+          row_count?: number;
+          error_message?: string;
+          completed_at?: string;
+          type?: string;
+          name?: string;
         };
         Update: {
           id?: string;
@@ -111,21 +85,75 @@ export interface Database {
           metadata?: Json;
           created_at?: string;
           updated_at?: string;
+          row_count?: number;
+          error_message?: string;
+          completed_at?: string;
+          type?: string;
+          name?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: "import_sessions_user_id_fkey";
-            columns: ["user_id"];
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          }
-        ];
       };
+
+      // Security audit logs table
       security_audit_logs: {
+        Row: {
+          id: string;
+          event_type: string;
+          user_id?: string;
+          resource_type?: string;
+          resource_id?: string;
+          action: string;
+          severity: string;
+          previous_state?: Json;
+          new_state?: Json;
+          metadata?: Json;
+          created_at: string;
+          ip_address?: string;
+          user_agent?: string;
+        };
+        Insert: {
+          id?: string;
+          event_type: string;
+          user_id?: string;
+          resource_type?: string;
+          resource_id?: string;
+          action: string;
+          severity: string;
+          previous_state?: Json;
+          new_state?: Json;
+          metadata?: Json;
+          created_at?: string;
+          ip_address?: string;
+          user_agent?: string;
+        };
+        Update: {
+          id?: string;
+          event_type?: string;
+          user_id?: string;
+          resource_type?: string;
+          resource_id?: string;
+          action?: string;
+          severity?: string;
+          previous_state?: Json;
+          new_state?: Json;
+          metadata?: Json;
+          created_at?: string;
+          ip_address?: string;
+          user_agent?: string;
+        };
       };
     };
   };
 }
+
+export type AdminSetting = {
+  id: string;
+  setting_key: string;
+  setting_value: string;
+  setting_type: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type Tables = {
   admin_settings: {
     Row: AdminSetting;

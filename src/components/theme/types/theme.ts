@@ -39,7 +39,7 @@ export interface DatabaseSettingsRow {
   updated_at?: string;
   updated_by?: string;
   setting_key?: string;
-  security_settings?: Json;
+  security_settings?: SecuritySettings | Record<string, unknown>;
   theme_mode?: string;
   logo_url?: string;
   favicon_url?: string;
@@ -64,7 +64,7 @@ export interface Theme extends Omit<FlattenedSettings, 'id' | 'created_at' | 'up
 export function prepareSettingsForDatabase(settings: FlattenedSettings): Record<string, any> {
   return {
     ...settings,
-    security_settings: ensureJson(settings.security_settings),
+    security_settings: settings.security_settings ? ensureJson(settings.security_settings) : null,
     metadata: settings.metadata ? ensureJson(settings.metadata) : null,
     theme_preferences: settings.theme_preferences ? ensureJson(settings.theme_preferences) : null,
     theme_metadata: settings.theme_metadata ? ensureJson(settings.theme_metadata) : null,

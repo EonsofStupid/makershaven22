@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { prepareSecuritySettingsForDb } from "@/lib/types/security/types";
-import { useForm } from "react-hook-form";
+import { JsonObject } from "@/lib/types/core/json";
 
 export function IPSecuritySection() {
   const [enabled, setEnabled] = useState(false);
@@ -43,10 +42,22 @@ export function IPSecuritySection() {
 
   const toggleEnabled = async () => {
     try {
+      // Get current settings first
+      const { data, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("security_settings")
+        .single();
+
+      if (fetchError) throw fetchError;
+      
+      // Preserve other security settings
+      const currentSettings = data.security_settings || {};
+      
       const { error } = await supabase
         .from("site_settings")
         .update({
           security_settings: {
+            ...currentSettings,
             enable_ip_filtering: !enabled,
             ip_blacklist: blacklist
           }
@@ -66,13 +77,24 @@ export function IPSecuritySection() {
   const addIP = async () => {
     if (!newIP || blacklist.includes(newIP)) return;
 
-    const updatedBlacklist = [...blacklist, newIP];
-    
     try {
+      // Get current settings first
+      const { data, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("security_settings")
+        .single();
+
+      if (fetchError) throw fetchError;
+      
+      // Preserve other security settings
+      const currentSettings = data.security_settings || {};
+      const updatedBlacklist = [...blacklist, newIP];
+      
       const { error } = await supabase
         .from("site_settings")
         .update({
           security_settings: {
+            ...currentSettings,
             enable_ip_filtering: enabled,
             ip_blacklist: updatedBlacklist
           }
@@ -91,13 +113,24 @@ export function IPSecuritySection() {
   };
 
   const removeIP = async (ip: string) => {
-    const updatedBlacklist = blacklist.filter(item => item !== ip);
-    
     try {
+      // Get current settings first
+      const { data, error: fetchError } = await supabase
+        .from("site_settings")
+        .select("security_settings")
+        .single();
+
+      if (fetchError) throw fetchError;
+      
+      // Preserve other security settings
+      const currentSettings = data.security_settings || {};
+      const updatedBlacklist = blacklist.filter(item => item !== ip);
+      
       const { error } = await supabase
         .from("site_settings")
         .update({
           security_settings: {
+            ...currentSettings,
             enable_ip_filtering: enabled,
             ip_blacklist: updatedBlacklist
           }

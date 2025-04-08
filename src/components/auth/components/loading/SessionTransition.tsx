@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 export const SessionTransition: React.FC = () => {
   const auth = useAuthStore();
   
+  // Only show when transitioning is true
   if (!auth.isTransitioning) {
     return null;
   }

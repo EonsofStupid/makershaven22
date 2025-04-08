@@ -95,3 +95,6 @@ export interface PostWithAuthor {
     avatar_url?: string;
   };
 }
+
+// Export enum types for backward compatibility
+export { ContentStatus, ContentType };

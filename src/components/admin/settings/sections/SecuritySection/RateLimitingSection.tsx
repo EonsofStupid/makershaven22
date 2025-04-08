@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { prepareSecuritySettingsForDb } from "@/lib/types/security/types";
+import { JsonObject } from "@/lib/types/core/json";
 
 export function RateLimitingSection() {
   const [requestsPerMinute, setRequestsPerMinute] = useState(100);
