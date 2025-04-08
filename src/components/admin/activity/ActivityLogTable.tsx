@@ -1,60 +1,77 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
-import type { ActivityLogWithProfile } from '@/lib/types/activity';
-import { DataTable } from '@/components/ui/data-table';
+
+import React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { formatDistanceToNow } from 'date-fns';
+import { DataTable } from '@/components/ui/data-table';
+import { Badge } from '@/components/ui/badge';
 
-export function ActivityLogTable() {
-  const [logs, setLogs] = useState<ActivityLogWithProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchActivityLogs() {
-      try {
-        const { data, error } = await supabase
-          .from('user_activity')
-          .select(`
-            *,
-            profiles:user_id(
-              full_name,
-              avatar_url
-            )
-          `)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setLogs(data as ActivityLogWithProfile[]);
-      } catch (error) {
-        console.error('Error fetching activity logs:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchActivityLogs();
-  }, []);
-
-  const columns = [
-    {
-      header: 'User',
-      accessorKey: 'profiles.full_name',
-    },
-    {
-      header: 'Activity',
-      accessorKey: 'activity_type',
-    },
-    {
-      header: 'Details',
-      accessorKey: 'details',
-    },
-    {
-      header: 'Time',
-      accessorKey: 'created_at',
-      cell: ({ row }) => formatDistanceToNow(new Date(row.original.created_at), { addSuffix: true }),
-    },
-  ];
-
-  if (loading) return <div>Loading...</div>;
-
-  return <DataTable data={logs} columns={columns} />;
+export interface ActivityLog {
+  id: string;
+  user_id: string;
+  activity_type: string;
+  details?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  user?: {
+    username?: string;
+    display_name?: string;
+  };
 }
+
+const columns: ColumnDef<ActivityLog>[] = [
+  {
+    accessorKey: 'activity_type',
+    header: 'Activity',
+    cell: ({ row }) => {
+      const type = row.getValue('activity_type') as string;
+      return (
+        <Badge variant="outline" className="capitalize">
+          {type.replace('_', ' ')}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'user',
+    header: 'User',
+    cell: ({ row }) => {
+      const user = row.original.user;
+      return <span>{user?.display_name || user?.username || 'Unknown user'}</span>;
+    },
+  },
+  {
+    accessorKey: 'details',
+    header: 'Details',
+    cell: ({ row }) => {
+      const details = row.original.details;
+      return <span className="text-gray-400">{details || 'No details'}</span>;
+    },
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Time',
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('created_at') as string);
+      return <span className="text-gray-400">{formatDistanceToNow(date, { addSuffix: true })}</span>;
+    },
+  },
+];
+
+interface ActivityLogTableProps {
+  data: ActivityLog[];
+  isLoading?: boolean;
+}
+
+export const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ 
+  data, 
+  isLoading = false 
+}) => {
+  return (
+    <DataTable
+      columns={columns}
+      data={data}
+      filterColumn="activity_type"
+      filterPlaceholder="Filter activities..."
+    />
+  );
+};

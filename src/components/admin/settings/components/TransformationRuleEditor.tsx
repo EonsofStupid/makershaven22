@@ -6,10 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useSettingsStore } from '@/lib/store/settings-store';
 import { toast } from 'sonner';
+import { Json, JsonObject } from '@/lib/types/core/json';
 
-interface TransformationRule {
+// Define the TransformationRule interface with index signature
+export interface TransformationRule {
   from: string;
   to: string;
+  [key: string]: string; // Add index signature
 }
 
 export const TransformationRuleEditor = () => {
@@ -23,14 +26,18 @@ export const TransformationRuleEditor = () => {
       try {
         const storedRules = settings.metadata.transformationRules;
         if (Array.isArray(storedRules)) {
-          // Validate that each rule has from and to properties
-          const validRules = storedRules.filter(
-            (rule): rule is TransformationRule => 
-              typeof rule === 'object' && 
-              rule !== null &&
-              typeof (rule as any).from === 'string' && 
-              typeof (rule as any).to === 'string'
-          );
+          // Validate and convert rules to TransformationRule type
+          const validRules = storedRules
+            .filter(rule => typeof rule === 'object' && rule !== null)
+            .map(rule => {
+              // Ensure the rule has from and to properties that are strings
+              if (typeof rule.from === 'string' && typeof rule.to === 'string') {
+                return rule as TransformationRule;
+              }
+              return null;
+            })
+            .filter(Boolean) as TransformationRule[];
+            
           setRules(validRules);
         }
       } catch (e) {
@@ -50,10 +57,10 @@ export const TransformationRuleEditor = () => {
     setRules(updatedRules);
     setNewRule({ from: '', to: '' });
     
-    // Save to settings metadata
-    const updatedMetadata = {
+    // Convert rules to a format that matches JsonObject
+    const updatedMetadata: JsonObject = {
       ...settings.metadata,
-      transformationRules: updatedRules
+      transformationRules: updatedRules as unknown as Json
     };
     
     updateSettings({ metadata: updatedMetadata });
@@ -64,10 +71,10 @@ export const TransformationRuleEditor = () => {
     const updatedRules = rules.filter((_, i) => i !== index);
     setRules(updatedRules);
     
-    // Save to settings metadata
-    const updatedMetadata = {
+    // Convert rules to a format that matches JsonObject
+    const updatedMetadata: JsonObject = {
       ...settings.metadata,
-      transformationRules: updatedRules
+      transformationRules: updatedRules as unknown as Json
     };
     
     updateSettings({ metadata: updatedMetadata });

@@ -2,8 +2,68 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { validateContentCreate, validateContentUpdate } from "../utils/contentTypeValidation";
 import { ContentCreate, ContentUpdate, BaseContent } from "@/lib/types/content/types";
+import { JsonObject } from "@/lib/types/core/json";
+
+interface ValidationResult<T> {
+  success: boolean;
+  data?: T;
+  errors?: { message: string }[];
+}
+
+// Simple validation for content creation and updates
+const validateContentCreate = (data: ContentCreate): ValidationResult<ContentCreate> => {
+  if (!data.title || data.title.trim() === '') {
+    return {
+      success: false,
+      errors: [{ message: 'Title is required' }]
+    };
+  }
+  
+  if (!data.created_by) {
+    return {
+      success: false,
+      errors: [{ message: 'User ID (created_by) is required' }]
+    };
+  }
+  
+  return {
+    success: true,
+    data: {
+      ...data,
+      content: data.content || {} as JsonObject,
+      metadata: data.metadata || {} as JsonObject
+    }
+  };
+};
+
+const validateContentUpdate = (data: ContentUpdate): ValidationResult<ContentUpdate> => {
+  if (!data.id) {
+    return {
+      success: false,
+      errors: [{ message: 'Content ID is required' }]
+    };
+  }
+  
+  if (!data.updated_by) {
+    return {
+      success: false,
+      errors: [{ message: 'User ID (updated_by) is required' }]
+    };
+  }
+  
+  if (data.title !== undefined && data.title.trim() === '') {
+    return {
+      success: false,
+      errors: [{ message: 'Title cannot be empty' }]
+    };
+  }
+  
+  return {
+    success: true,
+    data
+  };
+};
 
 export const useContentMutations = () => {
   const queryClient = useQueryClient();
@@ -21,15 +81,10 @@ export const useContentMutations = () => {
         throw new Error(errorMessage);
       }
 
-      // Ensure contentData has created_by, which is required by the database
-      if (!contentData.created_by) {
-        throw new Error("User ID (created_by) is required for content creation");
-      }
-
       // Insert the validated data
       const { data: result, error } = await supabase
         .from("cms_content")
-        .insert(validation.data as Required<ContentCreate>)
+        .insert(validation.data as ContentCreate)
         .select()
         .single();
 
@@ -63,15 +118,10 @@ export const useContentMutations = () => {
         throw new Error(errorMessage);
       }
 
-      // Ensure contentData has updated_by, which is required for updates
-      if (!contentData.updated_by) {
-        throw new Error("User ID (updated_by) is required for content updates");
-      }
-
       // Update with validated data
       const { data: result, error } = await supabase
         .from("cms_content")
-        .update(validation.data as Required<ContentUpdate>)
+        .update(validation.data as ContentUpdate)
         .eq("id", contentData.id)
         .select()
         .single();

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useContentMutations } from "./useContentMutations";
 import { toast } from "sonner";
@@ -10,13 +11,16 @@ import {
   contentFormContentAtom,
   contentFormMetadataAtom,
   contentFormValidAtom,
-  currentContentAtom
+  currentContentAtom,
+  prepareContentCreateAtom,
+  prepareContentUpdateAtom
 } from "@/lib/store/atoms/content-atoms";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ContentType, ContentStatus } from "@/lib/types";
+import { ContentType, ContentStatus } from '@/lib/types/core/enums';
+import { JsonObject } from '@/lib/types/core/json';
 
 const ContentForm: React.FC = () => {
   const { createContentWithUser, updateContentWithUser } = useContentMutations();
@@ -28,6 +32,8 @@ const ContentForm: React.FC = () => {
   const [metadata, setMetadata] = useAtom(contentFormMetadataAtom);
   const [isValid] = useAtom(contentFormValidAtom);
   const [currentContent] = useAtom(currentContentAtom);
+  const [createData] = useAtom(prepareContentCreateAtom);
+  const [updateData] = useAtom(prepareContentUpdateAtom);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,25 +44,13 @@ const ContentForm: React.FC = () => {
     }
 
     try {
-      const formData = {
-        title,
-        type,
-        status,
-        slug,
-        content,
-        metadata
-      };
-
       if (currentContent?.id) {
         // Update existing content
-        await updateContentWithUser({
-          ...formData,
-          id: currentContent.id
-        });
+        await updateContentWithUser(updateData);
         toast.success("Content updated successfully");
       } else {
         // Create new content
-        await createContentWithUser(formData);
+        await createContentWithUser(createData);
         toast.success("Content created successfully");
       }
     } catch (error) {

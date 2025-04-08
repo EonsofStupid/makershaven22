@@ -1,29 +1,65 @@
-import { Settings } from './settings/types';
-import { AuthSession, AuthUser, AuthError } from './auth/types';
+
+import { ThemeMode, UserRole } from './core/enums';
+import { FlattenedSettings } from './settings/core';
+import { SecuritySettings } from './security/types';
 
 export interface ThemeState {
-  settings: Settings | null;
-  isLoading: boolean;
-  error: Error | null;
-  setSettings: (settings: Settings) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  updateSettings: (settings: Settings) => Promise<void>;
+  currentTheme: string;
+  systemTheme: ThemeMode;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
+  setSystemTheme: (mode: ThemeMode) => void;
 }
 
 export interface AuthState {
-  session: AuthSession | null;
   user: AuthUser | null;
+  session: AuthSession | null;
   isLoading: boolean;
-  error: AuthError | null;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: AuthError | null) => void;
-  signOut: () => Promise<void>;
+  isTransitioning?: boolean;
+  hasAccess: boolean;
+  error: Error | { message: string } | null;
+  
+  // Auth methods that should be available in the store
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, userData?: Record<string, any>) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateProfile: (data: Partial<AuthUser>) => Promise<void>;
+  
+  // Derived state and utility methods
+  getIsAuthenticated: () => boolean;
+  getUserRole: () => UserRole | undefined;
+  checkAccess: (requiredRoles?: UserRole[]) => boolean;
+}
+
+export interface AuthUser {
+  id: string;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
+}
+
+export interface AuthSession {
+  id: string;
+  user: AuthUser;
+  expires_at?: number;
+  created_at: string;
 }
 
 export interface SettingsState {
-  settings: Settings;
-  saveTransformationRule: (rule: any) => Promise<void>;
+  settings: FlattenedSettings;
+  isLoading: boolean;
+  error: Error | null;
+  isDirty: boolean;
+  defaultSettings: FlattenedSettings;
+  
+  // Settings methods
+  updateSettings: (settings: Partial<FlattenedSettings>) => Promise<void>;
+  resetSettings: () => Promise<void>;
+  loadSettings: () => Promise<void>;
 }

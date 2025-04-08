@@ -4,15 +4,16 @@ import { UseFormReturn } from "react-hook-form";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FlattenedSettings } from "@/lib/types/settings/types";
+import { FlattenedSettings } from "@/lib/types/settings/core";
+import { SecuritySettings, DEFAULT_SECURITY_SETTINGS } from "@/lib/types/security/types";
 
 interface SecuritySectionProps {
   form: UseFormReturn<FlattenedSettings>;
 }
 
 export function SecuritySection({ form }: SecuritySectionProps) {
-  // Get nested security settings values safely
-  const securitySettings = form.watch("security_settings") || {};
+  // Get nested security settings values safely with defaults
+  const securitySettings = form.watch("security_settings") as SecuritySettings || DEFAULT_SECURITY_SETTINGS;
 
   return (
     <AccordionItem value="security">
@@ -46,7 +47,7 @@ export function SecuritySection({ form }: SecuritySectionProps) {
               type="number"
               min={1}
               max={10}
-              value={securitySettings.max_login_attempts || 5}
+              value={securitySettings.max_login_attempts || DEFAULT_SECURITY_SETTINGS.max_login_attempts}
               onChange={(e) => 
                 form.setValue("security_settings.max_login_attempts", 
                   parseInt(e.target.value), { shouldDirty: true })}

@@ -1,75 +1,87 @@
 
+/**
+ * Theme mode options
+ */
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+
+/**
+ * Glass effect intensity levels
+ */
 export type GlassEffectLevel = 'none' | 'light' | 'medium' | 'heavy';
 
-export enum BuildDifficulty {
-  Beginner = 'beginner',
-  Intermediate = 'intermediate',
-  Advanced = 'advanced',
-  Expert = 'expert'
+/**
+ * Transition animation types
+ */
+export type TransitionType = 'fade' | 'slide' | 'scale' | 'blur';
+
+/**
+ * User role types
+ */
+export type UserRole = 'subscriber' | 'maker' | 'admin' | 'super_admin';
+
+/**
+ * Content status types
+ */
+export type ContentStatus = 'draft' | 'published' | 'archived';
+
+/**
+ * Content type categories
+ */
+export type ContentType = 
+  | 'page'
+  | 'component'
+  | 'template'
+  | 'build'
+  | 'guide'
+  | 'part'
+  | 'workflow'
+  | 'hero'
+  | 'feature';
+
+/**
+ * Workflow stage types
+ */
+export type WorkflowStageType = 'approval' | 'review' | 'edit' | 'publish';
+
+/**
+ * Security event severity
+ */
+export type SecurityEventSeverity = 'low' | 'medium' | 'high';
+
+/**
+ * Security event category
+ */
+export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';
+
+/**
+ * Type guards for enums
+ */
+export function isValidThemeMode(value: unknown): value is ThemeMode {
+  return typeof value === 'string' && ['light', 'dark', 'system'].includes(value);
 }
 
-export enum BuildStatus {
-  Draft = 'draft',
-  Pending = 'pending',
-  Approved = 'approved',
-  Rejected = 'rejected'
+export function isValidGlassEffectLevel(value: unknown): value is GlassEffectLevel {
+  return typeof value === 'string' && ['none', 'light', 'medium', 'heavy'].includes(value);
 }
 
-export enum ContentType {
-  Page = 'page',
-  Component = 'component',
-  Template = 'template',
-  Workflow = 'workflow',
-  Hero = 'hero',
-  Feature = 'feature'
+export function isValidTransitionType(value: unknown): value is TransitionType {
+  return typeof value === 'string' && ['fade', 'slide', 'scale', 'blur'].includes(value);
 }
 
-export enum ContentStatus {
-  Draft = 'draft',
-  Published = 'published',
-  Archived = 'archived'
+export function isValidUserRole(value: unknown): value is UserRole {
+  return typeof value === 'string' && ['subscriber', 'maker', 'admin', 'super_admin'].includes(value);
 }
 
-export enum UserRole {
-  Subscriber = 'subscriber',
-  Maker = 'maker',
-  Admin = 'admin',
-  SuperAdmin = 'super_admin',
-  Moderator = 'moderator'
+export function isValidContentStatus(value: unknown): value is ContentStatus {
+  return typeof value === 'string' && ['draft', 'published', 'archived'].includes(value);
 }
 
-// Settings types
-export enum SettingCategory {
-  Theme = 'theme',
-  Security = 'security',
-  Site = 'site',
-  User = 'user'
+export function isValidContentType(value: unknown): value is ContentType {
+  return typeof value === 'string' && [
+    'page', 'component', 'template', 'build', 'guide', 'part', 'workflow', 'hero', 'feature'
+  ].includes(value);
 }
 
-export enum SettingType {
-  Theme = 'theme',
-  Security = 'security',
-  Site = 'site',
-  User = 'user'
-}
-
-export enum ThemeInheritanceStrategy {
-  Merge = 'merge',
-  Override = 'override'
-}
-
-export enum ComponentType {
-  Card = 'card',
-  Button = 'button',
-  Input = 'input',
-  Typography = 'typography',
-  Layout = 'layout'
-}
-
-export enum ThemeAvailabilityStatus {
-  Enabled = 'enabled',
-  Disabled = 'disabled',
-  Preview = 'preview'
+export function isValidWorkflowStageType(value: unknown): value is WorkflowStageType {
+  return typeof value === 'string' && ['approval', 'review', 'edit', 'publish'].includes(value);
 }

@@ -1,64 +1,106 @@
 
 import React from 'react';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export const TableRowSkeleton = ({ columns = 4 }: { columns?: number }) => {
+export interface LoadingProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+  text?: string;
+}
+
+export const LoadingSpinner: React.FC<LoadingProps> = ({ 
+  size = 'md', 
+  className,
+  text
+}) => {
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8'
+  };
+
   return (
-    <div className="px-4 py-3 animate-pulse">
-      <div className="flex items-center space-x-4">
-        {Array(columns)
-          .fill(null)
-          .map((_, index) => (
-            <div
-              key={index}
-              className={`h-4 bg-white/10 rounded ${
-                index === 0 ? 'w-1/4' : 'w-1/6'
-              }`}
-            />
+    <div className={cn('flex items-center justify-center', className)}>
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+      {text && <span className="ml-2">{text}</span>}
+    </div>
+  );
+};
+
+export const CardSkeleton: React.FC<{ className?: string }> = ({ className }) => {
+  return (
+    <div className={cn(
+      'rounded-lg bg-black/20 backdrop-blur-lg animate-pulse', 
+      'border border-white/5 p-4 h-40',
+      className
+    )}>
+      <div className="h-4 bg-white/10 rounded-full w-3/4 mb-4"></div>
+      <div className="h-2 bg-white/10 rounded-full mb-2"></div>
+      <div className="h-2 bg-white/10 rounded-full w-5/6 mb-2"></div>
+      <div className="h-2 bg-white/10 rounded-full w-4/6 mb-4"></div>
+      <div className="mt-auto flex justify-between">
+        <div className="h-6 bg-white/10 rounded-full w-1/4"></div>
+        <div className="h-6 bg-white/10 rounded-full w-1/4"></div>
+      </div>
+    </div>
+  );
+};
+
+export const GridSkeleton: React.FC<{ count?: number, className?: string }> = ({ 
+  count = 6,
+  className
+}) => {
+  return (
+    <div className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4', className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <CardSkeleton key={i} />
+      ))}
+    </div>
+  );
+};
+
+export const TableSkeleton: React.FC<{ rows?: number, columns?: number, className?: string }> = ({ 
+  rows = 5,
+  columns = 4,
+  className
+}) => {
+  return (
+    <div className={cn('w-full rounded-md overflow-hidden', className)}>
+      <div className="bg-black/30 p-4">
+        <div className="h-6 bg-white/10 rounded-full w-1/4 mb-2"></div>
+      </div>
+      <div className="w-full">
+        <div className="grid grid-cols-4 bg-black/20 p-3 border-b border-white/5">
+          {Array.from({ length: columns }).map((_, i) => (
+            <div key={i} className="h-4 bg-white/10 rounded-full"></div>
           ))}
+        </div>
+        {Array.from({ length: rows }).map((_, rowIndex) => (
+          <div key={rowIndex} className="grid grid-cols-4 p-3 border-b border-white/5">
+            {Array.from({ length: columns }).map((_, colIndex) => (
+              <div key={colIndex} className="h-4 bg-white/10 rounded-full"></div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export const CardSkeleton = () => {
+export const FormSkeleton: React.FC<{ fields?: number, className?: string }> = ({ 
+  fields = 4,
+  className
+}) => {
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-xl p-6 border border-white/10 animate-pulse">
-      <div className="h-6 bg-white/10 rounded w-3/4 mb-4" />
-      <div className="space-y-3">
-        <div className="h-4 bg-white/10 rounded w-full" />
-        <div className="h-4 bg-white/10 rounded w-5/6" />
-        <div className="h-4 bg-white/10 rounded w-4/6" />
-      </div>
-    </div>
-  );
-};
-
-export const ListItemSkeleton = () => {
-  return (
-    <div className="flex items-center space-x-4 py-3 animate-pulse">
-      <div className="h-10 w-10 rounded-full bg-white/10" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-white/10 rounded w-3/4" />
-        <div className="h-3 bg-white/10 rounded w-1/2" />
-      </div>
-    </div>
-  );
-};
-
-export const FullPageLoader = ({ message }: { message?: string }) => {
-  return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-      <LoadingSpinner size="lg" color="neon-cyan" className="mb-4" />
-      {message && <p className="text-white text-lg">{message}</p>}
-    </div>
-  );
-};
-
-export const ContentLoader = ({ className = '' }: { className?: string }) => {
-  return (
-    <div className={`flex items-center justify-center p-8 ${className}`}>
-      <LoadingSpinner color="neon-cyan" />
+    <div className={cn('space-y-6', className)}>
+      {Array.from({ length: fields }).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <div className="h-4 bg-white/10 rounded-full w-1/4"></div>
+          <div className="h-10 bg-white/5 rounded-md w-full"></div>
+        </div>
+      ))}
+      <div className="h-10 bg-primary/20 rounded-md w-1/3"></div>
     </div>
   );
 };
