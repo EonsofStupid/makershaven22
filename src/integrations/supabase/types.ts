@@ -3689,17 +3689,11 @@ export type Database = {
     }
     Functions: {
       append_blog_image: {
-        Args: {
-          post_id: string
-          image_url: string
-        }
+        Args: { post_id: string; image_url: string }
         Returns: undefined
       }
       ban_user: {
-        Args: {
-          p_user_id: string
-          p_reason: string
-        }
+        Args: { p_user_id: string; p_reason: string }
         Returns: undefined
       }
       check_rate_limit: {
@@ -3721,34 +3715,23 @@ export type Database = {
         Returns: undefined
       }
       get_complete_theme_settings: {
-        Args: {
-          theme_id: string
-        }
+        Args: { theme_id: string }
         Returns: Json
       }
       get_user_role: {
-        Args: {
-          user_id: string
-        }
+        Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
       }
       has_role: {
-        Args: {
-          user_id: string
-          role_names: string[]
-        }
+        Args: { user_id: string; role_names: string[] }
         Returns: boolean
       }
       initialize_user_gamification: {
-        Args: {
-          user_id: string
-        }
+        Args: { user_id: string }
         Returns: undefined
       }
       is_admin: {
-        Args: {
-          user_id: string
-        }
+        Args: { user_id: string }
         Returns: boolean
       }
       log_audit_event: {
@@ -3786,16 +3769,11 @@ export type Database = {
         Returns: string
       }
       merge_theme_settings: {
-        Args: {
-          child_settings: Json
-          parent_settings: Json
-        }
+        Args: { child_settings: Json; parent_settings: Json }
         Returns: Json
       }
       parse_workflow_stages: {
-        Args: {
-          data: Json
-        }
+        Args: { data: Json }
         Returns: Json
       }
       record_user_activity: {
@@ -3808,9 +3786,7 @@ export type Database = {
         Returns: string
       }
       resend_2fa_code: {
-        Args: {
-          p_email: string
-        }
+        Args: { p_email: string }
         Returns: Json
       }
       setup_pin: {
@@ -3823,18 +3799,11 @@ export type Database = {
         Returns: Json
       }
       verify_2fa_code: {
-        Args: {
-          p_code: string
-          p_email: string
-        }
+        Args: { p_code: string; p_email: string }
         Returns: Json
       }
       verify_device_pin: {
-        Args: {
-          p_device_id: string
-          p_pin: string
-          p_user_id: string
-        }
+        Args: { p_device_id: string; p_pin: string; p_user_id: string }
         Returns: Json
       }
       verify_pin_login: {
@@ -3922,27 +3891,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -3950,20 +3921,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -3971,20 +3944,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -3992,21 +3967,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -4015,6 +3992,87 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      audit_category: [
+        "authentication",
+        "authorization",
+        "data_access",
+        "system",
+        "security",
+        "performance",
+        "user_action",
+        "configuration",
+      ],
+      audit_severity: ["info", "warn", "error", "critical"],
+      build_difficulty: ["beginner", "intermediate", "advanced", "expert"],
+      build_status: [
+        "draft",
+        "pending_review",
+        "approved",
+        "rejected",
+        "archived",
+      ],
+      component_type: ["color", "typography", "layout", "animation", "effect"],
+      content_status: ["draft", "published", "archived"],
+      content_type: [
+        "page",
+        "build",
+        "guide",
+        "part",
+        "component",
+        "template",
+        "workflow",
+        "hero",
+        "feature",
+      ],
+      glass_effect_level: ["none", "light", "medium", "heavy"],
+      pin_verification_status: ["success", "failed", "locked"],
+      post_category: [
+        "Guides",
+        "Reviews",
+        "Blog",
+        "Site Updates",
+        "Critical",
+        "3D Printer",
+        "3D Printer Hardware",
+      ],
+      setting_category: ["theme", "system", "user", "security", "performance"],
+      setting_type: [
+        "theme",
+        "security",
+        "content",
+        "system",
+        "user",
+        "notification",
+        "workflow",
+      ],
+      setting_value_type: ["string", "number", "boolean", "json"],
+      theme_availability_status: ["available", "disabled", "preview"],
+      theme_component_type: [
+        "color",
+        "typography",
+        "layout",
+        "animation",
+        "effect",
+      ],
+      theme_inheritance_strategy: ["override", "merge", "replace"],
+      theme_mode: ["light", "dark", "system"],
+      theme_property_type: ["mandatory", "optional"],
+      transition_type: ["fade", "slide", "scale", "blur"],
+      user_role: ["subscriber", "maker", "admin", "super_admin", "moderator"],
+      workflow_stage_type: [
+        "approval",
+        "review",
+        "task",
+        "notification",
+        "conditional",
+      ],
+    },
+  },
+} as const

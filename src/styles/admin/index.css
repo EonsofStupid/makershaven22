@@ -1,0 +1,50 @@
+
+@import './layout.css';
+@import './components.css';
+@import './sidebar.css';
+@import './topnav.css';
+@import './dashboard.css';
+@import './_theme.css';
+
+/* Admin Base Classes */
+.admin-layout {
+  @apply min-h-screen relative overflow-hidden;
+  background: linear-gradient(135deg, 
+    rgba(21,26,36,0.95),
+    rgba(32,37,47,0.95)
+  );
+}
+
+.admin-content {
+  @apply relative z-10 space-y-8 px-6 py-8 min-h-screen;
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: var(--sidebar-width, 16rem);
+  padding-top: var(--topbar-height, 3.7rem);
+}
+
+/* Admin Glass Effects */
+.admin-glass {
+  @apply relative overflow-hidden backdrop-blur-xl;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+  border: 1px solid rgba(65, 240, 219, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.admin-glass:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .admin-content {
+    margin-left: 0;
+  }
+  
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+}

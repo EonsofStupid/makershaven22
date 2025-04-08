@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useAdminSidebar } from './sidebar/AdminSidebarContext';
@@ -68,10 +69,7 @@ export const AdminNav = () => {
                 {shortcut}
               </Link>
               <button
-                onClick={() => {
-                  removeShortcut(shortcut);
-                  toast.success(`Removed ${shortcut} from shortcuts`);
-                }}
+                onClick={() => removeShortcut(shortcut)}
                 className="absolute -top-2 -right-2 p-1 rounded-full bg-[#151A24]/20 
                            hover:bg-[#151A24]/40 backdrop-blur-sm opacity-0 
                            group-hover:opacity-100 transition-all duration-300"

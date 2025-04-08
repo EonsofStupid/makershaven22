@@ -1,40 +1,37 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from './types/database'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables')
+  console.error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+// Create a single Supabase client for the application
+export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  },
-  global: {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  },
-  db: {
-    schema: 'public'
+    autoRefreshToken: true
   }
-})
+});
 
-// Add error handling for fetch failures
-const originalFetch = window.fetch;
-window.fetch = async (...args) => {
+// Export utility functions that use the single client instance
+export const uploadMedia = async (file: File, path = 'uploads') => {
   try {
-    const response = await originalFetch(...args);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response;
+    const { data, error } = await supabase.storage
+      .from('media')
+      .upload(`${path}/${file.name}`, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('media')
+      .getPublicUrl(data.path);
+
+    return publicUrl;
   } catch (error) {
-    console.error('Fetch error:', error);
+    console.error('Error in uploadMedia:', error);
     throw error;
   }
 };

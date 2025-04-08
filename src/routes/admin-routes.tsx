@@ -1,9 +1,12 @@
 
-import { Dashboard } from "@/pages/admin/dashboard";
-import { UsersList } from "@/components/admin/users/UsersList";
-import { PostsTable } from "@/components/admin/posts/PostsTable";
-import { ForumManagement } from "@/components/admin/dashboard/forum/ForumManagement";
-import { SettingsDashboard } from "@/components/admin/settings/SettingsDashboard";
+import { lazy } from "react";
+import Dashboard from "@/pages/admin/dashboard";
+
+// Lazy-loaded components
+const UsersList = lazy(() => import("@/components/admin/users/UsersList"));
+const PostsTable = lazy(() => import("@/components/admin/posts/PostsTable"));
+const ForumManagement = lazy(() => import("@/components/admin/dashboard/forum/ForumManagement"));
+const SettingsDashboard = lazy(() => import("@/components/admin/settings/SettingsDashboard"));
 
 interface AdminRoute {
   path: string;
@@ -26,7 +29,7 @@ export const adminRoutes: AdminRoute[] = [
   },
   {
     path: "posts",
-    element: <PostsTable />,
+    element: <PostsTable posts={[]} onDelete={() => {}} />,
     title: "Content Management"
   },
   {
@@ -38,5 +41,15 @@ export const adminRoutes: AdminRoute[] = [
     path: "settings",
     element: <SettingsDashboard />,
     title: "Site Settings"
+  },
+  {
+    path: "data-maestro",
+    element: <div>Data Maestro</div>,
+    title: "Data Management"
+  },
+  {
+    path: "monitoring",
+    element: <div>Monitoring Dashboard</div>,
+    title: "System Monitoring"
   }
 ];

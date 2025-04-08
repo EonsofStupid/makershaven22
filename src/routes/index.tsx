@@ -1,6 +1,6 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { PageTransition } from "@/components/shared/transitions/PageTransition";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { AuthGuard } from "@/lib/auth/AuthGuard";
@@ -9,7 +9,10 @@ import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
 import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
-import { Dashboard } from "@/pages/admin/dashboard";
+import Dashboard from "@/pages/admin/dashboard";
+
+// Lazy load admin-specific layouts
+const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout'));
 
 export const AppRoutes = () => {
   const { isLoading } = useAuthStore();
@@ -48,7 +51,7 @@ export const AppRoutes = () => {
 
             {/* Admin Dashboard Route */}
             <Route 
-              path="/admin" 
+              path="/admin/*" 
               element={
                 <ErrorBoundary>
                   <AuthGuard 
@@ -56,30 +59,23 @@ export const AppRoutes = () => {
                     requiredRole={["admin", "super_admin"]}
                     fallbackPath="/login"
                   >
-                    <Dashboard />
+                    <Routes>
+                      {/* Default admin dashboard */}
+                      <Route index element={<Dashboard />} />
+                      
+                      {/* Admin sub-routes */}
+                      {adminRoutes.map((route) => (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={route.element}
+                        />
+                      ))}
+                    </Routes>
                   </AuthGuard>
                 </ErrorBoundary>
               }
             />
-
-            {/* Admin Routes - Restricted to admin/super_admin */}
-            {adminRoutes.map((route) => (
-              <Route
-                key={route.path}
-                path={`/admin/${route.path}`}
-                element={
-                  <ErrorBoundary>
-                    <AuthGuard 
-                      requireAuth={true}
-                      requiredRole={["admin", "super_admin"]}
-                      fallbackPath="/login"
-                    >
-                      {route.element}
-                    </AuthGuard>
-                  </ErrorBoundary>
-                }
-              />
-            ))}
 
             {/* Fallback route */}
             <Route path="*" element={<Navigate to="/" replace />} />
