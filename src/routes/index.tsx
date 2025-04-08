@@ -9,7 +9,6 @@ import { publicRoutes } from "./public-routes";
 import { makerSpaceRoutes } from "./maker-space-routes";
 import { adminRoutes } from "./admin-routes";
 import { ErrorBoundary } from "@/components/shared/error-handling/ErrorBoundary";
-import Dashboard from "@/pages/admin/dashboard";
 
 // Lazy load admin-specific layouts
 const AdminLayout = lazy(() => import('@/components/admin/layout/AdminLayout'));
@@ -59,19 +58,17 @@ export const AppRoutes = () => {
                     requiredRole={["admin", "super_admin"]}
                     fallbackPath="/login"
                   >
-                    <Routes>
-                      {/* Default admin dashboard */}
-                      <Route index element={<Dashboard />} />
-                      
-                      {/* Admin sub-routes */}
-                      {adminRoutes.map((route) => (
-                        <Route
-                          key={route.path}
-                          path={route.path}
-                          element={route.element}
-                        />
-                      ))}
-                    </Routes>
+                    <AdminLayout>
+                      <Routes>
+                        {adminRoutes.map((route) => (
+                          <Route
+                            key={route.path}
+                            path={route.path}
+                            element={route.element}
+                          />
+                        ))}
+                      </Routes>
+                    </AdminLayout>
                   </AuthGuard>
                 </ErrorBoundary>
               }

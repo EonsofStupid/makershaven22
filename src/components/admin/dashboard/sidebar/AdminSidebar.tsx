@@ -2,37 +2,45 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
-  Calendar, Clock, Settings, Users, Database, 
-  Radio, MessageSquare, LayoutDashboard, ChevronLeft, ChevronRight 
+  LayoutDashboard, ChevronLeft, ChevronRight,
+  Settings, Users, Database, Radio, MessageSquare, CalendarClock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAdminSidebar } from "./AdminSidebarContext";
+import { adminRoutes } from "@/routes/admin-routes";
 
 export const AdminSidebar = () => {
   const { isExpanded, setIsExpanded } = useAdminSidebar();
   const [activeItem, setActiveItem] = useState("dashboard");
   const location = useLocation();
 
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-    { id: "schedule", label: "Schedule", icon: Calendar, path: "/admin/content/schedule" },
-    { id: "queue", label: "Queue", icon: Clock, path: "/admin/content/queue" },
-    { id: "users", label: "Users", icon: Users, path: "/admin/users" },
-    { id: "data", label: "Data", icon: Database, path: "/admin/data-maestro" },
-    { id: "monitoring", label: "Monitoring", icon: Radio, path: "/admin/monitoring" },
-    { id: "forum", label: "Forum", icon: MessageSquare, path: "/admin/forum" },
-    { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
-  ];
+  // Map icons to route paths
+  const getIconForPath = (path: string) => {
+    switch (path) {
+      case "":
+        return LayoutDashboard;
+      case "users":
+        return Users;
+      case "settings":
+        return Settings;
+      case "data-maestro":
+        return Database;
+      case "monitoring":
+        return Radio;
+      case "forum":
+        return MessageSquare;
+      default:
+        return CalendarClock;
+    }
+  };
 
   // Update active item based on current path
   useEffect(() => {
-    const path = location.pathname;
-    const currentItem = menuItems.find((item) => 
-      path === item.path || path.startsWith(item.path + "/")
-    );
-    if (currentItem) {
-      setActiveItem(currentItem.id);
+    const currentPath = location.pathname.split('/').filter(Boolean);
+    if (currentPath[0] === 'admin') {
+      const activePath = currentPath[1] || '';
+      setActiveItem(activePath);
     }
   }, [location.pathname]);
 
@@ -56,22 +64,25 @@ export const AdminSidebar = () => {
       </div>
 
       <div className="flex flex-col gap-2 p-4">
-        {menuItems.map((item) => (
-          <Link key={item.id} to={item.path}>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-start gap-3 text-white/70 hover:text-white hover:bg-white/5",
-                activeItem === item.id && "bg-white/5 text-white",
-                !isExpanded && "justify-center"
-              )}
-              onClick={() => setActiveItem(item.id)}
-            >
-              <item.icon className="w-5 h-5" />
-              {isExpanded && <span>{item.label}</span>}
-            </Button>
-          </Link>
-        ))}
+        {adminRoutes.map((route) => {
+          const Icon = getIconForPath(route.path);
+          return (
+            <Link key={route.path} to={`/admin/${route.path}`}>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start gap-3 text-white/70 hover:text-white hover:bg-white/5",
+                  activeItem === route.path && "bg-white/5 text-white",
+                  !isExpanded && "justify-center"
+                )}
+                onClick={() => setActiveItem(route.path)}
+              >
+                <Icon className="w-5 h-5" />
+                {isExpanded && <span>{route.title}</span>}
+              </Button>
+            </Link>
+          );
+        })}
       </div>
     </aside>
   );

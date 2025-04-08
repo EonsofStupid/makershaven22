@@ -12,7 +12,13 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <AdminSidebarProvider>
-      <div className="min-h-screen flex flex-col w-full">
+      <div className="min-h-screen flex flex-col w-full relative overflow-hidden">
+        {/* Background layers */}
+        <div className="fixed inset-0 bg-[#151A24] z-0" />
+        <div className="fixed inset-0 bg-gradient-to-b from-[#41f0db]/20 via-[#ff0abe]/20 to-transparent z-0" />
+        <div className="fixed inset-0 opacity-30 z-0" style={{ backgroundImage: 'url(/cyber-grid.svg)' }} />
+        <div className="fixed inset-0 opacity-[0.03] z-0" style={{ backgroundImage: 'url(/scratch-overlay.svg)' }} />
+        
         <Navigation />
         
         <div className="flex flex-1">

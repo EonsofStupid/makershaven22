@@ -1,3 +1,4 @@
+
 export interface SessionConfig {
   refreshInterval: number;
   sessionTimeout: number;
@@ -38,18 +39,5 @@ export interface AuthSession {
   expires_at?: number;
 }
 
-export interface AuthStore {
-  session: AuthSession | null;
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOffline: boolean;
-  isTransitioning: boolean;
-  setSession: (session: AuthSession | null) => void;
-  setUser: (user: AuthUser | null) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setOffline: (isOffline: boolean) => void;
-  signOut: () => Promise<void>;
-  reset: () => void;
-}
+export type SecurityEventSeverity = 'low' | 'medium' | 'high';
+export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';

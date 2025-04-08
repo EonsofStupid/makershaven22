@@ -1,55 +1,42 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from '@/integrations/supabase/client';
-import { UserRole } from '../types/core/enums';
+import { supabase } from '@/lib/supabase/client';
 
-// Define our auth user type
-interface AuthUser {
+export type AuthUser = {
   id: string;
-  email?: string;
-  role?: UserRole;
+  email?: string | null;
+  role?: string;
   username?: string;
   displayName?: string;
   user_metadata?: {
     avatar_url?: string;
     [key: string]: any;
   };
-}
+};
 
-// Define our auth session type
-interface AuthSession {
+export interface AuthSession {
   user: AuthUser;
   expires_at?: number;
 }
 
-// Define the auth state
 interface AuthState {
   session: AuthSession | null;
   user: AuthUser | null;
   isLoading: boolean;
-  isTransitioning: boolean;
   error: Error | null;
   isOffline: boolean;
-  lastVerified: number | null;
   
-  // Actions
   setSession: (session: AuthSession | null) => void;
   setUser: (user: AuthUser | null) => void;
   setLoading: (loading: boolean) => void;
-  setTransitioning: (transitioning: boolean) => void;
   setError: (error: Error | null) => void;
   setOffline: (isOffline: boolean) => void;
   signOut: () => Promise<void>;
   reset: () => void;
   initialize: () => Promise<void>;
-  refreshUserRole: () => Promise<UserRole | null>;
-  
-  // Computed properties
-  getIsAuthenticated: () => boolean;
+  refreshUserRole: () => Promise<void>;
   getIsAdmin: () => boolean;
-  getIsMaker: () => boolean;
-  getUserRole: () => UserRole | null;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -58,78 +45,46 @@ export const useAuthStore = create<AuthState>()(
       session: null,
       user: null,
       isLoading: true,
-      isTransitioning: false,
       error: null,
       isOffline: false,
-      lastVerified: null,
       
       setSession: (session) => set({ session }),
       setUser: (user) => set({ user }),
       setLoading: (isLoading) => set({ isLoading }),
-      setTransitioning: (isTransitioning) => set({ isTransitioning }),
       setError: (error) => set({ error }),
       setOffline: (isOffline) => set({ isOffline }),
       
-      reset: () => set({ 
-        session: null, 
-        user: null, 
-        error: null,
-        lastVerified: null
+      reset: () => set({
+        session: null,
+        user: null,
+        isLoading: false,
+        error: null
       }),
       
       initialize: async () => {
         set({ isLoading: true });
-        
         try {
-          console.log('Initializing auth store');
-          const { data: { session }, error } = await supabase.auth.getSession();
+          const { data, error } = await supabase.auth.getSession();
+          if (error) throw error;
           
-          if (error) {
-            console.error('Error initializing auth store:', error);
-            throw error;
-          }
-          
-          if (session) {
-            const { user } = session;
-            console.log('User authenticated:', user.id);
-            
-            // Fetch the user's profile to get their role
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('role, username, display_name')
-              .eq('id', user.id)
-              .single();
-              
-            const role = profile?.role || user.user_metadata?.role || 'subscriber';
-            
-            set({
-              session: {
-                user: {
-                  id: user.id,
-                  email: user.email,
-                  role: role,
-                  username: profile?.username || user.user_metadata?.username,
-                  displayName: profile?.display_name || user.user_metadata?.display_name || user.user_metadata?.username,
-                  user_metadata: user.user_metadata
-                },
-                expires_at: session.expires_at
-              },
+          if (data.session) {
+            set({ session: {
               user: {
-                id: user.id,
-                email: user.email,
-                role: role,
-                username: profile?.username || user.user_metadata?.username,
-                displayName: profile?.display_name || user.user_metadata?.display_name || user.user_metadata?.username,
-                user_metadata: user.user_metadata
+                id: data.session.user.id,
+                email: data.session.user.email,
+                role: data.session.user.user_metadata?.role || 'subscriber',
+                username: data.session.user.user_metadata?.username,
+                displayName: data.session.user.user_metadata?.display_name,
+                user_metadata: data.session.user.user_metadata
               },
-              lastVerified: Date.now()
-            });
-          } else {
-            console.log('No active session');
-            set({ session: null, user: null });
+              expires_at: data.session.expires_at
+            }});
+            
+            // Fetch user profile to get role
+            await get().refreshUserRole();
           }
         } catch (error) {
-          console.error('Auth initialization error:', error);
+          console.error('Error initializing auth store:', error);
           set({ error: error as Error });
         } finally {
           set({ isLoading: false });
@@ -137,79 +92,55 @@ export const useAuthStore = create<AuthState>()(
       },
       
       refreshUserRole: async () => {
-        const userId = get().user?.id;
-        if (!userId) return null;
+        const { session } = get();
+        if (!session?.user?.id) return;
         
         try {
-          const { data: profile, error } = await supabase
+          const { data, error } = await supabase
             .from('profiles')
-            .select('role')
-            .eq('id', userId)
+            .select('role, username, display_name')
+            .eq('id', session.user.id)
             .single();
-            
+          
           if (error) throw error;
           
-          if (profile?.role) {
-            set(state => ({
-              user: state.user ? { ...state.user, role: profile.role } : null,
-              session: state.session ? {
-                ...state.session,
-                user: { ...state.session.user, role: profile.role }
-              } : null,
-              lastVerified: Date.now()
-            }));
-            return profile.role as UserRole;
+          if (data) {
+            set({
+              user: {
+                ...session.user,
+                role: data.role,
+                username: data.username,
+                displayName: data.display_name
+              }
+            });
           }
-          
-          return null;
         } catch (error) {
-          console.error('Error refreshing user role:', error);
-          return null;
+          console.error('Error fetching user role:', error);
         }
-      },
-      
-      signOut: async () => {
-        set({ isTransitioning: true });
-        try {
-          const { error } = await supabase.auth.signOut();
-          if (error) throw error;
-          set({ session: null, user: null, error: null, lastVerified: null });
-        } catch (error) {
-          console.error('Error signing out:', error);
-          set({ error: error as Error });
-        } finally {
-          set({ isTransitioning: false });
-        }
-      },
-      
-      // Computed properties as methods
-      getIsAuthenticated: () => {
-        const state = get();
-        return !!state.session?.user?.id;
       },
       
       getIsAdmin: () => {
-        const state = get();
-        return state.user?.role === 'admin' || state.user?.role === 'super_admin';
+        const { user } = get();
+        return user?.role === 'admin' || user?.role === 'super_admin';
       },
       
-      getIsMaker: () => {
-        const state = get();
-        return state.user?.role === 'maker';
+      signOut: async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          get().reset();
+        } catch (error) {
+          console.error('Error signing out:', error);
+          set({ error: error as Error });
+        }
       },
-      
-      getUserRole: () => {
-        return get().user?.role || null;
-      }
     }),
     {
-      name: 'auth-store',
-      partialize: (state) => ({
+      name: 'auth-storage',
+      partialize: (state) => ({ 
         session: state.session,
-        user: state.user,
-        isOffline: state.isOffline,
-        lastVerified: state.lastVerified
-      })
+        user: state.user 
+      }),
     }
   )
 );
