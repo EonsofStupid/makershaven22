@@ -1,21 +1,21 @@
-import type { UserRole } from '../core/enums';
-import type { JsonObject } from '../core/json';
+
+import { UserRole } from '../core/enums';
+import { JsonObject } from '../core/json';
 
 /**
  * Auth user interface
  */
 export interface AuthUser {
   id: string;
-  email: string;
-  role: UserRole;
-  display_name?: string;
-  avatar_url?: string;
-  metadata?: JsonObject;
-  created_at?: string;
-  updated_at?: string;
-  last_sign_in?: string;
-  email_verified?: boolean;
-  is_active: boolean;
+  email?: string | null;
+  role?: UserRole;
+  username?: string;
+  displayName?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    [key: string]: any;
+  };
+  is_active?: boolean;
 }
 
 /**
@@ -24,12 +24,8 @@ export interface AuthUser {
 export interface AuthSession {
   id: string;
   user: AuthUser;
-  access_token: string;
-  refresh_token?: string;
-  expires_at: string;
+  expires_at?: number;
   created_at: string;
-  updated_at?: string;
-  metadata?: JsonObject;
 }
 
 /**
@@ -89,4 +85,23 @@ export interface AuthState {
   hasAccess: boolean;
   error: Error | { message: string } | null;
   isTransitioning?: boolean;
+}
+
+// Create a helper to map Supabase session to our AuthSession
+export function mapSupabaseSession(session: any): AuthSession | null {
+  if (!session || !session.user) return null;
+  
+  return {
+    id: session.access_token || session.user.id,
+    user: {
+      id: session.user.id,
+      email: session.user.email,
+      role: session.user.role,
+      username: session.user.user_metadata?.username,
+      displayName: session.user.user_metadata?.display_name,
+      user_metadata: session.user.user_metadata
+    },
+    expires_at: session.expires_at,
+    created_at: new Date().toISOString()
+  };
 }

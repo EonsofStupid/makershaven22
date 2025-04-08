@@ -1,6 +1,7 @@
 
 import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
 import { DatabaseSettingsRow } from "../types/theme";
+import { parseSecuritySettings } from "@/lib/types/security/types";
 
 export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null): FlattenedSettings => {
   if (!dbSettings) {
@@ -10,8 +11,11 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
   // Map database settings to flattened settings
   return {
     ...DEFAULT_SETTINGS,
+    id: dbSettings.id,
     site_title: dbSettings.site_title || DEFAULT_SETTINGS.site_title,
     tagline: dbSettings.tagline || undefined,
+    description: dbSettings.description || undefined,
+    keywords: Array.isArray(dbSettings.keywords) ? dbSettings.keywords : undefined,
     primary_color: dbSettings.primary_color || DEFAULT_SETTINGS.primary_color,
     secondary_color: dbSettings.secondary_color || DEFAULT_SETTINGS.secondary_color,
     accent_color: dbSettings.accent_color || DEFAULT_SETTINGS.accent_color,
@@ -36,7 +40,16 @@ export const convertDbSettingsToTheme = (dbSettings: DatabaseSettingsRow | null)
     letter_spacing: dbSettings.letter_spacing || DEFAULT_SETTINGS.letter_spacing,
     logo_url: dbSettings.logo_url || undefined,
     favicon_url: dbSettings.favicon_url || undefined,
-    security_settings: dbSettings.security_settings || DEFAULT_SETTINGS.security_settings,
+    security_settings: parseSecuritySettings(dbSettings.security_settings),
+    theme_mode: dbSettings.theme_mode || DEFAULT_SETTINGS.theme_mode,
+    transition_type: dbSettings.transition_type || DEFAULT_SETTINGS.transition_type,
+    menu_animation_type: dbSettings.transition_type || undefined,
+    box_shadow: dbSettings.box_shadow || DEFAULT_SETTINGS.box_shadow,
+    backdrop_blur: dbSettings.backdrop_blur || DEFAULT_SETTINGS.backdrop_blur,
+    created_at: dbSettings.created_at,
+    updated_at: dbSettings.updated_at,
+    created_by: dbSettings.created_by,
+    updated_by: dbSettings.updated_by,
   };
 };
 

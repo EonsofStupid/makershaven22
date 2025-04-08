@@ -1,15 +1,14 @@
 
-import { Json, JsonObject } from "../core/json";
-import { GlassEffectLevel, ThemeMode, TransitionType } from "../core/enums";
-import { SecuritySettings, DEFAULT_SECURITY_SETTINGS } from "../security/types";
+import { Json, JsonObject } from '../core/json';
+import { SecuritySettings } from '../security/types';
+import { ThemeMode, TransitionType, GlassEffectLevel } from '../core/enums';
 
 /**
- * Flattened representation of all site and theme settings
- * This is the core interface for all settings in the application
+ * Core settings interface that acts as the source of truth for all settings
  */
 export interface FlattenedSettings {
   // System fields
-  id?: string;
+  id: string;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -70,26 +69,21 @@ export interface FlattenedSettings {
   glass_effect?: GlassEffectLevel;
   custom_css?: string;
   
-  // Security
+  // Security settings
   security_settings: SecuritySettings;
   
-  // Custom data
+  // Metadata
   metadata?: JsonObject;
   theme_preferences?: JsonObject;
   theme_metadata?: JsonObject;
 }
 
 /**
- * Default settings to use when initializing or resetting
+ * Default settings instance to use as fallback
  */
 export const DEFAULT_SETTINGS: FlattenedSettings = {
-  // Site info
+  id: '',
   site_title: 'MakersImpulse',
-  
-  // Theme mode
-  theme_mode: 'system',
-  
-  // Colors
   primary_color: '#7FFFD4',
   secondary_color: '#FFB6C1',
   accent_color: '#E6E6FA',
@@ -100,8 +94,11 @@ export const DEFAULT_SETTINGS: FlattenedSettings = {
   neon_cyan: '#41f0db',
   neon_pink: '#ff0abe',
   neon_purple: '#8000ff',
-  
-  // Typography
+  border_radius: '0.5rem',
+  spacing_unit: '1rem',
+  transition_duration: '0.3s',
+  shadow_color: '#000000',
+  hover_scale: '1.05',
   font_family_heading: 'Inter',
   font_family_body: 'Inter',
   font_size_base: '16px',
@@ -109,19 +106,22 @@ export const DEFAULT_SETTINGS: FlattenedSettings = {
   font_weight_bold: '700',
   line_height_base: '1.5',
   letter_spacing: 'normal',
-  
-  // Layout
-  border_radius: '0.5rem',
-  spacing_unit: '1rem',
-  transition_duration: '0.3s',
-  shadow_color: '#000000',
-  hover_scale: '1.05',
   box_shadow: 'none',
   backdrop_blur: '0',
-  
-  // Effects
   transition_type: 'fade',
-  
-  // Security
-  security_settings: DEFAULT_SECURITY_SETTINGS,
+  theme_mode: 'system',
+  security_settings: {
+    ip_blacklist: [],
+    ip_whitelist: [],
+    enable_ip_filtering: false,
+    two_factor_auth: false,
+    max_login_attempts: 5,
+    rate_limit_requests: 100,
+    rate_limit_window_minutes: 5,
+    session_timeout_minutes: 60,
+    lockout_duration_minutes: 30
+  }
 };
+
+// Type alias for Settings pointing to FlattenedSettings for backward compatibility
+export type Settings = FlattenedSettings;

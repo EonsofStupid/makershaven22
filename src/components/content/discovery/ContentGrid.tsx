@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ContentCard } from './ContentCard';
-import { BaseContent } from '@/lib/types/content/types';
+import { BaseContent } from '@/lib/types/core';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ContentGridProps {

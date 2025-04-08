@@ -3,15 +3,14 @@ import React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BaseContent } from "@/lib/types/content/types";
+import { BaseContent } from "@/lib/types/core";
 import { useContentMutations } from "./useContentMutations";
 import { useAtom } from "jotai";
-import { currentContentAtom, resetContentFormAtom } from "@/lib/store/atoms/content-atoms";
+import { currentContentAtom } from "@/lib/store/atoms/content-atoms";
 
 export const useContent = (contentId?: string) => {
   // Use Jotai atoms
   const [currentContent, setCurrentContent] = useAtom(currentContentAtom);
-  const [, resetForm] = useAtom(resetContentFormAtom);
 
   // Fetch content directly to avoid type mismatches
   const { data: content, isLoading, error } = useQuery({
@@ -41,9 +40,13 @@ export const useContent = (contentId?: string) => {
   // When content is loaded, update the form state
   React.useEffect(() => {
     if (content) {
-      resetForm(content);
+      setCurrentContent(content);
     }
-  }, [content, resetForm]);
+  }, [content, setCurrentContent]);
+
+  const resetForm = React.useCallback((initialContent: BaseContent | null) => {
+    setCurrentContent(initialContent);
+  }, [setCurrentContent]);
 
   return {
     content,
@@ -51,10 +54,7 @@ export const useContent = (contentId?: string) => {
     error,
     createContent: createContentWithUser,
     updateContent: updateContentWithUser,
-    setCurrentContent: (newContent: BaseContent | null) => {
-      setCurrentContent(newContent);
-      resetForm(newContent);
-    },
+    setCurrentContent,
     resetForm
   };
 };

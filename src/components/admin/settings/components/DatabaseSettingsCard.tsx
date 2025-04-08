@@ -1,12 +1,13 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { SettingValue } from '@/lib/types/database/core/json';
-import { Settings } from '@/lib/types/settings/types';
+import { FlattenedSettings } from '@/lib/types/settings/types';
 
 interface DatabaseSettingsProps {
   settings: Record<string, SettingValue>;
-  onSettingChange: (key: keyof Settings, value: boolean) => void;
+  onSettingChange: (key: keyof FlattenedSettings, value: boolean) => void;
 }
 
 const DatabaseSettingsCard: React.FC<DatabaseSettingsProps> = ({ settings, onSettingChange }) => {
@@ -19,7 +20,7 @@ const DatabaseSettingsCard: React.FC<DatabaseSettingsProps> = ({ settings, onSet
             <label className="text-sm font-medium">{setting.label}</label>
             <Switch
               checked={setting.value}
-              onCheckedChange={(checked) => onSettingChange(key as keyof Settings, checked)}
+              onCheckedChange={(checked) => onSettingChange(key as keyof FlattenedSettings, checked)}
             />
           </div>
         ))}

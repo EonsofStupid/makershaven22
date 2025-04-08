@@ -12,6 +12,7 @@ import {
   fetchUserProfileAtom,
   signOutAtom
 } from '@/lib/store/atoms/user-atoms';
+import { mapSupabaseSession } from '@/lib/types/auth/types';
 
 export function useAuth() {
   const [session, setSession] = useAtom(userSessionAtom);
@@ -29,8 +30,9 @@ export function useAuth() {
     
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
+      const mappedSession = mapSupabaseSession(session);
+      setSession(mappedSession);
+      if (mappedSession) {
         fetchProfile();
       } else {
         setIsLoading(false);
@@ -40,9 +42,10 @@ export function useAuth() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
+        const mappedSession = mapSupabaseSession(session);
+        setSession(mappedSession);
         
-        if (session) {
+        if (mappedSession) {
           fetchProfile();
         } else {
           setUser(null);

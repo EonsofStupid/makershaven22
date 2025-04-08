@@ -1,110 +1,97 @@
-import { toast as sonnerToast, ToastT, ToastOptions } from 'sonner';
 
-// Keep track of active toast IDs to prevent duplicates
-const activeToasts = new Set<string>();
+import { toast as sonnerToast, type Toast } from 'sonner';
 
-type ToastType = 'success' | 'error' | 'info' | 'loading';
+/**
+ * Enhanced toast wrapper with standardized configurations
+ */
+const toast = {
+  /**
+   * Show a default toast message
+   */
+  message: (message: string, options?: Toast) => {
+    return sonnerToast(message, options);
+  },
 
-function createMessageId(message: string, type: ToastType): string {
-  return `${type}:${message}`;
-}
+  /**
+   * Show a success toast message
+   */
+  success: (message: string, options?: Toast) => {
+    return sonnerToast.success(message, options);
+  },
 
-interface ToastParams {
-  message: string;
-  description?: string;
-  duration?: number;
-  type?: ToastType;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-}
+  /**
+   * Show an error toast message
+   */
+  error: (message: string, options?: Toast) => {
+    return sonnerToast.error(message, options);
+  },
 
-export function toast({
-  message,
-  description,
-  duration = 4000,
-  type = 'info',
-  action
-}: ToastParams): string | null {
-  // Create a unique ID for this message
-  const messageId = createMessageId(message, type);
-  
-  // If the toast is already active, don't show it again
-  if (activeToasts.has(messageId)) {
-    return null;
-  }
-  
-  // Add to active toasts
-  activeToasts.add(messageId);
+  /**
+   * Show a warning toast message
+   */
+  warning: (message: string, options?: Toast) => {
+    return sonnerToast.warning(message, options);
+  },
 
-  // Configure the toast options
-  const options: ToastOptions = {
-    id: messageId,
-    description,
-    duration,
-    onDismiss: () => {
-      activeToasts.delete(messageId);
+  /**
+   * Show an info toast message
+   */
+  info: (message: string, options?: Toast) => {
+    return sonnerToast.info(message, options);
+  },
+
+  /**
+   * Show a loading toast message
+   */
+  loading: (message: string, options?: Toast) => {
+    const id = sonnerToast.loading(message, options);
+    return id.toString();
+  },
+
+  /**
+   * Update a toast message
+   */
+  update: (id: string, message: string, options?: Toast) => {
+    sonnerToast.dismiss(id);
+    return sonnerToast(message, options);
+  },
+
+  /**
+   * Convert a loading toast to another type
+   */
+  updateLoading: (id: string, message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    sonnerToast.dismiss(id);
+    return sonnerToast[type](message);
+  },
+
+  /**
+   * Dismiss a toast by ID
+   */
+  dismiss: (id: string) => {
+    sonnerToast.dismiss(id);
+  },
+
+  /**
+   * Dismiss all toast notifications
+   */
+  dismissAll: () => {
+    sonnerToast.dismiss();
+  },
+
+  /**
+   * Create a promise toast
+   */
+  promise: <T>(
+    promise: Promise<T>,
+    options: {
+      loading: string;
+      success: string | ((data: T) => string);
+      error: string | ((error: Error) => string);
     },
-  };
-
-  if (action) {
-    options.action = {
-      label: action.label,
-      onClick: () => {
-        action.onClick();
-        activeToasts.delete(messageId);
-      }
-    };
+    toastOptions?: Toast
+  ) => {
+    return sonnerToast.promise(promise, options, toastOptions);
   }
-
-  // Show the appropriate toast type
-  let toastId: string;
-  
-  switch (type) {
-    case 'success':
-      toastId = sonnerToast.success(message, options);
-      break;
-    case 'error':
-      toastId = sonnerToast.error(message, options);
-      break;
-    case 'loading':
-      toastId = sonnerToast.loading(message, options);
-      break;
-    default:
-      toastId = sonnerToast(message, options);
-  }
-  
-  return toastId;
-}
-
-// Helper methods for common toast types
-toast.success = (message: string, options?: Omit<ToastParams, 'message' | 'type'>) => 
-  toast({ message, type: 'success', ...options });
-
-toast.error = (message: string, options?: Omit<ToastParams, 'message' | 'type'>) => 
-  toast({ message, type: 'error', ...options });
-
-toast.info = (message: string, options?: Omit<ToastParams, 'message' | 'type'>) => 
-  toast({ message, type: 'info', ...options });
-
-toast.loading = (message: string, options?: Omit<ToastParams, 'message' | 'type'>) => 
-  toast({ message, type: 'loading', ...options });
-
-// Dismiss helpers
-toast.dismiss = sonnerToast.dismiss;
-toast.dismissAll = sonnerToast.dismiss;
-
-// Update a loading toast
-toast.update = (toastId: string, message: string, description?: string) => {
-  sonnerToast.update(toastId, { description });
 };
 
-// Convert a loading toast to success/error
-toast.success.fromLoading = (toastId: string, message: string, description?: string) => {
-  sonnerToast.success(message, { id: toastId, description });
-};
-
-toast.error.fromLoading = (toastId: string, message: string, description?: string) => {
-  sonnerToast.error(message, { id: toastId, description });
-};
+export default toast;

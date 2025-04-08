@@ -1,160 +1,192 @@
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { FlattenedSettings, DEFAULT_SETTINGS } from "@/lib/types/settings/core";
-import { useThemeSetup } from "./hooks/useThemeSetup";
-import { useThemeSubscription } from "./hooks/useThemeSubscription";
-import { applyThemeToDocument } from "./utils/themeUtils";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuthStore } from '@/lib/store/auth-store';
-import { LoadingState } from "@/components/common/LoadingState";
-import { toast } from "@/lib/toast";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Theme, flattenedSettingsToTheme, themeToFlattenedSettings } from './types/theme';
+import { applyThemeToDocument, convertDbSettingsToTheme } from './utils/themeUtils';
+import { FlattenedSettings } from '@/lib/types/settings/core';
+import toast from '@/lib/toast';
 
-interface ThemeContextType {
-  theme: FlattenedSettings;
-  isLoading: boolean;
-  updateTheme: (newTheme: FlattenedSettings) => Promise<void>;
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  updateTheme: (theme: Theme) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<FlattenedSettings>({ ...DEFAULT_SETTINGS });
-  const [isLoading, setIsLoading] = useState(true);
-  const { session } = useAuthStore();
-  
-  // Apply default theme immediately
-  useEffect(() => {
-    applyThemeToDocument(DEFAULT_SETTINGS);
-  }, []);
+export const useThemeContext = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useThemeContext must be used within a ThemeProvider');
+  }
+  return context;
+};
 
-  // Try to fetch the theme from the database
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const [theme, setThemeState] = useState<Theme>({
+    site_title: 'MakersImpulse',
+    tagline: '',
+    primary_color: '#7FFFD4',
+    secondary_color: '#FFB6C1',
+    accent_color: '#E6E6FA',
+    text_primary_color: '#FFFFFF',
+    text_secondary_color: '#A1A1AA',
+    text_link_color: '#3B82F6',
+    text_heading_color: '#FFFFFF',
+    neon_cyan: '#41f0db',
+    neon_pink: '#ff0abe',
+    neon_purple: '#8000ff',
+    border_radius: '0.5rem',
+    spacing_unit: '1rem',
+    transition_duration: '0.3s',
+    shadow_color: '#000000',
+    hover_scale: '1.05',
+    font_family_heading: 'Inter',
+    font_family_body: 'Inter',
+    font_size_base: '16px',
+    font_weight_normal: '400',
+    font_weight_bold: '700',
+    line_height_base: '1.5',
+    letter_spacing: 'normal',
+    box_shadow: 'none',
+    backdrop_blur: '0',
+    transition_type: 'fade',
+    theme_mode: 'system',
+    security_settings: {
+      ip_blacklist: [],
+      ip_whitelist: [],
+      enable_ip_filtering: false,
+      two_factor_auth: false,
+      max_login_attempts: 5,
+      rate_limit_requests: 100,
+      rate_limit_window_minutes: 5,
+      session_timeout_minutes: 60,
+      lockout_duration_minutes: 30
+    },
+    logo_url: '',
+    favicon_url: '',
+    maintenance_mode: false,
+    maintenance_message: '',
+    primary_domain: '',
+    support_email: '',
+    contact_email: '',
+    social_links: {},
+    analytics_id: '',
+    custom_scripts: [],
+    glass_effect: 'medium',
+    custom_css: '',
+    menu_animation_type: 'fade'
+  });
+
+  // Initialize theme from database
   useEffect(() => {
     const fetchTheme = async () => {
+      const toastId = toast.loading('Loading theme settings...');
+      
       try {
-        setIsLoading(true);
-        
         const { data, error } = await supabase
-          .from("site_settings")
-          .select("*")
-          .limit(1)
-          .maybeSingle();
+          .from('site_settings')
+          .select('*')
+          .single();
 
-        if (error) {
-          console.warn("Error fetching theme:", error.message);
-          toast.error("Could not load theme settings", {
-            description: "Using default theme instead"
-          });
-          // Continue with default theme
-          return;
-        }
+        if (error) throw error;
 
-        if (data) {
-          const updatedTheme = {
-            ...DEFAULT_SETTINGS,
-            ...data,
-            security_settings: data.security_settings || {}
-          };
-          
-          setTheme(updatedTheme);
-          applyThemeToDocument(updatedTheme);
-          console.log("Theme loaded from database:", updatedTheme.site_title);
-        }
+        // Convert database settings to theme object
+        const flattenedSettings = convertDbSettingsToTheme(data);
+        const themeData = flattenedSettingsToTheme(flattenedSettings);
+        
+        setThemeState(themeData);
+        applyThemeToDocument(flattenedSettings);
+        
+        toast.updateLoading(toastId, 'Theme loaded successfully', 'success');
       } catch (error) {
-        console.error("Theme loading error:", error);
-        toast.error("Theme loading error", {
-          description: "An unexpected error occurred when loading theme"
-        });
-      } finally {
-        setIsLoading(false);
+        console.error('Error fetching theme:', error);
+        toast.updateLoading(toastId, 'Failed to load theme settings', 'error');
       }
     };
 
     fetchTheme();
   }, []);
-  
-  // Subscribe to theme changes
-  useThemeSubscription(setTheme);
 
-  const updateTheme = async (newTheme: FlattenedSettings) => {
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    
+    // Convert theme to flattened settings and apply to document
+    const flattenedSettings = themeToFlattenedSettings(newTheme);
+    applyThemeToDocument(flattenedSettings);
+  };
+
+  const updateTheme = async (newTheme: Theme): Promise<void> => {
+    const toastId = toast.loading('Updating theme settings...');
+    
     try {
-      const loadingToastId = toast.loading("Updating theme...");
-      setIsLoading(true);
+      // Convert theme to flattened settings format for database
+      const flattenedSettings = themeToFlattenedSettings(newTheme);
       
-      if (!session?.user) {
-        console.log('No active session, applying theme without persistence');
-        applyThemeToDocument(newTheme);
-        setTheme(newTheme);
-        setIsLoading(false);
-        toast.success.fromLoading(loadingToastId, "Theme updated locally", {
-          description: "Changes won't be saved until you sign in"
-        });
-        return;
-      }
+      // Update in database
+      const { error } = await supabase
+        .from('site_settings')
+        .update({
+          site_title: flattenedSettings.site_title,
+          tagline: flattenedSettings.tagline,
+          primary_color: flattenedSettings.primary_color,
+          secondary_color: flattenedSettings.secondary_color,
+          accent_color: flattenedSettings.accent_color,
+          text_primary_color: flattenedSettings.text_primary_color,
+          text_secondary_color: flattenedSettings.text_secondary_color,
+          text_link_color: flattenedSettings.text_link_color,
+          text_heading_color: flattenedSettings.text_heading_color,
+          neon_cyan: flattenedSettings.neon_cyan,
+          neon_pink: flattenedSettings.neon_pink,
+          neon_purple: flattenedSettings.neon_purple,
+          border_radius: flattenedSettings.border_radius,
+          spacing_unit: flattenedSettings.spacing_unit,
+          transition_duration: flattenedSettings.transition_duration,
+          shadow_color: flattenedSettings.shadow_color,
+          hover_scale: flattenedSettings.hover_scale,
+          font_family_heading: flattenedSettings.font_family_heading,
+          font_family_body: flattenedSettings.font_family_body,
+          font_size_base: flattenedSettings.font_size_base,
+          font_weight_normal: flattenedSettings.font_weight_normal,
+          font_weight_bold: flattenedSettings.font_weight_bold,
+          line_height_base: flattenedSettings.line_height_base,
+          letter_spacing: flattenedSettings.letter_spacing,
+          box_shadow: flattenedSettings.box_shadow,
+          backdrop_blur: flattenedSettings.backdrop_blur,
+          transition_type: flattenedSettings.transition_type,
+          theme_mode: flattenedSettings.theme_mode,
+          security_settings: flattenedSettings.security_settings,
+          logo_url: flattenedSettings.logo_url,
+          favicon_url: flattenedSettings.favicon_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', '1'); // Assuming there's only one site settings row
 
-      const { error } = await supabase.rpc('update_site_settings', {
-        p_site_title: newTheme.site_title,
-        p_tagline: newTheme.tagline || "",
-        p_primary_color: newTheme.primary_color,
-        p_secondary_color: newTheme.secondary_color,
-        p_accent_color: newTheme.accent_color,
-        p_text_primary_color: newTheme.text_primary_color,
-        p_text_secondary_color: newTheme.text_secondary_color,
-        p_text_link_color: newTheme.text_link_color,
-        p_text_heading_color: newTheme.text_heading_color,
-        p_neon_cyan: newTheme.neon_cyan,
-        p_neon_pink: newTheme.neon_pink,
-        p_neon_purple: newTheme.neon_purple,
-        p_border_radius: newTheme.border_radius,
-        p_spacing_unit: newTheme.spacing_unit,
-        p_transition_duration: newTheme.transition_duration,
-        p_shadow_color: newTheme.shadow_color,
-        p_hover_scale: newTheme.hover_scale,
-        p_font_family_heading: newTheme.font_family_heading,
-        p_font_family_body: newTheme.font_family_body,
-        p_font_size_base: newTheme.font_size_base,
-        p_font_weight_normal: newTheme.font_weight_normal,
-        p_font_weight_bold: newTheme.font_weight_bold,
-        p_line_height_base: newTheme.line_height_base,
-        p_letter_spacing: newTheme.letter_spacing,
-        p_security_settings: newTheme.security_settings || {}
-      });
-
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       
+      // Apply changes
       setTheme(newTheme);
-      applyThemeToDocument(newTheme);
-      toast.success.fromLoading(loadingToastId, "Theme updated successfully", {
-        description: "Your changes have been saved and applied"
-      });
+      toast.updateLoading(toastId, 'Theme settings updated successfully', 'success');
     } catch (error) {
-      console.error("Error updating theme:", error);
-      toast.error("Failed to update theme", {
-        description: "Please try again or contact support if the issue persists"
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Error updating theme:', error);
+      toast.updateLoading(toastId, 'Failed to update theme settings', 'error');
+      throw error;
     }
   };
 
-  const contextValue = {
+  const value = {
     theme,
-    isLoading,
+    setTheme,
     updateTheme
   };
 
   return (
-    <ThemeContext.Provider value={contextValue}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
 };
