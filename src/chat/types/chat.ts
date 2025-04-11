@@ -30,7 +30,7 @@ export interface ChatBridgeChannel {
 }
 
 export interface ChatBridge {
-  sendMessage: (channel: string, message: Record<string, any>) => void;
-  subscribe: (channel: string, callback: (data: any) => void) => () => void;
+  sendMessage: (channel: string, message: ChatBridgeMessage) => void;
+  subscribe: (channel: string, callback: (data: ChatBridgeMessage) => void) => () => void;
   getChannels: () => ChatBridgeChannel[];
 }

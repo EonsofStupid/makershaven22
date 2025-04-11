@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '../store';
-import { sessionManager } from '../../lib/auth/SessionManager';
-import { securityManager } from '../../lib/auth/SecurityManager';
-import { ErrorBoundary } from '../../components/shared/error-handling/ErrorBoundary';
+import { sessionManager } from '../utils/SessionManager';
+import { securityManager } from '../utils/SecurityManager';
+import { ErrorBoundary } from '../../shared/components/error-handling/ErrorBoundary';
 
 interface AuthGuardProps {
   children: React.ReactNode;

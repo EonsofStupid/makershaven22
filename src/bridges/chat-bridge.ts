@@ -1,53 +1,50 @@
 
-import { ChatBridgeChannel, ChatBridgeMessage } from "../chat/types/chat";
+/**
+ * ChatBridge - Provides a communication layer for chat-related events
+ * Prevents circular dependencies by using a pub/sub pattern
+ */
 
-type EventCallback = (data: any) => void;
+export type ChatBridgeCallback = (data: ChatBridgeMessage) => void;
+
+export interface ChatBridgeMessage {
+  type: string;
+  payload: any;
+}
+
+export interface ChatBridgeChannel {
+  id: string;
+  name: string;
+}
+
+export enum ChatEvent {
+  MESSAGE_SENT = 'message_sent',
+  MESSAGE_RECEIVED = 'message_received',
+  SESSION_CREATED = 'session_created',
+  SESSION_DELETED = 'session_deleted',
+  MODE_CHANGED = 'mode_changed',
+  ERROR = 'error',
+  CONTEXT_LOADED = 'context_loaded',
+}
 
 class ChatBridgeImpl {
-  private listeners: Map<string, EventCallback[]> = new Map();
+  private listeners: Map<string, ChatBridgeCallback[]> = new Map();
   private channels: ChatBridgeChannel[] = [
     { id: 'general', name: 'General' },
-    { id: 'support', name: 'Support' },
-    { id: 'development', name: 'Development' }
+    { id: 'system', name: 'System' },
+    { id: 'notifications', name: 'Notifications' }
   ];
 
   /**
-   * Send a message to a specific channel
+   * Subscribe to a chat event on a specific channel
    */
-  sendMessage(channel: string, message: Record<string, any>): void {
-    if (!this.listeners.has(channel)) {
-      console.warn(`No listeners for channel: ${channel}`);
-      return;
+  subscribe(channel: string, callback: ChatBridgeCallback): () => void {
+    const channelId = `${channel}`;
+    
+    if (!this.listeners.has(channelId)) {
+      this.listeners.set(channelId, []);
     }
 
-    // Ensure message has a type property
-    const typedMessage = {
-      type: message.type || 'message',
-      ...message
-    };
-
-    const callbacks = this.listeners.get(channel)!;
-    // Use setTimeout to avoid blocking the execution context
-    setTimeout(() => {
-      callbacks.forEach(callback => {
-        try {
-          callback(typedMessage);
-        } catch (error) {
-          console.error(`Error in ChatBridge callback for channel ${channel}:`, error);
-        }
-      });
-    }, 0);
-  }
-
-  /**
-   * Subscribe to messages on a specific channel
-   */
-  subscribe(channel: string, callback: (data: any) => void): () => void {
-    if (!this.listeners.has(channel)) {
-      this.listeners.set(channel, []);
-    }
-
-    const callbacks = this.listeners.get(channel)!;
+    const callbacks = this.listeners.get(channelId)!;
     callbacks.push(callback);
 
     // Return unsubscribe function
@@ -60,10 +57,42 @@ class ChatBridgeImpl {
   }
 
   /**
-   * Get available channels
+   * Publish a message to a specific channel
+   */
+  sendMessage(channel: string, message: ChatBridgeMessage): void {
+    const channelId = `${channel}`;
+    
+    if (!this.listeners.has(channelId)) {
+      return;
+    }
+
+    const callbacks = this.listeners.get(channelId)!;
+    // Use setTimeout to avoid blocking the execution context
+    setTimeout(() => {
+      callbacks.forEach(callback => {
+        try {
+          callback(message);
+        } catch (error) {
+          console.error(`Error in ChatBridge callback for channel ${channel}:`, error);
+        }
+      });
+    }, 0);
+  }
+
+  /**
+   * Get available chat channels
    */
   getChannels(): ChatBridgeChannel[] {
     return [...this.channels];
+  }
+
+  /**
+   * Add a new channel
+   */
+  addChannel(id: string, name: string): void {
+    if (!this.channels.some(channel => channel.id === id)) {
+      this.channels.push({ id, name });
+    }
   }
 }
 
