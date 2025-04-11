@@ -1,0 +1,30 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    
+    --primary: 174 86% 59%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 330 100% 53%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --accent: 266 100% 50%;
+    --accent-foreground: 0 0% 98%;
+    
+    --neon-cyan: 174 86% 59%;
+    --neon-pink: 330 100% 53%;
+    --neon-purple: 266 100% 50%;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-black text-white;
+  }
+}
