@@ -1,5 +1,5 @@
 
-import { LogCategory } from "../types";
+import { LogCategory } from "../../shared/types/enums";
 
 /**
  * Format message for logging
@@ -20,4 +20,11 @@ export function formatErrorForLog(error: unknown): string {
     return `${error.name}: ${error.message}\n${error.stack || ""}`;
   }
   return String(error);
+}
+
+/**
+ * Add details to a log message
+ */
+export function withDetails(details: Record<string, any>): Record<string, any> {
+  return { details };
 }

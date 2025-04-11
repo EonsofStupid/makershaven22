@@ -8,15 +8,18 @@ import { useState, useEffect } from 'react';
 export function useAdminAccess() {
   const { isAdmin, isLoading } = useAuthState();
   const [hasAccess, setHasAccess] = useState(false);
+  const [hasAdminAccess, setHasAdminAccess] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
       setHasAccess(isAdmin);
+      setHasAdminAccess(isAdmin);
     }
   }, [isAdmin, isLoading]);
 
   return {
     hasAccess,
+    hasAdminAccess,
     isLoading
   };
 }

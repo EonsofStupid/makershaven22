@@ -1,84 +1,69 @@
 
-import { getLogger } from '@/logging';
-import { LogCategory } from '@/logging/types';
+import { CHAT_EVENTS } from "../../shared/constants/app-constants";
 
-export type ChatBridgeMessage = {
-  type: string;
-  [key: string]: any;
+// Type for chat event callbacks
+type ChatEventCallback = (event: {type: string, [key: string]: any}) => void;
+
+// Store subscriptions by channel
+const channelSubscribers: Record<string, ChatEventCallback[]> = {
+  'message': [],
+  'system': [],
+  'ui': []
 };
 
-export type ChatBridgeChannel = string;
-
-export type ChatBridgeListener = (message: ChatBridgeMessage) => void;
-
 /**
- * ChatBridge - Implements a centralized messaging system for the chat module
- * This prevents circular dependencies by creating a one-way communication flow
+ * Subscribe to chat events on a specific channel
+ * @param channel Channel to subscribe to
+ * @param callback Function to call when events occur on this channel
+ * @returns Unsubscribe function
  */
-class ChatBridgeImpl {
-  private listeners: Map<ChatBridgeChannel, ChatBridgeListener[]> = new Map();
-  private logger = getLogger('ChatBridge');
+export function subscribeToChatEvents(
+  channel: string, 
+  callback: ChatEventCallback
+): () => void {
+  // Create the channel if it doesn't exist
+  if (!channelSubscribers[channel]) {
+    channelSubscribers[channel] = [];
+  }
   
-  /**
-   * Subscribe to a channel
-   */
-  subscribe(channel: ChatBridgeChannel, listener: ChatBridgeListener): () => void {
-    if (!this.listeners.has(channel)) {
-      this.listeners.set(channel, []);
-    }
-    
-    const channelListeners = this.listeners.get(channel)!;
-    channelListeners.push(listener);
-    
-    this.logger.debug(`Listener added to ${channel} channel`, { 
-      category: LogCategory.CHAT,
-      details: { listenersCount: channelListeners.length }
-    });
-    
-    // Return unsubscribe function
-    return () => {
-      const index = channelListeners.indexOf(listener);
-      if (index > -1) {
-        channelListeners.splice(index, 1);
-        this.logger.debug(`Listener removed from ${channel} channel`, { 
-          category: LogCategory.CHAT,
-          details: { listenersCount: channelListeners.length }
-        });
+  channelSubscribers[channel].push(callback);
+  
+  // Return unsubscribe function
+  return () => {
+    const subs = channelSubscribers[channel];
+    if (subs) {
+      const index = subs.indexOf(callback);
+      if (index !== -1) {
+        subs.splice(index, 1);
       }
-    };
-  }
-  
-  /**
-   * Publish a message to a channel
-   */
-  publish(channel: ChatBridgeChannel, message: ChatBridgeMessage): void {
-    if (!this.listeners.has(channel)) {
-      return;
     }
-    
-    const channelListeners = this.listeners.get(channel)!;
-    
-    this.logger.debug(`Publishing to ${channel} channel`, {
-      category: LogCategory.CHAT,
-      details: { message, listenersCount: channelListeners.length }
-    });
-    
-    // Use setTimeout to break potential circular dependencies
-    setTimeout(() => {
-      channelListeners.forEach(listener => {
-        try {
-          listener(message);
-        } catch (error) {
-          this.logger.error(`Error in ${channel} channel listener`, {
-            category: LogCategory.CHAT,
-            details: { error, messageType: message.type },
-            error: true
-          });
-        }
-      });
-    }, 0);
-  }
+  };
 }
 
-// Export singleton instance
-export const chatBridge = new ChatBridgeImpl();
+/**
+ * Publish an event to a specific channel
+ * @param channel Channel to publish to
+ * @param event Event object to publish
+ */
+export function publishChatEvent(channel: string, event: Record<string, any>): void {
+  const subs = channelSubscribers[channel];
+  if (!subs) return;
+  
+  // Notify all subscribers on this channel
+  subs.forEach(callback => {
+    try {
+      callback(event);
+    } catch (error) {
+      console.error(`Error in chat event subscriber on channel ${channel}:`, error);
+    }
+  });
+}
+
+/**
+ * Chat bridge API - bridges between chat domain and other parts of the app
+ */
+export const chatBridge = {
+  subscribe: subscribeToChatEvents,
+  publish: publishChatEvent,
+  events: CHAT_EVENTS
+};

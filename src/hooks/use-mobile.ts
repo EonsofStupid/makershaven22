@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { UI_BREAKPOINTS } from "../shared/constants/app-constants";
 
 /**
  * Hook to detect if the screen is mobile-sized
@@ -9,7 +10,7 @@ export function useMobile() {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < UI_BREAKPOINTS.MD);
     };
 
     // Check on initial load

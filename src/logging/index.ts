@@ -1,28 +1,36 @@
 
-import { LogCategory, Logger } from "./types";
+import { Logger, LogOptions } from '../shared/types/common';
+import { LogCategory, LogLevel } from '../shared/types/enums';
 
-export { LogCategory } from "./types";
+// Export the log category and level enums
+export { LogCategory, LogLevel };
+
+// Export the logger interface
+export type { Logger, LogOptions };
 
 /**
- * Create a logger instance for a specific source
+ * Get a logger instance for a specific component or module
  */
-export function getLogger(source: string, defaultCategory = LogCategory.APP): Logger {
+export function getLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
   return {
-    debug: (message: string, options: any = {}) => {
-      const { category = defaultCategory, details = {} } = options;
-      console.log(`[DEBUG][${category}][${source}] ${message}`, details);
+    debug: (message: string, options?: any) => {
+      console.debug(`[${category}][${source}] ${message}`, options || '');
     },
-    info: (message: string, options: any = {}) => {
-      const { category = defaultCategory, details = {} } = options;
-      console.log(`[INFO][${category}][${source}] ${message}`, details);
+    info: (message: string, options?: any) => {
+      console.info(`[${category}][${source}] ${message}`, options || '');
     },
-    warn: (message: string, options: any = {}) => {
-      const { category = defaultCategory, details = {} } = options;
-      console.warn(`[WARN][${category}][${source}] ${message}`, details);
+    warn: (message: string, options?: any) => {
+      console.warn(`[${category}][${source}] ${message}`, options || '');
     },
-    error: (message: string, options: any = {}) => {
-      const { category = defaultCategory, details = {}, error } = options;
-      console.error(`[ERROR][${category}][${source}] ${message}`, details, error || "");
-    },
+    error: (message: string, options?: any) => {
+      console.error(`[${category}][${source}] ${message}`, options || '');
+    }
   };
+}
+
+/**
+ * Hook for using logger in components
+ */
+export function useLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
+  return getLogger(source, category);
 }

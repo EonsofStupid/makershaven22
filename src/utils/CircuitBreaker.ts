@@ -1,59 +1,83 @@
 
 /**
- * Simple circuit breaker pattern to prevent infinite loops
+ * Simple circuit breaker utility to prevent infinite loops
+ * and excessive operations.
  */
-export default class CircuitBreaker {
-  private static circuits: Map<string, { count: number; threshold: number; reset: number }> = new Map();
-  
+const CircuitBreaker = {
+  breakers: new Map<string, { count: number; limit: number; tripped: boolean; timeout: number }>(),
+
   /**
-   * Initialize a circuit with a threshold and reset timeout
+   * Initialize a circuit breaker
+   * @param key Unique identifier for this breaker
+   * @param limit Number of operations before tripping
+   * @param timeout Optional timeout to reset breaker (ms)
    */
-  static init(name: string, threshold = 5, resetMs = 2000): void {
-    if (!this.circuits.has(name)) {
-      this.circuits.set(name, { count: 0, threshold, reset: resetMs });
-    }
-  }
-  
+  init(key: string, limit: number, timeout: number = 0): void {
+    this.breakers.set(key, { count: 0, limit, tripped: false, timeout });
+  },
+
   /**
-   * Increment counter and check if circuit is tripped
+   * Increment the counter for this breaker
+   * @param key Breaker identifier
+   * @returns True if increment successful, false if tripped
    */
-  static count(name: string): boolean {
-    const circuit = this.circuits.get(name);
-    if (!circuit) {
-      return false;
-    }
+  count(key: string): boolean {
+    const breaker = this.breakers.get(key);
+    if (!breaker) return false;
     
-    circuit.count++;
+    if (breaker.tripped) return false;
     
-    if (circuit.count >= circuit.threshold) {
-      setTimeout(() => {
-        const c = this.circuits.get(name);
-        if (c) {
-          c.count = 0;
-        }
-      }, circuit.reset);
+    breaker.count += 1;
+    if (breaker.count >= breaker.limit) {
+      breaker.tripped = true;
       
-      return true;
+      // Auto-reset after timeout if specified
+      if (breaker.timeout > 0) {
+        setTimeout(() => {
+          this.reset(key);
+        }, breaker.timeout);
+      }
     }
     
-    return false;
-  }
-  
+    return !breaker.tripped;
+  },
+
   /**
-   * Check if circuit is tripped without incrementing
+   * Check if a breaker is tripped
+   * @param key Breaker identifier
    */
-  static isTripped(name: string): boolean {
-    const circuit = this.circuits.get(name);
-    return circuit ? circuit.count >= circuit.threshold : false;
-  }
-  
+  isTripped(key: string): boolean {
+    return this.breakers.get(key)?.tripped || false;
+  },
+
   /**
-   * Reset a circuit
+   * Get current count for a breaker
+   * @param key Breaker identifier
    */
-  static reset(name: string): void {
-    const circuit = this.circuits.get(name);
-    if (circuit) {
-      circuit.count = 0;
+  getCount(key: string): number {
+    return this.breakers.get(key)?.count || 0;
+  },
+
+  /**
+   * Reset a breaker
+   * @param key Breaker identifier
+   */
+  reset(key: string): void {
+    const breaker = this.breakers.get(key);
+    if (breaker) {
+      breaker.count = 0;
+      breaker.tripped = false;
     }
+  },
+
+  /**
+   * Reset all breakers
+   */
+  resetAll(): void {
+    this.breakers.forEach((breaker, key) => {
+      this.reset(key);
+    });
   }
-}
+};
+
+export default CircuitBreaker;

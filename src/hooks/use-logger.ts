@@ -1,37 +1,44 @@
 
-import { useCallback } from "react";
-import { LogCategory } from "../logging/types";
+import { useCallback } from 'react';
+import { LogCategory } from '../shared/types/enums';
+import { Logger } from '../shared/types/common';
 
-interface LogOptions {
-  category?: LogCategory;
-  details?: Record<string, any>;
-  error?: boolean;
-}
-
-export function useLogger(source: string, defaultCategory = LogCategory.APP) {
-  const log = useCallback(
-    (message: string, options: LogOptions = {}) => {
-      const { category = defaultCategory, details = {}, error = false } = options;
-      
-      if (error) {
-        console.error(`[${category}][${source}] ${message}`, details);
-      } else {
-        console.log(`[${category}][${source}] ${message}`, details);
-      }
-      
-      // Here we could also send logs to a central service if needed
+/**
+ * Hook for using logger in components
+ */
+export function useLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
+  const debug = useCallback(
+    (message: string, options?: any) => {
+      console.debug(`[${category}][${source}] ${message}`, options || '');
     },
-    [source, defaultCategory]
+    [source, category]
+  );
+
+  const info = useCallback(
+    (message: string, options?: any) => {
+      console.info(`[${category}][${source}] ${message}`, options || '');
+    },
+    [source, category]
+  );
+
+  const warn = useCallback(
+    (message: string, options?: any) => {
+      console.warn(`[${category}][${source}] ${message}`, options || '');
+    },
+    [source, category]
+  );
+
+  const error = useCallback(
+    (message: string, options?: any) => {
+      console.error(`[${category}][${source}] ${message}`, options || '');
+    },
+    [source, category]
   );
 
   return {
-    debug: (message: string, options: Omit<LogOptions, "error"> = {}) => 
-      log(message, { ...options, error: false }),
-    info: (message: string, options: Omit<LogOptions, "error"> = {}) => 
-      log(message, { ...options, error: false }),
-    warn: (message: string, options: Omit<LogOptions, "error"> = {}) => 
-      log(`⚠️ ${message}`, { ...options, error: false }),
-    error: (message: string, options: Omit<LogOptions, "error"> = {}) => 
-      log(`🔴 ${message}`, { ...options, error: true }),
+    debug,
+    info,
+    warn,
+    error
   };
 }

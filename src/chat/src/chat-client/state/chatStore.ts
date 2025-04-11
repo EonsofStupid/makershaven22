@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMode, ChatMessage, ChatStore, ChatConversation } from '../types';
+import { ChatStore, ChatMode, ChatMessage, ChatConversation } from '../../../types';
 
 /**
  * Zustand store for chat state management
@@ -115,30 +115,16 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     const { conversations, activeConversationId } = get();
     const updatedConversations = conversations.filter(conv => conv.id !== id);
     
-    // If the deleted conversation was active, set the most recent one as active
-    let newActiveId = activeConversationId;
+    // If deleting the active conversation, clear the messages
     if (activeConversationId === id) {
-      const sorted = [...updatedConversations].sort((a, b) => b.updatedAt - a.updatedAt);
-      newActiveId = sorted.length > 0 ? sorted[0].id : null;
-      
-      // If we have a new active conversation, set its messages and mode
-      if (newActiveId) {
-        const newActive = sorted[0];
-        set({
-          conversations: updatedConversations,
-          activeConversationId: newActiveId,
-          messages: newActive.messages,
-          mode: newActive.mode
-        });
-        return;
-      }
+      set({
+        conversations: updatedConversations,
+        activeConversationId: null,
+        messages: []
+      });
+    } else {
+      set({ conversations: updatedConversations });
     }
-    
-    set({ 
-      conversations: updatedConversations,
-      activeConversationId: newActiveId,
-      messages: newActiveId ? get().messages : []
-    });
   },
   
   pinConversation: (id: string, pinned: boolean) => {
@@ -147,17 +133,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       conv.id === id ? { ...conv, pinned, updatedAt: Date.now() } : conv
     );
     
-    // Sort so pinned conversations are at the top
-    const sortedConversations = [...updatedConversations].sort((a, b) => {
-      // First sort by pinned status
-      if ((a.pinned && b.pinned) || (!a.pinned && !b.pinned)) {
-        // If pinned status is the same, sort by updatedAt
-        return b.updatedAt - a.updatedAt;
-      }
-      return a.pinned ? -1 : 1;
-    });
-    
-    set({ conversations: sortedConversations });
+    set({ conversations: updatedConversations });
   },
   
   favoriteConversation: (id: string, favorite: boolean) => {
