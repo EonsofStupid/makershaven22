@@ -1,40 +1,22 @@
 
-import { ChatConversation, ChatMessage, ChatMode } from './chat';
+import { ChatMode } from "../../shared/types/enums";
+import { ChatMessage, ChatSession } from "./chat";
 
-/**
- * Core chat state management store interface
- */
-export interface ChatStore {
-  // State
-  mode: ChatMode;
-  messages: ChatMessage[];
+export interface ChatState {
+  sessions: ChatSession[];
+  currentSessionId: string | null;
+  activeMode: ChatMode;
   isLoading: boolean;
-  conversations: ChatConversation[];
-  activeConversationId: string | null;
-  
-  // Actions
-  setMode: (mode: ChatMode) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
-  clearMessages: () => void;
-  createConversation: (mode?: ChatMode) => string;
-  setActiveConversation: (id: string) => void;
-  updateConversation: (id: string, updates: Partial<ChatConversation>) => void;
-  deleteConversation: (id: string) => void;
-  pinConversation: (id: string, pinned: boolean) => void;
-  favoriteConversation: (id: string, favorite: boolean) => void;
+  error: Error | null;
 }
 
-/**
- * Chat context interface for React context
- */
-export interface ChatContextValue {
-  isOpen: boolean;
-  toggleChat: () => void;
-  openChat: () => void;
-  closeChat: () => void;
-  messages: ChatMessage[];
-  sendMessage: (content: string) => Promise<void>;
-  activeSessionId: string | null;
-  isLoading: boolean;
+export interface ChatActions {
+  setActiveMode: (mode: ChatMode) => void;
+  createSession: (mode: ChatMode, initialMessage?: string) => Promise<string>;
+  selectSession: (sessionId: string) => void;
+  sendMessage: (content: string, metadata?: Record<string, any>) => Promise<void>;
+  deleteSession: (sessionId: string) => Promise<void>;
+  clearSessions: () => void;
 }
+
+export type ChatStore = ChatState & ChatActions;

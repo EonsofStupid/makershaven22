@@ -1,5 +1,5 @@
 
-import { useAuthState } from '@/auth/hooks/useAuthState';
+import { useAuthState } from '../../auth/hooks/useAuthState';
 import { useState, useEffect } from 'react';
 
 /**
