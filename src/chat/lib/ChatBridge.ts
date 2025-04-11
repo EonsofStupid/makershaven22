@@ -1,13 +1,12 @@
 
 import { getLogger } from '@/logging';
-import { LogCategory, LogOptions } from '@/logging/types';
+import { LogCategory } from '@/logging/types';
 
 export type ChatBridgeMessage = {
   type: string;
   [key: string]: any;
 };
 
-// Updated to accept any string channel, including dynamic patterns like 'session:123'
 export type ChatBridgeChannel = string;
 
 export type ChatBridgeListener = (message: ChatBridgeMessage) => void;
@@ -22,9 +21,6 @@ class ChatBridgeImpl {
   
   /**
    * Subscribe to a channel
-   * @param channel The channel to subscribe to
-   * @param listener The listener callback
-   * @returns Unsubscribe function
    */
   subscribe(channel: ChatBridgeChannel, listener: ChatBridgeListener): () => void {
     if (!this.listeners.has(channel)) {
@@ -37,7 +33,7 @@ class ChatBridgeImpl {
     this.logger.debug(`Listener added to ${channel} channel`, { 
       category: LogCategory.CHAT,
       details: { listenersCount: channelListeners.length }
-    } as LogOptions);
+    });
     
     // Return unsubscribe function
     return () => {
@@ -47,15 +43,13 @@ class ChatBridgeImpl {
         this.logger.debug(`Listener removed from ${channel} channel`, { 
           category: LogCategory.CHAT,
           details: { listenersCount: channelListeners.length }
-        } as LogOptions);
+        });
       }
     };
   }
   
   /**
    * Publish a message to a channel
-   * @param channel The channel to publish to
-   * @param message The message to publish
    */
   publish(channel: ChatBridgeChannel, message: ChatBridgeMessage): void {
     if (!this.listeners.has(channel)) {
@@ -67,7 +61,7 @@ class ChatBridgeImpl {
     this.logger.debug(`Publishing to ${channel} channel`, {
       category: LogCategory.CHAT,
       details: { message, listenersCount: channelListeners.length }
-    } as LogOptions);
+    });
     
     // Use setTimeout to break potential circular dependencies
     setTimeout(() => {
@@ -79,7 +73,7 @@ class ChatBridgeImpl {
             category: LogCategory.CHAT,
             details: { error, messageType: message.type },
             error: true
-          } as LogOptions);
+          });
         }
       });
     }, 0);
