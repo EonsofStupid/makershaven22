@@ -29,6 +29,7 @@ export type LogLevel =
   | 'error'
   | 'debug';
 
+// Expand ChatMode to include all required modes
 export type ChatMode =
   | 'admin'
   | 'dev'

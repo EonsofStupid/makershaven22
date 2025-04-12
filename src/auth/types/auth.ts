@@ -39,5 +39,17 @@ export interface AuthSession {
   expires_at?: number;
 }
 
+// Add a proper Session interface that includes the user property
+export interface Session {
+  user: {
+    id: string;
+    email?: string;
+    role?: string;
+    [key: string]: any;
+  };
+  expires_at?: number;
+  [key: string]: any;
+}
+
 export type SecurityEventSeverity = 'low' | 'medium' | 'high';
 export type SecurityEventCategory = 'auth' | 'data_access' | 'admin' | 'system';

@@ -15,6 +15,22 @@ class LocalChatBridge implements ChatBridge {
     log.info("Initializing local chat bridge");
   }
   
+  async connect(): Promise<void> {
+    log.info("Connecting to chat bridge");
+    this.connected = true;
+    return Promise.resolve();
+  }
+  
+  disconnect(): void {
+    log.info("Disconnecting from chat bridge");
+    this.connected = false;
+    this.listeners.clear();
+  }
+  
+  isConnected(): boolean {
+    return this.connected;
+  }
+  
   /**
    * Send a message through the bridge
    */
@@ -35,6 +51,13 @@ class LocalChatBridge implements ChatBridge {
         data: response
       });
     }, 1000);
+  }
+  
+  /**
+   * Publish to a channel
+   */
+  publish(channel: string, message: any): void {
+    this.notifyListeners(channel, message);
   }
   
   /**
@@ -62,6 +85,23 @@ class LocalChatBridge implements ChatBridge {
         });
       }
     };
+  }
+  
+  /**
+   * Unsubscribe from a channel
+   */
+  unsubscribe(channel: string): void {
+    this.listeners.delete(channel);
+    log.debug(`Unsubscribed from all listeners on channel: ${channel}`);
+  }
+  
+  /**
+   * Reconnect to the bridge
+   */
+  async reconnect(): Promise<void> {
+    log.info("Reconnecting to chat bridge");
+    this.disconnect();
+    return this.connect();
   }
   
   /**

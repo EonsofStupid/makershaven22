@@ -1,163 +1,140 @@
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { chatBridge } from '../lib/ChatBridge';
+import { ChatMessage } from '../types/chat';
+import { ChatMode } from '../shared/types/enums';
 import { useLogger } from '../hooks/use-logger';
-import { LogCategories } from '../shared/types/enums';
-import CircuitBreaker from '../utils/CircuitBreaker';
 import { useAuthState } from '../auth/hooks/useAuthState';
+import CircuitBreaker from '../utils/CircuitBreaker';
 
-// Define the shape of our chat context
-interface ChatContextValue {
-  isOpen: boolean;
-  toggleChat: () => void;
-  openChat: () => void;
-  closeChat: () => void;
-  messages: any[];
+interface ChatContextType {
+  messages: ChatMessage[];
   sendMessage: (content: string) => Promise<void>;
-  activeSessionId: string | null;
   isLoading: boolean;
+  mode: ChatMode;
+  sessionId: string;
+  setMode: (mode: ChatMode) => void;
 }
 
-// Create the context with a default value
-const ChatContext = createContext<ChatContextValue | null>(null);
+const ChatContext = createContext<ChatContextType>({
+  messages: [],
+  sendMessage: async () => {},
+  isLoading: false,
+  mode: 'normal',
+  sessionId: '',
+  setMode: () => {}
+});
 
-// Provider component
-export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+export const useChat = () => useContext(ChatContext);
+
+interface ChatProviderProps {
+  children: ReactNode;
+  initialMode?: ChatMode;
+  initialSessionId?: string;
+}
+
+export const ChatProvider: React.FC<ChatProviderProps> = ({
+  children,
+  initialMode = 'normal',
+  initialSessionId
+}) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const logger = useLogger('ChatProvider');
+  const [mode, setMode] = useState<ChatMode>(initialMode);
+  const [sessionId, setSessionId] = useState<string>(initialSessionId || uuidv4());
   const { user } = useAuthState();
-  const initRef = useRef(false);
+  const logger = useLogger('ChatProvider');
   
-  // Initialize circuit breaker
+  // Initialize CircuitBreaker
   useEffect(() => {
-    CircuitBreaker.init('ChatProvider', 5, 1000);
+    CircuitBreaker.init('chat-provider', 10, 5000);
     
-    // Clean up on component unmount
     return () => {
-      logger.info('Chat provider unmounting');
+      CircuitBreaker.reset('chat-provider');
     };
-  }, [logger]);
+  }, []);
   
-  // Set up chat bridge listener - only once and without dependencies 
-  // that can trigger render loops
+  // Connect to chat bridge
   useEffect(() => {
-    // Prevent multiple initializations
-    if (initRef.current) return;
-    initRef.current = true;
-    
-    logger.info('Initializing chat bridge listener');
-    
-    const unsubscribe = chatBridge.subscribe('system', (message) => {
-      logger.info('Received system message', {
-        type: message.type
-      });
-      
-      // Handle system messages
-      switch (message.type) {
-        case 'session-created':
-          setActiveSessionId(message.data?.sessionId);
-          break;
-        case 'message-received':
-          setMessages(prev => [...prev, message.data?.message]);
-          break;
-      }
-    });
-    
-    // Clean up subscription
-    return () => {
-      unsubscribe();
-    };
-  }, []); // Empty dependencies - only run once
-  
-  // Toggle chat visibility with circuit breaker protection
-  const toggleChat = () => {
-    if (CircuitBreaker.isTripped('ChatProvider')) {
-      logger.warn('Circuit breaker tripped, ignoring toggle action');
+    if (CircuitBreaker.count('chat-provider-connect')) {
+      logger.warn('Breaking potential infinite loop in ChatProvider connection');
       return;
     }
     
-    setIsOpen(prev => !prev);
-  };
+    const initBridge = async () => {
+      try {
+        if (!chatBridge.isConnected()) {
+          await chatBridge.connect();
+        }
+      } catch (error) {
+        logger.error('Failed to connect to chat bridge', error instanceof Error ? error : new Error('Unknown error'));
+      }
+    };
+    
+    initBridge();
+    
+    return () => {
+      chatBridge.disconnect();
+    };
+  }, [logger]);
   
-  // Simple open/close functions with stable references
-  const openChat = () => setIsOpen(true);
-  const closeChat = () => setIsOpen(false);
+  // Set up message listener
+  useEffect(() => {
+    if (!sessionId) return;
+    
+    const unsubscribe = chatBridge.subscribe('message', (message) => {
+      if (message.sessionId === sessionId || !message.sessionId) {
+        if (message.type === 'message_received' && message.data) {
+          setMessages(prev => [...prev, message.data]);
+        }
+      }
+    });
+    
+    return unsubscribe;
+  }, [sessionId]);
   
-  // Send message through chat bridge
+  // Send message function
   const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || isLoading) return;
     
     try {
       setIsLoading(true);
       
-      // Create a new message object
-      const message = {
-        id: `msg-${Date.now()}`,
+      const userMessage: ChatMessage = {
+        id: `user-${Date.now()}`,
         content,
         sender: 'user',
         timestamp: new Date().toISOString(),
-        sessionId: activeSessionId,
-        userId: user?.id
+        sessionId
       };
       
-      // Add to local messages
-      setMessages(prev => [...prev, message]);
+      setMessages(prev => [...prev, userMessage]);
       
-      // Send through bridge - asynchronously
-      setTimeout(() => {
-        chatBridge.publish('message', {
-          type: 'user-message',
-          data: message
-        });
-      }, 0);
-      
-      // Simulate response for now
-      setTimeout(() => {
-        const responseMessage = {
-          id: `msg-${Date.now()}`,
-          content: `Echo: ${content}`,
-          sender: 'assistant',
-          timestamp: new Date().toISOString(),
-          sessionId: activeSessionId
-        };
-        
-        setMessages(prev => [...prev, responseMessage]);
-        setIsLoading(false);
-      }, 1000);
+      chatBridge.send({
+        type: 'user_message',
+        data: userMessage,
+        sessionId,
+        timestamp: Date.now()
+      });
       
     } catch (error) {
       logger.error('Error sending message', error instanceof Error ? error : new Error('Unknown error'));
-      setIsLoading(false);
+    } finally {
+      // Note: We don't set isLoading to false here because we wait for the response
+      // The loading state will be cleared when we receive a response
     }
   };
   
-  // Create the context value - use stable references
+  // Value for the context
   const value = {
-    isOpen,
-    toggleChat,
-    openChat,
-    closeChat,
     messages,
     sendMessage,
-    activeSessionId,
-    isLoading
+    isLoading,
+    mode,
+    sessionId,
+    setMode
   };
   
-  return (
-    <ChatContext.Provider value={value}>
-      {children}
-    </ChatContext.Provider>
-  );
-}
-
-// Custom hook to use the chat context
-export function useChat() {
-  const context = useContext(ChatContext);
-  if (context === null) {
-    throw new Error('useChat must be used within a ChatProvider');
-  }
-  return context;
-}
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+};

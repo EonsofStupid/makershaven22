@@ -1,40 +1,52 @@
 
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatStore, ChatMode, ChatMessage, ChatConversation } from '../../../types';
+import { ChatMode } from '../../../../shared/types/enums';
+import { ChatStore, ChatMessage, ChatConversation } from '../types';
 
 /**
  * Zustand store for chat state management
  */
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
-  isLoading: false,
-  mode: 'chat',
+  sessions: [],
   conversations: [],
+  isLoading: false,
   activeConversationId: null,
+  currentSessionId: null,
+  activeMode: 'chat' as ChatMode,
+  error: null,
   
   setMode: (mode: ChatMode) => {
-    set({ mode });
+    set({ activeMode: mode, mode });
     
     // Update the mode of the active conversation if there is one
     const { activeConversationId, conversations } = get();
     if (activeConversationId) {
       const updatedConversations = conversations.map(conv => 
         conv.id === activeConversationId 
-          ? { ...conv, mode, updatedAt: Date.now() } 
+          ? { ...conv, mode, updatedAt: new Date().toISOString() } 
           : conv
       );
       set({ conversations: updatedConversations });
     }
   },
   
+  setActiveMode: (mode: ChatMode) => {
+    set({ activeMode: mode, mode });
+  },
+  
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
   
+  setError: (error: string | null) => set({ error }),
+  
+  setMessages: (messages: ChatMessage[]) => set({ messages }),
+  
   addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
-    const newMessage = { 
+    const newMessage: ChatMessage = { 
       ...message, 
       id: uuidv4(), 
-      timestamp: Date.now() 
+      timestamp: new Date().toISOString()
     };
     
     set((state) => {
@@ -48,7 +60,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
             ? { 
                 ...conv, 
                 messages: [...conv.messages, newMessage],
-                updatedAt: Date.now(),
+                updatedAt: new Date().toISOString(),
                 title: conv.title === 'New conversation' && message.sender === 'user' 
                   ? message.content.slice(0, 30) + (message.content.length > 30 ? '...' : '')
                   : conv.title
@@ -68,25 +80,32 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   
   clearMessages: () => set({ messages: [] }),
   
-  createConversation: (mode = 'chat') => {
+  createNewConversation: (mode: ChatMode = 'chat') => {
     const newId = uuidv4();
     const newConversation: ChatConversation = {
       id: newId,
       title: 'New conversation',
       messages: [],
       mode,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     set((state) => ({
       conversations: [...(state.conversations || []), newConversation],
       activeConversationId: newId,
       messages: [],
+      activeMode: mode,
       mode
     }));
     
     return newId;
+  },
+  
+  // Alias for createNewConversation for compatibility
+  createConversation: (mode: ChatMode = 'chat') => {
+    const { createNewConversation } = get();
+    return createNewConversation(mode);
   },
   
   setActiveConversation: (id: string) => {
@@ -97,6 +116,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       set({
         activeConversationId: id,
         messages: conversation.messages,
+        activeMode: conversation.mode,
         mode: conversation.mode
       });
     }
@@ -105,7 +125,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   updateConversation: (id: string, updates: Partial<ChatConversation>) => {
     const { conversations } = get();
     const updatedConversations = conversations.map(conv => 
-      conv.id === id ? { ...conv, ...updates, updatedAt: Date.now() } : conv
+      conv.id === id 
+        ? { ...conv, ...updates, updatedAt: new Date().toISOString() } 
+        : conv
     );
     
     set({ conversations: updatedConversations });
@@ -130,7 +152,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   pinConversation: (id: string, pinned: boolean) => {
     const { conversations } = get();
     const updatedConversations = conversations.map(conv => 
-      conv.id === id ? { ...conv, pinned, updatedAt: Date.now() } : conv
+      conv.id === id 
+        ? { ...conv, pinned, updatedAt: new Date().toISOString() } 
+        : conv
     );
     
     set({ conversations: updatedConversations });
@@ -139,7 +163,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   favoriteConversation: (id: string, favorite: boolean) => {
     const { conversations } = get();
     const updatedConversations = conversations.map(conv => 
-      conv.id === id ? { ...conv, favorite, updatedAt: Date.now() } : conv
+      conv.id === id 
+        ? { ...conv, favorite, isFavorite: favorite, updatedAt: new Date().toISOString() } 
+        : conv
     );
     
     set({ conversations: updatedConversations });
