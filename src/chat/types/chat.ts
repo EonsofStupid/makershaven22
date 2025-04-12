@@ -1,36 +1,39 @@
 
-import { ChatMode } from "../../shared/types/enums";
+import { ChatMode, ChatBridgeChannel } from "../../shared/types/enums";
 
 export interface ChatMessage {
   id: string;
+  timestamp: string;
   content: string;
-  role: 'user' | 'assistant' | 'system';
-  createdAt: string;
   metadata?: Record<string, any>;
+  sender: "user" | "assistant" | "system";
 }
 
 export interface ChatSession {
   id: string;
-  title: string;
   messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
+  title: string;
   mode: ChatMode;
-  metadata?: Record<string, any>;
 }
 
 export interface ChatBridgeMessage {
-  type: string;
-  payload: any;
-}
-
-export interface ChatBridgeChannel {
   id: string;
-  name: string;
+  channel: ChatBridgeChannel;
+  sessionId: string;
+  message: string;
+  timestamp: string;
 }
 
 export interface ChatBridge {
-  sendMessage: (channel: string, message: ChatBridgeMessage) => void;
-  subscribe: (channel: string, callback: (data: ChatBridgeMessage) => void) => () => void;
-  getChannels: () => ChatBridgeChannel[];
+  subscribe: (channel: ChatBridgeChannel, callback: (message: ChatBridgeMessage) => void) => () => void;
+  publish: (channel: ChatBridgeChannel, message: string, sessionId: string) => void;
+  isConnected: () => boolean;
+}
+
+export interface SimpleChatBridge {
+  subscribe: (channel: ChatBridgeChannel, callback: (message: ChatBridgeMessage) => void) => () => void;
+  publish: (channel: ChatBridgeChannel, message: string, sessionId: string) => void;
+  isConnected: () => boolean;
 }

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import CircuitBreaker from '@/utils/CircuitBreaker';
+import CircuitBreaker from '../../utils/CircuitBreaker';
 
 const FloatingChatWrapper: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

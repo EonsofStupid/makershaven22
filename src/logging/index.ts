@@ -1,36 +1,44 @@
 
-import { Logger, LogOptions } from '../shared/types/common';
-import { LogCategory, LogLevel } from '../shared/types/enums';
+import { LogCategory, LogLevel } from "../shared/types/enums";
+import type { Logger, LogOptions } from "../shared/types/common";
 
-// Export the log category and level enums
+// Re-export types for convenience
+export type { Logger, LogOptions };
 export { LogCategory, LogLevel };
 
-// Export the logger interface
-export type { Logger, LogOptions };
-
-/**
- * Get a logger instance for a specific component or module
- */
-export function getLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
+// Create a default logger implementation
+export const createLogger = (): Logger => {
   return {
-    debug: (message: string, options?: any) => {
-      console.debug(`[${category}][${source}] ${message}`, options || '');
+    log: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
+      console.log(`[${category.toUpperCase()}]: ${message}`, metadata || '');
     },
-    info: (message: string, options?: any) => {
-      console.info(`[${category}][${source}] ${message}`, options || '');
+    
+    logError: (message: string, error?: Error, category: LogCategory = 'debug') => {
+      console.error(`[${category.toUpperCase()}][ERROR]: ${message}`, error || '');
     },
-    warn: (message: string, options?: any) => {
-      console.warn(`[${category}][${source}] ${message}`, options || '');
+    
+    logWarning: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
+      console.warn(`[${category.toUpperCase()}][WARNING]: ${message}`, metadata || '');
     },
-    error: (message: string, options?: any) => {
-      console.error(`[${category}][${source}] ${message}`, options || '');
+    
+    logDebug: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
+      console.debug(`[${category.toUpperCase()}][DEBUG]: ${message}`, metadata || '');
+    },
+    
+    // Add convenience methods for common log levels
+    info: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
+      console.info(`[${category.toUpperCase()}][INFO]: ${message}`, metadata || '');
+    },
+    
+    warn: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
+      console.warn(`[${category.toUpperCase()}][WARN]: ${message}`, metadata || '');
+    },
+    
+    error: (message: string, error?: Error, category: LogCategory = 'debug') => {
+      console.error(`[${category.toUpperCase()}][ERROR]: ${message}`, error || '');
     }
   };
-}
+};
 
-/**
- * Hook for using logger in components
- */
-export function useLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
-  return getLogger(source, category);
-}
+// Export a default logger instance
+export const logger = createLogger();

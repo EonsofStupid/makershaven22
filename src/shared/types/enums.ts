@@ -27,3 +27,20 @@ export type LogLevel =
   | 'warn'
   | 'error'
   | 'debug';
+
+export type ChatMode =
+  | 'admin'
+  | 'dev'
+  | 'thread'
+  | 'agent'
+  | 'ultra'
+  | 'developer'
+  | 'image'
+  | 'debug'
+  | 'planning'
+  | 'training';
+
+export type ChatBridgeChannel =
+  | 'system'
+  | 'user'
+  | 'assistant';

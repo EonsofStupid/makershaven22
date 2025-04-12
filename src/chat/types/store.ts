@@ -2,21 +2,35 @@
 import { ChatMode } from "../../shared/types/enums";
 import { ChatMessage, ChatSession } from "./chat";
 
-export interface ChatState {
+export interface ChatConversation {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: ChatMessage[];
+  mode: ChatMode;
+  isFavorite?: boolean;
+}
+
+export interface ChatStore {
+  messages: ChatMessage[];
   sessions: ChatSession[];
+  conversations: ChatConversation[];
+  isLoading: boolean;
+  activeConversationId: string | null;
   currentSessionId: string | null;
   activeMode: ChatMode;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-export interface ChatActions {
+  error: string | null;
+  
+  // Actions
+  setMessages: (messages: ChatMessage[]) => void;
+  addMessage: (message: Omit<ChatMessage, "id" | "timestamp">) => void;
+  clearMessages: () => void;
+  setActiveConversation: (id: string | null) => void;
+  createNewConversation: (mode: ChatMode) => string;
   setActiveMode: (mode: ChatMode) => void;
-  createSession: (mode: ChatMode, initialMessage?: string) => Promise<string>;
-  selectSession: (sessionId: string) => void;
-  sendMessage: (content: string, metadata?: Record<string, any>) => Promise<void>;
-  deleteSession: (sessionId: string) => Promise<void>;
-  clearSessions: () => void;
+  setIsLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
+  pinConversation: (id: string, pinned: boolean) => void;
+  favoriteConversation: (id: string, favorite: boolean) => void;
 }
-
-export type ChatStore = ChatState & ChatActions;
