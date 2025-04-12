@@ -1,49 +1,75 @@
 
-import { toast as sonnerToast } from 'sonner';
-import type { ToastOptions } from 'sonner';
+import { toast as sonnerToast } from "sonner";
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
-
-export interface ExtendedToastOptions extends ToastOptions {
-  title?: string;
-  description?: string;
-  type?: ToastType;
+// Type definition for ToastOptions
+interface ToastOptions {
+  id?: string | number;
+  duration?: number;
+  icon?: React.ReactNode;
+  promise?: Promise<any>;
+  closeButton?: boolean;
+  className?: string;
+  description?: React.ReactNode;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  cancel?: {
+    label: string;
+    onClick?: () => void;
+  };
+  onDismiss?: () => void;
+  onAutoClose?: () => void;
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center';
 }
 
-/**
- * Enhanced toast functionality with consistent styling and extended options
- */
-function toast(message: string, options: ExtendedToastOptions = {}) {
-  const { type = 'info', ...restOptions } = options;
+// Custom toast function with our styling
+export const toast = {
+  // Standard toast
+  show: (message: string, options?: ToastOptions) => {
+    return sonnerToast(message, options);
+  },
   
-  switch (type) {
-    case 'success':
-      return sonnerToast.success(message, restOptions);
-    case 'error':
-      return sonnerToast.error(message, restOptions);
-    case 'warning':
-      return sonnerToast.warning(message, restOptions);
-    case 'info':
-    default:
-      return sonnerToast(message, restOptions);
+  // Success toast
+  success: (message: string, options?: ToastOptions) => {
+    return sonnerToast.success(message, options);
+  },
+  
+  // Error toast
+  error: (message: string, options?: ToastOptions) => {
+    return sonnerToast.error(message, options);
+  },
+  
+  // Info toast
+  info: (message: string, options?: ToastOptions) => {
+    return sonnerToast.info(message, options);
+  },
+  
+  // Warning toast
+  warning: (message: string, options?: ToastOptions) => {
+    return sonnerToast.warning(message, options);
+  },
+  
+  // Promise toast
+  promise: <T>(
+    promise: Promise<T>,
+    options: {
+      loading: string;
+      success: string | ((data: T) => string);
+      error: string | ((error: any) => string);
+    },
+    toastOptions?: ToastOptions
+  ) => {
+    return sonnerToast.promise(promise, options, toastOptions);
+  },
+  
+  // Dismiss a toast by ID
+  dismiss: (toastId?: string | number) => {
+    return sonnerToast.dismiss(toastId);
+  },
+  
+  // Custom positioning
+  position: (position: ToastOptions['position']) => {
+    return sonnerToast.position(position);
   }
-}
-
-// Add direct methods for convenience
-toast.success = (message: string, options: Omit<ExtendedToastOptions, 'type'> = {}) => 
-  sonnerToast.success(message, options);
-
-toast.error = (message: string, options: Omit<ExtendedToastOptions, 'type'> = {}) => 
-  sonnerToast.error(message, options);
-
-toast.warning = (message: string, options: Omit<ExtendedToastOptions, 'type'> = {}) => 
-  sonnerToast.warning(message, options);
-
-toast.info = (message: string, options: Omit<ExtendedToastOptions, 'type'> = {}) => 
-  sonnerToast(message, options);
-
-toast.custom = sonnerToast.custom;
-toast.dismiss = sonnerToast.dismiss;
-toast.promise = sonnerToast.promise;
-
-export { toast };
+};

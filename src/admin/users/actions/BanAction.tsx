@@ -3,6 +3,7 @@ import React from 'react';
 import { Ban } from "lucide-react";
 import { DropdownMenuItem } from "../../../shared/ui/dropdown-menu";
 import { toast } from "sonner";
+import { supabase } from "../../../integrations/supabase/client";
 
 interface BanActionProps {
   userId: string;

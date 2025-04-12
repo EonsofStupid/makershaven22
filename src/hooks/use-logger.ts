@@ -1,44 +1,35 @@
 
 import { useCallback } from 'react';
 import { LogCategory } from '../shared/types/enums';
-import { Logger } from '../shared/types/common';
+import logger from '../logger';
 
-/**
- * Hook for using logger in components
- */
-export function useLogger(source: string, category: LogCategory = LogCategory.APP): Logger {
-  const debug = useCallback(
-    (message: string, options?: any) => {
-      console.debug(`[${category}][${source}] ${message}`, options || '');
-    },
-    [source, category]
-  );
+export const useLogger = (defaultCategory?: LogCategory) => {
+  const log = useCallback((message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.info(message, category || defaultCategory, metadata);
+  }, [defaultCategory]);
 
-  const info = useCallback(
-    (message: string, options?: any) => {
-      console.info(`[${category}][${source}] ${message}`, options || '');
-    },
-    [source, category]
-  );
+  const logError = useCallback((message: string, error?: Error, category?: LogCategory) => {
+    const metadata = error ? {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    } : undefined;
+    
+    logger.error(message, category || defaultCategory, metadata);
+  }, [defaultCategory]);
 
-  const warn = useCallback(
-    (message: string, options?: any) => {
-      console.warn(`[${category}][${source}] ${message}`, options || '');
-    },
-    [source, category]
-  );
+  const logWarning = useCallback((message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.warn(message, category || defaultCategory, metadata);
+  }, [defaultCategory]);
 
-  const error = useCallback(
-    (message: string, options?: any) => {
-      console.error(`[${category}][${source}] ${message}`, options || '');
-    },
-    [source, category]
-  );
+  const logDebug = useCallback((message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.debug(message, category || defaultCategory, metadata);
+  }, [defaultCategory]);
 
   return {
-    debug,
-    info,
-    warn,
-    error
+    log,
+    logError,
+    logWarning,
+    logDebug
   };
-}
+};

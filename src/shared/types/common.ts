@@ -1,32 +1,23 @@
 
-import { LogCategory } from './enums';
+import { LogCategory, LogLevel } from "./enums";
 
-/**
- * Shared interface for logger functionality
- */
-export interface Logger {
-  debug: (message: string, options?: any) => void;
-  info: (message: string, options?: any) => void;
-  warn: (message: string, options?: any) => void;
-  error: (message: string, options?: any) => void;
+export interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  category: LogCategory;
+  message: string;
+  data?: Record<string, any>;
 }
 
-/**
- * Shared log options
- */
-export interface LogOptions {
-  category?: LogCategory;
-  details?: Record<string, any>;
-  error?: boolean;
+export interface PaginationMeta {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
 }
 
-/**
- * Base entity interface for database models
- */
-export interface BaseEntity {
-  id: string;
-  created_at?: string;
-  updated_at?: string;
-  created_by?: string;
-  updated_by?: string;
+export interface ApiResponse<T> {
+  data: T | null;
+  error: string | null;
+  meta?: PaginationMeta;
 }

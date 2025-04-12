@@ -1,38 +1,33 @@
 
-import { Logger, LogOptions } from '../shared/types/common';
-import { LogCategory, LogLevel } from '../shared/types/enums';
+import { LogCategory, LogLevel } from "../shared/types/enums";
 
-// Re-export the log category and level enums for easier access
-export { LogCategory, LogLevel };
-
-// Re-export the logger interface
-export type { Logger, LogOptions };
-
-/**
- * Get a logger instance for a specific component or module
- */
-export function getLogger(source: string, defaultCategory: LogCategory = LogCategory.APP): Logger {
-  const logger: Logger = {
-    debug: (message: string, options?: any) => {
-      const category = options?.category || defaultCategory;
-      console.debug(`[${category}][${source}] ${message}`, options || '');
-    },
-    
-    info: (message: string, options?: any) => {
-      const category = options?.category || defaultCategory;
-      console.info(`[${category}][${source}] ${message}`, options || '');
-    },
-    
-    warn: (message: string, options?: any) => {
-      const category = options?.category || defaultCategory;
-      console.warn(`[${category}][${source}] ${message}`, options || '');
-    },
-    
-    error: (message: string, options?: any) => {
-      const category = options?.category || defaultCategory;
-      console.error(`[${category}][${source}] ${message}`, options || '');
-    }
-  };
-  
-  return logger;
+export interface LoggerOptions {
+  category?: LogCategory;
+  level?: LogLevel;
+  metadata?: Record<string, any>;
 }
+
+// Basic logger implementation
+export const logger = {
+  log: (message: string, options?: LoggerOptions) => {
+    console.log(`[${options?.level || 'info'}][${options?.category || 'general'}] ${message}`, options?.metadata || '');
+  },
+  
+  info: (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.log(message, { level: 'info', category, metadata });
+  },
+  
+  warn: (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.log(message, { level: 'warn', category, metadata });
+  },
+  
+  error: (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.log(message, { level: 'error', category, metadata });
+  },
+  
+  debug: (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    logger.log(message, { level: 'debug', category, metadata });
+  }
+};
+
+export default logger;

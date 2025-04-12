@@ -3,6 +3,7 @@ import React from 'react';
 import { EyeOff } from "lucide-react";
 import { DropdownMenuItem } from "../../../shared/ui/dropdown-menu";
 import { toast } from "sonner";
+import { supabase } from "../../../integrations/supabase/client";
 
 interface UnbanActionProps {
   userId: string;
@@ -12,15 +13,6 @@ interface UnbanActionProps {
 export const UnbanAction = ({ userId, onSuccess }: UnbanActionProps) => {
   const handleUnban = async () => {
     try {
-      // TODO: Update this once Supabase client is properly set up
-      const supabase = {
-        from: (table: string) => ({
-          update: (data: any) => ({
-            eq: (field: string, value: any) => Promise.resolve({ error: null })
-          })
-        })
-      };
-      
       const { error } = await supabase
         .from('profiles')
         .update({ 

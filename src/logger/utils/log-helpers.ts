@@ -1,30 +1,36 @@
 
 import { LogCategory } from "../../shared/types/enums";
 
-/**
- * Format message for logging
- */
-export function formatLogMessage(
-  category: LogCategory,
-  source: string,
-  message: string
-): string {
-  return `[${category}][${source}] ${message}`;
-}
+export const formatLogMessage = (message: string, category?: LogCategory) => {
+  return `[${category || 'general'}] ${message}`;
+};
 
-/**
- * Format an error for logging
- */
-export function formatErrorForLog(error: unknown): string {
-  if (error instanceof Error) {
-    return `${error.name}: ${error.message}\n${error.stack || ""}`;
+export const formatErrorForLogging = (error: Error) => {
+  return {
+    message: error.message,
+    stack: error.stack,
+    name: error.name
+  };
+};
+
+export const logToConsole = (message: string, level: string = 'log') => {
+  const timestamp = new Date().toISOString();
+  const formattedMessage = `[${timestamp}] ${message}`;
+  
+  switch (level) {
+    case 'error':
+      console.error(formattedMessage);
+      break;
+    case 'warn':
+      console.warn(formattedMessage);
+      break;
+    case 'info':
+      console.info(formattedMessage);
+      break;
+    case 'debug':
+      console.debug(formattedMessage);
+      break;
+    default:
+      console.log(formattedMessage);
   }
-  return String(error);
-}
-
-/**
- * Add details to a log message
- */
-export function withDetails(details: Record<string, any>): Record<string, any> {
-  return { details };
-}
+};

@@ -1,64 +1,43 @@
 
-/**
- * AuthBridge - Provides a communication layer for auth-related events
- * Prevents circular dependencies by using a pub/sub pattern
- */
+import { EventEmitter } from 'events';
 
-type EventCallback = (data: any) => void;
+type AuthEventType = 'login' | 'logout' | 'session-change' | 'user-update';
 
-export enum AuthEvent {
-  LOGIN = 'login',
-  LOGOUT = 'logout',
-  SESSION_EXPIRED = 'session_expired',
-  PROFILE_UPDATED = 'profile_updated',
-  PERMISSION_CHANGED = 'permission_changed',
-  ROLE_UPDATED = 'role_updated',
+interface AuthEvent {
+  type: AuthEventType;
+  payload: any;
 }
 
-class AuthBridgeImpl {
-  private listeners: Map<AuthEvent, EventCallback[]> = new Map();
+class AuthBridge extends EventEmitter {
+  constructor() {
+    super();
+  }
 
-  /**
-   * Register a callback for an auth event
-   */
-  subscribe(event: AuthEvent, callback: EventCallback): () => void {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
-    }
+  emitAuthEvent(event: AuthEvent) {
+    this.emit(event.type, event.payload);
+  }
 
-    const callbacks = this.listeners.get(event)!;
-    callbacks.push(callback);
-
+  subscribeToAuthEvents(eventType: AuthEventType | AuthEventType[], callback: (payload: any) => void) {
+    const events = Array.isArray(eventType) ? eventType : [eventType];
+    
+    events.forEach(event => {
+      this.on(event, callback);
+    });
+    
     // Return unsubscribe function
     return () => {
-      const index = callbacks.indexOf(callback);
-      if (index > -1) {
-        callbacks.splice(index, 1);
-      }
-    };
-  }
-
-  /**
-   * Publish an auth event with data
-   */
-  publish(event: AuthEvent, data?: any): void {
-    if (!this.listeners.has(event)) {
-      return;
-    }
-
-    const callbacks = this.listeners.get(event)!;
-    // Use setTimeout to avoid blocking the execution context
-    setTimeout(() => {
-      callbacks.forEach(callback => {
-        try {
-          callback(data);
-        } catch (error) {
-          console.error(`Error in AuthBridge callback for event ${event}:`, error);
-        }
+      events.forEach(event => {
+        this.off(event, callback);
       });
-    }, 0);
+    };
   }
 }
 
-// Export a singleton instance
-export const authBridge = new AuthBridgeImpl();
+export const authBridge = new AuthBridge();
+
+export const subscribeToAuthEvents = (
+  eventType: AuthEventType | AuthEventType[],
+  callback: (payload: any) => void
+) => {
+  return authBridge.subscribeToAuthEvents(eventType, callback);
+};

@@ -1,39 +1,41 @@
 
-import { useState, useCallback } from 'react';
-import { chatBridge, ChatBridgeChannel, ChatBridgeMessage } from '../lib/ChatBridge';
-import { useLogger } from '@/hooks/use-logger';
-import { LogCategory } from '@/logging';
+import { useEffect, useCallback } from 'react';
+import { chatBridge } from '../lib/ChatBridge';
+import { ChatBridgeChannel, ChatBridgeMessage } from '../types';
 
-/**
- * Hook to use the chat bridge
- */
-export function useChatBridge(defaultChannel: ChatBridgeChannel = 'global') {
-  const [channel, setChannel] = useState(defaultChannel);
-  const logger = useLogger('useChatBridge', LogCategory.CHAT);
-  
-  const publish = useCallback((message: ChatBridgeMessage, targetChannel?: string) => {
-    const publishChannel = targetChannel || channel;
-    logger.debug(`Publishing to ${publishChannel}`, { details: { message } });
-    chatBridge.publish(publishChannel, message);
-  }, [channel, logger]);
-  
-  const subscribe = useCallback((listener: (message: ChatBridgeMessage) => void, targetChannel?: string) => {
-    const subscribeChannel = targetChannel || channel;
-    logger.debug(`Subscribing to ${subscribeChannel}`);
+export const useChatBridge = () => {
+  useEffect(() => {
+    // Connect when the hook is first used
+    chatBridge.connect().catch(err => {
+      console.error('Failed to connect to ChatBridge:', err);
+    });
     
-    const unsubscribe = chatBridge.subscribe(subscribeChannel, listener);
-    return unsubscribe;
-  }, [channel, logger]);
+    // Disconnect when the component using this hook unmounts
+    return () => {
+      chatBridge.disconnect();
+    };
+  }, []);
   
-  const changeChannel = useCallback((newChannel: string) => {
-    logger.debug(`Changing channel from ${channel} to ${newChannel}`);
-    setChannel(newChannel);
-  }, [channel, logger]);
+  const send = useCallback((message: ChatBridgeMessage) => {
+    return chatBridge.send(message);
+  }, []);
+  
+  const subscribe = useCallback((channel: ChatBridgeChannel, callback: (message: ChatBridgeMessage) => void) => {
+    chatBridge.subscribe(channel, callback);
+  }, []);
+  
+  const unsubscribe = useCallback((channel: ChatBridgeChannel) => {
+    chatBridge.unsubscribe(channel);
+  }, []);
+  
+  const isConnected = useCallback(() => {
+    return chatBridge.isConnected();
+  }, []);
   
   return {
-    publish,
+    isConnected,
+    send,
     subscribe,
-    channel,
-    changeChannel
+    unsubscribe
   };
-}
+};

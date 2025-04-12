@@ -1,90 +1,72 @@
 
-import React, { useEffect, useRef, useMemo, useState } from 'react';
-import { ChatWidget } from './ChatWidget';
-import { useLocation } from 'react-router-dom';
-import { useChat } from '../context/ChatProvider';
-import { useAdminAccess } from '@/admin/hooks/useAdminAccess';
-import { useAuthState } from '@/auth/hooks/useAuthState';
-import { getLogger } from '@/logging';
-import { withDetails } from '@/logging/utils/log-helpers';
-import CircuitBreaker from '@/utils/CircuitBreaker';
-import { subscribeToAuthEvents } from '@/auth/bridge';
+import React, { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MessageCircle, X } from 'lucide-react';
+import { useChatBridge } from '../hooks/useChatBridge';
+import { subscribeToAuthEvents } from '../../auth/bridge';
 
-export function FloatingChat() {
-  const logger = getLogger('FloatingChat');
-  const location = useLocation();
-  const { isAuthenticated } = useAuthState();
-  const { hasAdminAccess } = useAdminAccess();
-  const { isOpen } = useChat();
-  const renderedRef = useRef(false);
-  const [shouldRender, setShouldRender] = useState(false);
+const FloatingChat: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isConnected } = useChatBridge();
   
-  // Use memoized values with stable references
-  const pathname = useMemo(() => location.pathname, [location.pathname]);
-  const inChatRoute = useMemo(() => pathname.startsWith('/chat'), [pathname]);
-  
-  // Show chat only for authenticated admin users and not in chat route
-  // But don't block rendering of other content on the page
-  const canShow = useMemo(() => isAuthenticated && hasAdminAccess && !inChatRoute, 
-    [isAuthenticated, hasAdminAccess, inChatRoute]);
-  
-  // Handle initial render with circuit breaker to prevent render loops
   useEffect(() => {
-    if (renderedRef.current) return;
-    renderedRef.current = true;
-    
-    // Initialize circuit breaker for this component
-    CircuitBreaker.init('floating-chat-render', 3, 500);
-    
-    logger.debug('FloatingChat rendered with state:', 
-      withDetails({
-        canShow, 
-        isAuthenticated, 
-        hasAdminAccess, 
-        path: pathname 
-      }));
-    
-    // Subscribe to auth events
-    const unsubscribe = subscribeToAuthEvents((event) => {
-      // Just check the conditions again - don't update state directly from auth events
-      const shouldShow = isAuthenticated && hasAdminAccess && !pathname.startsWith('/chat');
-      if (shouldShow !== shouldRender) {
-        setShouldRender(shouldShow);
-      }
+    // Subscribe to auth events to show/hide the chat based on authentication status
+    const unsubscribe = subscribeToAuthEvents('session-change', (payload) => {
+      setIsAuthenticated(!!payload?.session);
     });
     
-    // Safely update state based on props
-    setShouldRender(canShow);
-    
     return () => {
-      CircuitBreaker.reset('floating-chat-render');
       unsubscribe();
     };
   }, []);
   
-  // Separate effect for updates to prevent re-render loops
-  useEffect(() => {
-    if (!renderedRef.current) return;
-    
-    // Only update if the component has already done its first render
-    if (CircuitBreaker.getCount('floating-chat-render') > 1) {
-      // Update the render state based on latest values, but don't cause a loop
-      const newShouldRender = canShow;
-      if (newShouldRender !== shouldRender) {
-        setShouldRender(newShouldRender);
-      }
-    }
-  }, [canShow, shouldRender]);
-  
-  // Check for render loops
-  if (CircuitBreaker.isTripped('floating-chat-render')) {
-    logger.warn('Circuit breaker triggered in FloatingChat - preventing render loop');
+  // Only show the floating chat button if the user is authenticated and the chat bridge is connected
+  if (!isAuthenticated || !isConnected()) {
     return null;
   }
   
-  if (!shouldRender) {
-    return null;
-  }
-  
-  return <ChatWidget />;
-}
+  return (
+    <>
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          className="bg-primary text-primary-foreground rounded-full p-3 shadow-lg hover:bg-primary/90 transition-colors"
+          onClick={() => setIsOpen(true)}
+          aria-label="Open chat"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </button>
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-20 right-6 z-50 w-80 sm:w-96 h-96 bg-card border rounded-lg shadow-xl overflow-hidden"
+          >
+            <div className="flex justify-between items-center p-3 border-b">
+              <h3 className="font-medium">Chat Support</h3>
+              <button 
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => setIsOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-4 h-full overflow-y-auto">
+              {/* Chat content would go here */}
+              <div className="h-full flex items-center justify-center">
+                <p className="text-muted-foreground">Chat functionality will be implemented here.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+export default FloatingChat;
