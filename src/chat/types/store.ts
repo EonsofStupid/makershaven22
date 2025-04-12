@@ -9,7 +9,8 @@ export interface ChatConversation {
   updatedAt: string;
   messages: ChatMessage[];
   mode: ChatMode;
-  isFavorite?: boolean;
+  pinned?: boolean;
+  favorite?: boolean;
 }
 
 export interface ChatStore {

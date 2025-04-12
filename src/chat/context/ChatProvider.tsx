@@ -1,10 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { chatBridge } from '../lib/ChatBridge';
-import { useLogger } from '@/hooks/use-logger';
-import { LogCategory } from '@/logging';
-import CircuitBreaker from '@/utils/CircuitBreaker';
-import { useAuthState } from '@/auth/hooks/useAuthState';
+import { useLogger } from '../hooks/use-logger';
+import { LogCategories } from '../shared/types/enums';
+import CircuitBreaker from '../utils/CircuitBreaker';
+import { useAuthState } from '../auth/hooks/useAuthState';
 
 // Define the shape of our chat context
 interface ChatContextValue {
@@ -27,7 +27,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const logger = useLogger('ChatProvider', LogCategory.CHAT);
+  const logger = useLogger('ChatProvider');
   const { user } = useAuthState();
   const initRef = useRef(false);
   
@@ -52,16 +52,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     
     const unsubscribe = chatBridge.subscribe('system', (message) => {
       logger.info('Received system message', {
-        details: { type: message.type }
+        type: message.type
       });
       
       // Handle system messages
       switch (message.type) {
         case 'session-created':
-          setActiveSessionId(message.sessionId);
+          setActiveSessionId(message.data?.sessionId);
           break;
         case 'message-received':
-          setMessages(prev => [...prev, message.message]);
+          setMessages(prev => [...prev, message.data?.message]);
           break;
       }
     });
@@ -98,7 +98,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         id: `msg-${Date.now()}`,
         content,
         sender: 'user',
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         sessionId: activeSessionId,
         userId: user?.id
       };
@@ -110,7 +110,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setTimeout(() => {
         chatBridge.publish('message', {
           type: 'user-message',
-          message
+          data: message
         });
       }, 0);
       
@@ -120,7 +120,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           id: `msg-${Date.now()}`,
           content: `Echo: ${content}`,
           sender: 'assistant',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(),
           sessionId: activeSessionId
         };
         
@@ -129,9 +129,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       }, 1000);
       
     } catch (error) {
-      logger.error('Error sending message', {
-        details: { error: error instanceof Error ? error.message : String(error) }
-      });
+      logger.error('Error sending message', error instanceof Error ? error : new Error('Unknown error'));
       setIsLoading(false);
     }
   };

@@ -1,83 +1,91 @@
 
 /**
- * Simple circuit breaker utility to prevent infinite loops
- * and excessive operations.
+ * A simple circuit breaker implementation to prevent infinite loops
+ * in hooks and components
  */
-const CircuitBreaker = {
-  breakers: new Map<string, { count: number; limit: number; tripped: boolean; timeout: number }>(),
+class CircuitBreaker {
+  private breakers: Map<string, { count: number; limit: number; timeWindow: number; lastReset: number }> = new Map();
 
   /**
-   * Initialize a circuit breaker
-   * @param key Unique identifier for this breaker
-   * @param limit Number of operations before tripping
-   * @param timeout Optional timeout to reset breaker (ms)
+   * Initialize a circuit breaker for a specific component or hook
    */
-  init(key: string, limit: number, timeout: number = 0): void {
-    this.breakers.set(key, { count: 0, limit, tripped: false, timeout });
-  },
-
-  /**
-   * Increment the counter for this breaker
-   * @param key Breaker identifier
-   * @returns True if increment successful, false if tripped
-   */
-  count(key: string): boolean {
-    const breaker = this.breakers.get(key);
-    if (!breaker) return false;
-    
-    if (breaker.tripped) return false;
-    
-    breaker.count += 1;
-    if (breaker.count >= breaker.limit) {
-      breaker.tripped = true;
-      
-      // Auto-reset after timeout if specified
-      if (breaker.timeout > 0) {
-        setTimeout(() => {
-          this.reset(key);
-        }, breaker.timeout);
-      }
+  init(id: string, limit: number = 5, timeWindow: number = 1000): void {
+    if (!this.breakers.has(id)) {
+      this.breakers.set(id, {
+        count: 0,
+        limit,
+        timeWindow,
+        lastReset: Date.now()
+      });
     }
-    
-    return !breaker.tripped;
-  },
-
-  /**
-   * Check if a breaker is tripped
-   * @param key Breaker identifier
-   */
-  isTripped(key: string): boolean {
-    return this.breakers.get(key)?.tripped || false;
-  },
-
-  /**
-   * Get current count for a breaker
-   * @param key Breaker identifier
-   */
-  getCount(key: string): number {
-    return this.breakers.get(key)?.count || 0;
-  },
-
-  /**
-   * Reset a breaker
-   * @param key Breaker identifier
-   */
-  reset(key: string): void {
-    const breaker = this.breakers.get(key);
-    if (breaker) {
-      breaker.count = 0;
-      breaker.tripped = false;
-    }
-  },
-
-  /**
-   * Reset all breakers
-   */
-  resetAll(): void {
-    this.breakers.forEach((breaker, key) => {
-      this.reset(key);
-    });
   }
-};
 
-export default CircuitBreaker;
+  /**
+   * Increment the counter for a circuit breaker
+   * @returns true if the count was incremented, false if it hit the limit
+   */
+  count(id: string): boolean {
+    if (!this.breakers.has(id)) {
+      this.init(id);
+    }
+
+    const breaker = this.breakers.get(id)!;
+    
+    // Check if we should reset the counter due to time window
+    if (Date.now() - breaker.lastReset > breaker.timeWindow) {
+      breaker.count = 0;
+      breaker.lastReset = Date.now();
+    }
+    
+    // Check if the circuit is already tripped
+    if (breaker.count >= breaker.limit) {
+      return true;
+    }
+    
+    // Increment the counter
+    breaker.count++;
+    return false;
+  }
+
+  /**
+   * Check if a circuit breaker is tripped
+   */
+  isTripped(id: string): boolean {
+    if (!this.breakers.has(id)) {
+      return false;
+    }
+    
+    const breaker = this.breakers.get(id)!;
+    
+    // Check if we should reset the counter due to time window
+    if (Date.now() - breaker.lastReset > breaker.timeWindow) {
+      breaker.count = 0;
+      breaker.lastReset = Date.now();
+      return false;
+    }
+    
+    return breaker.count >= breaker.limit;
+  }
+
+  /**
+   * Reset a circuit breaker
+   */
+  reset(id: string): void {
+    if (this.breakers.has(id)) {
+      const breaker = this.breakers.get(id)!;
+      breaker.count = 0;
+      breaker.lastReset = Date.now();
+    }
+  }
+
+  /**
+   * Clear all circuit breakers
+   */
+  clearAll(): void {
+    this.breakers.clear();
+  }
+}
+
+// Export singleton instance
+const circuitBreaker = new CircuitBreaker();
+export default circuitBreaker;

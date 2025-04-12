@@ -1,23 +1,14 @@
 
-import { ChatBridgeChannel, ChatBridgeMessage } from '../types/chat';
-
-export interface SimpleChatBridge {
-  connect: () => Promise<void>;
-  disconnect: () => void;
-  isConnected: () => boolean;
-  send: (message: ChatBridgeMessage) => void;
-  subscribe: (channel: ChatBridgeChannel, callback: (message: any) => void) => () => void;
-  unsubscribe: (channel: ChatBridgeChannel) => void;
-}
+import { ChatBridgeChannel, ChatBridgeMessage, ChatBridge } from '../types/chat';
 
 // Simple in-memory implementation of the ChatBridge
-class InMemoryChatBridge implements SimpleChatBridge {
+class InMemoryChatBridge implements ChatBridge {
   private subscribers: Record<string, Array<(message: any) => void>> = {};
   private connected: boolean = true;
 
   constructor() {
     // Initialize subscriber channels
-    const channels: ChatBridgeChannel[] = ['user', 'assistant', 'system', 'message'];
+    const channels: ChatBridgeChannel[] = ['user', 'assistant', 'system', 'message', 'error'];
     channels.forEach(channel => {
       this.subscribers[channel] = [];
     });
@@ -65,6 +56,8 @@ class InMemoryChatBridge implements SimpleChatBridge {
       channel = 'assistant';
     } else if (message.type.includes('message')) {
       channel = 'message';
+    } else if (message.type.includes('error')) {
+      channel = 'error';
     }
     
     this.publish(channel, message);

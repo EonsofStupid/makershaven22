@@ -1,30 +1,27 @@
 
-import { UserRole } from "@/lib/types/core/enums";
+import { UserRole } from "../shared/types/enums";
 
-export interface AuthUser {
+export interface User {
   id: string;
-  email?: string | null;
-  role?: UserRole;
-  username?: string;
-  displayName?: string;
-  user_metadata?: {
-    avatar_url?: string;
-    [key: string]: any;
-  };
+  email: string;
+  name?: string;
+  role: UserRole;
+  avatar?: string;
+  metadata?: Record<string, any>;
 }
 
-export interface AuthSession {
+export interface Session {
   id: string;
-  user: AuthUser;
-  expires_at?: number;
-  created_at: string;
+  userId: string;
+  expiresAt: string;
+  token: string;
 }
 
 export interface AuthState {
-  user: AuthUser | null;
-  session: AuthSession | null;
+  user: User | null;
+  session: Session | null;
   isLoading: boolean;
   isTransitioning: boolean;
   hasAccess: boolean;
-  error: Error | { message: string } | null;
+  error: string | null;
 }

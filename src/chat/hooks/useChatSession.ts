@@ -1,19 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from '@/auth/hooks/useAuthState';
+import { useAuthState } from '../auth/hooks/useAuthState';
 import { chatBridge } from '../lib/ChatBridge';
-import { useLogger } from '@/hooks/use-logger';
-import { LogCategory } from '@/logging';
+import { useLogger } from '../hooks/use-logger';
+import { LogCategories } from '../shared/types/enums';
 import { v4 as uuidv4 } from 'uuid';
-import CircuitBreaker from '@/utils/CircuitBreaker';
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  sender: 'user' | 'assistant' | 'system';
-  timestamp: Date;
-  sessionId?: string;
-}
+import CircuitBreaker from '../utils/CircuitBreaker';
+import { ChatBridgeChannel, ChatMessage } from '../types/chat';
 
 interface UseChatSessionProps {
   sessionId?: string;
@@ -25,7 +18,7 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
   const [sessionId, setSessionId] = useState<string>(externalSessionId || '');
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthState();
-  const logger = useLogger('useChatSession', LogCategory.CHAT);
+  const logger = useLogger('useChatSession');
   
   // Initialize circuit breaker
   CircuitBreaker.init('useChatSession', 5, 1000);
@@ -46,13 +39,16 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
       // Notify about new session
       chatBridge.publish('system', {
         type: 'session-created',
-        sessionId: newSessionId,
-        mode,
-        userId: user?.id
+        data: {
+          sessionId: newSessionId,
+          mode,
+          userId: user?.id
+        }
       });
       
       logger.info('Created new chat session', {
-        details: { sessionId: newSessionId, mode }
+        sessionId: newSessionId, 
+        mode
       });
     }
   }, [externalSessionId, sessionId, user?.id, logger, mode]);
@@ -62,11 +58,11 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
     if (!sessionId) return;
     
     // Create a session-specific channel
-    const sessionChannel = `session:${sessionId}`;
+    const sessionChannel: ChatBridgeChannel = 'system';
     
     const unsubscribe = chatBridge.subscribe(sessionChannel, (message) => {
-      if (message.type === 'new-message') {
-        setMessages(prev => [...prev, message.message]);
+      if (message.type === 'new-message' && message.sessionId === sessionId) {
+        setMessages(prev => [...prev, message.data.message]);
       }
     });
     
@@ -87,7 +83,7 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
         id: `user-${Date.now()}`,
         content,
         sender: 'user',
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         sessionId
       };
       
@@ -97,8 +93,10 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
       // Send through bridge
       chatBridge.publish('message', {
         type: 'send-message',
-        message: userMessage,
-        sessionId
+        data: {
+          message: userMessage,
+          sessionId
+        }
       });
       
       // Simulate response for now
@@ -107,7 +105,7 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
           id: `assistant-${Date.now()}`,
           content: `This is a response to: "${content}"`,
           sender: 'assistant',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(),
           sessionId
         };
         
@@ -116,9 +114,7 @@ export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }
       }, 1000);
       
     } catch (error) {
-      logger.error('Error sending message', { 
-        details: { error: error instanceof Error ? error.message : String(error) }
-      });
+      logger.error('Error sending message', error instanceof Error ? error : new Error('Unknown error'));
       setIsLoading(false);
     }
   };

@@ -21,7 +21,7 @@ export type LogCategory =
   | 'performance'
   | 'security'
   | 'debug'
-  | 'chat'; // Added chat category
+  | 'chat'; 
 
 export type LogLevel = 
   | 'info'
@@ -42,10 +42,23 @@ export type ChatMode =
   | 'training'
   | 'learn'
   | 'chat'
-  | 'normal'; // Added normal mode
+  | 'normal';
 
-export type ChatBridgeChannel =
-  | 'system'
-  | 'user'
-  | 'assistant'
-  | 'message'; // Adding message channel
+// Re-export for modules that need to use them as constants
+export const LogCategories = {
+  AUTH: 'auth' as LogCategory,
+  API: 'api' as LogCategory,
+  UI: 'ui' as LogCategory,
+  DATABASE: 'database' as LogCategory,
+  PERFORMANCE: 'performance' as LogCategory,
+  SECURITY: 'security' as LogCategory,
+  DEBUG: 'debug' as LogCategory,
+  CHAT: 'chat' as LogCategory
+};
+
+export const LogLevels = {
+  INFO: 'info' as LogLevel,
+  WARN: 'warn' as LogLevel,
+  ERROR: 'error' as LogLevel,
+  DEBUG: 'debug' as LogLevel
+};

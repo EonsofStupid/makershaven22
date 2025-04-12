@@ -1,65 +1,57 @@
 
-import { LogCategory } from '../shared/types/enums';
+import { LogCategory, LogLevel } from '../shared/types/enums';
+import type { Logger } from '../shared/types/common';
 
-export interface Logger {
-  log: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
-  info: (message: string, metadata?: Record<string, any>) => void;
-  warn: (message: string, metadata?: Record<string, any>) => void;
-  error: (message: string, error?: Error, metadata?: Record<string, any>) => void;
-  debug: (message: string, metadata?: Record<string, any>) => void;
-  logError: (message: string, error?: Error, category?: LogCategory) => void;
-  logWarning: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
-  logDebug: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
-}
-
+/**
+ * Creates a logger instance for a specific component
+ */
 export function createLogger(name: string, defaultCategory?: LogCategory): Logger {
   const loggerName = name;
   const category = defaultCategory || 'debug';
 
-  const logger: Logger = {
-    log: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
-      const cat = msgCategory || category;
-      console.log(`[${cat}][${loggerName}] ${message}`, metadata || '');
-    },
-
-    info: (message: string, metadata?: Record<string, any>) => {
-      console.log(`[INFO][${category}][${loggerName}] ${message}`, metadata || '');
-    },
-
-    warn: (message: string, metadata?: Record<string, any>) => {
-      console.warn(`[WARN][${category}][${loggerName}] ${message}`, metadata || '');
-    },
-
-    error: (message: string, error?: Error, metadata?: Record<string, any>) => {
-      console.error(
-        `[ERROR][${category}][${loggerName}] ${message}`,
-        error ? `\n${error.stack || error.message}` : '',
-        metadata || ''
-      );
-    },
-
-    debug: (message: string, metadata?: Record<string, any>) => {
-      console.debug(`[DEBUG][${category}][${loggerName}] ${message}`, metadata || '');
-    },
-
-    logError: (message: string, error?: Error, msgCategory?: LogCategory) => {
-      const cat = msgCategory || category;
-      console.error(
-        `[ERROR][${cat}][${loggerName}] ${message}`,
-        error ? `\n${error.stack || error.message}` : ''
-      );
-    },
-
-    logWarning: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
-      const cat = msgCategory || category;
-      console.warn(`[WARN][${cat}][${loggerName}] ${message}`, metadata || '');
-    },
-
-    logDebug: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
-      const cat = msgCategory || category;
-      console.debug(`[DEBUG][${cat}][${loggerName}] ${message}`, metadata || '');
-    }
+  // Base log function
+  const log = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    console.log(`[${category || 'debug'}][${loggerName}] ${message}`, metadata || '');
   };
 
-  return logger;
+  // Specific log levels
+  const info = (message: string, metadata?: Record<string, any>) => {
+    console.info(`[INFO][${loggerName}] ${message}`, metadata || '');
+  };
+
+  const warn = (message: string, metadata?: Record<string, any>) => {
+    console.warn(`[WARN][${loggerName}] ${message}`, metadata || '');
+  };
+
+  const error = (message: string, err?: Error, metadata?: Record<string, any>) => {
+    console.error(`[ERROR][${loggerName}] ${message}`, err, metadata || '');
+  };
+
+  const debug = (message: string, metadata?: Record<string, any>) => {
+    console.debug(`[DEBUG][${loggerName}] ${message}`, metadata || '');
+  };
+
+  // Alias methods for easier use
+  const logError = (message: string, err?: Error, category?: LogCategory) => {
+    error(message, err, { category });
+  };
+
+  const logWarning = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    warn(message, { ...metadata, category });
+  };
+
+  const logDebug = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+    debug(message, { ...metadata, category });
+  };
+
+  return {
+    log,
+    info,
+    warn,
+    error,
+    debug,
+    logError,
+    logWarning,
+    logDebug
+  };
 }

@@ -1,7 +1,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { chatBridge } from '../lib/ChatBridge';
-import { ChatBridgeChannel, ChatBridgeMessage } from '../types';
+import { ChatBridgeChannel, ChatBridgeMessage } from '../types/chat';
 
 export const useChatBridge = () => {
   useEffect(() => {
@@ -20,8 +20,12 @@ export const useChatBridge = () => {
     return chatBridge.send(message);
   }, []);
   
+  const publish = useCallback((channel: ChatBridgeChannel, message: any) => {
+    return chatBridge.publish(channel, message);
+  }, []);
+  
   const subscribe = useCallback((channel: ChatBridgeChannel, callback: (message: ChatBridgeMessage) => void) => {
-    chatBridge.subscribe(channel, callback);
+    return chatBridge.subscribe(channel, callback);
   }, []);
   
   const unsubscribe = useCallback((channel: ChatBridgeChannel) => {
@@ -35,6 +39,7 @@ export const useChatBridge = () => {
   return {
     isConnected,
     send,
+    publish,
     subscribe,
     unsubscribe
   };
