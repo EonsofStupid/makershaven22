@@ -18,15 +18,8 @@ const ImageThumbnails: React.FC<ImageThumbnailsProps> = ({ images, onImageClick 
           className="relative aspect-square overflow-hidden rounded-lg border border-[#ff0abe]/20 shadow-lg shadow-[#ff0abe]/10 cursor-pointer bg-black/40"
           whileHover={{ y: -5, scale: 1.05 }}
           transition={{ duration: 0.2 }}
-          onClick={() => {
-            console.log('Thumbnail clicked:', index, image); // Debug log
-            onImageClick(index);
-          }}
+          onClick={() => onImageClick(index)}
         >
-          <motion.div
-            className="absolute inset-0 bg-[#ff0abe]/20 mix-blend-overlay"
-            whileHover={{ opacity: 0 }}
-          />
           <img 
             src={image} 
             alt={`Thumbnail ${index + 1}`}

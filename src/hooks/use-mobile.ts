@@ -1,24 +1,24 @@
 
-import { useEffect, useState } from "react";
-import { UI_BREAKPOINTS } from "../shared/constants/app-constants";
+import { useState, useEffect } from 'react';
 
-/**
- * Hook to detect if the screen is mobile-sized
- */
-export function useMobile() {
+export function useMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < UI_BREAKPOINTS.MD);
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
 
-    // Check on initial load
-    checkMobile();
+    // Initial check
+    checkIsMobile();
 
-    // Listen for resize events
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    // Set up event listener
+    window.addEventListener('resize', checkIsMobile);
+
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
   }, []);
 
   return isMobile;

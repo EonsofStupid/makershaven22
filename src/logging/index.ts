@@ -5,7 +5,7 @@ import { createLogger } from './logger';
 
 // Re-export types
 export type { Logger };
-export { LogCategory, LogLevel };
+export type { LogCategory, LogLevel };
 
 // Global logger instance for convenience
 const globalLogger = createLogger('global');

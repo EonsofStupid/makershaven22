@@ -1,15 +1,13 @@
 
-import { ChatBridgeChannel } from '../types/chat';
-
-export interface ChatBridgeMessage {
-  type: string;
-  data: any;
-}
+import { ChatBridgeChannel, ChatBridgeMessage } from '../types/chat';
 
 export interface SimpleChatBridge {
-  subscribe: (channel: ChatBridgeChannel, callback: (message: any) => void) => () => void;
-  publish: (channel: ChatBridgeChannel, message: any) => void;
+  connect: () => Promise<void>;
+  disconnect: () => void;
   isConnected: () => boolean;
+  send: (message: ChatBridgeMessage) => void;
+  subscribe: (channel: ChatBridgeChannel, callback: (message: any) => void) => () => void;
+  unsubscribe: (channel: ChatBridgeChannel) => void;
 }
 
 // Simple in-memory implementation of the ChatBridge
@@ -25,6 +23,15 @@ class InMemoryChatBridge implements SimpleChatBridge {
     });
   }
 
+  connect(): Promise<void> {
+    this.connected = true;
+    return Promise.resolve();
+  }
+
+  disconnect(): void {
+    this.connected = false;
+  }
+
   subscribe(channel: ChatBridgeChannel, callback: (message: any) => void): () => void {
     if (!this.subscribers[channel]) {
       this.subscribers[channel] = [];
@@ -36,6 +43,31 @@ class InMemoryChatBridge implements SimpleChatBridge {
     return () => {
       this.subscribers[channel] = this.subscribers[channel].filter(cb => cb !== callback);
     };
+  }
+
+  unsubscribe(channel: ChatBridgeChannel): void {
+    if (this.subscribers[channel]) {
+      this.subscribers[channel] = [];
+    }
+  }
+
+  send(message: ChatBridgeMessage): void {
+    if (!this.connected) {
+      console.warn('Chat bridge is disconnected, message not sent');
+      return;
+    }
+    
+    // Determine channel based on message type
+    let channel: ChatBridgeChannel = 'system';
+    if (message.type.includes('user')) {
+      channel = 'user';
+    } else if (message.type.includes('assistant')) {
+      channel = 'assistant';
+    } else if (message.type.includes('message')) {
+      channel = 'message';
+    }
+    
+    this.publish(channel, message);
   }
 
   publish(channel: ChatBridgeChannel, message: any): void {
@@ -64,10 +96,6 @@ class InMemoryChatBridge implements SimpleChatBridge {
   }
 
   // For testing purposes
-  disconnect(): void {
-    this.connected = false;
-  }
-
   reconnect(): void {
     this.connected = true;
   }

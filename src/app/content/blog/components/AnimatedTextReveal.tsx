@@ -1,31 +1,56 @@
 
-import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 interface AnimatedTextRevealProps {
   content: string;
+  delay?: number;
+  duration?: number;
 }
 
-const AnimatedTextReveal: React.FC<AnimatedTextRevealProps> = ({ content }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 0.9", "start 0.2"]
-  });
+const AnimatedTextReveal: React.FC<AnimatedTextRevealProps> = ({
+  content,
+  delay = 0.3,
+  duration = 0.5
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [observer, setObserver] = useState<IntersectionObserver | null>(null);
+  const [contentRef, setContentRef] = useState<HTMLDivElement | null>(null);
 
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
-  const blur = useTransform(scrollYProgress, [0, 1], [4, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.98, 1]);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    
+    setObserver(obs);
+    
+    return () => {
+      if (obs) {
+        obs.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (observer && contentRef) {
+      observer.observe(contentRef);
+      
+      return () => {
+        observer.unobserve(contentRef);
+      };
+    }
+  }, [observer, contentRef]);
 
   return (
-    <div ref={containerRef} className="relative min-h-[200px]">
+    <div ref={setContentRef}>
       <motion.div
-        style={{
-          opacity,
-          filter: blur.get() > 0 ? `blur(${blur.get()}px)` : undefined,
-          scale,
-        }}
-        className="prose prose-invert max-w-none transition-all duration-300"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration, delay }}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </div>

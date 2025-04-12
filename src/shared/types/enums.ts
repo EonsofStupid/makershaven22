@@ -41,7 +41,8 @@ export type ChatMode =
   | 'planning'
   | 'training'
   | 'learn'
-  | 'chat';
+  | 'chat'
+  | 'normal'; // Added normal mode
 
 export type ChatBridgeChannel =
   | 'system'

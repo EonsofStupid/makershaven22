@@ -1,7 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import { validateBlogImage } from '../../../../services/imageService';
-import { toast } from "sonner";
 
 interface ImageValidationProps {
   images: string[];
@@ -14,55 +12,60 @@ export const ImageValidation: React.FC<ImageValidationProps> = ({
   onValidImagesChange,
   onLoadingChange
 }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
   useEffect(() => {
-    let isMounted = true;
-    console.log('ImageValidation useEffect triggered with images:', images);
+    if (!images || images.length === 0) {
+      onValidImagesChange([]);
+      onLoadingChange(false);
+      return;
+    }
 
-    const validateImages = async () => {
-      if (!images.length) {
-        console.log('No images to validate');
-        if (isMounted) onLoadingChange(false);
-        return;
-      }
+    setIsProcessing(true);
+    onLoadingChange(true);
 
-      try {
-        console.log('Starting batch validation for images:', images);
-        const validationResults = await Promise.all(
-          images.map(async (imageUrl) => {
-            if (!isMounted) return { imageUrl, isValid: false };
-            const isValid = await validateBlogImage(imageUrl);
-            console.log(`Validation result for ${imageUrl}:`, isValid);
-            return { imageUrl, isValid };
-          })
-        );
+    const validImages: string[] = [];
+    let loadedCount = 0;
 
-        if (!isMounted) return;
-
-        const validUrls = validationResults
-          .filter(({ isValid }) => isValid)
-          .map(({ imageUrl }) => imageUrl);
-
-        console.log('Valid images:', validUrls);
-        onValidImagesChange(validUrls);
-      } catch (error) {
-        console.error('Validation error:', error);
-        if (isMounted) {
-          toast.error('Failed to validate some images');
-        }
-      } finally {
-        if (isMounted) {
+    images.forEach((imageSrc) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        validImages.push(imageSrc);
+        loadedCount++;
+        
+        if (loadedCount === images.length) {
+          onValidImagesChange(validImages);
+          setIsProcessing(false);
           onLoadingChange(false);
         }
-      }
-    };
-
-    validateImages();
+      };
+      
+      img.onerror = () => {
+        console.warn(`Failed to load image: ${imageSrc}`);
+        loadedCount++;
+        
+        if (loadedCount === images.length) {
+          onValidImagesChange(validImages);
+          setIsProcessing(false);
+          onLoadingChange(false);
+        }
+      };
+      
+      img.src = imageSrc;
+    });
 
     return () => {
-      isMounted = false;
+      // Cleanup - cancel image loading if component unmounts
+      images.forEach((_, index) => {
+        const img = new Image();
+        img.onload = null;
+        img.onerror = null;
+      });
     };
   }, [images, onValidImagesChange, onLoadingChange]);
 
+  // This is a utility component that doesn't render anything visible
   return null;
 };
 

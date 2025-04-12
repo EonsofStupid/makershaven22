@@ -1,90 +1,65 @@
 
-import { LogCategory, LogLevel } from '../shared/types/enums';
-import type { Logger, LogOptions } from '../shared/types/common';
+import { LogCategory } from '../shared/types/enums';
 
-export class LoggerImpl implements Logger {
-  private name: string;
-  private defaultCategory: LogCategory;
-
-  constructor(name: string, defaultCategory: LogCategory = 'debug') {
-    this.name = name;
-    this.defaultCategory = defaultCategory;
-  }
-
-  log(message: string, category?: LogCategory, metadata?: Record<string, any>): void {
-    this._log('info', message, category || this.defaultCategory, metadata);
-  }
-
-  logError(message: string, error?: Error, category?: LogCategory): void {
-    this._log('error', message, category || this.defaultCategory, {
-      error: error?.message || 'Unknown error',
-      stack: error?.stack
-    });
-  }
-
-  logWarning(message: string, category?: LogCategory, metadata?: Record<string, any>): void {
-    this._log('warn', message, category || this.defaultCategory, metadata);
-  }
-
-  logDebug(message: string, category?: LogCategory, metadata?: Record<string, any>): void {
-    this._log('debug', message, category || this.defaultCategory, metadata);
-  }
-
-  // Extended methods to match common logger interfaces
-  info(message: string, metadata?: Record<string, any>): void {
-    this._log('info', message, this.defaultCategory, metadata);
-  }
-
-  warn(message: string, metadata?: Record<string, any>): void {
-    this._log('warn', message, this.defaultCategory, metadata);
-  }
-
-  error(message: string, error?: Error, metadata?: Record<string, any>): void {
-    this._log('error', message, this.defaultCategory, {
-      ...(metadata || {}),
-      error: error?.message || 'Unknown error',
-      stack: error?.stack
-    });
-  }
-
-  debug(message: string, metadata?: Record<string, any>): void {
-    this._log('debug', message, this.defaultCategory, metadata);
-  }
-
-  private _log(level: LogLevel, message: string, category: LogCategory, metadata?: Record<string, any>): void {
-    const timestamp = new Date().toISOString();
-    const logData = {
-      timestamp,
-      level,
-      category,
-      source: this.name,
-      message,
-      ...(metadata ? { metadata } : {})
-    };
-
-    // Log to console
-    const prefix = `[${timestamp}] [${level.toUpperCase()}] [${category}] [${this.name}]`;
-    switch (level) {
-      case 'error':
-        console.error(prefix, message, metadata || '');
-        break;
-      case 'warn':
-        console.warn(prefix, message, metadata || '');
-        break;
-      case 'debug':
-        console.debug(prefix, message, metadata || '');
-        break;
-      case 'info':
-      default:
-        console.log(prefix, message, metadata || '');
-        break;
-    }
-
-    // Here you would typically send logs to a service or store them
-    // Example: logService.send(logData);
-  }
+export interface Logger {
+  log: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
+  info: (message: string, metadata?: Record<string, any>) => void;
+  warn: (message: string, metadata?: Record<string, any>) => void;
+  error: (message: string, error?: Error, metadata?: Record<string, any>) => void;
+  debug: (message: string, metadata?: Record<string, any>) => void;
+  logError: (message: string, error?: Error, category?: LogCategory) => void;
+  logWarning: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
+  logDebug: (message: string, category?: LogCategory, metadata?: Record<string, any>) => void;
 }
 
-export function createLogger(name: string, category?: LogCategory): Logger {
-  return new LoggerImpl(name, category);
+export function createLogger(name: string, defaultCategory?: LogCategory): Logger {
+  const loggerName = name;
+  const category = defaultCategory || 'debug';
+
+  const logger: Logger = {
+    log: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
+      const cat = msgCategory || category;
+      console.log(`[${cat}][${loggerName}] ${message}`, metadata || '');
+    },
+
+    info: (message: string, metadata?: Record<string, any>) => {
+      console.log(`[INFO][${category}][${loggerName}] ${message}`, metadata || '');
+    },
+
+    warn: (message: string, metadata?: Record<string, any>) => {
+      console.warn(`[WARN][${category}][${loggerName}] ${message}`, metadata || '');
+    },
+
+    error: (message: string, error?: Error, metadata?: Record<string, any>) => {
+      console.error(
+        `[ERROR][${category}][${loggerName}] ${message}`,
+        error ? `\n${error.stack || error.message}` : '',
+        metadata || ''
+      );
+    },
+
+    debug: (message: string, metadata?: Record<string, any>) => {
+      console.debug(`[DEBUG][${category}][${loggerName}] ${message}`, metadata || '');
+    },
+
+    logError: (message: string, error?: Error, msgCategory?: LogCategory) => {
+      const cat = msgCategory || category;
+      console.error(
+        `[ERROR][${cat}][${loggerName}] ${message}`,
+        error ? `\n${error.stack || error.message}` : ''
+      );
+    },
+
+    logWarning: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
+      const cat = msgCategory || category;
+      console.warn(`[WARN][${cat}][${loggerName}] ${message}`, metadata || '');
+    },
+
+    logDebug: (message: string, msgCategory?: LogCategory, metadata?: Record<string, any>) => {
+      const cat = msgCategory || category;
+      console.debug(`[DEBUG][${cat}][${loggerName}] ${message}`, metadata || '');
+    }
+  };
+
+  return logger;
 }

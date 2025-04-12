@@ -1,14 +1,7 @@
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { toast as sonnerToast } from "sonner";
-
-// Types from shadcn's toast
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
-type ToastActionElement = React.ReactElement<typeof ToastAction>;
-
-// Define a Toast component to maintain type compatibility
-const Toast: React.FC<ToastProps> = () => null;
-const ToastAction: React.FC<any> = () => null;
+import type { ToastActionElement } from "../shared/ui/toast";
 
 // Types for maintaining compatibility with shadcn toast
 interface ToastOptions {
@@ -19,25 +12,28 @@ interface ToastOptions {
   duration?: number;
 }
 
-// Types from sonner
-type ExternalToast = Parameters<typeof sonnerToast>[1];
-
 // Helper function to convert shadcn toast format to sonner toast format
-function convertToSonnerToast(options?: ToastOptions): ExternalToast {
+function convertToSonnerToast(options?: ToastOptions): any {
   if (!options) return {};
   
-  return {
+  const sonnerOptions: any = {
     ...options,
-    // Convert shadcn action to sonner action
-    action: options.action ? {
+  };
+  
+  // Convert shadcn action to sonner action
+  if (options.action) {
+    sonnerOptions.action = {
       label: "Action",
       onClick: () => console.log("Action clicked")
-    } : undefined,
-  };
+    };
+  }
+  
+  return sonnerOptions;
 }
 
 // Create custom toast functions that match shadcn API
 const customToast = {
+  toasts: [],
   default: (message: string, options?: ToastOptions) => {
     return sonnerToast(message, convertToSonnerToast(options));
   },
@@ -77,19 +73,8 @@ export const toast = customToast;
 
 // Create a hook for compatibility with shadcn toast
 export function useToast() {
-  const [toasts, setToasts] = useState<any[]>([]);
-
-  // This is mainly for type compatibility, as sonner manages its own state
-  useEffect(() => {
-    // This would normally track toasts but we're using sonner's internal state
-    return () => {
-      // cleanup if needed
-    };
-  }, []);
-
   return {
     toast: customToast,
-    toasts,
     dismiss: customToast.dismiss,
   };
 }
