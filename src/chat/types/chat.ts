@@ -23,6 +23,7 @@ export interface ChatBridge {
   publish: (channel: ChatBridgeChannel, message: any) => void;
   subscribe: (channel: ChatBridgeChannel, callback: (message: ChatBridgeMessage) => void) => () => void;
   unsubscribe: (channel: ChatBridgeChannel) => void;
+  reconnect?: () => Promise<void>;
 }
 
 export interface ChatMessage {

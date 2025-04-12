@@ -1,102 +1,81 @@
 
-import { LogLevelType, LogCategoryType, LogLevel, LogCategory } from '../types';
+import { LogLevelType, LogCategoryType } from "../types";
 
 interface LogOptions {
+  level?: LogLevelType;
   category?: LogCategoryType;
-  data?: unknown;
-  timestamp?: number;
+  metadata?: Record<string, any>;
 }
 
-/**
- * Logger utility for client-side logging
- */
 export class Logger {
-  private static instance: Logger;
-
-  private constructor() {
-    // Private constructor to enforce singleton
+  private name: string;
+  
+  constructor(name: string) {
+    this.name = name;
   }
-
-  /**
-   * Get the singleton instance of the logger
-   */
-  public static getInstance(): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger();
-    }
-    return Logger.instance;
+  
+  info(message: string, options?: Omit<LogOptions, 'level'>) {
+    this.log(message, { ...options, level: 'info' });
   }
-
-  /**
-   * Internal log method that handles all logging levels
-   */
-  private log(level: LogLevelType, message: string, options?: LogOptions): void {
-    const timestamp = options?.timestamp || Date.now();
-    const category = options?.category || LogCategory.SYSTEM;
-    const data = options?.data || {};
-
-    const logEntry = {
-      level,
-      message,
-      timestamp,
-      category,
-      data
-    };
-
-    // In development, output to console with appropriate styling
-    if (process.env.NODE_ENV === 'development') {
-      const styles = {
-        [LogLevel.INFO]: 'color: #5eeaf7',
-        [LogLevel.WARN]: 'color: #f6ad55',
-        [LogLevel.ERROR]: 'color: #fc8181',
-        [LogLevel.DEBUG]: 'color: #9f7aea',
-      };
-
-      console.log(`%c[${category}] ${level}:`, styles[level], message, data);
-    }
-
-    // In a real app, you might want to send this to a server or analytics service
-    // this.sendToAnalyticsService(logEntry);
+  
+  warn(message: string, options?: Omit<LogOptions, 'level'>) {
+    this.log(message, { ...options, level: 'warn' });
   }
-
-  /**
-   * Log information messages
-   */
-  public info(message: string, options?: LogOptions): void {
-    this.log(LogLevel.INFO, message, options);
-  }
-
-  /**
-   * Log warning messages
-   */
-  public warn(message: string, options?: LogOptions): void {
-    this.log(LogLevel.WARN, message, options);
-  }
-
-  /**
-   * Log error messages
-   */
-  public error(message: string, options?: LogOptions): void {
-    this.log(LogLevel.ERROR, message, options);
-  }
-
-  /**
-   * Log debug messages
-   */
-  public debug(message: string, options?: LogOptions): void {
-    this.log(LogLevel.DEBUG, message, options);
-  }
-
-  /**
-   * Log chat-specific messages
-   */
-  public chatEvent(message: string, data?: unknown): void {
-    this.log(LogLevel.INFO, message, { 
-      category: LogCategory.CHAT, 
-      data 
+  
+  error(message: string, error?: Error, options?: Omit<LogOptions, 'level'>) {
+    this.log(message, { 
+      ...options, 
+      level: 'error', 
+      metadata: { 
+        ...options?.metadata,
+        error: error?.message,
+        stack: error?.stack
+      } 
     });
   }
+  
+  debug(message: string, options?: Omit<LogOptions, 'level'>) {
+    this.log(message, { ...options, level: 'debug' });
+  }
+  
+  private log(message: string, options: LogOptions = {}) {
+    const { level = 'info', category = 'chat', metadata = {} } = options;
+    
+    const logData = {
+      timestamp: new Date().toISOString(),
+      level,
+      category,
+      component: this.name,
+      message,
+      ...metadata
+    };
+    
+    switch (level) {
+      case 'error':
+        console.error(`[${category.toUpperCase()}][${this.name}] ${message}`, metadata);
+        break;
+      case 'warn':
+        console.warn(`[${category.toUpperCase()}][${this.name}] ${message}`, metadata);
+        break;
+      case 'debug':
+        console.debug(`[${category.toUpperCase()}][${this.name}] ${message}`, metadata);
+        break;
+      case 'info':
+      default:
+        console.log(`[${category.toUpperCase()}][${this.name}] ${message}`, metadata);
+    }
+    
+    // In the future, we might want to send logs to a remote service
+    this.sendToAnalytics(logData);
+  }
+  
+  private sendToAnalytics(logData: any) {
+    // Placeholder for sending logs to analytics or monitoring service
+    // Implementation will depend on the analytics service used
+  }
 }
 
-// Export a singleton instance
-export const logger = Logger.getInstance();
+// Singleton logger factory
+export const logger = (name: string): Logger => {
+  return new Logger(name);
+};

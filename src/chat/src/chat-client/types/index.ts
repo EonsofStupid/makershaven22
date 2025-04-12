@@ -1,102 +1,97 @@
 
-/**
- * All available chat modes in the MakersImpulse system
- */
-export type ChatMode = 'chat' | 'ultra' | 'developer' | 'image' | 'debug' | 'planning' | 'training' | 'learn';
+import { ChatBridgeMessage } from "../../../types/chat";
 
-/**
- * Structure of a single chat message
- */
+// Chat client specific types
+export type ChatMode = 
+  | 'chat'     // Regular chat mode
+  | 'ultra'    // Premium model
+  | 'developer' // Code assistance 
+  | 'debug'    // Debug assistance
+  | 'image'    // Image generation
+  | 'planning'  // Project planning
+  | 'training'  // Learning mode
+  | 'normal'   // Default mode
+  | 'admin'    // Admin mode
+  | 'dev'      // Developer mode
+  | 'thread'   // Thread mode
+  | 'agent'    // Agent mode
+  | 'learn';   // Learning mode
+
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'ai' | 'system';
   content: string;
-  timestamp: number;
-  imageUrl?: string;
-  thumbnailUrl?: string;
+  sender: 'user' | 'assistant' | 'system';
+  timestamp: string;
+  metadata?: Record<string, any>;
 }
 
-/**
- * Structure of a conversation within the chat system
- */
 export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
   mode: ChatMode;
-  createdAt: number;
-  updatedAt: number;
-  pinned?: boolean;
+  createdAt: string;
+  updatedAt: string;
   favorite?: boolean;
+  pinned?: boolean;
 }
 
-/**
- * Core chat state management store interface
- */
 export interface ChatStore {
-  mode: ChatMode;
   messages: ChatMessage[];
-  isLoading: boolean;
+  sessions: any[];
   conversations: ChatConversation[];
+  isLoading: boolean;
   activeConversationId: string | null;
+  currentSessionId: string | null;
+  activeMode: ChatMode;
+  error: string | null;
   
-  setMode: (mode: ChatMode) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => void;
+  // Actions
+  setMessages: (messages: ChatMessage[]) => void;
+  addMessage: (message: Omit<ChatMessage, "id" | "timestamp">) => void;
   clearMessages: () => void;
-  createConversation: (mode?: ChatMode) => string;
-  setActiveConversation: (id: string) => void;
-  updateConversation?: (id: string, updates: Partial<ChatConversation>) => void;
-  deleteConversation?: (id: string) => void;
-  pinConversation?: (id: string, pinned: boolean) => void;
-  favoriteConversation?: (id: string, favorite: boolean) => void;
+  setActiveConversation: (id: string | null) => void;
+  createNewConversation: (mode: ChatMode) => string;
+  setActiveMode: (mode: ChatMode) => void;
+  setMode?: (mode: ChatMode) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
+  pinConversation: (id: string, pinned: boolean) => void;
+  favoriteConversation: (id: string, favorite: boolean) => void;
 }
 
-/**
- * Printer context data structure
- */
-export interface PrinterContext {
-  name: string;
-  settings: Record<string, unknown>;
-}
-
-/**
- * Project context data structure
- */
-export interface ProjectContext {
-  id: string;
-  title: string;
-}
-
-/**
- * Bridge between chat and external systems
- */
 export interface ChatBridge {
-  userId: string;
-  printerContext: PrinterContext;
-  projectContext: ProjectContext;
+  send: (message: ChatBridgeMessage) => void;
+  subscribe: (channel: string, callback: (message: any) => void) => () => void;
 }
 
-/**
- * Logging level constants
- */
+export interface PrinterContext {
+  printerConnected: boolean;
+  printerStatus: string;
+  jobInProgress: boolean;
+}
+
+export interface ProjectContext {
+  projectId: string;
+  projectName: string;
+  components: string[];
+}
+
+// Log types
+export type LogLevelType = 'info' | 'warn' | 'error' | 'debug';
+export type LogCategoryType = 'chat' | 'ui' | 'network' | 'auth' | 'system';
+
 export const LogLevel = {
-  INFO: 'info',
-  WARN: 'warn',
-  ERROR: 'error',
-  DEBUG: 'debug',
-} as const;
+  INFO: 'info' as LogLevelType,
+  WARN: 'warn' as LogLevelType,
+  ERROR: 'error' as LogLevelType,
+  DEBUG: 'debug' as LogLevelType
+};
 
-export type LogLevelType = typeof LogLevel[keyof typeof LogLevel];
-
-/**
- * Logging category constants
- */
 export const LogCategory = {
-  UI: 'ui',
-  API: 'api',
-  CHAT: 'chat',
-  SYSTEM: 'system',
-} as const;
-
-export type LogCategoryType = typeof LogCategory[keyof typeof LogCategory];
+  CHAT: 'chat' as LogCategoryType,
+  UI: 'ui' as LogCategoryType,
+  NETWORK: 'network' as LogCategoryType,
+  AUTH: 'auth' as LogCategoryType,
+  SYSTEM: 'system' as LogCategoryType
+};

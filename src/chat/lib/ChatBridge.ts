@@ -1,98 +1,92 @@
 
-import { ChatBridgeChannel, ChatBridgeMessage, ChatBridge } from '../types/chat';
+/**
+ * ChatBridge - Provides a communication layer for chat-related events
+ * Implementation using in-memory event bus for now
+ */
+import { ChatBridge, ChatBridgeChannel, ChatBridgeMessage } from '../types/chat';
 
-// Simple in-memory implementation of the ChatBridge
+type CallbackFn = (message: ChatBridgeMessage) => void;
+
 class InMemoryChatBridge implements ChatBridge {
-  private subscribers: Record<string, Array<(message: any) => void>> = {};
-  private connected: boolean = true;
-
-  constructor() {
-    // Initialize subscriber channels
-    const channels: ChatBridgeChannel[] = ['user', 'assistant', 'system', 'message', 'error'];
-    channels.forEach(channel => {
-      this.subscribers[channel] = [];
-    });
-  }
-
-  connect(): Promise<void> {
-    this.connected = true;
+  private isActive: boolean = false;
+  private listeners: Map<string, CallbackFn[]> = new Map();
+  
+  public async connect(): Promise<void> {
+    console.log('ChatBridge: Connecting...');
+    this.isActive = true;
     return Promise.resolve();
   }
-
-  disconnect(): void {
-    this.connected = false;
+  
+  public disconnect(): void {
+    console.log('ChatBridge: Disconnecting...');
+    this.isActive = false;
+    this.listeners.clear();
   }
-
-  subscribe(channel: ChatBridgeChannel, callback: (message: any) => void): () => void {
-    if (!this.subscribers[channel]) {
-      this.subscribers[channel] = [];
+  
+  public isConnected(): boolean {
+    return this.isActive;
+  }
+  
+  public send(message: ChatBridgeMessage): void {
+    console.log('ChatBridge: Sending message', message);
+    // Simply reroute to publish for in-memory implementation
+    this.publish('message', message);
+  }
+  
+  public publish(channel: ChatBridgeChannel, message: any): void {
+    if (!this.isActive) {
+      console.warn('ChatBridge: Cannot publish, bridge is not connected');
+      return;
     }
     
-    this.subscribers[channel].push(callback);
+    const callbacks = this.listeners.get(channel);
+    if (callbacks && callbacks.length > 0) {
+      // Wrap in a timeout to simulate async behavior
+      setTimeout(() => {
+        const bridgeMessage: ChatBridgeMessage = {
+          type: typeof message === 'object' && message.type ? message.type : 'message',
+          data: message,
+          timestamp: Date.now()
+        };
+        
+        callbacks.forEach(callback => {
+          try {
+            callback(bridgeMessage);
+          } catch (error) {
+            console.error('ChatBridge: Error in callback', error);
+          }
+        });
+      }, 0);
+    }
+  }
+  
+  public subscribe(channel: ChatBridgeChannel, callback: CallbackFn): () => void {
+    if (!this.listeners.has(channel)) {
+      this.listeners.set(channel, []);
+    }
     
-    // Return unsubscribe function
+    const callbacks = this.listeners.get(channel)!;
+    callbacks.push(callback);
+    
     return () => {
-      this.subscribers[channel] = this.subscribers[channel].filter(cb => cb !== callback);
+      const idx = callbacks.indexOf(callback);
+      if (idx >= 0) {
+        callbacks.splice(idx, 1);
+      }
     };
   }
-
-  unsubscribe(channel: ChatBridgeChannel): void {
-    if (this.subscribers[channel]) {
-      this.subscribers[channel] = [];
-    }
+  
+  public unsubscribe(channel: ChatBridgeChannel): void {
+    this.listeners.delete(channel);
   }
-
-  send(message: ChatBridgeMessage): void {
-    if (!this.connected) {
-      console.warn('Chat bridge is disconnected, message not sent');
-      return;
+  
+  public async reconnect(): Promise<void> {
+    if (this.isActive) {
+      this.disconnect();
     }
-    
-    // Determine channel based on message type
-    let channel: ChatBridgeChannel = 'system';
-    if (message.type.includes('user')) {
-      channel = 'user';
-    } else if (message.type.includes('assistant')) {
-      channel = 'assistant';
-    } else if (message.type.includes('message')) {
-      channel = 'message';
-    } else if (message.type.includes('error')) {
-      channel = 'error';
-    }
-    
-    this.publish(channel, message);
-  }
-
-  publish(channel: ChatBridgeChannel, message: any): void {
-    if (!this.connected) {
-      console.warn('Chat bridge is disconnected, message not sent');
-      return;
-    }
-    
-    if (!this.subscribers[channel]) {
-      console.warn(`No subscribers for channel ${channel}`);
-      return;
-    }
-    
-    // Send to all subscribers on this channel
-    this.subscribers[channel].forEach(callback => {
-      try {
-        callback(message);
-      } catch (error) {
-        console.error('Error in subscriber callback:', error);
-      }
-    });
-  }
-
-  isConnected(): boolean {
-    return this.connected;
-  }
-
-  // For testing purposes
-  reconnect(): void {
-    this.connected = true;
+    return this.connect();
   }
 }
 
-// Create a singleton instance
+// Export a singleton instance
 export const chatBridge = new InMemoryChatBridge();

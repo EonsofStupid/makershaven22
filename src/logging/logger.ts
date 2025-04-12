@@ -55,3 +55,6 @@ export function createLogger(name: string, defaultCategory?: LogCategory): Logge
     logDebug
   };
 }
+
+// Export the Logger type for usage in other files
+export type { Logger };

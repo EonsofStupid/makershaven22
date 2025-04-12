@@ -11,6 +11,7 @@ export interface ChatConversation {
   mode: ChatMode;
   pinned?: boolean;
   favorite?: boolean;
+  isFavorite?: boolean; // Alternative property name
 }
 
 export interface ChatStore {
@@ -23,6 +24,9 @@ export interface ChatStore {
   activeMode: ChatMode;
   error: string | null;
   
+  // Added for chat client compatibility
+  mode?: string;
+  
   // Actions
   setMessages: (messages: ChatMessage[]) => void;
   addMessage: (message: Omit<ChatMessage, "id" | "timestamp">) => void;
@@ -34,4 +38,7 @@ export interface ChatStore {
   setError: (error: string | null) => void;
   pinConversation: (id: string, pinned: boolean) => void;
   favoriteConversation: (id: string, favorite: boolean) => void;
+  
+  // Added for chat client compatibility
+  setMode?: (mode: ChatMode) => void;
 }
