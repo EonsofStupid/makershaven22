@@ -1,7 +1,7 @@
 
 import { FC, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../store';
+import { useAuthStore } from '../../auth/store';
 import { UserRole } from '../../shared/types/enums';
 import { LoadingScreen } from './loading/LoadingScreen';
 import { SessionTransition } from './loading/SessionTransition';
