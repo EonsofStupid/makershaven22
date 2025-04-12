@@ -1,7 +1,8 @@
 
 // Re-export from the shadcn toast component
-import { useToast as useShadcnToast, toast } from "../shared/ui/toast";
-import type { ToastActionElement, ToastProps } from "../shared/ui/toast";
+import { Toast, ToastActionElement, ToastProps } from "../shared/ui/toast";
+import { useToast as useShadcnToast } from "../lib/toast";
+import { toast } from "../lib/toast";
 
 export {
   toast,

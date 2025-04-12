@@ -20,7 +20,8 @@ export type LogCategory =
   | 'database'
   | 'performance'
   | 'security'
-  | 'debug';
+  | 'debug'
+  | 'chat'; // Added chat category
 
 export type LogLevel = 
   | 'info'
@@ -38,9 +39,12 @@ export type ChatMode =
   | 'image'
   | 'debug'
   | 'planning'
-  | 'training';
+  | 'training'
+  | 'learn'
+  | 'chat';
 
 export type ChatBridgeChannel =
   | 'system'
   | 'user'
-  | 'assistant';
+  | 'assistant'
+  | 'message'; // Adding message channel

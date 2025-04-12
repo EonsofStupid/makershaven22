@@ -1,100 +1,73 @@
 
-// Import necessary types from Supabase
-import { SupabaseClient } from '@supabase/supabase-js';
-import { z } from 'zod';
+// RAG (Retrieval Augmented Generation) client for the chat module
+// This is a placeholder implementation that will be replaced with real API calls
 
-// Define result schema with proper typing for content (allowing null)
-export const SearchResultSchema = z.object({
-  id: z.string(),
-  content: z.string().nullable(),
-  metadata: z.any(),
-  similarity: z.number()
-});
+interface RAGClientOptions {
+  baseUrl?: string;
+  apiKey?: string;
+  timeout?: number;
+}
 
-export type SearchResult = z.infer<typeof SearchResultSchema>;
-
-// Create safe wrapper for search results
-const safeParseSearchResults = (results: any[]): SearchResult[] => {
-  return results.map(result => {
-    try {
-      return SearchResultSchema.parse(result);
-    } catch (error) {
-      // If parsing fails, provide a safe default
-      console.error('Error parsing search result:', error);
-      return {
-        id: result.id || 'unknown',
-        content: result.content || '',
-        metadata: result.metadata || {},
-        similarity: result.similarity || 0
-      };
-    }
-  });
-};
-
-/**
- * RAG Client for embeddings search
- */
-export class RagClient {
-  private supabase: SupabaseClient;
-  private embeddingsTable: string;
-
-  constructor(supabase: SupabaseClient, embeddingsTable = 'embeddings') {
-    this.supabase = supabase;
-    this.embeddingsTable = embeddingsTable;
+class RAGClient {
+  private baseUrl: string;
+  private apiKey: string | null;
+  private timeout: number;
+  
+  constructor(options: RAGClientOptions = {}) {
+    this.baseUrl = options.baseUrl || '/api/rag';
+    this.apiKey = options.apiKey || null;
+    this.timeout = options.timeout || 10000; // 10 seconds default timeout
   }
-
+  
   /**
-   * Search for similar content
-   */
-  async search(query: string, options?: { limit?: number; threshold?: number }): Promise<SearchResult[]> {
-    try {
-      // Check if embeddings table exists
-      const { limit = 5, threshold = 0.5 } = options || {};
-
-      // Get embeddings for the query
-      const { data: embeddings, error: embeddingsError } = await this.supabase
-        .functions.invoke('get-embeddings', {
-          body: { text: query },
-        });
-
-      if (embeddingsError || !embeddings?.embedding) {
-        throw new Error(`Failed to get embeddings: ${embeddingsError?.message || 'Unknown error'}`);
-      }
-
-      // Search for similar content
-      const { data: results, error: searchError } = await this.supabase
-        .rpc('match_embeddings', {
-          query_embedding: embeddings.embedding,
-          match_threshold: threshold,
-          match_count: limit,
-        });
-
-      if (searchError) {
-        throw new Error(`Search error: ${searchError.message}`);
-      }
-
-      // Parse and return safe results
-      return safeParseSearchResults(results || []);
-    } catch (error) {
-      console.error('RAG search error:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Get context for the RAG system
+   * Get context for a query using RAG
+   * @param query The user query to get context for
+   * @returns A promise that resolves to the relevant context
    */
   async getRagContext(query: string): Promise<string> {
-    const results = await this.search(query);
-    if (results.length === 0) return '';
+    // This is a placeholder implementation
+    // In a real implementation, this would call an API endpoint
     
-    // Combine the content of all results
-    return results
-      .map(result => result.content)
-      .filter(Boolean) // Remove null/undefined values
-      .join('\n\n');
+    console.log('Getting RAG context for query:', query);
+    
+    // Simulate API call with timeout
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Return mock context based on query keywords
+        if (query.toLowerCase().includes('authentication') || query.toLowerCase().includes('login')) {
+          resolve('User authentication is handled through Zustand state management. The auth store maintains user session information.');
+        } else if (query.toLowerCase().includes('chat') || query.toLowerCase().includes('message')) {
+          resolve('The chat system uses a bridge pattern to facilitate communication between components. Messages are passed through channels.');
+        } else {
+          resolve('No specific context found for this query. The application uses a domain-driven architecture with clear boundaries.');
+        }
+      }, Math.random() * 1000); // Random delay to simulate network
+    });
+  }
+  
+  /**
+   * Submit a query to the RAG system
+   * @param query The user query
+   * @param context Optional context to include
+   * @returns A promise that resolves to the response
+   */
+  async query(query: string, context?: string): Promise<{answer: string, sources: any[]}> {
+    console.log('Submitting RAG query:', query, context ? `with context: ${context}` : '');
+    
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          answer: `This is a simulated response to: "${query}"`,
+          sources: [
+            { title: 'Documentation', url: '#', relevance: 0.95 },
+            { title: 'Code Sample', url: '#', relevance: 0.85 }
+          ]
+        });
+      }, Math.random() * 1500 + 500); // Random delay between 500-2000ms
+    });
   }
 }
 
-// Export singleton instance
-export const ragClient = new RagClient(null as any); // Will be initialized later
+// Export a singleton instance
+export const ragClient = new RAGClient();

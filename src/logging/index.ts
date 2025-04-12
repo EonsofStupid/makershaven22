@@ -1,44 +1,38 @@
 
-import { LogCategory, LogLevel } from "../shared/types/enums";
-import type { Logger, LogOptions } from "../shared/types/common";
+import { LogCategory, LogLevel } from '../shared/types/enums';
+import type { Logger } from '../shared/types/common';
+import { createLogger } from './logger';
 
-// Re-export types for convenience
-export type { Logger, LogOptions };
+// Re-export types
+export type { Logger };
 export { LogCategory, LogLevel };
 
-// Create a default logger implementation
-export const createLogger = (): Logger => {
-  return {
-    log: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
-      console.log(`[${category.toUpperCase()}]: ${message}`, metadata || '');
-    },
-    
-    logError: (message: string, error?: Error, category: LogCategory = 'debug') => {
-      console.error(`[${category.toUpperCase()}][ERROR]: ${message}`, error || '');
-    },
-    
-    logWarning: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
-      console.warn(`[${category.toUpperCase()}][WARNING]: ${message}`, metadata || '');
-    },
-    
-    logDebug: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
-      console.debug(`[${category.toUpperCase()}][DEBUG]: ${message}`, metadata || '');
-    },
-    
-    // Add convenience methods for common log levels
-    info: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
-      console.info(`[${category.toUpperCase()}][INFO]: ${message}`, metadata || '');
-    },
-    
-    warn: (message: string, category: LogCategory = 'debug', metadata?: Record<string, any>) => {
-      console.warn(`[${category.toUpperCase()}][WARN]: ${message}`, metadata || '');
-    },
-    
-    error: (message: string, error?: Error, category: LogCategory = 'debug') => {
-      console.error(`[${category.toUpperCase()}][ERROR]: ${message}`, error || '');
-    }
-  };
+// Global logger instance for convenience
+const globalLogger = createLogger('global');
+
+// Factory function to create loggers
+export function getLogger(name: string, category?: LogCategory): Logger {
+  return createLogger(name, category);
+}
+
+// Shorthand for quick logging without creating a logger instance
+export const log = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+  globalLogger.log(message, category, metadata);
 };
 
-// Export a default logger instance
-export const logger = createLogger();
+export const logError = (message: string, error?: Error, category?: LogCategory) => {
+  globalLogger.logError(message, error, category);
+};
+
+export const logWarning = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+  globalLogger.logWarning(message, category, metadata);
+};
+
+export const logDebug = (message: string, category?: LogCategory, metadata?: Record<string, any>) => {
+  globalLogger.logDebug(message, category, metadata);
+};
+
+// Hook to access logger in components
+export function useLogger(name: string, category?: LogCategory): Logger {
+  return createLogger(name, category);
+}
