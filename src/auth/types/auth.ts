@@ -39,7 +39,7 @@ export interface AuthSession {
   expires_at?: number;
 }
 
-// Add a proper Session interface that includes the user property
+// Update the Session interface to ensure it has a user property
 export interface Session {
   user: {
     id: string;

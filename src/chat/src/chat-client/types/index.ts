@@ -1,7 +1,5 @@
 
-import { ChatBridgeMessage } from "../../../types/chat";
-
-// Chat client specific types
+// Export ChatMode and other common types
 export type ChatMode = 
   | 'chat'     // Regular chat mode
   | 'ultra'    // Premium model
@@ -61,7 +59,7 @@ export interface ChatStore {
 }
 
 export interface ChatBridge {
-  send: (message: ChatBridgeMessage) => void;
+  send: (message: any) => void;
   subscribe: (channel: string, callback: (message: any) => void) => () => void;
 }
 

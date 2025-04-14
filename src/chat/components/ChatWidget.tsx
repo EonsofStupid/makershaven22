@@ -7,8 +7,11 @@ import { Button } from '../../shared/ui/button';
 import { Textarea } from '../../shared/ui/textarea';
 
 export function ChatWidget() {
-  const { isOpen, toggleChat, messages, sendMessage, isLoading } = useChat();
+  const chat = useChat();
   const [input, setInput] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleChat = () => setIsOpen(prev => !prev);
 
   if (!isOpen) {
     return (
@@ -34,8 +37,8 @@ export function ChatWidget() {
   }
 
   const handleSend = () => {
-    if (input.trim() && !isLoading) {
-      sendMessage(input);
+    if (input.trim() && !chat.isLoading) {
+      chat.sendMessage(input);
       setInput('');
     }
   };
@@ -56,13 +59,13 @@ export function ChatWidget() {
         </Button>
       </CardHeader>
       <CardContent className="h-[300px] overflow-y-auto pb-0">
-        {messages.length === 0 ? (
+        {chat.messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             Send a message to start chatting
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((message) => (
+            {chat.messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -90,7 +93,7 @@ export function ChatWidget() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <Button size="icon" onClick={handleSend} disabled={isLoading}>
+          <Button size="icon" onClick={handleSend} disabled={chat.isLoading}>
             <Send className="h-4 w-4" />
           </Button>
         </div>

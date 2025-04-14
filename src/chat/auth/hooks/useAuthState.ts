@@ -32,7 +32,7 @@ export function useAuthState(): AuthState {
       user: user || null,
       isLoading,
       isAuthenticated: !!user,
-      error: error as Error | null
+      error: error ? (error instanceof Error ? error : new Error(typeof error === 'string' ? error : 'Unknown error')) : null
     });
   }, [user, isLoading, error]);
 

@@ -3,9 +3,10 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { v4 as uuidv4 } from 'uuid';
 import { chatBridge } from '../lib/ChatBridge';
 import { ChatMessage } from '../types/chat';
-import { ChatMode } from '../shared/types/enums';
+import { LogCategories } from '../shared/types/enums';
 import { useLogger } from '../hooks/use-logger';
 import { useAuthState } from '../auth/hooks/useAuthState';
+import { type ChatMode } from '../shared/types/enums';
 import CircuitBreaker from '../utils/CircuitBreaker';
 
 interface ChatContextType {
@@ -15,6 +16,8 @@ interface ChatContextType {
   mode: ChatMode;
   sessionId: string;
   setMode: (mode: ChatMode) => void;
+  isOpen?: boolean;
+  toggleChat?: () => void;
 }
 
 const ChatContext = createContext<ChatContextType>({
@@ -23,7 +26,9 @@ const ChatContext = createContext<ChatContextType>({
   isLoading: false,
   mode: 'normal',
   sessionId: '',
-  setMode: () => {}
+  setMode: () => {},
+  isOpen: false,
+  toggleChat: () => {}
 });
 
 export const useChat = () => useContext(ChatContext);
@@ -43,8 +48,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<ChatMode>(initialMode);
   const [sessionId, setSessionId] = useState<string>(initialSessionId || uuidv4());
+  const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuthState();
   const logger = useLogger('ChatProvider');
+  
+  const toggleChat = () => setIsOpen(prev => !prev);
   
   // Initialize CircuitBreaker
   useEffect(() => {
@@ -133,7 +141,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     isLoading,
     mode,
     sessionId,
-    setMode
+    setMode,
+    isOpen,
+    toggleChat
   };
   
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

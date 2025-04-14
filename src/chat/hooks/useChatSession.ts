@@ -2,15 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useAuthState } from '../auth/hooks/useAuthState';
 import { chatBridge } from '../lib/ChatBridge';
-import { useLogger } from '../hooks/use-logger';
-import { LogCategories } from '../shared/types/enums';
+import { useLogger } from './use-logger';
+import { type LogCategory } from '../shared/types/enums';
 import { v4 as uuidv4 } from 'uuid';
 import CircuitBreaker from '../utils/CircuitBreaker';
 import { ChatBridgeChannel, ChatMessage } from '../types/chat';
+import { type ChatMode } from '../shared/types/enums';
 
 interface UseChatSessionProps {
   sessionId?: string;
-  mode?: 'normal' | 'dev' | 'admin';
+  mode?: ChatMode;
 }
 
 export function useChatSession({ sessionId: externalSessionId, mode = 'normal' }: UseChatSessionProps = {}) {
