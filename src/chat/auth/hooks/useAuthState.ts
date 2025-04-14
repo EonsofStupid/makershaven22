@@ -1,25 +1,18 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../auth/store';
+import type { Session } from '../../../auth/types/session';
+import type { User } from '../../../auth/types/auth';
 
-// Type for the state returned by the hook
 interface AuthState {
-  user: {
-    id: string;
-    email?: string;
-    role?: string;
-    [key: string]: any;
-  } | null;
+  user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   error: Error | null;
 }
 
-/**
- * Hook to access auth state in the chat module
- */
 export function useAuthState(): AuthState {
-  const { user, isLoading, error } = useAuthStore();
+  const { user, session, isLoading, error } = useAuthStore();
   const [state, setState] = useState<AuthState>({
     user: null,
     isLoading: true,
@@ -31,10 +24,10 @@ export function useAuthState(): AuthState {
     setState({
       user: user || null,
       isLoading,
-      isAuthenticated: !!user,
-      error: error ? (error instanceof Error ? error : new Error(typeof error === 'string' ? error : 'Unknown error')) : null
+      isAuthenticated: !!session?.user,
+      error: error ? new Error(typeof error === 'string' ? error : 'Unknown error') : null
     });
-  }, [user, isLoading, error]);
+  }, [user, session, isLoading, error]);
 
   return state;
 }
